@@ -7,6 +7,15 @@ import easyaccept.EasyAcceptFacade;
 
 import br.edu.ufcg.dsc.si1.webservice.BlogWSImpl;
 
+/**
+ * 
+ * @author caiopaes
+ * @author Carlos
+ * @author Catharine
+ * @author Demontiê
+ * @author Matheus
+ *
+ */
 public class BlogaoTest {
 	
 	public static void main(String[] args) {
