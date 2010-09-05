@@ -1,4 +1,4 @@
-package br.edu.ufcg.dsc.si1.blog.data;
+package br.edu.ufcg.blogao.blog.data;
 
 import java.io.File;
 import java.util.Date;

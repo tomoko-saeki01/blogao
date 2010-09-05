@@ -1,9 +1,9 @@
-package br.edu.ufcg.dsc.si1.blog;
+package br.edu.ufcg.blogao.blog;
 
 import java.util.Date;
 import java.util.List;
 
-import br.edu.ufcg.dsc.si1.blog.data.*;
+import br.edu.ufcg.blogao.blog.data.*;
 
 public class Post implements WebElement {
 	

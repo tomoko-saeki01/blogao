@@ -5,7 +5,7 @@ import java.util.List;
 
 import easyaccept.EasyAcceptFacade;
 
-import br.edu.ufcg.dsc.si1.webservice.BlogWSImpl;
+import br.edu.ufcg.blogao.webservice.BlogWSImpl;
 
 /**
  * 

@@ -1,4 +1,4 @@
-package br.edu.ufcg.dsc.si1.webservice;
+package br.edu.ufcg.blogao.webservice;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;

@@ -1,4 +1,4 @@
-package br.edu.ufcg.dsc.si1.user;
+package br.edu.ufcg.blogao.user;
 
 import java.util.Date;
 import java.util.List;

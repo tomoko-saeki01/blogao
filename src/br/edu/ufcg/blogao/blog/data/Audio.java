@@ -1,13 +1,14 @@
-package br.edu.ufcg.dsc.si1.blog.data;
+package br.edu.ufcg.blogao.blog.data;
 
 import java.io.File;
 import java.util.Date;
 
-public class Image implements InteractiveContent {
+public class Audio implements InteractiveContent {
 	
 	private String name;
-	private File file;
+	private String artist;
 	private Date date;
+	private File file;
 
 	@Override
 	public File getContent() {

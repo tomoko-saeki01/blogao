@@ -1,4 +1,4 @@
-package br.edu.ufcg.dsc.si1.webservice;
+package br.edu.ufcg.blogao.webservice;
 
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
