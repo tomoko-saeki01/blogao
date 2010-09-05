@@ -2,11 +2,14 @@ package br.edu.ufcg.blogao.blog;
 
 import java.util.Date;
 
-public interface WebElement {
+import br.edu.ufcg.blogao.Identifiable;
+import br.edu.ufcg.blogao.blog.data.StaticContent;
+
+public interface WebElement extends Identifiable {
 	
-	public String getText();
+	public StaticContent getText();
 	
-	public void setText(String text);
+	public void setText(StaticContent text);
 	
 	public Date getCreationDate();
 

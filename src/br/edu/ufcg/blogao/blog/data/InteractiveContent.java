@@ -1,16 +1,17 @@
 package br.edu.ufcg.blogao.blog.data;
 
 import java.io.File;
-import java.util.Date;
 
-public interface InteractiveContent {
+import br.edu.ufcg.blogao.Identifiable;
+
+public interface InteractiveContent extends Identifiable {
 	
-	public String getName();
+	public StaticContent getDescription();
 	
-	public void setName(String name);
+	public void setDescription(StaticContent description);
 	
-	public Date getCreationDate();
+	public File getData();
 	
-	public File getContent();
+	public void setData(File data);
 
 }
