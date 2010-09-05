@@ -313,8 +313,8 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public String getMovie(String postId, Integer index) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		 
+		return Finder.findPost(postId).getMovie(index).getData();
 	}
 
 	/* (non-Javadoc)
@@ -322,8 +322,8 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public String getMovieData(String soundId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return Finder.findContent(soundId).getData();
 	}
 
 	/* (non-Javadoc)
@@ -331,8 +331,9 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public String getMovieDescription(String soundId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return Finder.findContent(soundId).getDescription();
+
 	}
 
 	/* (non-Javadoc)
@@ -386,8 +387,9 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public Integer getNumberOfMovies(String postId) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return Finder.findPost(postId).getNumberOfMovies();
+
 	}
 
 	/* (non-Javadoc)
@@ -395,8 +397,8 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public Integer getNumberOfPictures(String postId) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return Finder.findPost(postId).getNumberOfPictures();
 	}
 
 	/* (non-Javadoc)
@@ -413,8 +415,8 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public Integer getNumberOfSounds(String postId) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return Finder.findPost(postId).getNumberOfSounds();
 	}
 
 	/* (non-Javadoc)
@@ -449,8 +451,8 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public String getPicture(String postId, Integer index) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return Finder.findPost(postId).getPicture(index).getData();
 	}
 
 	/* (non-Javadoc)
@@ -458,8 +460,8 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public String getPictureData(String soundId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return Finder.findContent(soundId).getData();
 	}
 
 	/* (non-Javadoc)
@@ -467,8 +469,8 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public String getPictureDescription(String soundId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return Finder.findContent(soundId).getDescription();
 	}
 
 	/* (non-Javadoc)
@@ -486,8 +488,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public String getPostInformation(String postId, String atributo)
 			throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return Finder.findPostInfo(postId, atributo);
 	}
 
 	/* (non-Javadoc)
@@ -524,8 +526,9 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public String getSound(String postId, Integer index) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return Finder.findPost(postId).getSound(index).getData();
+
 	}
 
 	/* (non-Javadoc)
@@ -533,8 +536,8 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public String getSoundData(String soundId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return Finder.findContent(soundId).getData();
 	}
 
 	/* (non-Javadoc)
@@ -542,8 +545,8 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public String getSoundDescription(String soundId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return Finder.findContent(soundId).getDescription();
 	}
 
 	/* (non-Javadoc)
