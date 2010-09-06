@@ -15,8 +15,7 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public String addComment(String sessionId, String postId, String texto)
 			throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return Finder.findSession(sessionId).getPost(postId).addComment(texto);
 	}
 
 	/* (non-Javadoc)
@@ -25,8 +24,7 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public void addPostAnnouncements(String sessionId, String blogId)
 			throws Exception {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub		
 	}
 
 	/* (non-Javadoc)
@@ -76,17 +74,14 @@ public class BlogWSImpl implements BlogWS {
 	public void changeBlogInformation(String sessionId, String BlogId,
 			String atributo, String valor) throws Exception {
 		// TODO Auto-generated method stub
-		
 	}
 
 	/* (non-Javadoc)
 	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#changePostInformation(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void changePostInformation(String sessionId, String postId,
-			String atributo, String valor) throws Exception {
-		// TODO Auto-generated method stub
-		
+	public void changePostInformation(String sessionId, String postId, String atributo, String valor) throws Exception {
+		// TODO Auto-generated method stub		
 	}
 
 	/* (non-Javadoc)
@@ -157,7 +152,6 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public void deleteBlog(String sessionId, String blogId) throws Exception {
 		// TODO Auto-generated method stub
-		
 	}
 
 	/* (non-Javadoc)
@@ -165,18 +159,15 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public void deleteMovie(String sessionId, String videoId) throws Exception {
-		// TODO Auto-generated method stub
-		
+		Finder.findSession(sessionId).deleteMovie(videoId);
 	}
 
 	/* (non-Javadoc)
 	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#deletePicture(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void deletePicture(String sessionId, String pictureId)
-			throws Exception {
-		// TODO Auto-generated method stub
-		
+	public void deletePicture(String sessionId, String pictureId) throws Exception {
+		Finder.findSession(sessionId).deletePicture(pictureId);		
 	}
 
 	/* (non-Javadoc)
@@ -202,8 +193,7 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public void deleteSound(String sessionId, String soundId) throws Exception {
-		// TODO Auto-generated method stub
-		
+		Finder.findSession(sessionId).deleteSound(soundId);
 	}
 
 	/* (non-Javadoc)
@@ -257,18 +247,17 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public Integer getBlogByLogin(String login, Integer index) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		//TODO esse metodo ta estranho. REVER! (catha)
+		return Finder.findUser(login).getBlog(index);
 	}
 
 	/* (non-Javadoc)
 	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getBlogBySessionId(java.lang.String, java.lang.Integer)
 	 */
 	@Override
-	public Integer getBlogBySessionId(String sessiongId, Integer index)
-			throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public Integer getBlogBySessionId(String sessiongId, Integer index) throws Exception {
+		//TODO esse metodo ta estranho. REVER! (catha)
+		return Finder.findSession(sessiongId).getBlog(index);
 	}
 
 	/* (non-Javadoc)
@@ -286,8 +275,7 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public String getComment(String postId, Integer index) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return Finder.findPost(postId).getComment(index);
 	}
 
 	/* (non-Javadoc)
@@ -359,8 +347,7 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public Integer getNumberOfBlogsByLogin(String login) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return Finder.findUser(login).getNumberOfBlogs();
 	}
 
 	/* (non-Javadoc)
@@ -369,8 +356,7 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public Integer getNumberOfBlogsBySessionId(String sessiongId)
 			throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return Finder.findSession(sessiongId).getNumberOfBlogs();
 	}
 
 	/* (non-Javadoc)
@@ -379,7 +365,7 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public Integer getNumberOfComments(String postId) throws Exception {
 		// TODO Auto-generated method stub
-		return null;
+		return Finder.findPost(postId).getNumberOfComments();
 	}
 
 	/* (non-Javadoc)
@@ -407,7 +393,7 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public Integer getNumberOfPosts(String blogId) throws Exception {
 		// TODO Auto-generated method stub
-		return null;
+		return Finder.fingBlog(blogId).getNumberOfPost();
 	}
 
 	/* (non-Javadoc)
@@ -478,8 +464,8 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public Integer getPost(String blogId, Integer index) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO Ajeitar!! (catha)
+		return Finder.fingBlog(blogId).getPost(index);
 	}
 
 	/* (non-Javadoc)
@@ -610,5 +596,4 @@ public class BlogWSImpl implements BlogWS {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }
