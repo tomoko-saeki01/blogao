@@ -128,6 +128,15 @@ public class User implements Identifiable {
 	}
 	
 	/**
+	 * Return a user's blog from blog's ID.
+	 * @param id Blog's ID.
+	 * @return A user's blog from blog's ID.
+	 */
+	public Blog getBlog(String id) {
+		return blogs.get(id);
+	}
+	
+	/**
 	 * Return all user's blogs.
 	 * @return All user's blogs.
 	 */
