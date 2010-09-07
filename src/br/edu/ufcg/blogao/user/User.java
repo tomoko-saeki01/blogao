@@ -7,7 +7,7 @@ package br.edu.ufcg.blogao.user;
  * @author Catharine
  * @author Demontie
  * @author Matheus
- * @version 2.0 - 31th August, 2010.
+ * @version 3.0 - 31th August, 2010.
  */
 
 import java.util.Calendar;
@@ -16,8 +16,6 @@ import java.util.Map;
 
 import br.edu.ufcg.blogao.Identifiable;
 import br.edu.ufcg.blogao.blog.Blog;
-import br.edu.ufcg.blogao.blog.Comment;
-import br.edu.ufcg.blogao.blog.Post;
 
 public class User implements Identifiable {
 	
@@ -36,10 +34,8 @@ public class User implements Identifiable {
 	private String books;
 	
 	//
-	private Map<String, Comment> comments; //<comment id, comment>
-	private Map<String, Blog> blogs;
-	private Map<String, Post> posts;
-		
+	private Map<String, Blog> blogs; //<blog id, blog>
+			
 	/**
 	 * Default constructor.
 	 * @param login User's login.
@@ -51,9 +47,7 @@ public class User implements Identifiable {
 		this.password = password;
 		this.email = email;
 		
-		comments = new HashMap<String, Comment>();		
 		blogs = new HashMap<String, Blog>();
-		posts = new HashMap<String, Post>();
 	} 
 	
 	/**
@@ -100,16 +94,7 @@ public class User implements Identifiable {
 	public void addBlog(Blog blog, String id) {
 		blogs.put(id, blog);
 	}
-	
-	/**
-	 * Add a user's comment.
-	 * @param comment The user's comment.
-	 * @param id The comment's ID.
-	 */
-	public void addComment(Comment comment, String id) {
-		comments.put(id, comment);
-	}
- 	
+	 	
 	/**
 	 * Add a user's favorite movie.
 	 * @param movies User's favorite movie.
@@ -125,16 +110,7 @@ public class User implements Identifiable {
 	public void addMusic(String music) {
 		this.musics += music;
 	}
-	
-	/**
-	 * Add a user's post.
-	 * @param post A user's post.
-	 * @param id A post's ID.
-	 */
-	public void addPost(Post post, String id) {
-		posts.put(id, post);
-	}
-	
+		
 	/**
 	 * Return user's address.
 	 * @return The user's address.
@@ -157,14 +133,6 @@ public class User implements Identifiable {
 	 */
 	public Map<String, Blog> getBlogs() {
 		return blogs;
-	}
-	
-	/**
-	 * Return all user's comments.
-	 * @return All user's comments.
-	 */
-	public Map<String, Comment> getComments() {
-		return comments;
 	}
 	
 	/**
@@ -232,13 +200,13 @@ public class User implements Identifiable {
 	}
 	
 	/**
-	 * Return all user's posts.
-	 * @return All user's posts.
+	 * Return the user's number of blogs.
+	 * @return The user's number of blogs.
 	 */
-	public Map<String, Post> getPosts() {
-		return posts;
+	public int getNumberOfBlogs() {
+		return blogs.size();
 	}
-	
+		
 	/**
 	 * Return the user's sex.	
 	 * @return The user's sex.
