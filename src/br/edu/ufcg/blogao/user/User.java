@@ -43,39 +43,46 @@ public class User implements Identifiable {
 	 * @param email User's e-mail
 	 */
 	public User(String login, String password, String email) {
-		this.login = login;
-		this.password = password;
-		this.email = email;
-		
-		blogs = new HashMap<String, Blog>();
+		this(login, password, email, "");
 	} 
 	
 	/**
-	 * 
-	 * @param login
-	 * @param password
-	 * @param email
-	 * @param name
+	 * Another constructor.
+	 * @param login User's login.
+	 * @param password User's Password
+	 * @param email User's e-mail.
+	 * @param name User's name.
 	 */
 	public User(String login, String password, String email, String name) {
-		//TODO
+		this(login, password, email, name, "", null, Sex.Uninformed, "", "", "");
 	}
 	
 	/**
-	 * 
-	 * @param login
-	 * @param password
-	 * @param email
-	 * @param name
-	 * @param interests
-	 * @param dateBirthday
-	 * @param sex
-	 * @param music
-	 * @param movies
-	 * @param books
+	 * Another constructor.
+	 * @param login User's login.
+	 * @param password User's Password
+	 * @param email User's e-mail.
+	 * @param name User's name.
+	 * @param interests User's interests.
+	 * @param dateOfBirthday User's anniversary date.
+	 * @param sex User's sex.
+	 * @param music User's music.
+	 * @param movies User's movies.
+	 * @param books User's books.
 	 */
-	public User(String login, String password, String email, String name, String interests, Calendar dateBirthday, Sex sex, String music, String movies, String books) {
-		//TODO
+	public User(String login, String password, String email, String name, String interests, Calendar dateOfBirthday, Sex sex, String music, String movies, String books) {
+		this.login = login;
+		this.password = password;
+		this.email = email;
+		this.name = name;
+		this.interests = interests;
+		this.dateOfBirthday = dateOfBirthday;
+		this.sex = sex;
+		this.musics = music;
+		this.movies = movies;
+		this.books = books;
+		
+		blogs = new HashMap<String, Blog>();		
 	}
 	
 	/**
