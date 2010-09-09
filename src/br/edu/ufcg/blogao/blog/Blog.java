@@ -7,11 +7,11 @@ package br.edu.ufcg.blogao.blog;
  * @author Catharine
  * @author Demontie
  * @author Matheus
- * @version 1.0 - 7th September, 2010.
+ * @version 2.0 - 7th September, 2010.
  */
 
+import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Map;
 
 import br.edu.ufcg.blogao.blog.data.StaticContent;
@@ -22,7 +22,7 @@ public class Blog implements WebElement {
 	
 	//
 	private String id;
-	private Date date;
+	private Calendar date;
 	private StaticContent description;
 	private Map<String, Blog> subBlogs; //<id, blog>
 	private Map<String, Post> posts; //<id, post>
@@ -44,7 +44,7 @@ public class Blog implements WebElement {
 		this.title = title;
 		this.description = description;
 		
-		//TODO Creation date.
+		date = Calendar.getInstance();
 	}
 	
 	/**
@@ -57,10 +57,10 @@ public class Blog implements WebElement {
 	}
 	
 	/**
-	 * Return blog's date creation.
+	 * Return blog's creation date.
 	 */
 	@Override
-	public Date getCreationDate() {
+	public Calendar getCreationDate() {
 		return date;
 	}
 	

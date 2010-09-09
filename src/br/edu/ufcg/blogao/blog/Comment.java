@@ -1,6 +1,15 @@
 package br.edu.ufcg.blogao.blog;
 
-import java.util.Date;
+/**
+ * @author Caio
+ * @author Carlos
+ * @author Catharine
+ * @author Demontie
+ * @author Matheus
+ * @version 2.0 - 31th August, 2010.
+ */
+
+import java.util.Calendar;
 import java.util.List;
 
 import br.edu.ufcg.blogao.blog.data.StaticContent;
@@ -10,11 +19,11 @@ public class Comment implements WebElement {
 	private String id;
 	private String author;
 	private StaticContent text;
-	private Date date;
+	private Calendar date;
 	private List<Comment> subComments;
 
 	@Override
-	public Date getCreationDate() {
+	public Calendar getCreationDate() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -42,11 +51,11 @@ public class Comment implements WebElement {
 		this.author = author;
 	}
 
-	public Date getDate() {
+	public Calendar getDate() {
 		return date;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(Calendar date) {
 		this.date = date;
 	}
 

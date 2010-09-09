@@ -1,6 +1,15 @@
 package br.edu.ufcg.blogao.blog;
 
-import java.util.Date;
+/**
+ * @author Caio
+ * @author Carlos
+ * @author Catharine
+ * @author Demontie
+ * @author Matheus
+ * @version 2.0 - 31th August, 2010.
+ */
+
+import java.util.Calendar;
 import java.util.List;
 
 import br.edu.ufcg.blogao.blog.data.*;
@@ -10,13 +19,13 @@ public class Post implements WebElement {
 	private String id;
 	private String title;
 	private StaticContent text;
-	private Date date;
+	private Calendar Calendar;
 	private List<InteractiveContent> content;
 	private List<Comment> comments;
 
 	@Override
-	public Date getCreationDate() {
-		return date;
+	public Calendar getCreationDate() {
+		return Calendar;
 	}
 
 	@Override
