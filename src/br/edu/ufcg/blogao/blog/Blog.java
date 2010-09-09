@@ -81,14 +81,6 @@ public class Blog implements WebElement {
 	}
 	
 	/**
-	 * Return the total number of subBlogs.
-	 * @return The total number of subBlogs.
-	 */
-	public Integer getNumberOfSubBlogs() {
-		return subBlogs.size();
-	}
-	
-	/**
 	 * Return the total number of all subBlogs.
 	 * @return The total number of all subBlogs.
 	 */
@@ -99,6 +91,14 @@ public class Blog implements WebElement {
 			total += b.getNumberOfSubBlogs();
 		}		
 		return total;
+	}
+	
+	/**
+	 * Return the total number of subBlogs.
+	 * @return The total number of subBlogs.
+	 */
+	public Integer getNumberOfSubBlogs() {
+		return subBlogs.size();
 	}
 	
 	/**

@@ -16,10 +16,21 @@ import br.edu.ufcg.blogao.blog.data.StaticContent;
 
 public interface WebElement extends Identifiable {
 	
+	/**
+	 * Return a text.
+	 * @return A text.
+	 */
 	public StaticContent getText();
 	
+	/**
+	 * Set a text.
+	 * @param text A text.
+	 */
 	public void setText(StaticContent text);
 	
+	/**
+	 * Return the creation date.
+	 * @return The creation date.
+	 */
 	public Calendar getCreationDate();
-
 }
