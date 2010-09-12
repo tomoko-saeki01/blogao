@@ -1,26 +1,23 @@
 package br.edu.ufcg.blogao.user;
 
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+
+import br.edu.ufcg.blogao.blog.Blog;
+
 /**
- * Represents a user's blog.
+ * Represents a simple user's blog implementation.
  * @author Caio
  * @author Carlos
  * @author Catharine
  * @author Demontie
  * @author Matheus
- * @version 3.0 - 31th August, 2010.
+ * @version 0.4 - 12nd September, 2010.
  */
-
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-
-import br.edu.ufcg.blogao.Identifiable;
-import br.edu.ufcg.blogao.blog.Blog;
-
-public class User implements Identifiable {
+public class UserImpl implements User {
 	
 	//User "default" attributes.
-	private String id;
 	private String login;
 	private String password;
 	private String name;
@@ -42,7 +39,7 @@ public class User implements Identifiable {
 	 * @param password User's password
 	 * @param email User's e-mail
 	 */
-	public User(String login, String password, String email) {
+	public UserImpl(String login, String password, String email) {
 		this(login, password, email, "");
 	} 
 	
@@ -53,7 +50,7 @@ public class User implements Identifiable {
 	 * @param email User's e-mail.
 	 * @param name User's name.
 	 */
-	public User(String login, String password, String email, String name) {
+	public UserImpl(String login, String password, String email, String name) {
 		this(login, password, email, name, "", null, Sex.Uninformed, "", "", "");
 	}
 	
@@ -70,7 +67,7 @@ public class User implements Identifiable {
 	 * @param movies User's movies.
 	 * @param books User's books.
 	 */
-	public User(String login, String password, String email, String name, String interests, Calendar dateOfBirthday, Sex sex, String music, String movies, String books) {
+	public UserImpl(String login, String password, String email, String name, String interests, Calendar dateOfBirthday, Sex sex, String musics, String movies, String books) {
 		this.login = login;
 		this.password = password;
 		this.email = email;
@@ -78,11 +75,18 @@ public class User implements Identifiable {
 		this.interests = interests;
 		this.dateOfBirthday = dateOfBirthday;
 		this.sex = sex;
-		this.musics = music;
+		this.musics = musics;
 		this.movies = movies;
 		this.books = books;
 		
 		blogs = new HashMap<String, Blog>();		
+	}
+	
+	/* (non-Javadoc)
+	 * @see br.edu.ufcg.blogao.user.User#addBlog(br.edu.ufcg.blogao.blog.Blog, java.lang.String)
+	 */
+	public void addBlog(Blog blog, String id) {
+		blogs.put(id, blog);
 	}
 	
 	/**
@@ -91,15 +95,6 @@ public class User implements Identifiable {
 	 */
 	public void addBook(String book) {
 		this.books += book;
-	}
-	
-	/**
-	 * Add a user's blog.
-	 * @param blog The user's blog.
-	 * @param id The blog's ID.
-	 */
-	public void addBlog(Blog blog, String id) {
-		blogs.put(id, blog);
 	}
 	 	
 	/**
@@ -118,163 +113,135 @@ public class User implements Identifiable {
 		this.musics += music;
 	}
 		
-	/**
-	 * Return user's address.
-	 * @return The user's address.
+	/* (non-Javadoc)
+	 * @see br.edu.ufcg.blogao.user.User#getAddress()
 	 */
 	public String getAddress() {
 		return address;
 	}
 
-	/**
-	 * Return the user's favorites books.
-	 * @return The user's favorites books.
+	/* (non-Javadoc)
+	 * @see br.edu.ufcg.blogao.user.User#getBooks()
 	 */
 	public String getBooks() {
 		return books;
 	}
 	
-	/**
-	 * Return a user's blog from blog's ID.
-	 * @param id Blog's ID.
-	 * @return A user's blog from blog's ID.
+	/* (non-Javadoc)
+	 * @see br.edu.ufcg.blogao.user.User#getBlog(java.lang.String)
 	 */
 	public Blog getBlog(String id) {
 		return blogs.get(id);
 	}
 	
-	/**
-	 * Return all user's blogs.
-	 * @return All user's blogs.
+	/* (non-Javadoc)
+	 * @see br.edu.ufcg.blogao.user.User#getBlogs()
 	 */
 	public Map<String, Blog> getBlogs() {
 		return blogs;
 	}
 	
-	/**
-	 * Return the user's anniversary date.
-	 * @return The user's anniversary date.
+	/* (non-Javadoc)
+	 * @see br.edu.ufcg.blogao.user.User#getDateOfBirthday()
 	 */
 	public Calendar getDateOfBirthday() {
 		return dateOfBirthday;
 	}
 
-	/**
-	 * Return the user's e-mail.
-	 * @return The user's e-mail.
+	/* (non-Javadoc)
+	 * @see br.edu.ufcg.blogao.user.User#getEmail()
 	 */
 	public String getEmail() {
 		return email;
 	}
 	
-	/**
-	 * Return the user's identification.
+	/* (non-Javadoc)
+	 * @see br.edu.ufcg.blogao.user.User#getId()
 	 */
 	@Override
 	public String getId() {
-		return id;
+		return login;
 	}	
 	
-	/**
-	 * Return the user's interests.
-	 * @return The user's interests.
+	/* (non-Javadoc)
+	 * @see br.edu.ufcg.blogao.user.User#getInterests()
 	 */
 	public String getInterests() {
 		return interests;
 	}
 	
-	/**
-	 * Return the user's login.
-	 * @return The user's login.
-	 */
-	public String getLogin() {
-		return login;
-	}
-	
-	/**
-	 * Return the user's favorites movies.
-	 * @return The user's favorites movies.
+	/* (non-Javadoc)
+	 * @see br.edu.ufcg.blogao.user.User#getMovies()
 	 */
 	public String getMovies() {
 		return movies;
 	}
 	
-	/**
-	 * Return the user's favorites musics.
-	 * @return The user's favorites musics.
+	/* (non-Javadoc)
+	 * @see br.edu.ufcg.blogao.user.User#getMusics()
 	 */
 	public String getMusics() {
 		return musics;
 	}
 
-	/**
-	 * Return the user's name.
-	 * @return The user's name.
+	/* (non-Javadoc)
+	 * @see br.edu.ufcg.blogao.user.User#getName()
 	 */
 	public String getName() {
 		return name;
 	}
 	
-	/**
-	 * Return the user's number of blogs.
-	 * @return The user's number of blogs.
+	/* (non-Javadoc)
+	 * @see br.edu.ufcg.blogao.user.User#getNumberOfBlogs()
 	 */
 	public int getNumberOfBlogs() {
 		return blogs.size();
 	}
 		
-	/**
-	 * Return the user's sex.	
-	 * @return The user's sex.
+	/* (non-Javadoc)
+	 * @see br.edu.ufcg.blogao.user.User#getSex()
 	 */
 	public Sex getSex() {
 		return sex;
 	}
 	
-	/**
-	 * Set the user's address.
-	 * @param address User's address.
+	/* (non-Javadoc)
+	 * @see br.edu.ufcg.blogao.user.User#setAddress(java.lang.String)
 	 */
 	public void setAddress(String address) {
 		this.address = address;
 	}
 	
-	/**
-	 * Set the user's anniversary date.
-	 * @param dateOfBirthday The user's anniversary date.
+	/* (non-Javadoc)
+	 * @see br.edu.ufcg.blogao.user.User#setDateOfBirthday(java.util.Calendar)
 	 */
 	public void setDateOfBirthday(Calendar dateOfBirthday) {
 		this.dateOfBirthday = dateOfBirthday;
 	}
 	
-	/**
-	 * Set the user's e-mail.
-	 * @param email The user's e-mail.
+	/* (non-Javadoc)
+	 * @see br.edu.ufcg.blogao.user.User#setEmail(java.lang.String)
 	 */
 	public void setEmail(String email) {
 		this.email = email;
 	}
 	
-	/**
-	 * Set the user's interests.
-	 * @param interests The user's interests.
+	/* (non-Javadoc)
+	 * @see br.edu.ufcg.blogao.user.User#setInterests(java.lang.String)
 	 */
 	public void setInterests(String interests) {
 		this.interests = interests;
 	}
 	
-	/**
-	 * Set the user's name.
-	 * @param name The user's name.
+	/* (non-Javadoc)
+	 * @see br.edu.ufcg.blogao.user.User#setName(java.lang.String)
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 	
-	/**
-	 * Set the user's password.
-	 * @param newPassword User's new password.
-	 * @param oldPassword User's old password.
+	/* (non-Javadoc)
+	 * @see br.edu.ufcg.blogao.user.User#setPassword(java.lang.String, java.lang.String)
 	 */
 	public void setPassword(String newPassword, String oldPassword) {
 		if (oldPassword.equals(getPassword())) {
@@ -282,9 +249,8 @@ public class User implements Identifiable {
 		}
 	}
 	
-	/**
-	 * Set the user's sex.
-	 * @param sex The user's sex.
+	/* (non-Javadoc)
+	 * @see br.edu.ufcg.blogao.user.User#setSex(br.edu.ufcg.blogao.user.Sex)
 	 */
 	public void setSex(Sex sex) {
 		this.sex = sex;

@@ -1,6 +1,8 @@
 package br.edu.ufcg.blogao;
 
 /**
+ * Promisses an unique identification to an type.
+ * 
  * @author Caio
  * @author Carlos
  * @author Catharine
@@ -8,7 +10,6 @@ package br.edu.ufcg.blogao;
  * @author Matheus
  * @version 2.0 - 31th August, 2010.
  */
-
 public interface Identifiable {
 	
 	/**

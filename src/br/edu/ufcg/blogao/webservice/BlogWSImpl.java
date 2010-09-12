@@ -3,11 +3,15 @@
  */
 package br.edu.ufcg.blogao.webservice;
 
+import br.edu.ufcg.blogao.user.UsersHandler;
+
 /**
  * @author ivocalado
  *
  */
 public class BlogWSImpl implements BlogWS {
+	
+	private UsersHandler usersHandler = UsersHandler.getInstance();
 
 	/* (non-Javadoc)
 	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#addComment(java.lang.String, java.lang.String, java.lang.String)
@@ -15,7 +19,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public String addComment(String sessionId, String postId, String texto)
 			throws Exception {
-		return Finder.findSession(sessionId).getPost(postId).addComment(texto);
+//		return Finder.findSession(sessionId).getPost(postId).addComment(texto);
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -122,8 +127,8 @@ public class BlogWSImpl implements BlogWS {
 			String email, String sexo, String dataNasc, String endereco,
 			String interesses, String quem_sou_eu, String filmes,
 			String musicas, String livros) throws Exception {
-		// TODO Auto-generated method stub
 		
+		usersHandler.createUser(login, senha, nome_exibicao, email, sexo, dataNasc, endereco, interesses, quem_sou_eu, filmes, musicas, livros);
 	}
 
 	/* (non-Javadoc)
@@ -159,7 +164,7 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public void deleteMovie(String sessionId, String videoId) throws Exception {
-		Finder.findSession(sessionId).deleteMovie(videoId);
+//		Finder.findSession(sessionId).deleteMovie(videoId);
 	}
 
 	/* (non-Javadoc)
@@ -167,7 +172,7 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public void deletePicture(String sessionId, String pictureId) throws Exception {
-		Finder.findSession(sessionId).deletePicture(pictureId);		
+//		Finder.findSession(sessionId).deletePicture(pictureId);		
 	}
 
 	/* (non-Javadoc)
@@ -193,7 +198,7 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public void deleteSound(String sessionId, String soundId) throws Exception {
-		Finder.findSession(sessionId).deleteSound(soundId);
+//		Finder.findSession(sessionId).deleteSound(soundId);
 	}
 
 	/* (non-Javadoc)
@@ -248,7 +253,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public Integer getBlogByLogin(String login, Integer index) throws Exception {
 		//TODO esse metodo ta estranho. REVER! (catha)
-		return Finder.findUser(login).getBlog(index);
+//		return Finder.findUser(login).getBlog(index);
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -257,7 +263,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public Integer getBlogBySessionId(String sessiongId, Integer index) throws Exception {
 		//TODO esse metodo ta estranho. REVER! (catha)
-		return Finder.findSession(sessiongId).getBlog(index);
+//		return Finder.findSession(sessiongId).getBlog(index);
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -275,7 +282,8 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public String getComment(String postId, Integer index) throws Exception {
-		return Finder.findPost(postId).getComment(index);
+//		return Finder.findPost(postId).getComment(index);
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -302,7 +310,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public String getMovie(String postId, Integer index) throws Exception {
 		 
-		return Finder.findPost(postId).getMovie(index).getData();
+//		return Finder.findPost(postId).getMovie(index).getData();
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -311,7 +320,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public String getMovieData(String soundId) throws Exception {
 		
-		return Finder.findContent(soundId).getData();
+//		return Finder.findContent(soundId).getData();
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -320,7 +330,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public String getMovieDescription(String soundId) throws Exception {
 		
-		return Finder.findContent(soundId).getDescription();
+//		return Finder.findContent(soundId).getDescription();
+		return null;
 
 	}
 
@@ -347,7 +358,8 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public Integer getNumberOfBlogsByLogin(String login) throws Exception {
-		return Finder.findUser(login).getNumberOfBlogs();
+//		return Finder.findUser(login).getNumberOfBlogs();
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -356,7 +368,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public Integer getNumberOfBlogsBySessionId(String sessiongId)
 			throws Exception {
-		return Finder.findSession(sessiongId).getNumberOfBlogs();
+//		return Finder.findSession(sessiongId).getNumberOfBlogs();
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -365,7 +378,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public Integer getNumberOfComments(String postId) throws Exception {
 		// TODO Auto-generated method stub
-		return Finder.findPost(postId).getNumberOfComments();
+//		return Finder.findPost(postId).getNumberOfComments();
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -374,7 +388,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public Integer getNumberOfMovies(String postId) {
 		
-		return Finder.findPost(postId).getNumberOfMovies();
+//		return Finder.findPost(postId).getNumberOfMovies();
+		return null;
 
 	}
 
@@ -384,7 +399,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public Integer getNumberOfPictures(String postId) {
 		
-		return Finder.findPost(postId).getNumberOfPictures();
+//		return Finder.findPost(postId).getNumberOfPictures();
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -393,7 +409,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public Integer getNumberOfPosts(String blogId) throws Exception {
 		// TODO Auto-generated method stub
-		return Finder.fingBlog(blogId).getNumberOfPost();
+//		return Finder.fingBlog(blogId).getNumberOfPost();
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -402,7 +419,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public Integer getNumberOfSounds(String postId) {
 		
-		return Finder.findPost(postId).getNumberOfSounds();
+//		return Finder.findPost(postId).getNumberOfSounds();
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -438,7 +456,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public String getPicture(String postId, Integer index) throws Exception {
 		
-		return Finder.findPost(postId).getPicture(index).getData();
+//		return Finder.findPost(postId).getPicture(index).getData();
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -447,7 +466,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public String getPictureData(String soundId) throws Exception {
 		
-		return Finder.findContent(soundId).getData();
+//		return Finder.findContent(soundId).getData();
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -456,7 +476,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public String getPictureDescription(String soundId) throws Exception {
 		
-		return Finder.findContent(soundId).getDescription();
+//		return Finder.findContent(soundId).getDescription();
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -465,7 +486,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public Integer getPost(String blogId, Integer index) throws Exception {
 		// TODO Ajeitar!! (catha)
-		return Finder.fingBlog(blogId).getPost(index);
+//		return Finder.fingBlog(blogId).getPost(index);
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -513,7 +535,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public String getSound(String postId, Integer index) throws Exception {
 		
-		return Finder.findPost(postId).getSound(index).getData();
+//		return Finder.findPost(postId).getSound(index).getData();
+		return null;
 
 	}
 
@@ -523,7 +546,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public String getSoundData(String soundId) throws Exception {
 		
-		return Finder.findContent(soundId).getData();
+//		return Finder.findContent(soundId).getData();
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -532,7 +556,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public String getSoundDescription(String soundId) throws Exception {
 		
-		return Finder.findContent(soundId).getDescription();
+//		return Finder.findContent(soundId).getDescription();
+		return null;
 	}
 
 	/* (non-Javadoc)
