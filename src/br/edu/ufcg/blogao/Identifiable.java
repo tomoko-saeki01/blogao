@@ -17,4 +17,10 @@ public interface Identifiable {
 	 * @return The ID.
 	 */
 	public String getId();
+	
+	/**
+	 * Set the element ID.
+	 * @param id the ID.
+	 */
+	public void setID(String id);
 }

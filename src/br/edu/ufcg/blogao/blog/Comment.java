@@ -117,6 +117,11 @@ public class Comment implements WebElement {
 		this.author = author;
 	}
 	
+	@Override
+	public void setID(String id) {
+		this.id = id;
+	}
+	
 	/**
 	 * Set the comment's text.
 	 */
@@ -124,4 +129,5 @@ public class Comment implements WebElement {
 	public void setText(StaticContent text) {
 		this.text = text;
 	}
+
 }

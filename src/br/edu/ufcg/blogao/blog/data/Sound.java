@@ -56,4 +56,9 @@ public class Sound implements InteractiveContent {
 	public void setDescription(StaticContent description) {
 		this.description = description;
 	}
+	
+	@Override
+	public void setID(String id) {
+		this.id = id;
+	}
 }

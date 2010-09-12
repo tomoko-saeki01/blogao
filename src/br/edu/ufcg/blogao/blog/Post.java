@@ -149,6 +149,11 @@ public class Post implements WebElement {
 	public StaticContent getText() {
 		return text;
 	}
+	
+	@Override
+	public void setID(String id) {
+		this.id = id;
+	}
 
 	/**
 	 * Set the post's text.

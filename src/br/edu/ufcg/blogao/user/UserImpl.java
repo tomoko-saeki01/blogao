@@ -24,6 +24,7 @@ public class UserImpl implements User {
 	private String address;
 	private String email;
 	private String interests;
+	private String whoIAm;
 	private Calendar dateOfBirthday;
 	private Sex sex;
 	private String musics;
@@ -51,7 +52,7 @@ public class UserImpl implements User {
 	 * @param name User's name.
 	 */
 	public UserImpl(String login, String password, String email, String name) {
-		this(login, password, email, name, "", null, Sex.Uninformed, "", "", "");
+		this(login, password, email, name, "", "", null, Sex.Uninformed, "", "", "");
 	}
 	
 	/**
@@ -67,12 +68,13 @@ public class UserImpl implements User {
 	 * @param movies User's movies.
 	 * @param books User's books.
 	 */
-	public UserImpl(String login, String password, String email, String name, String interests, Calendar dateOfBirthday, Sex sex, String musics, String movies, String books) {
+	public UserImpl(String login, String password, String email, String name, String interests, String whoIAm, Calendar dateOfBirthday, Sex sex, String musics, String movies, String books) {
 		this.login = login;
 		this.password = password;
 		this.email = email;
 		this.name = name;
 		this.interests = interests;
+		this.whoIAm = whoIAm;
 		this.dateOfBirthday = dateOfBirthday;
 		this.sex = sex;
 		this.musics = musics;
@@ -82,9 +84,7 @@ public class UserImpl implements User {
 		blogs = new HashMap<String, Blog>();		
 	}
 	
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.blogao.user.User#addBlog(br.edu.ufcg.blogao.blog.Blog, java.lang.String)
-	 */
+	@Override
 	public void addBlog(Blog blog, String id) {
 		blogs.put(id, blog);
 	}
@@ -113,154 +113,126 @@ public class UserImpl implements User {
 		this.musics += music;
 	}
 		
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.blogao.user.User#getAddress()
-	 */
+	@Override
 	public String getAddress() {
 		return address;
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.blogao.user.User#getBooks()
-	 */
+	@Override
 	public String getBooks() {
 		return books;
 	}
 	
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.blogao.user.User#getBlog(java.lang.String)
-	 */
+	@Override
 	public Blog getBlog(String id) {
 		return blogs.get(id);
 	}
 	
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.blogao.user.User#getBlogs()
-	 */
+	@Override
 	public Map<String, Blog> getBlogs() {
 		return blogs;
 	}
 	
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.blogao.user.User#getDateOfBirthday()
-	 */
+	@Override
 	public Calendar getDateOfBirthday() {
 		return dateOfBirthday;
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.blogao.user.User#getEmail()
-	 */
+	@Override
 	public String getEmail() {
 		return email;
 	}
 	
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.blogao.user.User#getId()
-	 */
 	@Override
 	public String getId() {
 		return login;
 	}	
 	
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.blogao.user.User#getInterests()
-	 */
+	@Override
 	public String getInterests() {
 		return interests;
 	}
 	
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.blogao.user.User#getMovies()
-	 */
+	@Override
 	public String getMovies() {
 		return movies;
 	}
 	
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.blogao.user.User#getMusics()
-	 */
+	@Override
 	public String getMusics() {
 		return musics;
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.blogao.user.User#getName()
-	 */
+	@Override
 	public String getName() {
 		return name;
 	}
 	
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.blogao.user.User#getNumberOfBlogs()
-	 */
+	@Override
 	public int getNumberOfBlogs() {
 		return blogs.size();
 	}
+	
+	@Override
+	public String getPassword() {
+		return password;
+	}
 		
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.blogao.user.User#getSex()
-	 */
+	@Override
 	public Sex getSex() {
 		return sex;
 	}
 	
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.blogao.user.User#setAddress(java.lang.String)
-	 */
+	@Override
+	public String getWhoIAm() {
+		return whoIAm;
+	}
+	
+	@Override
 	public void setAddress(String address) {
 		this.address = address;
 	}
 	
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.blogao.user.User#setDateOfBirthday(java.util.Calendar)
-	 */
+	@Override
 	public void setDateOfBirthday(Calendar dateOfBirthday) {
 		this.dateOfBirthday = dateOfBirthday;
 	}
 	
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.blogao.user.User#setEmail(java.lang.String)
-	 */
+	@Override
 	public void setEmail(String email) {
 		this.email = email;
 	}
 	
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.blogao.user.User#setInterests(java.lang.String)
-	 */
+	@Override
+	public void setID(String login) {
+		this.login = login;
+	}
+	
+	@Override
 	public void setInterests(String interests) {
 		this.interests = interests;
 	}
 	
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.blogao.user.User#setName(java.lang.String)
-	 */
+	@Override
 	public void setName(String name) {
 		this.name = name;
 	}
 	
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.blogao.user.User#setPassword(java.lang.String, java.lang.String)
-	 */
+	@Override
 	public void setPassword(String newPassword, String oldPassword) {
 		if (oldPassword.equals(getPassword())) {
 			this.password = newPassword;
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.blogao.user.User#setSex(br.edu.ufcg.blogao.user.Sex)
-	 */
+	@Override
 	public void setSex(Sex sex) {
 		this.sex = sex;
-	}	
-
-	/**
-	 * Return the user's password.
-	 * @return The user's password.
-	 */
-	private String getPassword() {
-		return password;
 	}
+
+	@Override
+	public void setWhoIAm(String whoIAm) {
+		this.whoIAm = whoIAm;
+	}
+	
 }

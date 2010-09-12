@@ -142,6 +142,11 @@ public class Blog implements WebElement {
 	public Post getPost(int index) {
 		return posts.get(index);
 	}
+	
+	@Override
+	public void setID(String id) {
+		this.id = id;
+	}
 
 	/**
 	 * Set the blog's title.
@@ -150,4 +155,5 @@ public class Blog implements WebElement {
 	public void setTitle(String title) {
 		this.title = title;
 	}
+
 }
