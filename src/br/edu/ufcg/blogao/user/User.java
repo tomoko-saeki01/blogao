@@ -9,13 +9,6 @@ import br.edu.ufcg.blogao.blog.Blog;
 public interface User extends Identifiable {
 
 	/**
-	 * Add a user's blog.
-	 * @param blog The user's blog.
-	 * @param id The blog's ID.
-	 */
-	public void addBlog(Blog blog, String id);
-
-	/**
 	 * Return user's address.
 	 * @return The user's address.
 	 */
@@ -110,6 +103,12 @@ public interface User extends Identifiable {
 	 * @param address User's address.
 	 */
 	public void setAddress(String address);
+	
+	/**
+	 * Set the user's favorite books.
+	 * @param books The users books.
+	 */
+	public void setBooks(String books);
 
 	/**
 	 * Set the user's anniversary date.
@@ -128,6 +127,18 @@ public interface User extends Identifiable {
 	 * @param interests The user's interests.
 	 */
 	public void setInterests(String interests);
+	
+	/**
+	 * Set the user's musics.
+	 * @param musics The user's musics.
+	 */
+	public void setMusics(String musics);
+	
+	/**
+	 * Set the user's favorite movies;
+	 * @param movies The user's movies;
+	 */
+	public void setMovies(String movies);
 
 	/**
 	 * Set the user's name.
@@ -140,7 +151,7 @@ public interface User extends Identifiable {
 	 * @param newPassword User's new password.
 	 * @param oldPassword User's old password.
 	 */
-	public void setPassword(String newPassword, String oldPassword);
+	public void setPassword(String password);
 
 	/**
 	 * Set the user's sex.

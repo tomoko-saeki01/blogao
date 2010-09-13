@@ -34,7 +34,7 @@ public interface BlogWS {
 
 	@WebMethod
 	public Boolean isUserLogged(@WebParam(name = "login")
-	String login);
+	String login) throws Exception;
 
 	@WebMethod
 	public String getProfileInformationBySessionId(
@@ -44,7 +44,7 @@ public interface BlogWS {
 
 	@WebMethod
 	public void logoff(@WebParam(name = "sessionId")
-	String sessionId);
+	String sessionId) throws Exception;
 
 	@WebMethod
 	public void changeProfileInformation(@WebParam(name = "sessionId")

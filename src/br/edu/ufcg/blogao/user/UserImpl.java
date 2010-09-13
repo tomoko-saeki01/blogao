@@ -52,7 +52,7 @@ public class UserImpl implements User {
 	 * @param name User's name.
 	 */
 	public UserImpl(String login, String password, String email, String name) {
-		this(login, password, email, name, "", "", null, Sex.Uninformed, "", "", "");
+		this(login, password, name, email, Sex.Uninformed, null, "", "", "", "", "", "");
 	}
 	
 	/**
@@ -68,25 +68,31 @@ public class UserImpl implements User {
 	 * @param movies User's movies.
 	 * @param books User's books.
 	 */
-	public UserImpl(String login, String password, String email, String name, String interests, String whoIAm, Calendar dateOfBirthday, Sex sex, String musics, String movies, String books) {
-		this.login = login;
-		this.password = password;
-		this.email = email;
-		this.name = name;
-		this.interests = interests;
-		this.whoIAm = whoIAm;
-		this.dateOfBirthday = dateOfBirthday;
-		this.sex = sex;
-		this.musics = musics;
-		this.movies = movies;
-		this.books = books;
+	public UserImpl(String login, String password, String name, String email, 
+			Sex sex, Calendar dateOfBirthday, String address, String interests, 
+			String whoIAm, String movies, String musics, String books) {
+		this.setID(login);
+		this.setPassword(password);
+		this.setName(name);
+		this.setEmail(email);
+		this.setSex(sex);
+		this.setDateOfBirthday(dateOfBirthday);
+		this.setAddress(address);
+		this.setInterests(interests);
+		this.setWhoIAm(whoIAm);		
+		this.setMovies(movies);
+		this.setMusics(musics);
+		this.setBooks(books);
 		
 		blogs = new HashMap<String, Blog>();		
 	}
 	
-	@Override
-	public void addBlog(Blog blog, String id) {
-		blogs.put(id, blog);
+	/**
+	 * Add a new user's blog.
+	 * @param blog The user's blog.
+	 */
+	public void addBlog(Blog blog) {
+		blogs.put(blog.getId(), blog);
 	}
 	
 	/**
@@ -194,6 +200,11 @@ public class UserImpl implements User {
 	}
 	
 	@Override
+	public void setBooks(String books) {
+		this.books = books;
+	}
+	
+	@Override
 	public void setDateOfBirthday(Calendar dateOfBirthday) {
 		this.dateOfBirthday = dateOfBirthday;
 	}
@@ -214,15 +225,23 @@ public class UserImpl implements User {
 	}
 	
 	@Override
+	public void setMovies(String movies) {
+		this.movies = movies;
+	}
+
+	@Override
+	public void setMusics(String musics) {
+		this.musics = musics;
+	}
+	
+	@Override
 	public void setName(String name) {
 		this.name = name;
 	}
 	
 	@Override
-	public void setPassword(String newPassword, String oldPassword) {
-		if (oldPassword.equals(getPassword())) {
-			this.password = newPassword;
-		}
+	public void setPassword(String password) {
+		this.password = password;
 	}
 	
 	@Override

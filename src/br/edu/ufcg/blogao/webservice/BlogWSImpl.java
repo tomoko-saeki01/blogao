@@ -3,6 +3,7 @@
  */
 package br.edu.ufcg.blogao.webservice;
 
+import br.edu.ufcg.blogao.session.SessionManager;
 import br.edu.ufcg.blogao.user.UsersHandler;
 
 /**
@@ -12,6 +13,7 @@ import br.edu.ufcg.blogao.user.UsersHandler;
 public class BlogWSImpl implements BlogWS {
 	
 	private UsersHandler usersHandler = UsersHandler.getInstance();
+	private SessionManager sessionManager = SessionManager.getInstance();
 
 	/* (non-Javadoc)
 	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#addComment(java.lang.String, java.lang.String, java.lang.String)
@@ -119,9 +121,6 @@ public class BlogWSImpl implements BlogWS {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#createProfile(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
 	@Override
 	public void createProfile(String login, String senha, String nome_exibicao,
 			String email, String sexo, String dataNasc, String endereco,
@@ -509,24 +508,16 @@ public class BlogWSImpl implements BlogWS {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getProfileInformation(java.lang.String, java.lang.String)
-	 */
 	@Override
 	public String getProfileInformation(String login, String atributo)
 			throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return usersHandler.getUserInformation(login, atributo);
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getProfileInformationBySessionId(java.lang.String, java.lang.String)
-	 */
 	@Override
 	public String getProfileInformationBySessionId(String sessionId,
 			String atributo) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return sessionManager.getUserInformation(sessionId, atributo);
 	}
 
 	/* (non-Javadoc)
@@ -579,13 +570,9 @@ public class BlogWSImpl implements BlogWS {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#isUserLogged(java.lang.String)
-	 */
 	@Override
-	public Boolean isUserLogged(String login) {
-		// TODO Auto-generated method stub
-		return false;
+	public Boolean isUserLogged(String login) throws Exception {
+		return sessionManager.isUserLogged(login);
 	}
 
 	
@@ -604,21 +591,13 @@ public class BlogWSImpl implements BlogWS {
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#logoff(java.lang.String)
-	 */
 	@Override
-	public void logoff(String sessionId) {
-		// TODO Auto-generated method stub
-		
+	public void logoff(String sessionId) throws Exception {
+		sessionManager.logoff(sessionId);
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#logon(java.lang.String, java.lang.String)
-	 */
 	@Override
 	public String logon(String login, String senha) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return sessionManager.logon(login, senha);
 	}
 }
