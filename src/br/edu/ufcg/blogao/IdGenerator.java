@@ -27,6 +27,7 @@ public class IdGenerator {
 		if (nextId == 0) {
 			nextId = retriveBackupId();
 		}
+		System.out.print(String.valueOf(nextId + 1) + " ");
 		saveBackupId(++nextId);
 		return Encryptor.encrypt(nextId);
 	}
@@ -63,7 +64,6 @@ public class IdGenerator {
 		} finally {
 			if (reader != null) {
 				try {
-					System.out.println("AQQUI");
 					reader.close();
 				} catch (IOException e) {
 					e.printStackTrace();
