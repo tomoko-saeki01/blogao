@@ -19,7 +19,7 @@ import br.edu.ufcg.blogao.blog.data.StaticContent;
 public class Comment implements WebElement {
 	
 	private String id;
-	private String author;
+	private String authorId;
 	private StaticContent text;
 	private Calendar date;
 	private Map<String, Comment> subComments;
@@ -29,13 +29,12 @@ public class Comment implements WebElement {
 	 * @param author Comment's author.
 	 * @param text Comment.
 	 */
-	public Comment(String author, StaticContent text) {
-		this.author = author;
-		this.text = text;
-		
-		subComments = new HashMap<String, Comment>();
-		
-		date = Calendar.getInstance();
+	public Comment(String id, String authorId, StaticContent text) {
+		this.setID(id);
+		this.setAuthorId(authorId);
+		this.setText(text);
+		this.date = Calendar.getInstance();
+		this.subComments = new HashMap<String, Comment>();
 	}
 	
 	/**
@@ -48,11 +47,11 @@ public class Comment implements WebElement {
 	}
 	
 	/**
-	 * Return comment's author.
-	 * @return The comment's author.
+	 * Return comment's author id.
+	 * @return The comment's author id.
 	 */
-	public String getAuthor() {
-		return author;
+	public String getAuthorId() {
+		return authorId;
 	}
 	
 	/**
@@ -110,11 +109,11 @@ public class Comment implements WebElement {
 	}
 
 	/**
-	 * Set the comment's author.
-	 * @param author The comment's author.
+	 * Set the comment's author id.
+	 * @param author The comment's author id.
 	 */
-	public void setAuthor(String author) {
-		this.author = author;
+	public void setAuthorId(String authorId) {
+		this.authorId = authorId;
 	}
 	
 	@Override

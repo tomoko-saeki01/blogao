@@ -268,14 +268,10 @@ public class BlogWSImpl implements BlogWS {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getBlogInformation(java.lang.String, java.lang.String)
-	 */
 	@Override
-	public String getBlogInformation(String BlogId, String atributo)
+	public String getBlogInformation(String blogId, String atributo)
 			throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return webElementManager.getBlogInformation(blogId, atributo);
 	}
 
 	/* (non-Javadoc)

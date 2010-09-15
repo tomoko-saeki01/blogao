@@ -52,7 +52,7 @@ public class UsersHandler {
 		return selfInstance;
 	}
 	
-	public void addBlogToUser(String blogId, String login) {
+	public void addBlogToUser(String blogId, String login) throws Exception {
 		if (isInvalidString(login) || !existsUserWithLogin(login)) {
 			throw new IllegalArgumentException(INVALID_LOGIN_MESSAGE);
 		}

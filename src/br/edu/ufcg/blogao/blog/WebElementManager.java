@@ -15,6 +15,11 @@ public class WebElementManager {
 	private final String INVALID_BLOG_MESSAGE = "Blog inválido";
 	private final String INVALID_BLOG_AUTHOR_MESSAGE = "Autor inválido";
 	private final String INVALID_TITLE_MESSAGE = "Você deve especificar um título para o blog";
+	private final String INVALID_ATTRIBUTE_MESSAGE = "Atributo inválido";
+	
+	private final String TITLE = "titulo";
+	private final String AUTHOR = "dono";
+	private final String DESCRIPTION = "descricao";
 	
 	private WebElementManager() {
 		this.blogs = new HashMap<String, WebElement>();
@@ -37,16 +42,35 @@ public class WebElementManager {
 		
 		String blogId = IdGenerator.getInstance().getNextId();
 		StaticContent blogDescription = new Text(description);
-		Blog newBlog = new Blog(blogId, title, blogDescription);
+		Blog newBlog = new Blog(blogId, authorId, title, blogDescription);
 		blogs.put(newBlog.getId(), newBlog);
 		return newBlog.getId();
 	}
 	
-	public Blog getBlog(String blogId) {
+	public Blog getBlog(String blogId) throws Exception {
 		if (isInvalidString(blogId) || isInvalidBlog(blogId)) {
 			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
 		}
 		return (Blog) blogs.get(blogId);
+	}
+	
+	public String getBlogInformation(String blogId, String attribute) throws Exception {
+		if (isInvalidString(blogId) || isInvalidBlog(blogId)) {
+			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
+		}
+		if (isInvalidString(attribute)) {
+			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
+		}
+		
+		Blog blog = (Blog) blogs.get(blogId);
+		if (attribute.equals(TITLE)) {
+			return blog.getTitle();
+		} else if (attribute.equals(AUTHOR)) {
+			return blog.getAuthorId();
+		} else if(attribute.equals(DESCRIPTION)) {
+			return blog.getText().getText();
+		}
+		throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
 	}
 
 	private boolean isInvalidString(String str) {

@@ -12,6 +12,7 @@ package br.edu.ufcg.blogao.blog;
 
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import br.edu.ufcg.blogao.blog.data.StaticContent;
@@ -20,6 +21,7 @@ public class Blog implements WebElement {
 	//Blog "default" attributes.
 	private String title;
 	private String id;
+	private String authorId;
 	private Calendar creationDate;
 	private StaticContent description;
 	private Map<String, Blog> subBlogs; //<subBlogId, blog>
@@ -30,11 +32,14 @@ public class Blog implements WebElement {
 	 * @param title The blog's title.
 	 * @param description The blog's description.
 	 */
-	public Blog(String id, String title, StaticContent description) {
+	public Blog(String id, String authorId, String title, StaticContent description) {
 		this.setID(id);
+		this.setAuthorId(authorId);
 		this.setTitle(title);
 		this.setText(description);
 		this.creationDate = Calendar.getInstance();
+		this.subBlogs = new HashMap<String, Blog>();
+		this.posts = new HashMap<String, Post>();
 	}
 	
 	/**
@@ -44,6 +49,14 @@ public class Blog implements WebElement {
 	 */
 	public void addPost(Post post) {
 		posts.put(post.getId(), post);
+	}
+	
+	/**
+	 * Gets the blog's author id.
+	 * @return author id.
+	 */
+	public String getAuthorId() {
+		return authorId;
 	}
 	
 	/**
@@ -114,6 +127,14 @@ public class Blog implements WebElement {
 	 */
 	public String getTitle() {
 		return title;
+	}
+	
+	/**
+	 * Sets the blog's author id.
+	 * @param authorId Id of blog's author.
+	 */
+	public void setAuthorId(String authorId) {
+		this.authorId = authorId;
 	}
 
 	/**
