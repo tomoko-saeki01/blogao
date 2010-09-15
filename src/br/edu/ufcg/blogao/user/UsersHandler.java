@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import br.edu.ufcg.blogao.Encryptor;
+import br.edu.ufcg.blogao.blog.WebElementManager;
 
 public class UsersHandler {
 	
@@ -27,6 +28,19 @@ public class UsersHandler {
 	private final String ACCEPTABLE_DATE_REGEX = "\\d\\d/\\d\\d/\\d\\d\\d\\d";
 	private final String DATE_FORMAT = "%02d/%02d/%04d";
 	
+	private final String PASSWORD = "senha";
+	private final String LOGIN = "login";
+	private final String NAME = "nome_exibicao";
+	private final String EMAIL = "email";
+	private final String SEX = "sexo";
+	private final String DATE_BIRTHDAY = "dataNasc";
+	private final String ADDRESS = "endereco";
+	private final String INTERESTS = "interesses";
+	private final String WHO_I_AM = "quem_sou_eu";
+	private final String MOVIES = "filmes";
+	private final String MUSICS = "musicas";
+	private final String BOOKS = "livros";
+	
 	private UsersHandler(){
 		users = new HashMap<String, User>(); // <userID, user>
 	}
@@ -36,6 +50,86 @@ public class UsersHandler {
 			selfInstance = new UsersHandler();
 		}
 		return selfInstance;
+	}
+	
+	public void addBlogToUser(String blogId, String login) {
+		if (isInvalidString(login) || !existsUserWithLogin(login)) {
+			throw new IllegalArgumentException(INVALID_LOGIN_MESSAGE);
+		}
+		User user = users.get(login);
+		user.addBlog(WebElementManager.getInstance().getBlog(blogId));
+	}
+	
+	public void changeUserInformation(String login, String attribute, String value) {
+		// Required parameters
+		if (isInvalidString(login)) {
+			throw new IllegalArgumentException(INVALID_LOGIN_MESSAGE);
+		}
+		if (!existsUserWithLogin(login)) {
+			throw new IllegalStateException(UNEXISTENT_USER_MESSAGE);
+		}
+		if (isInvalidString(attribute)) {
+			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
+		}
+		
+		if (isInvalidString(value)) {
+			// Required not null parameters
+			if (attribute.equals(PASSWORD)) {
+				throw new IllegalArgumentException(INVALID_PASSWORD_MESSAGE);
+			}
+			if (attribute.equals(EMAIL)) {
+				throw new IllegalArgumentException(INVALID_EMAIL_MESSAGE);
+			}
+			if (attribute.equals(LOGIN)) {
+				throw new IllegalArgumentException(INVALID_LOGIN_MESSAGE);
+			}
+			value = "";
+		} else {
+			// Validate some parameters
+			if (attribute.equals(EMAIL) && existsUserWithEmail(value)) {
+				throw new IllegalArgumentException(EXISTENT_EMAIL_MESSAGE);
+			}
+			if (attribute.equals(LOGIN) && existsUserWithLogin(value)) {
+				throw new IllegalArgumentException(EXISTENT_LOGIN_MESSAGE);
+			}
+			if (attribute.equals(DATE_BIRTHDAY) && isInvalidDate(value)) {
+				throw new IllegalArgumentException(INVALID_DATE_MESSAGE);
+			}
+		}
+		if (attribute.equals(SEX) && isInvalidSex(value)) {
+			throw new IllegalArgumentException(INVALID_SEX_MESSAGE);
+		}
+		
+		User user = users.get(login);
+		
+		if (attribute.equals(LOGIN)) {
+			user.setID(value);
+		} else if (attribute.equals(PASSWORD)) {
+			user.setPassword(value);
+		} else if (attribute.equals(NAME)) {
+			user.setName(value);
+		} else if (attribute.equals(EMAIL)) {
+			user.setEmail(value);
+		} else if (attribute.equals(SEX)) {
+			user.setSex(convertStringSexToSex(value));
+		} else if (attribute.equals(DATE_BIRTHDAY)) {
+			user.setDateOfBirthday(convertStringDateToCalendar(value));
+		} else if (attribute.equals(ADDRESS)) {
+			user.setAddress(value);
+		} else if (attribute.equals(INTERESTS)) {
+			user.setInterests(value);
+		} else if (attribute.equals(WHO_I_AM)) {
+			user.setWhoIAm(value);
+		} else if (attribute.equals(MOVIES)) {
+			user.setMovies(value);
+		} else if (attribute.equals(MUSICS)) {
+			user.setMusics(value);
+		} else if(attribute.equals(BOOKS)) {
+			user.setBooks(value);
+		} else {
+			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
+		}
+		
 	}
 	
 	public synchronized void createUser(String login, String password, String name,
@@ -77,6 +171,15 @@ public class UsersHandler {
 			throw new IllegalArgumentException(EXISTENT_EMAIL_MESSAGE);
 		}
 		
+		// Override null parameters with ""
+		name = (name == null? "" : name);
+		address = (address == null? "" : address);
+		interests = (interests == null? "" : interests);
+		whoIAm = (whoIAm == null? "" : whoIAm);
+		movies = (movies == null? "" : movies);
+		musics = (musics == null? "" : musics);
+		books = (books == null? "" : books);
+		
 		Sex userSex = convertStringSexToSex(sex);
 		String userPassword = Encryptor.encrypt(password);
 		User newUser = new UserImpl(login, userPassword, name, email, userSex, userBirthday, address, interests, whoIAm, movies, musics, books);
@@ -90,28 +193,17 @@ public class UsersHandler {
 		if (isInvalidString(attribute)) {
 			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
 		}
-		final String LOGIN = "login";
-		final String NAME = "nome_exibicao";
-		final String EMAIL = "email";
-		final String SEX = "sexo";
-		final String DATE_BIRTHDAY = "dataNasc";
-		final String ADDRESS = "endereco";
-		final String INTERESTS = "interesses";
-		final String WHO_I_AM = "quem_sou_eu";
-		final String MOVIES = "filmes";
-		final String MUSICS = "musicas";
-		final String BOOKS = "livros";
-		
-		User user = users.get(login);
-		if (user == null) {
+		if (!existsUserWithLogin(login)) {
 			throw new IllegalStateException(UNEXISTENT_USER_MESSAGE);
 		}
+		
+		User user = users.get(login);
 		
 		if (attribute.equals(LOGIN)) {
 			return user.getId();
 		} else if (attribute.equals(NAME)) {
 			String name = user.getName();
-			return name == null? user.getId() : name;
+			return name == null || name.equals("")? user.getId() : name;
 		} else if (attribute.equals(EMAIL)) {
 			return user.getEmail();
 		} else if (attribute.equals(SEX)) {
@@ -135,12 +227,7 @@ public class UsersHandler {
 	}
 	
 	public boolean existsUserWithLogin(String login) {
-		for (User user : users.values()) {
-			if (user.getId().equals(login)) {
-				return true;
-			}
-		}
-		return false;
+		return users.containsKey(login);
 	}
 	
 	public boolean isTheUserPassword(String login, String password) {
@@ -236,18 +323,12 @@ public class UsersHandler {
 	}
 	
 	private boolean isInvalidSex(String sex) {
-		for (String acceptableSex : ACCEPTABLE_SEXES.keySet()) {
-			if (acceptableSex.equals(sex)) {
-				return false;
-			}
-		}
-		return true;
+		return !ACCEPTABLE_SEXES.containsKey(sex);
 	}
 	
 	private boolean isInvalidString(String str) {
 		return str == null || str.trim().isEmpty();
 	}
-	
 	
 
 }

@@ -27,7 +27,6 @@ public class IdGenerator {
 		if (nextId == 0) {
 			nextId = retriveBackupId();
 		}
-		System.out.print(String.valueOf(nextId + 1) + " ");
 		saveBackupId(++nextId);
 		return Encryptor.encrypt(nextId);
 	}
@@ -54,7 +53,6 @@ public class IdGenerator {
 		try {
 			reader = new BufferedReader(new FileReader(idBackupFile)); 
 			value = reader.readLine();
-			System.out.println(value);
 		} catch (FileNotFoundException e) {
 			System.err.println("ID backup File Corrupted! Blogao is creating a new ID primary key...");
 			// TODO We need to decide how to regenerate a valid ID.

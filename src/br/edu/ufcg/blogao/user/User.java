@@ -9,6 +9,19 @@ import br.edu.ufcg.blogao.blog.Blog;
 public interface User extends Identifiable {
 
 	/**
+	 * Add a new user's blog.
+	 * @param blog The user's blog.
+	 */
+	public void addBlog(Blog blog);
+	
+	/**
+	 * Removes an existent blog with blogId.
+	 * @param blogId The id of blog to be removed.
+	 * @return 
+	 */
+	public void removeBlog(String blogId);
+	
+	/**
 	 * Return user's address.
 	 * @return The user's address.
 	 */

@@ -87,38 +87,16 @@ public class UserImpl implements User {
 		blogs = new HashMap<String, Blog>();		
 	}
 	
-	/**
-	 * Add a new user's blog.
-	 * @param blog The user's blog.
-	 */
+	@Override
 	public void addBlog(Blog blog) {
 		blogs.put(blog.getId(), blog);
 	}
 	
-	/**
-	 * Add a user's favorite book.
-	 * @param books The user's favorite book.
-	 */
-	public void addBook(String book) {
-		this.books += book;
-	}
-	 	
-	/**
-	 * Add a user's favorite movie.
-	 * @param movies User's favorite movie.
-	 */
-	public void addMovie(String movie) {
-		this.movies += movie;
+	@Override
+	public void removeBlog(String blogId) {
+		blogs.remove(blogId);
 	}
 	
-	/**
-	 * Add a user's favorite music.
-	 * @param musics User's favorite music.
-	 */
-	public void addMusic(String music) {
-		this.musics += music;
-	}
-		
 	@Override
 	public String getAddress() {
 		return address;

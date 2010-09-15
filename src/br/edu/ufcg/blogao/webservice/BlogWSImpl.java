@@ -3,6 +3,7 @@
  */
 package br.edu.ufcg.blogao.webservice;
 
+import br.edu.ufcg.blogao.blog.WebElementManager;
 import br.edu.ufcg.blogao.session.SessionManager;
 import br.edu.ufcg.blogao.user.UsersHandler;
 
@@ -14,6 +15,7 @@ public class BlogWSImpl implements BlogWS {
 	
 	private UsersHandler usersHandler = UsersHandler.getInstance();
 	private SessionManager sessionManager = SessionManager.getInstance();
+	private WebElementManager webElementManager = WebElementManager.getInstance();
 
 	/* (non-Javadoc)
 	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#addComment(java.lang.String, java.lang.String, java.lang.String)
@@ -91,24 +93,24 @@ public class BlogWSImpl implements BlogWS {
 		// TODO Auto-generated method stub		
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#changeProfileInformation(java.lang.String, java.lang.String)
-	 */
 	@Override
-	public void changeProfileInformation(String sessionId, String atributo)
+	public void changeProfileInformation(String sessionId, String atributo, String valor)
 			throws Exception {
-		// TODO Auto-generated method stub
-		
+		final String LOGIN_USERID_ATTRIBUTE = "login";
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		usersHandler.changeUserInformation(userId, atributo, valor);
+		if (atributo.equals(LOGIN_USERID_ATTRIBUTE)) {
+			sessionManager.updateLoggedUserId(userId, valor);
+		}
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#createBlog(java.lang.String, java.lang.String, java.lang.String)
-	 */
 	@Override
 	public String createBlog(String sessionId, String titulo, String descricao)
 			throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		String blogId = webElementManager.createBlog(userId, titulo, descricao);
+		usersHandler.addBlogToUser(blogId, userId);
+		return blogId;
 	}
 
 	/* (non-Javadoc)
@@ -517,7 +519,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public String getProfileInformationBySessionId(String sessionId,
 			String atributo) throws Exception {
-		return sessionManager.getUserInformation(sessionId, atributo);
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		return usersHandler.getUserInformation(userId, atributo);
 	}
 
 	/* (non-Javadoc)

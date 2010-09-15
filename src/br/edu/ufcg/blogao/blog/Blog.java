@@ -19,32 +19,22 @@ import br.edu.ufcg.blogao.blog.data.StaticContent;
 public class Blog implements WebElement {
 	//Blog "default" attributes.
 	private String title;
-	
-	//
 	private String id;
-	private Calendar date;
+	private Calendar creationDate;
 	private StaticContent description;
-	private Map<String, Blog> subBlogs; //<id, blog>
-	private Map<String, Post> posts; //<id, post>
-	
-	/**
-	 * Default constructor.
-	 * @param title The blog's title.
-	 */
-	public Blog(String title) {
-		this(title, null);
-	}
+	private Map<String, Blog> subBlogs; //<subBlogId, blog>
+	private Map<String, Post> posts; //<postId, post>
 	
 	/**
 	 * Another constructor.
 	 * @param title The blog's title.
 	 * @param description The blog's description.
 	 */
-	public Blog(String title, StaticContent description) {
-		this.title = title;
-		this.description = description;
-		
-		date = Calendar.getInstance();
+	public Blog(String id, String title, StaticContent description) {
+		this.setID(id);
+		this.setTitle(title);
+		this.setText(description);
+		this.creationDate = Calendar.getInstance();
 	}
 	
 	/**
@@ -52,8 +42,8 @@ public class Blog implements WebElement {
 	 * @param id The post's ID.
 	 * @param post The post.
 	 */
-	public void addPost(String id, Post post) {
-		posts.put(id, post);
+	public void addPost(Post post) {
+		posts.put(post.getId(), post);
 	}
 	
 	/**
@@ -61,7 +51,7 @@ public class Blog implements WebElement {
 	 */
 	@Override
 	public Calendar getCreationDate() {
-		return date;
+		return creationDate;
 	}
 	
 	/**

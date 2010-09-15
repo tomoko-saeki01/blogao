@@ -28,6 +28,15 @@ public class SessionManager {
 		return selfInstance;
 	}
 	
+	public String getLoggedUserId(String sessionId) throws Exception {
+		if (isInvalidString(sessionId) || isInvalidSession(sessionId)) {
+			throw new IllegalArgumentException(INVALID_SESSIONID_MESSAGE);
+		}
+		
+		SessionIF session = actualSessions.get(sessionId);
+		return session.getUserId();
+	}
+
 	public synchronized void logoff(String sessionId) throws Exception {
 		if (isInvalidString(sessionId) || isInvalidSession(sessionId)) {
 			throw new IllegalArgumentException(INVALID_SESSIONID_MESSAGE);
@@ -71,21 +80,22 @@ public class SessionManager {
 		return false;
 	}
 	
-	public String getUserInformation(String sessionId, String attribute) throws Exception {
-		if (isInvalidString(sessionId) || isInvalidSession(sessionId)) {
-			throw new IllegalStateException(INVALID_SESSIONID_MESSAGE);
+	public void updateLoggedUserId(String actualUserId, String newUserId) throws Exception {
+		if (isInvalidString(actualUserId) || isInvalidString(newUserId)) {
+			throw new IllegalArgumentException(INVALID_LOGIN_MESSAGE);
+		}
+		if (isUserLogged(actualUserId)) {
+			for (SessionIF session : actualSessions.values()) {
+				if (session.getUserId().equals(actualUserId)) {
+					session.setUserId(newUserId);
+				}
+			}
 		}
 		
-		SessionIF session = actualSessions.get(sessionId);
-		String userLogin = session.getUserId();
-		return UsersHandler.getInstance().getUserInformation(userLogin, attribute);
 	}
 	
 	private boolean isInvalidSession(String sessionId) {
-		if (actualSessions.containsKey(sessionId)) {
-			return false;
-		}
-		return true;
+		return !actualSessions.containsKey(sessionId);
 	}
 
 	private boolean isInvalidString(String str) {
