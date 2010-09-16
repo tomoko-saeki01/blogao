@@ -157,6 +157,12 @@ public interface UserIF extends Identifiable {
 	 * @param email The user's e-mail.
 	 */
 	public void setEmail(String email);
+	
+	/**
+	 * Sets the user id (login).
+	 * @param id User unique identification.
+	 */
+	public void setId(String id);
 
 	/**
 	 * Set the user's interests.

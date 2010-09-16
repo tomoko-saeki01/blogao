@@ -9,7 +9,6 @@ package br.edu.ufcg.blogao.blog.data;
  * @version 1.0 - 31th August, 2010.
  */
 
-import java.io.File;
 import br.edu.ufcg.blogao.Identifiable;
 
 public interface InteractiveContent extends Identifiable {
@@ -18,7 +17,7 @@ public interface InteractiveContent extends Identifiable {
 	 * Return the data.
 	 * @return The data.
 	 */
-	public File getData();
+	public String getData();
 	
 	/**
 	 * Return the description.
@@ -30,7 +29,7 @@ public interface InteractiveContent extends Identifiable {
 	 * Set the data.
 	 * @param data The data to be set.
 	 */
-	public void setData(File data);
+	public void setData(String data);
 	
 	/**
 	 * Set the description.

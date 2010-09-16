@@ -257,16 +257,16 @@ public interface BlogWS {
 	String match);
 
 	@WebMethod
-	public Integer getNumberOfAnnouncements(@WebParam(name = "sessiondId")
+	public Integer getNumberOfAnnouncements(@WebParam(name = "sessionId")
 	String sessionId) throws Exception;
 
 	@WebMethod
-	public void addPostAnnouncements(@WebParam(name = "sessiondId")
+	public void addPostAnnouncements(@WebParam(name = "sessionId")
 	String sessionId, @WebParam(name = "blogId")
 	String blogId) throws Exception;
 
 	@WebMethod
-	public String getAnnouncement(@WebParam(name = "sessiondId")
+	public String getAnnouncement(@WebParam(name = "sessionId")
 	String sessionId, @WebParam(name = "index")
 	Integer index) throws Exception;
 
@@ -275,7 +275,7 @@ public interface BlogWS {
 	String announcementId) throws Exception;
 
 	@WebMethod
-	public String deleteAnnouncement(@WebParam(name = "sessiondId")
+	public String deleteAnnouncement(@WebParam(name = "sessionId")
 	String sessionId, @WebParam(name = "announcementId")
 	String announcementId) throws Exception;
 

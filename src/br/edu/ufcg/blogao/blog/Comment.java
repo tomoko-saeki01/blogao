@@ -30,7 +30,7 @@ public class Comment implements WebElement {
 	 * @param text Comment.
 	 */
 	public Comment(String id, String authorId, StaticContent text) {
-		this.setID(id);
+		this.id = id;
 		this.setAuthorId(authorId);
 		this.setText(text);
 		this.date = Calendar.getInstance();
@@ -114,11 +114,6 @@ public class Comment implements WebElement {
 	 */
 	public void setAuthorId(String authorId) {
 		this.authorId = authorId;
-	}
-	
-	@Override
-	public void setID(String id) {
-		this.id = id;
 	}
 	
 	/**

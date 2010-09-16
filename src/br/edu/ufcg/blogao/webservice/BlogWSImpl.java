@@ -77,8 +77,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public String attachSound(String sessionId, String postId,
 			String descricao, String dado) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		return webElementManager.attachSoundOnPost(userId, postId, descricao, dado);
 	}
 
 	@Override
@@ -126,8 +126,11 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public String createPost(String sessionId, String blogId, String titulo,
 			String texto) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		if (userId.equals(webElementManager.getBlog(blogId).getAuthorId())) {
+			return webElementManager.createPost(blogId, titulo, texto);
+		}
+		throw new IllegalArgumentException(INVALID_SESSION_MESSAGE);
 	}
 
 	@Override
@@ -586,6 +589,7 @@ public class BlogWSImpl implements BlogWS {
 		DatabaseFacade.getInstance().cleanPersistence();
 		usersHandler.deleteAllUsers();
 		webElementManager.deleteAllBlogs();
+		sessionManager.logoffAllSessions();
 	}
 
 	public void loadData() {

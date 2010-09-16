@@ -8,20 +8,23 @@ package br.edu.ufcg.blogao.blog.data;
  * @author Matheus
  * @version 1.0 - 31th August, 2010.
  */
-
-import java.io.File;
-
 public class Sound implements InteractiveContent {
 	
 	private String id;
 	private StaticContent description;
-	private File data;
+	private String data;
+	
+	public Sound(String id, StaticContent description, String data) {
+		this.id = id;
+		this.setDescription(description);
+		this.setData(data);
+	}
 	
 	/**
 	 * Return the data.
 	 */
 	@Override
-	public File getData() {
+	public String getData() {
 		return data;
 	}
 	
@@ -45,7 +48,7 @@ public class Sound implements InteractiveContent {
 	 * Set the data.
 	 */
 	@Override
-	public void setData(File data) {
+	public void setData(String data) {
 		this.data = data;
 	}
 
@@ -57,8 +60,4 @@ public class Sound implements InteractiveContent {
 		this.description = description;
 	}
 	
-	@Override
-	public void setID(String id) {
-		this.id = id;
-	}
 }

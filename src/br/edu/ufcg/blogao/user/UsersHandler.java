@@ -3,6 +3,7 @@ package br.edu.ufcg.blogao.user;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import br.edu.ufcg.blogao.Encryptor;
@@ -103,7 +104,7 @@ public class UsersHandler {
 		UserIF user = users.get(login);
 		
 		if (attribute.equals(LOGIN)) {
-			user.setID(value);
+			user.setId(value);
 		} else if (attribute.equals(PASSWORD)) {
 			user.setPassword(value);
 		} else if (attribute.equals(NAME)) {
@@ -184,6 +185,13 @@ public class UsersHandler {
 		String userPassword = Encryptor.encrypt(password);
 		UserIF newUser = new UserImpl(login, userPassword, name, email, userSex, userBirthday, address, interests, whoIAm, movies, musics, books);
 		users.put(newUser.getId(),newUser);
+	}
+	
+	public List<String> getAllBlogsFromUser(String userId) throws Exception {
+		if (isInvalidString(userId) || !existsUserWithLogin(userId)) {
+			throw new IllegalArgumentException(INVALID_LOGIN_MESSAGE);
+		}
+		return users.get(userId).getBlogs();
 	}
 	
 	public String getUserInformation(String login, String attribute) {

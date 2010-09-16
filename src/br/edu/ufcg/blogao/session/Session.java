@@ -6,7 +6,7 @@ public class Session implements SessionIF {
 	private String userId;
 	
 	public Session(String sessionId, String userId) {
-		this.setID(sessionId);
+		this.id = sessionId;
 		this.setUserId(userId);
 	}
 
@@ -18,11 +18,6 @@ public class Session implements SessionIF {
 	@Override
 	public String getUserId() {
 		return userId;
-	}
-
-	@Override
-	public void setID(String id) {
-		this.id = id;
 	}
 	
 	@Override

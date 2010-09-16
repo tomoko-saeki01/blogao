@@ -33,7 +33,7 @@ public class Blog implements WebElement {
 	 * @param description The blog's description.
 	 */
 	public Blog(String id, String authorId, String title, StaticContent description) {
-		this.setID(id);
+		this.id = id;
 		this.setAuthorId(authorId);
 		this.setTitle(title);
 		this.setText(description);
@@ -49,6 +49,15 @@ public class Blog implements WebElement {
 	 */
 	public void addPost(Post post) {
 		posts.put(post.getId(), post);
+	}
+	
+	/**
+	 * Verify if blog contains the post.
+	 * @param postId Id of the searched post.
+	 * @return true if the blog contains this postId. 
+	 */
+	public boolean containsPost(String postId) {
+		return posts.containsKey(postId);
 	}
 	
 	/**
@@ -154,9 +163,13 @@ public class Blog implements WebElement {
 		return posts.get(index);
 	}
 	
-	@Override
-	public void setID(String id) {
-		this.id = id;
+	/**
+	 * Return a blog's post by postId.
+	 * @param postId Id of wanted post.
+	 * @return the Post.
+	 */
+	public Post getPost(String postId) {
+		return posts.get(postId);
 	}
 
 	/**

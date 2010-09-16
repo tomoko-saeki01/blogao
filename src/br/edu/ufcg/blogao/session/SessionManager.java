@@ -102,4 +102,8 @@ public class SessionManager {
 		return str == null || str.trim().isEmpty();
 	}
 
+	public void logoffAllSessions() {
+		actualSessions.clear();
+	}
+
 }
