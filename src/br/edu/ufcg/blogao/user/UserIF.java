@@ -1,25 +1,23 @@
 package br.edu.ufcg.blogao.user;
 
 import java.util.Calendar;
-import java.util.Map;
+import java.util.List;
 
 import br.edu.ufcg.blogao.Identifiable;
-import br.edu.ufcg.blogao.blog.Blog;
 
-public interface User extends Identifiable {
+public interface UserIF extends Identifiable {
 
 	/**
-	 * Add a new user's blog.
-	 * @param blog The user's blog.
+	 * Add a new blog's reference to user. (blog id)
+	 * @param blog User's blog reference.
 	 */
-	public void addBlog(Blog blog);
+	public void addBlog(String blogId);
 	
 	/**
-	 * Removes an existent blog with blogId.
-	 * @param blogId The id of blog to be removed.
-	 * @return 
+	 * Add a new Comment reference (Comment id);
+	 * @param commentId User's Comment reference.
 	 */
-	public void removeBlog(String blogId);
+	public void addComment(String commentId);
 	
 	/**
 	 * Return user's address.
@@ -32,19 +30,32 @@ public interface User extends Identifiable {
 	 * @return The user's favorites books.
 	 */
 	public String getBooks();
-
+	
 	/**
-	 * Return a user's blog from blog's ID.
-	 * @param id Blog's ID.
-	 * @return A user's blog from blog's ID.
+	 * Gets the blogId at given index.
+	 * @param index Index of wanted blogId.
+	 * @return blogId
 	 */
-	public Blog getBlog(String id);
+	public String getBlogIdAtIndex(int index);
 
 	/**
 	 * Return all user's blogs.
 	 * @return All user's blogs.
 	 */
-	public Map<String, Blog> getBlogs();
+	public List<String> getBlogs();
+	
+	/**
+	 * Gets the comment id at given index.
+	 * @param index Index of wanted Comment id.
+	 * @return Comment id.
+	 */
+	public String getCommentIdAtIndex(int index);
+	
+	/**
+	 * Return all user's comment reference.
+	 * @return comments ids.
+	 */
+	public List<String> getComments();
 
 	/**
 	 * Return the user's anniversary date.
@@ -110,6 +121,18 @@ public interface User extends Identifiable {
 	 * @return The user's self description.
 	 */
 	public String getWhoIAm();
+	
+	/**
+	 * Removes an existent blogId.
+	 * @param blogId Index of blog id to be removed.
+	 */
+	public void removeBlogIdAtIndex(int index);
+	
+	/**
+	 * Removes an existent commentId.
+	 * @param index Index of comment id to be removed
+	 */
+	public void removeCommentIdAtIndex(int index);
 
 	/**
 	 * Set the user's address.

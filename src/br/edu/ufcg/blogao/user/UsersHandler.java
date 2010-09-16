@@ -6,12 +6,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import br.edu.ufcg.blogao.Encryptor;
-import br.edu.ufcg.blogao.blog.WebElementManager;
+import br.edu.ufcg.blogao.persistence.DatabaseFacade;
 
 public class UsersHandler {
 	
 	private static UsersHandler selfInstance = null;
-	private Map<String, User> users = null;
+	private Map<String, UserIF> users = null;
 	
 	private final String INVALID_LOGIN_MESSAGE ="Login inv‡lido";
 	private final String INVALID_PASSWORD_MESSAGE = "Senha inv‡lida";
@@ -42,7 +42,7 @@ public class UsersHandler {
 	private final String BOOKS = "livros";
 	
 	private UsersHandler(){
-		users = new HashMap<String, User>(); // <userID, user>
+		users = new HashMap<String, UserIF>(); // <userID, user>
 	}
 	
 	public synchronized static UsersHandler getInstance() {
@@ -56,8 +56,8 @@ public class UsersHandler {
 		if (isInvalidString(login) || !existsUserWithLogin(login)) {
 			throw new IllegalArgumentException(INVALID_LOGIN_MESSAGE);
 		}
-		User user = users.get(login);
-		user.addBlog(WebElementManager.getInstance().getBlog(blogId));
+		UserIF user = users.get(login);
+		user.addBlog(blogId);
 	}
 	
 	public void changeUserInformation(String login, String attribute, String value) {
@@ -100,7 +100,7 @@ public class UsersHandler {
 			throw new IllegalArgumentException(INVALID_SEX_MESSAGE);
 		}
 		
-		User user = users.get(login);
+		UserIF user = users.get(login);
 		
 		if (attribute.equals(LOGIN)) {
 			user.setID(value);
@@ -182,7 +182,7 @@ public class UsersHandler {
 		
 		Sex userSex = convertStringSexToSex(sex);
 		String userPassword = Encryptor.encrypt(password);
-		User newUser = new UserImpl(login, userPassword, name, email, userSex, userBirthday, address, interests, whoIAm, movies, musics, books);
+		UserIF newUser = new UserImpl(login, userPassword, name, email, userSex, userBirthday, address, interests, whoIAm, movies, musics, books);
 		users.put(newUser.getId(),newUser);
 	}
 	
@@ -197,7 +197,7 @@ public class UsersHandler {
 			throw new IllegalStateException(UNEXISTENT_USER_MESSAGE);
 		}
 		
-		User user = users.get(login);
+		UserIF user = users.get(login);
 		
 		if (attribute.equals(LOGIN)) {
 			return user.getId();
@@ -282,7 +282,7 @@ public class UsersHandler {
 	}
 	
 	private boolean existsUserWithEmail(String email) {
-		for (User user : users.values()) {
+		for (UserIF user : users.values()) {
 			if (user.getEmail().equals(email)) {
 				return true;
 			}
@@ -328,6 +328,30 @@ public class UsersHandler {
 	
 	private boolean isInvalidString(String str) {
 		return str == null || str.trim().isEmpty();
+	}
+
+	public void loadAllUsers() {
+		this.users = DatabaseFacade.getInstance().getAllUsers();
+	}
+	
+	public void deleteAllUsers() {
+		users.clear();
+		
+	}
+
+	public void saveAllUsers() {
+		DatabaseFacade dbFacade = DatabaseFacade.getInstance();
+		for (UserIF user : users.values()) {
+			try {
+				if (dbFacade.existsUserInDatabase(user.getId())) {
+					dbFacade.updateUser(user);
+				} else {
+					dbFacade.insertUser(user);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 

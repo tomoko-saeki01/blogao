@@ -4,6 +4,7 @@
 package br.edu.ufcg.blogao.webservice;
 
 import br.edu.ufcg.blogao.blog.WebElementManager;
+import br.edu.ufcg.blogao.persistence.DatabaseFacade;
 import br.edu.ufcg.blogao.session.SessionManager;
 import br.edu.ufcg.blogao.user.UsersHandler;
 
@@ -576,18 +577,19 @@ public class BlogWSImpl implements BlogWS {
 
 	
 	public void cleanPersistence() {
-		// TODO Auto-generated method stub
-		
+		DatabaseFacade.getInstance().cleanPersistence();
+		usersHandler.deleteAllUsers();
+		webElementManager.deleteAllBlogs();
 	}
 
 	public void loadData() {
-		// TODO Auto-generated method stub
-		
+		usersHandler.loadAllUsers();
+		webElementManager.loadAllBlogs();
 	}
 
 	public void saveData() {
-		// TODO Auto-generated method stub
-		
+		usersHandler.saveAllUsers();
+		webElementManager.saveAllBlogs();
 	}
 
 	@Override

@@ -1,10 +1,8 @@
 package br.edu.ufcg.blogao.user;
 
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-
-import br.edu.ufcg.blogao.blog.Blog;
+import java.util.List;
 
 /**
  * Represents a simple user's blog implementation.
@@ -15,7 +13,7 @@ import br.edu.ufcg.blogao.blog.Blog;
  * @author Matheus
  * @version 0.4 - 12nd September, 2010.
  */
-public class UserImpl implements User {
+public class UserImpl implements UserIF {
 	
 	//User "default" attributes.
 	private String login;
@@ -32,7 +30,8 @@ public class UserImpl implements User {
 	private String books;
 	
 	//
-	private Map<String, Blog> blogs; //<blog id, blog>
+	private List<String> blogs; //<blog id>
+	private List<String> comments;
 			
 	/**
 	 * Default constructor.
@@ -84,17 +83,18 @@ public class UserImpl implements User {
 		this.setMusics(musics);
 		this.setBooks(books);
 		
-		blogs = new HashMap<String, Blog>();		
+		blogs = new ArrayList<String>();
+		comments = new ArrayList<String>();
 	}
 	
 	@Override
-	public void addBlog(Blog blog) {
-		blogs.put(blog.getId(), blog);
+	public void addBlog(String blogId) {
+		blogs.add(blogId);
 	}
 	
 	@Override
-	public void removeBlog(String blogId) {
-		blogs.remove(blogId);
+	public void addComment(String commentId) {
+		comments.add(commentId);
 	}
 	
 	@Override
@@ -108,13 +108,23 @@ public class UserImpl implements User {
 	}
 	
 	@Override
-	public Blog getBlog(String id) {
-		return blogs.get(id);
+	public String getBlogIdAtIndex(int index) {
+		return blogs.get(index);
 	}
-	
+
 	@Override
-	public Map<String, Blog> getBlogs() {
+	public List<String> getBlogs() {
 		return blogs;
+	}
+
+	@Override
+	public String getCommentIdAtIndex(int index) {
+		return comments.get(index);
+	}
+
+	@Override
+	public List<String> getComments() {
+		return comments;
 	}
 	
 	@Override
@@ -170,6 +180,16 @@ public class UserImpl implements User {
 	@Override
 	public String getWhoIAm() {
 		return whoIAm;
+	}
+	
+	@Override
+	public void removeBlogIdAtIndex(int index) {
+		blogs.remove(index);
+	}
+
+	@Override
+	public void removeCommentIdAtIndex(int index) {
+		comments.remove(index);
 	}
 	
 	@Override

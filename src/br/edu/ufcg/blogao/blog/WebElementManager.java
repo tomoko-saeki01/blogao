@@ -6,11 +6,12 @@ import java.util.Map;
 import br.edu.ufcg.blogao.IdGenerator;
 import br.edu.ufcg.blogao.blog.data.StaticContent;
 import br.edu.ufcg.blogao.blog.data.Text;
+import br.edu.ufcg.blogao.persistence.DatabaseFacade;
 
 public class WebElementManager {
 	
 	private static WebElementManager selfInstance = null;
-	private Map<String, WebElement> blogs = null;
+	private Map<String, Blog> blogs = null;
 	
 	private final String INVALID_BLOG_MESSAGE = "Blog inv‡lido";
 	private final String INVALID_BLOG_AUTHOR_MESSAGE = "Autor inv‡lido";
@@ -22,7 +23,7 @@ public class WebElementManager {
 	private final String DESCRIPTION = "descricao";
 	
 	private WebElementManager() {
-		this.blogs = new HashMap<String, WebElement>();
+		this.blogs = new HashMap<String, Blog>();
 	}
 	
 	public static WebElementManager getInstance() {
@@ -51,7 +52,7 @@ public class WebElementManager {
 		if (isInvalidString(blogId) || isInvalidBlog(blogId)) {
 			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
 		}
-		return (Blog) blogs.get(blogId);
+		return blogs.get(blogId);
 	}
 	
 	public String getBlogInformation(String blogId, String attribute) throws Exception {
@@ -71,6 +72,29 @@ public class WebElementManager {
 			return blog.getText().getText();
 		}
 		throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
+	}
+	
+	public void loadAllBlogs() {
+		this.blogs = DatabaseFacade.getInstance().getAllBlogs();
+	}
+	
+	public void deleteAllBlogs() {
+		blogs.clear();
+	}
+	
+	public void saveAllBlogs() {
+		DatabaseFacade dbFacade = DatabaseFacade.getInstance();
+		for (Blog blog : blogs.values()) {
+			try {
+				if (dbFacade.existsBlogInDatabase(blog.getId())) {
+					dbFacade.updateBlog(blog);
+				} else {
+					dbFacade.insertBlog(blog);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private boolean isInvalidString(String str) {
