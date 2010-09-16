@@ -33,6 +33,30 @@ public class WebElementManager {
 		return selfInstance;
 	}
 	
+	public void changeBlogInformation(String blogId, String attribute, String value) {
+		if (isInvalidString(blogId) || isInvalidBlog(blogId)) {
+			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
+		}
+		if (isInvalidString(attribute)) {
+			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
+		}
+		if (isInvalidString(value)) {
+			if (attribute.equals(TITLE)) {
+				throw new IllegalArgumentException(INVALID_TITLE_MESSAGE);
+			}
+			value = "";
+		}
+		Blog blog = blogs.get(blogId);
+		if (attribute.equals(TITLE)) {
+			blog.setTitle(value);
+		} else if(attribute.equals(DESCRIPTION)) {
+			StaticContent blogText = new Text(value);
+			blog.setText(blogText);
+		} else {
+			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
+		}
+	}
+	
 	public String createBlog(String authorId, String title, String description) throws Exception {
 		if (isInvalidString(authorId)) {
 			throw new IllegalArgumentException(INVALID_BLOG_AUTHOR_MESSAGE);

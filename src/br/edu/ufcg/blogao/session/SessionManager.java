@@ -50,7 +50,7 @@ public class SessionManager {
 			throw new IllegalArgumentException(INVALID_LOGIN_OR_PASSWORD_MESSAGE);
 		}
 		
-		if (isInvalidString(userPassword) || !UsersHandler.getInstance().isTheUserPassword(userLogin, userPassword)) {
+		if (isInvalidString(userPassword) || !UsersHandler.getInstance().isPasswordFromUser(userLogin, userPassword)) {
 			throw new IllegalArgumentException(INVALID_LOGIN_OR_PASSWORD_MESSAGE);
 		}
 		

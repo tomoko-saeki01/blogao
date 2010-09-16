@@ -230,7 +230,7 @@ public class UsersHandler {
 		return users.containsKey(login);
 	}
 	
-	public boolean isTheUserPassword(String login, String password) {
+	public boolean isPasswordFromUser(String login, String password) {
 		if (isInvalidString(login)) {
 			throw new IllegalArgumentException(INVALID_LOGIN_MESSAGE);
 		}
@@ -243,10 +243,23 @@ public class UsersHandler {
 		String passedPassword = Encryptor.encrypt(password);
 		String userPassword = users.get(login).getPassword();
 		return userPassword.equals(passedPassword);
-		
 	}
 	
-	private String convertCalendarToStringDate(Calendar cal) {
+	public boolean isBlogFromUser(String login, String blogId) {
+		if (isInvalidString(login)) {
+			throw new IllegalArgumentException(INVALID_LOGIN_MESSAGE);
+		}
+		if (!existsUserWithLogin(login)) {
+			throw new IllegalStateException(UNEXISTENT_USER_MESSAGE);
+		}
+		if (isInvalidString(blogId)) {
+			throw new IllegalArgumentException(INVALID_PASSWORD_MESSAGE);
+		}
+		UserIF user = users.get(login);
+		return user.getBlogs().contains(blogId);
+	}
+	
+	public String convertCalendarToStringDate(Calendar cal) {
 		int dayOfMonth = cal.get(GregorianCalendar.DAY_OF_MONTH);
 		// In GregorianCalendar the month is from 0 (January) to 11 (December)
 		int month = cal.get(GregorianCalendar.MONTH) + 1;

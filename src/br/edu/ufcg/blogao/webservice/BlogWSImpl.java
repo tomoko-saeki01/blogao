@@ -3,6 +3,8 @@
  */
 package br.edu.ufcg.blogao.webservice;
 
+import java.util.Calendar;
+
 import br.edu.ufcg.blogao.blog.WebElementManager;
 import br.edu.ufcg.blogao.persistence.DatabaseFacade;
 import br.edu.ufcg.blogao.session.SessionManager;
@@ -13,6 +15,8 @@ import br.edu.ufcg.blogao.user.UsersHandler;
  *
  */
 public class BlogWSImpl implements BlogWS {
+	
+	private final String INVALID_SESSION_MESSAGE = "Sess‹o inv‡lida";
 	
 	private UsersHandler usersHandler = UsersHandler.getInstance();
 	private SessionManager sessionManager = SessionManager.getInstance();
@@ -77,13 +81,15 @@ public class BlogWSImpl implements BlogWS {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#changeBlogInformation(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
 	@Override
-	public void changeBlogInformation(String sessionId, String BlogId,
+	public void changeBlogInformation(String sessionId, String blogId,
 			String atributo, String valor) throws Exception {
-		// TODO Auto-generated method stub
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		if (userId.equals(webElementManager.getBlog(blogId).getAuthorId())) {
+			webElementManager.changeBlogInformation(blogId, atributo, valor);
+		} else {
+			throw new IllegalArgumentException(INVALID_SESSION_MESSAGE);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -591,6 +597,7 @@ public class BlogWSImpl implements BlogWS {
 		usersHandler.saveAllUsers();
 		webElementManager.saveAllBlogs();
 	}
+	
 
 	@Override
 	public void logoff(String sessionId) throws Exception {
@@ -600,5 +607,9 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public String logon(String login, String senha) throws Exception {
 		return sessionManager.logon(login, senha);
+	}
+	
+	public String todaysDate() {
+		return usersHandler.convertCalendarToStringDate(Calendar.getInstance());
 	}
 }
