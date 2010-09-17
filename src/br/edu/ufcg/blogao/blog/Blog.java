@@ -161,8 +161,9 @@ public class Blog implements WebElement {
 	 * Return a blog's post.
 	 * @param index The post's ID.
 	 * @return A blog's post.
+	 * @throws Exception 
 	 */
-	public Post getPost(int index) {
+	public Post getPost(int index) throws Exception {
 		return DatabaseFacade.getInstance().retrievePost(posts.get(index));
 	}
 	
@@ -170,8 +171,9 @@ public class Blog implements WebElement {
 	 * Return a blog's post by postId.
 	 * @param postId Id of wanted post.
 	 * @return the Post.
+	 * @throws Exception 
 	 */
-	public Post getPost(String postId) {
+	public Post getPost(String postId) throws Exception {
 		return DatabaseFacade.getInstance().retrievePost(postId);
 	}
 

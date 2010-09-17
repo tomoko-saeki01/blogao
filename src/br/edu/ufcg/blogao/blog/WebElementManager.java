@@ -1,11 +1,10 @@
 package br.edu.ufcg.blogao.blog;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import br.edu.ufcg.blogao.IdGenerator;
+import br.edu.ufcg.blogao.blog.data.InteractiveContent;
+import br.edu.ufcg.blogao.blog.data.Movie;
+import br.edu.ufcg.blogao.blog.data.Picture;
+import br.edu.ufcg.blogao.blog.data.Sound;
 import br.edu.ufcg.blogao.blog.data.StaticContent;
 import br.edu.ufcg.blogao.blog.data.Text;
 import br.edu.ufcg.blogao.persistence.DatabaseFacade;
@@ -14,13 +13,13 @@ import br.edu.ufcg.blogao.user.UsersHandler;
 public class WebElementManager {
 	
 	private static WebElementManager selfInstance = null;
-	private Map<String, Blog> blogs = null;
 	
 	private final String INVALID_BLOG_MESSAGE = "Blog inválido";
 	private final String INVALID_AUTHOR_MESSAGE = "Autor inválido";
 	private final String INVALID_TITLE_BLOG_MESSAGE = "Você deve especificar um título para o blog";
 	private final String INVALID_POST_MESSAGE = "Post inválido";
-	private final String INVALID_TITLE_POST_MESSAGE = "Título obrigatório";	
+	private final String INVALID_TITLE_POST_MESSAGE = "Título obrigatório";
+	private final String INVALID_INTERACTIVE_CONTENT_MESSAGE = "Id do conteúdo é inválido";
 	private final String INVALID_ATTRIBUTE_MESSAGE = "Atributo inválido";
 	private final String INVALID_DATA_MESSAGE = "Dado inválido";
 	
@@ -37,7 +36,6 @@ public class WebElementManager {
 	private final String SOUND = "sound";
 	
 	private WebElementManager() {
-		this.blogs = new HashMap<String, Blog>();
 	}
 	
 	public static WebElementManager getInstance() {
@@ -47,52 +45,56 @@ public class WebElementManager {
 		return selfInstance;
 	}
 	
-	public String attachMovieOnPost(String authorId, String postId, String description, String data) throws Exception {
-		if (isInvalidString(authorId)) {
-			throw new IllegalArgumentException(INVALID_AUTHOR_MESSAGE);
-		}
-		Post post = getPost(authorId, postId);
-		//TODO
+	public String attachMovieOnPost(String postId, String description, String data) throws Exception {
+		Post post = getPost(postId);
 		if (isInvalidString(data)) {
 			throw new IllegalArgumentException(INVALID_DATA_MESSAGE);
 		}
 		// Can be an empty data.
 		description = description == null? "" : description;
-		return post.attachMovie(description, data);
+		StaticContent movieDescription = new Text(description);
+		String movieId = IdGenerator.getInstance().getNextId();
+		InteractiveContent movie = new Movie(movieId, movieDescription, data);
+		DatabaseFacade.getInstance().insertInteractiveContent(movie);
+		post.attachMovie(movie.getId());
+		DatabaseFacade.getInstance().updatePost(post);
+		return movie.getId();
 	}
 	
-	public String attachPictureOnPost(String authorId, String postId, String description, String data) throws Exception {
-		if (isInvalidString(authorId)) {
-			throw new IllegalArgumentException(INVALID_AUTHOR_MESSAGE);
-		}
-		Post post = getPost(authorId, postId);
-		
+	public String attachPictureOnPost(String postId, String description, String data) throws Exception {
+		Post post = getPost(postId);
 		if (isInvalidString(data)) {
 			throw new IllegalArgumentException(INVALID_DATA_MESSAGE);
 		}
 		// Can be an empty data.
 		description = description == null? "" : description;
-		return post.attachPicture(description, data);
+		StaticContent pictureDescription = new Text(description);
+		String pictureId = IdGenerator.getInstance().getNextId();
+		InteractiveContent picture = new Picture(pictureId, pictureDescription, data);
+		DatabaseFacade.getInstance().insertInteractiveContent(picture);
+		post.attachPicture(picture.getId());
+		DatabaseFacade.getInstance().updatePost(post);
+		return picture.getId();
 	}
 
-	public String attachSoundOnPost(String authorId, String postId, String description, String data) throws Exception {
-		if (isInvalidString(authorId)) {
-			throw new IllegalArgumentException(INVALID_AUTHOR_MESSAGE);
-		}
-		Post post = getPost(authorId, postId);
-		
+	public String attachSoundOnPost(String postId, String description, String data) throws Exception {
+		Post post = getPost(postId);
 		if (isInvalidString(data)) {
 			throw new IllegalArgumentException(INVALID_DATA_MESSAGE);
 		}
 		// Can be an empty data.
 		description = description == null? "" : description;
-		return post.attachSound(description, data);
+		StaticContent soundDescription = new Text(description);
+		String soundId = IdGenerator.getInstance().getNextId();
+		InteractiveContent sound = new Sound(soundId, soundDescription, data);
+		DatabaseFacade.getInstance().insertInteractiveContent(sound);
+		post.attachSound(sound.getId());
+		DatabaseFacade.getInstance().updatePost(post);
+		return sound.getId();
 	}
 	
-	public void changeBlogInformation(String blogId, String attribute, String value) {
-		if (isInvalidString(blogId) || isInvalidBlog(blogId)) {
-			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
-		}
+	public void changeBlogInformation(String blogId, String attribute, String value) throws Exception {
+		Blog blog = getBlog(blogId);
 		if (isInvalidString(attribute)) {
 			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
 		}
@@ -102,16 +104,16 @@ public class WebElementManager {
 			}
 			value = "";
 		}
-		Blog blog = blogs.get(blogId);
 		if (attribute.equals(TITLE)) {
 			StaticContent blogTitle = new Text(value);
 			blog.setTitle(blogTitle);
-		} else if(attribute.equals(DESCRIPTION)) {
+		} else if (attribute.equals(DESCRIPTION)) {
 			StaticContent blogText = new Text(value);
 			blog.setText(blogText);
 		} else {
 			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
 		}
+		DatabaseFacade.getInstance().updateBlog(blog);
 	}
 	
 	public String createBlog(String authorId, String title, String description) throws Exception {
@@ -126,14 +128,12 @@ public class WebElementManager {
 		StaticContent blogTitle = new Text(title);
 		StaticContent blogDescription = new Text(description);
 		Blog newBlog = new Blog(blogId, authorId, blogTitle, blogDescription);
-		blogs.put(newBlog.getId(), newBlog);
+		DatabaseFacade.getInstance().insertBlog(newBlog);
 		return newBlog.getId();
 	}
 	
-	public String createPost(String blogId, String title, String text) {
-		if (isInvalidString(blogId) || isInvalidBlog(blogId)) {
-			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
-		}
+	public String createPost(String blogId, String title, String text) throws Exception {
+		Blog blog = getBlog(blogId);
 		if (isInvalidString(title)) {
 			throw new IllegalArgumentException(INVALID_TITLE_POST_MESSAGE);
 		}
@@ -144,28 +144,18 @@ public class WebElementManager {
 		StaticContent postTitle = new Text(title);
 		StaticContent postText = new Text(text);
 		Post newPost = new Post(blogId, postId, postTitle, postText);
-		Blog blog = blogs.get(blogId);
+		DatabaseFacade.getInstance().insertPost(newPost);
 		blog.addPost(newPost.getId());
-		DatabaseFacade.getInstance().insertPost(newPost.getId());
+		DatabaseFacade.getInstance().updateBlog(blog);
 		return newPost.getId();
 	}
 	
-	public Blog getBlog(String blogId) throws Exception {
-		if (isInvalidString(blogId) || isInvalidBlog(blogId)) {
-			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
-		}
-		return blogs.get(blogId);
-	}
-	
 	public String getBlogInformation(String blogId, String attribute) throws Exception {
-		if (isInvalidString(blogId) || isInvalidBlog(blogId)) {
-			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
-		}
+		Blog blog = getBlog(blogId);
 		if (isInvalidString(attribute)) {
 			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
 		}
 		
-		Blog blog = (Blog) blogs.get(blogId);
 		if (attribute.equals(TITLE)) {
 			return blog.getTitle().getText();
 		} else if (attribute.equals(AUTHOR)) {
@@ -177,13 +167,10 @@ public class WebElementManager {
 	}
 	
 	public String getPostInformation(String postId, String attribute) throws Exception {
-		if (isInvalidString(postId)) {
-			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
-		}
+		Post post = getPost(postId);
 		if (isInvalidString(attribute)) {
 			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
 		}
-		Post post = getPost(null, postId);
 		if (attribute.equals(TITLE)) {
 			return post.getTitle().getText();
 		} else if (attribute.equals(TEXT)) {
@@ -195,65 +182,25 @@ public class WebElementManager {
 		
 	}
 	
-	public void loadAllBlogs() {
-		this.blogs = DatabaseFacade.getInstance().getAllBlogs();
-	}
-	
-	public void deleteAllBlogs() {
-		blogs.clear();
-	}
-	
-	public void saveAllBlogs() {
-		DatabaseFacade dbFacade = DatabaseFacade.getInstance();
-		for (Blog blog : blogs.values()) {
-			try {
-				if (dbFacade.existsBlogInDatabase(blog.getId())) {
-					dbFacade.updateBlog(blog);
-				} else {
-					dbFacade.insertBlog(blog);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+	private Blog getBlog(String blogId) throws Exception {
+		if (isInvalidString(blogId) || isInvalidBlog(blogId)) {
+			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
 		}
+		return DatabaseFacade.getInstance().retrieveBlog(blogId);
 	}
 	
-	private String findBlogOwnerOfPost(String postId) throws Exception {
-		for (Blog blog : blogs.values()) {
-			if (blog.containsPost(postId)) {
-				return blog.getId();
-			}
-		}
-		return null;
-	}
-	
-	private String findBlogOwnerOfPost(String authorId, String postId) throws Exception {
-		List<String> authorBlogs = UsersHandler.getInstance().getAllBlogsFromUser(authorId);
-		Iterator<String> it = authorBlogs.iterator();
-		while(it.hasNext()) {
-			String blogId = it.next();
-			Blog blog = blogs.get(blogId);
-			if (blog != null && blog.containsPost(postId)) {
-				return blog.getId();
-			}
-		}
-		return null;
-	}
-	
-	private Post getPost(String authorId, String postId) throws Exception {
+	private Post getPost(String postId) throws Exception {
 		if (isInvalidString(postId)) {
 			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
 		}
-		String blogId = null;
-		if (authorId == null) {
-			blogId = findBlogOwnerOfPost(postId);
-		} else {
-			blogId = findBlogOwnerOfPost(authorId, postId);
+		return DatabaseFacade.getInstance().retrievePost(postId);
+	}
+	
+	private InteractiveContent getInteractiveContent(String interactiveContentId) throws Exception {
+		if (isInvalidString(interactiveContentId)) {
+			throw new IllegalArgumentException(INVALID_INTERACTIVE_CONTENT_MESSAGE);
 		}
-		if (blogId == null) {
-			throw new IllegalStateException(INVALID_AUTHOR_MESSAGE);
-		}
-		return blogs.get(blogId).getPost(postId);
+		return DatabaseFacade.getInstance().retrieveInteractiveContent(interactiveContentId);
 	}
 	
 	private boolean isInvalidString(String str) {
@@ -261,43 +208,47 @@ public class WebElementManager {
 	}
 
 	private boolean isInvalidBlog(String blogId) {
-		return !blogs.containsKey(blogId);
+		return !DatabaseFacade.getInstance().existsBlogInDatabase(blogId);
 	}
 
 	public Integer getPostAttachmentsNumericInformation(String postId, String attribute) throws Exception {
-		if (isInvalidString(postId)) {
-			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
-		}
+		Post post = getPost(postId);
 		if (isInvalidString(attribute)) {
 			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
 		}
 		
 		if (attribute.equals(NUMBER_OF_SOUNDS)) {
-			return getPost(null, postId).getNumberOfSounds();
-		} else if(attribute.equals(NUMBER_OF_PICTURES)) {
-			return getPost(null, postId).getNumberOfPictures();
+			return post.getNumberOfSounds();
+		} else if (attribute.equals(NUMBER_OF_PICTURES)) {
+			return post.getNumberOfPictures();
 		} else if (attribute.equals(NUMBER_OF_MOVIES)) {
-			return getPost(null, postId).getNumberOfMovies();
+			return post.getNumberOfMovies();
 		}
 		throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
 	}
 
 	public String getPostAttachmentsInformation(String postId, String attribute, Integer index) throws Exception {
-		if (isInvalidString(postId)) {
-			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
-		}
+		Post post = getPost(postId);
 		if (isInvalidString(attribute)) {
 			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
 		}
 		
 		if (attribute.equals(SOUND)) {
-			return getPost(null, postId).getSound(index).getId();
+			return getInteractiveContent(post.getSoundId(index)).getId();
 		} else if(attribute.equals(PICTURE)) {
-			return getPost(null, postId).getPicture(index).getId();
+			return getInteractiveContent(post.getPictureId(index)).getId();
 		} else if (attribute.equals(MOVIE)) {
-			return getPost(null, postId).getMovie(index).getId();
+			return getInteractiveContent(post.getMovieId(index)).getId();
 		}
 		throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
+	}
+
+	public Object getPostAuthor(String postId) throws Exception {
+		return getBlog(getPost(postId).getParentId()).getAuthorId();
+	}
+
+	public Object getBlogAuthor(String blogId) throws Exception {
+		return getBlog(blogId).getAuthorId();
 	}
 
 }

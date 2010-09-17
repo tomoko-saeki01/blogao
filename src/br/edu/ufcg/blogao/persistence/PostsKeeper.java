@@ -58,7 +58,7 @@ public class PostsKeeper {
 		new File(POSTS_PARENT_PATH + postId + POSTS_FILE_EXTENSION).delete();
 	}
 	
-	void deleteAllBlogs() {
+	void deleteAllPosts() {
 		File postsDirectory = new File(POSTS_PARENT_PATH);
 		postsDirectory.mkdirs();
 		File[] postsFiles = postsDirectory.listFiles();

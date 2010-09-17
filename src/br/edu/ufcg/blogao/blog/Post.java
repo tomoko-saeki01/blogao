@@ -2,14 +2,11 @@ package br.edu.ufcg.blogao.blog;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import br.edu.ufcg.blogao.IdGenerator;
-import br.edu.ufcg.blogao.blog.data.*;
-import br.edu.ufcg.blogao.persistence.DatabaseFacade;
+import br.edu.ufcg.blogao.blog.data.StaticContent;
 
 /**
  * @author Caio
@@ -31,7 +28,7 @@ public class Post implements WebElement {
 	private StaticContent text;
 	private Calendar creationDate;
 	private Map<String, List<String>> attachments;
-	private Map<String, Comment> comments; //<id, comment>
+	private List<String> comments;
 
 	/**
 	 * Default constructor.
@@ -49,7 +46,7 @@ public class Post implements WebElement {
 		attachments.put(MOVIES_KEY, new ArrayList<String>());
 		attachments.put(PICTURES_KEY, new ArrayList<String>());
 		attachments.put(SOUNDS_KEY, new ArrayList<String>());
-		comments = new HashMap<String, Comment>();
+		comments = new ArrayList<String>();
 	}
 	
 	public String getParentId() {
@@ -62,46 +59,30 @@ public class Post implements WebElement {
 	
 	/**
 	 * Add a comment to the post.
-	 * @param comment Post's comment.
 	 * @param id Comment's ID.
 	 */
-	public void addComment(Comment comment) {
-		comments.put(comment.getId(), comment);
+	public void addComment(String commentId) {
+		comments.add(commentId);
 	}
 	
-	public String attachMovie(String description, String data) {
-		StaticContent movieDescription = new Text(description);
-		String movieId = IdGenerator.getInstance().getNextId();
-		InteractiveContent movie = new Movie(movieId, movieDescription, data);
-		attachments.get(MOVIES_KEY).add(movie.getId());
-		DatabaseFacade.getInstance().insertInteractiveContent(movie);
-		return movie.getId();
+	public void attachMovie(String movieId) {
+		attachments.get(MOVIES_KEY).add(movieId);
 	}
 	
-	public String attachPicture(String description, String data) {
-		StaticContent pictureDescription = new Text(description);
-		String pictureId = IdGenerator.getInstance().getNextId();
-		InteractiveContent picture = new Picture(pictureId, pictureDescription, data);
-		attachments.get(PICTURES_KEY).add(picture.getId());
-		DatabaseFacade.getInstance().insertInteractiveContent(picture);
-		return picture.getId();
+	public void attachPicture(String pictureId) {
+		attachments.get(PICTURES_KEY).add(pictureId);
 	}
 	
-	public String attachSound(String description, String data) {
-		StaticContent soundDescription = new Text(description);
-		String soundId = IdGenerator.getInstance().getNextId();
-		InteractiveContent sound = new Sound(soundId, soundDescription, data);
-		attachments.get(SOUNDS_KEY).add(sound.getId());
-		DatabaseFacade.getInstance().insertInteractiveContent(sound);
-		return sound.getId();
+	public void attachSound(String soundId) {
+		attachments.get(SOUNDS_KEY).add(soundId);
 	}
 	
 	/**
-	 * Return a post's comment.
-	 * @param index Comment's index.
-	 * @return A post's comment.
+	 * Return a post's comment id.
+	 * @param index Comment's id index.
+	 * @return A post's commentId.
 	 */
-	public Comment getComment(int index) {
+	public String getCommentId(int index) {
 		return comments.get(index);
 	}
 	
@@ -118,8 +99,8 @@ public class Post implements WebElement {
 		return id;
 	}
 
-	public Movie getMovie(int index) {
-		return (Movie) DatabaseFacade.getInstance().retrieveInteractive(attachments.get(MOVIES_KEY).get(index));
+	public String getMovieId(int index) {
+		return attachments.get(MOVIES_KEY).get(index);
 	}
 	
 	/**
@@ -127,12 +108,7 @@ public class Post implements WebElement {
 	 * @return The total number of comments.
 	 */
 	public Integer getNumberOfComments() {
-		int total = 0;
-		Collection<Comment> allComments = comments.values();		
-		for (Comment c : allComments) {
-			total += c.getNumberOfAllSubComments();
-		}
-		return total;
+		return comments.size();
 	}
 	
 	public Integer getNumberOfMovies() {
@@ -155,12 +131,12 @@ public class Post implements WebElement {
 		return title;
 	}
 	
-	public Picture getPicture(int index) {
-		return (Picture) DatabaseFacade.getInstance().retrieveInteractive(attachments.get(PICTURES_KEY).get(index));
+	public String getPictureId(int index) {
+		return attachments.get(PICTURES_KEY).get(index);
 	}
 	
-	public Sound getSound(int index) {
-		return (Sound) DatabaseFacade.getInstance().retrieveInteractive(attachments.get(SOUNDS_KEY).get(index));
+	public String getSoundId(int index) {
+		return attachments.get(SOUNDS_KEY).get(index);
 	}
 	
 	/**

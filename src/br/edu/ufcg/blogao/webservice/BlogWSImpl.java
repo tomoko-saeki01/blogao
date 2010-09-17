@@ -55,32 +55,40 @@ public class BlogWSImpl implements BlogWS {
 	public String attachMovie(String sessionId, String postId,
 			String descricao, String dado) throws Exception {
 		String userId = sessionManager.getLoggedUserId(sessionId);
-		return webElementManager.attachMovieOnPost(userId, postId, descricao, dado);
+		if (!userId.equals(webElementManager.getPostAuthor(postId))) {
+			throw new IllegalArgumentException(INVALID_SESSION_MESSAGE);
+		}
+		return webElementManager.attachMovieOnPost(postId, descricao, dado);
 	}
 
 	@Override
 	public String attachPicture(String sessionId, String postId,
 			String descricao, String dado) throws Exception {
 		String userId = sessionManager.getLoggedUserId(sessionId);
-		return webElementManager.attachPictureOnPost(userId, postId, descricao, dado);
+		if (!userId.equals(webElementManager.getPostAuthor(postId))) {
+			throw new IllegalArgumentException(INVALID_SESSION_MESSAGE);
+		}
+		return webElementManager.attachPictureOnPost(postId, descricao, dado);
 	}
 
 	@Override
 	public String attachSound(String sessionId, String postId,
 			String descricao, String dado) throws Exception {
 		String userId = sessionManager.getLoggedUserId(sessionId);
-		return webElementManager.attachSoundOnPost(userId, postId, descricao, dado);
+		if (!userId.equals(webElementManager.getPostAuthor(postId))) {
+			throw new IllegalArgumentException(INVALID_SESSION_MESSAGE);
+		}
+		return webElementManager.attachSoundOnPost(postId, descricao, dado);
 	}
 
 	@Override
 	public void changeBlogInformation(String sessionId, String blogId,
 			String atributo, String valor) throws Exception {
 		String userId = sessionManager.getLoggedUserId(sessionId);
-		if (userId.equals(webElementManager.getBlog(blogId).getAuthorId())) {
-			webElementManager.changeBlogInformation(blogId, atributo, valor);
-		} else {
+		if (!userId.equals(webElementManager.getBlogAuthor(blogId))) {
 			throw new IllegalArgumentException(INVALID_SESSION_MESSAGE);
 		}
+		webElementManager.changeBlogInformation(blogId, atributo, valor);
 	}
 
 	/* (non-Javadoc)
@@ -118,10 +126,10 @@ public class BlogWSImpl implements BlogWS {
 	public String createPost(String sessionId, String blogId, String titulo,
 			String texto) throws Exception {
 		String userId = sessionManager.getLoggedUserId(sessionId);
-		if (userId.equals(webElementManager.getBlog(blogId).getAuthorId())) {
-			return webElementManager.createPost(blogId, titulo, texto);
+		if (!userId.equals(webElementManager.getBlogAuthor(blogId))) {
+			throw new IllegalArgumentException(INVALID_SESSION_MESSAGE);
 		}
-		throw new IllegalArgumentException(INVALID_SESSION_MESSAGE);
+		return webElementManager.createPost(blogId, titulo, texto);
 	}
 
 	@Override
@@ -563,19 +571,15 @@ public class BlogWSImpl implements BlogWS {
 	
 	public void cleanPersistence() {
 		DatabaseFacade.getInstance().cleanPersistence();
-		usersHandler.deleteAllUsers();
-		webElementManager.deleteAllBlogs();
 		sessionManager.logoffAllSessions();
 	}
 
 	public void loadData() {
-		usersHandler.loadAllUsers();
-		webElementManager.loadAllBlogs();
+		// Nao ha necessidade de abrir os dados para que os testes passem. As informacoes sao carregadas assim que necessarias.
 	}
 
 	public void saveData() {
-		usersHandler.saveAllUsers();
-		webElementManager.saveAllBlogs();
+		// Nao ha necessidade de salvar os dados em um momento especifico. Os dados inseridos e modificados sao salvos assim que os webMethods sao executados.
 	}
 	
 
