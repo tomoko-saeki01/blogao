@@ -51,29 +51,20 @@ public class BlogWSImpl implements BlogWS {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#attachMovie(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
 	@Override
 	public String attachMovie(String sessionId, String postId,
 			String descricao, String dado) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		return webElementManager.attachMovieOnPost(userId, postId, descricao, dado);
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#attachPicture(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
 	@Override
 	public String attachPicture(String sessionId, String postId,
 			String descricao, String dado) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		return webElementManager.attachPictureOnPost(userId, postId, descricao, dado);
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#attachSound(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
 	@Override
 	public String attachSound(String sessionId, String postId,
 			String descricao, String dado) throws Exception {
@@ -316,9 +307,8 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public String getMovie(String postId, Integer index) throws Exception {
-		 
-//		return Finder.findPost(postId).getMovie(index).getData();
-		return null;
+		final String ATTRIBUTE_MOVIE = "movie";
+		return webElementManager.getPostAttachmentsInformation(postId, ATTRIBUTE_MOVIE, index);
 	}
 
 	/* (non-Javadoc)
@@ -388,26 +378,25 @@ public class BlogWSImpl implements BlogWS {
 //		return Finder.findPost(postId).getNumberOfComments();
 		return null;
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getNumberOfMovies(java.lang.String)
-	 */
+	
 	@Override
 	public Integer getNumberOfMovies(String postId) {
-		
-//		return Finder.findPost(postId).getNumberOfMovies();
-		return null;
-
+		final String ATTRIBUTE_NUMBER_OF_MOVIES = "number_of_movies";
+		try {
+			return webElementManager.getPostAttachmentsNumericInformation(postId, ATTRIBUTE_NUMBER_OF_MOVIES);
+		} catch (Exception e) {
+			return null;
+		}
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getNumberOfPictures(java.lang.String)
-	 */
+	
 	@Override
 	public Integer getNumberOfPictures(String postId) {
-		
-//		return Finder.findPost(postId).getNumberOfPictures();
-		return null;
+		final String ATTRIBUTE_NUMBER_OF_PICTURES = "number_of_pictures";
+		try {
+			return webElementManager.getPostAttachmentsNumericInformation(postId, ATTRIBUTE_NUMBER_OF_PICTURES);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	/* (non-Javadoc)
@@ -420,14 +409,14 @@ public class BlogWSImpl implements BlogWS {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getNumberOfSounds(java.lang.String)
-	 */
 	@Override
 	public Integer getNumberOfSounds(String postId) {
-		
-//		return Finder.findPost(postId).getNumberOfSounds();
-		return null;
+		final String ATTRIBUTE_NUMBER_OF_SOUNDS = "number_of_sounds";
+		try {
+			return webElementManager.getPostAttachmentsNumericInformation(postId, ATTRIBUTE_NUMBER_OF_SOUNDS);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	/* (non-Javadoc)
@@ -457,14 +446,10 @@ public class BlogWSImpl implements BlogWS {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getPicture(java.lang.String, java.lang.Integer)
-	 */
 	@Override
 	public String getPicture(String postId, Integer index) throws Exception {
-		
-//		return Finder.findPost(postId).getPicture(index).getData();
-		return null;
+		final String ATTRIBUTE_PICTURE = "picture";
+		return webElementManager.getPostAttachmentsInformation(postId, ATTRIBUTE_PICTURE, index);
 	}
 
 	/* (non-Javadoc)
@@ -497,14 +482,10 @@ public class BlogWSImpl implements BlogWS {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getPostInformation(java.lang.String, java.lang.String)
-	 */
 	@Override
 	public String getPostInformation(String postId, String atributo)
 			throws Exception {
-		
-		return Finder.findPostInfo(postId, atributo);
+		return webElementManager.getPostInformation(postId, atributo);
 	}
 
 	/* (non-Javadoc)
@@ -529,15 +510,10 @@ public class BlogWSImpl implements BlogWS {
 		return usersHandler.getUserInformation(userId, atributo);
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getSound(java.lang.String, java.lang.Integer)
-	 */
 	@Override
 	public String getSound(String postId, Integer index) throws Exception {
-		
-//		return Finder.findPost(postId).getSound(index).getData();
-		return null;
-
+		final String ATTRIBUTE_SOUND = "sound";
+		return webElementManager.getPostAttachmentsInformation(postId, ATTRIBUTE_SOUND, index);
 	}
 
 	/* (non-Javadoc)

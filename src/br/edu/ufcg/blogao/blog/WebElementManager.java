@@ -17,15 +17,24 @@ public class WebElementManager {
 	private Map<String, Blog> blogs = null;
 	
 	private final String INVALID_BLOG_MESSAGE = "Blog inválido";
-	private final String INVALID_BLOG_AUTHOR_MESSAGE = "Autor inválido";
+	private final String INVALID_AUTHOR_MESSAGE = "Autor inválido";
 	private final String INVALID_TITLE_BLOG_MESSAGE = "Você deve especificar um título para o blog";
-	private final String INVALID_TITLE_POST_MESSAGE = "Título obrigatório";
+	private final String INVALID_POST_MESSAGE = "Post inválido";
+	private final String INVALID_TITLE_POST_MESSAGE = "Título obrigatório";	
 	private final String INVALID_ATTRIBUTE_MESSAGE = "Atributo inválido";
 	private final String INVALID_DATA_MESSAGE = "Dado inválido";
 	
+	private final String CREATION_DATE = "data_criacao";
+	private final String TEXT = "texto";
 	private final String TITLE = "titulo";
 	private final String AUTHOR = "dono";
 	private final String DESCRIPTION = "descricao";
+	private final String NUMBER_OF_MOVIES = "number_of_movies";
+	private final String NUMBER_OF_PICTURES = "number_of_pictures";
+	private final String NUMBER_OF_SOUNDS = "number_of_sounds";
+	private final String PICTURE = "picture";
+	private final String MOVIE = "movie";
+	private final String SOUND = "sound";
 	
 	private WebElementManager() {
 		this.blogs = new HashMap<String, Blog>();
@@ -36,6 +45,48 @@ public class WebElementManager {
 			selfInstance = new WebElementManager();
 		}
 		return selfInstance;
+	}
+	
+	public String attachMovieOnPost(String authorId, String postId, String description, String data) throws Exception {
+		if (isInvalidString(authorId)) {
+			throw new IllegalArgumentException(INVALID_AUTHOR_MESSAGE);
+		}
+		Post post = getPost(authorId, postId);
+		
+		if (isInvalidString(data)) {
+			throw new IllegalArgumentException(INVALID_DATA_MESSAGE);
+		}
+		// Can be an empty data.
+		description = description == null? "" : description;
+		return post.attachMovie(description, data);
+	}
+	
+	public String attachPictureOnPost(String authorId, String postId, String description, String data) throws Exception {
+		if (isInvalidString(authorId)) {
+			throw new IllegalArgumentException(INVALID_AUTHOR_MESSAGE);
+		}
+		Post post = getPost(authorId, postId);
+		
+		if (isInvalidString(data)) {
+			throw new IllegalArgumentException(INVALID_DATA_MESSAGE);
+		}
+		// Can be an empty data.
+		description = description == null? "" : description;
+		return post.attachPicture(description, data);
+	}
+
+	public String attachSoundOnPost(String authorId, String postId, String description, String data) throws Exception {
+		if (isInvalidString(authorId)) {
+			throw new IllegalArgumentException(INVALID_AUTHOR_MESSAGE);
+		}
+		Post post = getPost(authorId, postId);
+		
+		if (isInvalidString(data)) {
+			throw new IllegalArgumentException(INVALID_DATA_MESSAGE);
+		}
+		// Can be an empty data.
+		description = description == null? "" : description;
+		return post.attachSound(description, data);
 	}
 	
 	public void changeBlogInformation(String blogId, String attribute, String value) {
@@ -64,7 +115,7 @@ public class WebElementManager {
 	
 	public String createBlog(String authorId, String title, String description) throws Exception {
 		if (isInvalidString(authorId)) {
-			throw new IllegalArgumentException(INVALID_BLOG_AUTHOR_MESSAGE);
+			throw new IllegalArgumentException(INVALID_AUTHOR_MESSAGE);
 		}
 		if (isInvalidString(title)) {
 			throw new IllegalArgumentException(INVALID_TITLE_BLOG_MESSAGE);
@@ -121,6 +172,25 @@ public class WebElementManager {
 		throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
 	}
 	
+	public String getPostInformation(String postId, String attribute) throws Exception {
+		if (isInvalidString(postId)) {
+			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
+		}
+		if (isInvalidString(attribute)) {
+			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
+		}
+		Post post = getPost(null, postId);
+		if (attribute.equals(TITLE)) {
+			return post.getTitle();
+		} else if (attribute.equals(TEXT)) {
+			return post.getText().getText();
+		} else if(attribute.equals(CREATION_DATE)) {
+			return UsersHandler.getInstance().convertCalendarToStringDate(post.getCreationDate());
+		}
+		throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
+		
+	}
+	
 	public void loadAllBlogs() {
 		this.blogs = DatabaseFacade.getInstance().getAllBlogs();
 	}
@@ -143,7 +213,45 @@ public class WebElementManager {
 			}
 		}
 	}
-
+	
+	private String findBlogOwnerOfPost(String postId) throws Exception {
+		for (Blog blog : blogs.values()) {
+			if (blog.containsPost(postId)) {
+				return blog.getId();
+			}
+		}
+		return null;
+	}
+	
+	private String findBlogOwnerOfPost(String authorId, String postId) throws Exception {
+		List<String> authorBlogs = UsersHandler.getInstance().getAllBlogsFromUser(authorId);
+		Iterator<String> it = authorBlogs.iterator();
+		while(it.hasNext()) {
+			String blogId = it.next();
+			Blog blog = blogs.get(blogId);
+			if (blog != null && blog.containsPost(postId)) {
+				return blog.getId();
+			}
+		}
+		return null;
+	}
+	
+	private Post getPost(String authorId, String postId) throws Exception {
+		if (isInvalidString(postId)) {
+			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
+		}
+		String blogId = null;
+		if (authorId == null) {
+			blogId = findBlogOwnerOfPost(postId);
+		} else {
+			blogId = findBlogOwnerOfPost(authorId, postId);
+		}
+		if (blogId == null) {
+			throw new IllegalStateException(INVALID_AUTHOR_MESSAGE);
+		}
+		return blogs.get(blogId).getPost(postId);
+	}
+	
 	private boolean isInvalidString(String str) {
 		return str == null || str.trim().isEmpty();
 	}
@@ -152,23 +260,40 @@ public class WebElementManager {
 		return !blogs.containsKey(blogId);
 	}
 
-	// TODO
-	public String attachSoundOnPost(String userId, String postId, String description, String data) throws Exception {
-		if (isInvalidString(data)) {
-			throw new IllegalArgumentException(INVALID_DATA_MESSAGE);
+	public Integer getPostAttachmentsNumericInformation(String postId, String attribute) throws Exception {
+		if (isInvalidString(postId)) {
+			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
 		}
-		List<String> userBlogs = UsersHandler.getInstance().getAllBlogsFromUser(userId);
-		Iterator<String> it = userBlogs.iterator();
-		while(it.hasNext()) {
-			String blogId = it.next();
-			if (blogs.get(blogId).containsPost(postId)) {
-				Blog blog = blogs.get(blogId);
-				Post post = blog.getPost(postId);
-				return post.attachSound(description, data);
-			}
+		if (isInvalidString(attribute)) {
+			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
 		}
-		throw new IllegalStateException("POST NAO EH DO USUARIO - REFATORAR AQUI!!! - MENSAGEM NAO ESCOLHIDA");
 		
+		if (attribute.equals(NUMBER_OF_SOUNDS)) {
+			return getPost(null, postId).getNumberOfSounds();
+		} else if(attribute.equals(NUMBER_OF_PICTURES)) {
+			return getPost(null, postId).getNumberOfPictures();
+		} else if (attribute.equals(NUMBER_OF_MOVIES)) {
+			return getPost(null, postId).getNumberOfMovies();
+		}
+		throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
+	}
+
+	public String getPostAttachmentsInformation(String postId, String attribute, Integer index) throws Exception {
+		if (isInvalidString(postId)) {
+			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
+		}
+		if (isInvalidString(attribute)) {
+			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
+		}
+		
+		if (attribute.equals(SOUND)) {
+			return getPost(null, postId).getSound(index).getId();
+		} else if(attribute.equals(PICTURE)) {
+			return getPost(null, postId).getPicture(index).getId();
+		} else if (attribute.equals(MOVIE)) {
+			return getPost(null, postId).getMovie(index).getId();
+		}
+		throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
 	}
 
 }
