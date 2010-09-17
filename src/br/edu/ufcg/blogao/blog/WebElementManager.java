@@ -52,7 +52,7 @@ public class WebElementManager {
 			throw new IllegalArgumentException(INVALID_AUTHOR_MESSAGE);
 		}
 		Post post = getPost(authorId, postId);
-		
+		//TODO
 		if (isInvalidString(data)) {
 			throw new IllegalArgumentException(INVALID_DATA_MESSAGE);
 		}
@@ -104,7 +104,8 @@ public class WebElementManager {
 		}
 		Blog blog = blogs.get(blogId);
 		if (attribute.equals(TITLE)) {
-			blog.setTitle(value);
+			StaticContent blogTitle = new Text(value);
+			blog.setTitle(blogTitle);
 		} else if(attribute.equals(DESCRIPTION)) {
 			StaticContent blogText = new Text(value);
 			blog.setText(blogText);
@@ -122,8 +123,9 @@ public class WebElementManager {
 		}
 		
 		String blogId = IdGenerator.getInstance().getNextId();
+		StaticContent blogTitle = new Text(title);
 		StaticContent blogDescription = new Text(description);
-		Blog newBlog = new Blog(blogId, authorId, title, blogDescription);
+		Blog newBlog = new Blog(blogId, authorId, blogTitle, blogDescription);
 		blogs.put(newBlog.getId(), newBlog);
 		return newBlog.getId();
 	}
@@ -139,10 +141,12 @@ public class WebElementManager {
 			text = "";
 		}
 		String postId = IdGenerator.getInstance().getNextId();
+		StaticContent postTitle = new Text(title);
 		StaticContent postText = new Text(text);
-		Post newPost = new Post(postId, title, postText);
+		Post newPost = new Post(blogId, postId, postTitle, postText);
 		Blog blog = blogs.get(blogId);
-		blog.addPost(newPost);
+		blog.addPost(newPost.getId());
+		DatabaseFacade.getInstance().insertPost(newPost.getId());
 		return newPost.getId();
 	}
 	
@@ -163,7 +167,7 @@ public class WebElementManager {
 		
 		Blog blog = (Blog) blogs.get(blogId);
 		if (attribute.equals(TITLE)) {
-			return blog.getTitle();
+			return blog.getTitle().getText();
 		} else if (attribute.equals(AUTHOR)) {
 			return blog.getAuthorId();
 		} else if(attribute.equals(DESCRIPTION)) {
@@ -181,7 +185,7 @@ public class WebElementManager {
 		}
 		Post post = getPost(null, postId);
 		if (attribute.equals(TITLE)) {
-			return post.getTitle();
+			return post.getTitle().getText();
 		} else if (attribute.equals(TEXT)) {
 			return post.getText().getText();
 		} else if(attribute.equals(CREATION_DATE)) {

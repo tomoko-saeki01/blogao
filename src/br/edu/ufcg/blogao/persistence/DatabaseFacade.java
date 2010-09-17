@@ -3,6 +3,9 @@ package br.edu.ufcg.blogao.persistence;
 import java.util.Map;
 
 import br.edu.ufcg.blogao.blog.Blog;
+import br.edu.ufcg.blogao.blog.Post;
+import br.edu.ufcg.blogao.blog.data.InteractiveContent;
+import br.edu.ufcg.blogao.blog.data.Movie;
 import br.edu.ufcg.blogao.user.UserIF;
 
 public class DatabaseFacade {
@@ -104,6 +107,26 @@ public class DatabaseFacade {
 	
 	private boolean isInvalidString(String str) {
 		return str == null || str.trim().isEmpty();
+	}
+
+	public Post retrievePost(String string) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void insertPost(String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void insertInteractiveContent(InteractiveContent movie) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public InteractiveContent retrieveInteractive(String string) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	

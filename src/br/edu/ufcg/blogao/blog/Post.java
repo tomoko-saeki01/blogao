@@ -9,6 +9,7 @@ import java.util.Map;
 
 import br.edu.ufcg.blogao.IdGenerator;
 import br.edu.ufcg.blogao.blog.data.*;
+import br.edu.ufcg.blogao.persistence.DatabaseFacade;
 
 /**
  * @author Caio
@@ -25,10 +26,11 @@ public class Post implements WebElement {
 	private final String SOUNDS_KEY = "2";
 	
 	private String id;
-	private String title;
+	private String parentId;
+	private StaticContent title;
 	private StaticContent text;
 	private Calendar creationDate;
-	private Map<String, List<InteractiveContent>> attachments;
+	private Map<String, List<String>> attachments;
 	private Map<String, Comment> comments; //<id, comment>
 
 	/**
@@ -37,16 +39,25 @@ public class Post implements WebElement {
 	 * @param title The post's title.
 	 * @param text The post's text.
 	 */
-	public Post(String id, String title, StaticContent text) {
+	public Post(String parentId, String id, StaticContent title, StaticContent text) {
+		this.setParentId(parentId);
 		this.id = id;
 		this.setTitle(title);
 		this.setText(text);
 		creationDate = Calendar.getInstance();
-		attachments = new HashMap<String, List<InteractiveContent>>();
-		attachments.put(MOVIES_KEY, new ArrayList<InteractiveContent>());
-		attachments.put(PICTURES_KEY, new ArrayList<InteractiveContent>());
-		attachments.put(SOUNDS_KEY, new ArrayList<InteractiveContent>());
+		attachments = new HashMap<String, List<String>>();
+		attachments.put(MOVIES_KEY, new ArrayList<String>());
+		attachments.put(PICTURES_KEY, new ArrayList<String>());
+		attachments.put(SOUNDS_KEY, new ArrayList<String>());
 		comments = new HashMap<String, Comment>();
+	}
+	
+	public String getParentId() {
+		return parentId;
+	}
+	
+	public void setParentId(String parentId) {
+		this.parentId = parentId;
 	}
 	
 	/**
@@ -62,7 +73,8 @@ public class Post implements WebElement {
 		StaticContent movieDescription = new Text(description);
 		String movieId = IdGenerator.getInstance().getNextId();
 		InteractiveContent movie = new Movie(movieId, movieDescription, data);
-		attachments.get(MOVIES_KEY).add(movie);
+		attachments.get(MOVIES_KEY).add(movie.getId());
+		DatabaseFacade.getInstance().insertInteractiveContent(movie);
 		return movie.getId();
 	}
 	
@@ -70,7 +82,8 @@ public class Post implements WebElement {
 		StaticContent pictureDescription = new Text(description);
 		String pictureId = IdGenerator.getInstance().getNextId();
 		InteractiveContent picture = new Picture(pictureId, pictureDescription, data);
-		attachments.get(PICTURES_KEY).add(picture);
+		attachments.get(PICTURES_KEY).add(picture.getId());
+		DatabaseFacade.getInstance().insertInteractiveContent(picture);
 		return picture.getId();
 	}
 	
@@ -78,7 +91,8 @@ public class Post implements WebElement {
 		StaticContent soundDescription = new Text(description);
 		String soundId = IdGenerator.getInstance().getNextId();
 		InteractiveContent sound = new Sound(soundId, soundDescription, data);
-		attachments.get(SOUNDS_KEY).add(sound);
+		attachments.get(SOUNDS_KEY).add(sound.getId());
+		DatabaseFacade.getInstance().insertInteractiveContent(sound);
 		return sound.getId();
 	}
 	
@@ -105,7 +119,7 @@ public class Post implements WebElement {
 	}
 
 	public Movie getMovie(int index) {
-		return (Movie) attachments.get(MOVIES_KEY).get(index);
+		return (Movie) DatabaseFacade.getInstance().retrieveInteractive(attachments.get(MOVIES_KEY).get(index));
 	}
 	
 	/**
@@ -137,16 +151,16 @@ public class Post implements WebElement {
 	 * Return post's title.
 	 * @return Post's title.
 	 */
-	public String getTitle() {
+	public StaticContent getTitle() {
 		return title;
 	}
 	
 	public Picture getPicture(int index) {
-		return (Picture) attachments.get(PICTURES_KEY).get(index);
+		return (Picture) DatabaseFacade.getInstance().retrieveInteractive(attachments.get(PICTURES_KEY).get(index));
 	}
 	
 	public Sound getSound(int index) {
-		return (Sound) attachments.get(SOUNDS_KEY).get(index);
+		return (Sound) DatabaseFacade.getInstance().retrieveInteractive(attachments.get(SOUNDS_KEY).get(index));
 	}
 	
 	/**
@@ -169,7 +183,7 @@ public class Post implements WebElement {
 	 * Set post's title.
 	 * @param title Post's title.
 	 */
-	public void setTitle(String title) {
+	public void setTitle(StaticContent title) {
 		this.title = title;
 	}
 }

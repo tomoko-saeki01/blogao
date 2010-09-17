@@ -10,54 +10,53 @@ package br.edu.ufcg.blogao.blog;
  * @version 2.0 - 7th September, 2010.
  */
 
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import br.edu.ufcg.blogao.blog.data.StaticContent;
+import br.edu.ufcg.blogao.persistence.DatabaseFacade;
 
 public class Blog implements WebElement {
 	//Blog "default" attributes.
-	private String title;
+	private StaticContent title;
 	private String id;
 	private String authorId;
 	private Calendar creationDate;
 	private StaticContent description;
-	private Map<String, Blog> subBlogs; //<subBlogId, blog>
-	private Map<String, Post> posts; //<postId, post>
+	private List<String> subBlogs; //<subBlogId>
+	private List<String> posts; //<postId>
 	
 	/**
 	 * Another constructor.
 	 * @param title The blog's title.
 	 * @param description The blog's description.
 	 */
-	public Blog(String id, String authorId, String title, StaticContent description) {
+	public Blog(String id, String authorId, StaticContent title, StaticContent description) {
 		this.id = id;
 		this.setAuthorId(authorId);
 		this.setTitle(title);
 		this.setText(description);
 		this.creationDate = Calendar.getInstance();
-		this.subBlogs = new HashMap<String, Blog>();
-		this.posts = new HashMap<String, Post>();
+		this.subBlogs = new ArrayList<String>();
+		this.posts = new ArrayList<String>();
 	}
 	
 	/**
 	 * Add a post to the blog.
-	 * @param id The post's ID.
-	 * @param post The post.
+	 * @param postId The post's ID.
 	 */
-	public void addPost(Post post) {
-		posts.put(post.getId(), post);
+	public void addPost(String postId) {
+		posts.add(postId);
 	}
 	
 	/**
 	 * Verify if blog contains the post.
-	 * @param postId Id of the searched post.
+	 * @param postId Id searched.
 	 * @return true if the blog contains this postId. 
 	 */
 	public boolean containsPost(String postId) {
-		return posts.containsKey(postId);
+		return posts.contains(postId);
 	}
 	
 	/**
@@ -98,10 +97,13 @@ public class Blog implements WebElement {
 	 */
 	public Integer getNumberOfAllSubBlogs() {
 		int total = 0;
-		Collection<Blog> sub = subBlogs.values();
-		for (Blog b: sub) {
-			total += b.getNumberOfSubBlogs();
-		}		
+		for (String blogId : subBlogs) {
+			try {
+				total += (1 + DatabaseFacade.getInstance().retrieveBlog(blogId).getNumberOfAllSubBlogs());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		return total;
 	}
 	
@@ -117,9 +119,10 @@ public class Blog implements WebElement {
 	 * Return a blog's subBlog.
 	 * @param index The subBlog's ID.
 	 * @return A blog's subBlog.
+	 * @throws Exception If blogId is null or "" or doesn't exist a blog with passed blogId.
 	 */
-	public Blog getSubBlog(int index) {
-		return subBlogs.get(index);
+	public Blog getSubBlog(int index) throws Exception {
+		return DatabaseFacade.getInstance().retrieveBlog(subBlogs.get(index));
 	}
 	
 	/**
@@ -134,7 +137,7 @@ public class Blog implements WebElement {
 	 * Return the blog's title.
 	 * @return The blog's title.
 	 */
-	public String getTitle() {
+	public StaticContent getTitle() {
 		return title;
 	}
 	
@@ -160,7 +163,7 @@ public class Blog implements WebElement {
 	 * @return A blog's post.
 	 */
 	public Post getPost(int index) {
-		return posts.get(index);
+		return DatabaseFacade.getInstance().retrievePost(posts.get(index));
 	}
 	
 	/**
@@ -169,14 +172,14 @@ public class Blog implements WebElement {
 	 * @return the Post.
 	 */
 	public Post getPost(String postId) {
-		return posts.get(postId);
+		return DatabaseFacade.getInstance().retrievePost(postId);
 	}
 
 	/**
 	 * Set the blog's title.
 	 * @param title The blog's title.
 	 */
-	public void setTitle(String title) {
+	public void setTitle(StaticContent title) {
 		this.title = title;
 	}
 
