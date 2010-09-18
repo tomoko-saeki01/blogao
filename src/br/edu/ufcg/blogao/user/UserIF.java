@@ -14,12 +14,6 @@ public interface UserIF extends Identifiable {
 	public void addBlog(String blogId);
 	
 	/**
-	 * Add a new Comment reference (Comment id);
-	 * @param commentId User's Comment reference.
-	 */
-	public void addComment(String commentId);
-	
-	/**
 	 * Return user's address.
 	 * @return The user's address.
 	 */
@@ -43,19 +37,6 @@ public interface UserIF extends Identifiable {
 	 * @return All user's blogs.
 	 */
 	public List<String> getBlogs();
-	
-	/**
-	 * Gets the comment id at given index.
-	 * @param index Index of wanted Comment id.
-	 * @return Comment id.
-	 */
-	public String getCommentIdAtIndex(int index);
-	
-	/**
-	 * Return all user's comment reference.
-	 * @return comments ids.
-	 */
-	public List<String> getComments();
 
 	/**
 	 * Return the user's anniversary date.
@@ -127,12 +108,6 @@ public interface UserIF extends Identifiable {
 	 * @param blogId Index of blog id to be removed.
 	 */
 	public void removeBlogIdAtIndex(int index);
-	
-	/**
-	 * Removes an existent commentId.
-	 * @param index Index of comment id to be removed
-	 */
-	public void removeCommentIdAtIndex(int index);
 
 	/**
 	 * Set the user's address.

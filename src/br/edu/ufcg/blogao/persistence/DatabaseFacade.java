@@ -147,6 +147,14 @@ public class DatabaseFacade {
 		return usersKeeper.existsUserInDatabase(userId);
 	}
 	
+	public boolean existsInteractiveContentInDatabase(String icId) {
+		return icKeeper.existsInteractiveContentInDatabase(icId);
+	}
+	
+	public boolean existsPostInDatabase(String postId) {
+		return postsKeeper.existsPostInDatabase(postId);
+	}
+	
 	private boolean isInvalidString(String str) {
 		return str == null || str.trim().isEmpty();
 	}

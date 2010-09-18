@@ -31,7 +31,6 @@ public class UserImpl implements UserIF {
 	
 	//
 	private List<String> blogs; //<blog id>
-	private List<String> comments;
 			
 	/**
 	 * Default constructor.
@@ -84,17 +83,11 @@ public class UserImpl implements UserIF {
 		this.setBooks(books);
 		
 		blogs = new ArrayList<String>();
-		comments = new ArrayList<String>();
 	}
 	
 	@Override
 	public void addBlog(String blogId) {
 		blogs.add(blogId);
-	}
-	
-	@Override
-	public void addComment(String commentId) {
-		comments.add(commentId);
 	}
 	
 	@Override
@@ -115,16 +108,6 @@ public class UserImpl implements UserIF {
 	@Override
 	public List<String> getBlogs() {
 		return blogs;
-	}
-
-	@Override
-	public String getCommentIdAtIndex(int index) {
-		return comments.get(index);
-	}
-
-	@Override
-	public List<String> getComments() {
-		return comments;
 	}
 	
 	@Override
@@ -185,11 +168,6 @@ public class UserImpl implements UserIF {
 	@Override
 	public void removeBlogIdAtIndex(int index) {
 		blogs.remove(index);
-	}
-
-	@Override
-	public void removeCommentIdAtIndex(int index) {
-		comments.remove(index);
 	}
 	
 	@Override
