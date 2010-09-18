@@ -21,11 +21,11 @@ public class Encryptor {
 		return null;
 	}
 	
-	public static String randomEncrypt(int i) {
-		return randomEncrypt(String.valueOf(i));
+	public static String randomIntEncrypt(int i) {
+		return randomIntEncrypt(String.valueOf(i));
 	}
 	
-	public static String randomEncrypt(String str) {
+	public static String randomIntEncrypt(String str) {
 		try {
 			MessageDigest md = MessageDigest.getInstance(ENCRYPT_ALGORITHM);
 			md.update(str.getBytes());
@@ -66,7 +66,16 @@ public class Encryptor {
 	}
 	
 	private static String cutAQuarterString(String str) {
-		final int startIndex = (new Random()).nextInt(str.length() / 2);
+		final int MAXIMUM_START_INDEX = (3*(str.length())) / 4;
+		int startIndex = (new Random()).nextInt(MAXIMUM_START_INDEX);
+		// Special case: cut str starts with '0'. (Has to be changed)
+		while (str.charAt(startIndex) == '0' && startIndex > 0) {
+			startIndex--;
+		}
+		// Special case: starIndex == 0 and str starts with '0'.
+		while (str.charAt(startIndex) == '0' && startIndex <= MAXIMUM_START_INDEX) {
+			startIndex++;
+		}
 		final int endIndex = startIndex + str.length()/4;
 		return str.substring(startIndex, endIndex);
 	}

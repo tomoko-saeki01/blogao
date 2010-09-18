@@ -23,10 +23,10 @@ public class BlogaoTest {
 		String EASY_ACCEPT_TESTS_PATH = "test" + sep + "easyaccepttests" + sep; 
 		
 		List<String> acceptanceTests = new ArrayList<String>();
-		for (int i = 1; i <= 7; i++) {
+		for (int i = 1; i <= 8; i++) {
 			acceptanceTests.add(EASY_ACCEPT_TESTS_PATH + "us" + i + ".txt");
 		}
-//		acceptanceTests.add(EASY_ACCEPT_TESTS_PATH + "us7.txt");
+//		acceptanceTests.add(EASY_ACCEPT_TESTS_PATH + "us99.txt");
 		BlogWSImpl testFacade = new BlogWSImpl();
 		EasyAcceptFacade eaFacade = new EasyAcceptFacade(testFacade, acceptanceTests);
 		eaFacade.executeTests();

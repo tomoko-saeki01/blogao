@@ -28,7 +28,7 @@ public class IdGenerator {
 			nextId = retriveBackupId();
 		}
 		saveBackupId(++nextId);
-		return Encryptor.randomEncrypt(nextId);
+		return Encryptor.randomIntEncrypt(nextId);
 	}
 
 	private void saveBackupId(int i) {

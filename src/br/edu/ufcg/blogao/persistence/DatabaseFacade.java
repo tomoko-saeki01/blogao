@@ -142,28 +142,28 @@ public class DatabaseFacade {
 		return usersKeeper.retrieveUser(userId);
 	}
 	
-	public void updateBlog(Blog blog) throws Exception {
+	public synchronized void updateBlog(Blog blog) throws Exception {
 		if (blog == null) {
 			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
 		}
 		blogsKeeper.updateBlog(blog);
 	}
 	
-	public void updateComment(Comment comment) throws Exception {
+	public synchronized void updateComment(Comment comment) throws Exception {
 		if (comment == null) {
 			throw new IllegalArgumentException(INVALID_COMMENT_MESSAGE);
 		}
 		commentsKeeper.updateComment(comment);
 	}
 	
-	public void updatePost(Post post) throws Exception {
+	public synchronized void updatePost(Post post) throws Exception {
 		if (post == null) {
 			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
 		}
 		postsKeeper.updatePost(post);
 	}
 	
-	public void updateUser(UserIF user) throws Exception {
+	public synchronized void updateUser(UserIF user) throws Exception {
 		if (user == null) {
 			throw new IllegalArgumentException(INVALID_USER_MESSAGE);
 		}
