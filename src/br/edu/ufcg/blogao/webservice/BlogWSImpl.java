@@ -4,7 +4,9 @@
 package br.edu.ufcg.blogao.webservice;
 
 import java.util.Calendar;
+import java.util.List;
 
+import br.edu.ufcg.blogao.Finder;
 import br.edu.ufcg.blogao.blog.WebElementManager;
 import br.edu.ufcg.blogao.persistence.DatabaseFacade;
 import br.edu.ufcg.blogao.session.SessionManager;
@@ -21,6 +23,7 @@ public class BlogWSImpl implements BlogWS {
 	private UsersHandler usersHandler = UsersHandler.getInstance();
 	private SessionManager sessionManager = SessionManager.getInstance();
 	private WebElementManager webElementManager = WebElementManager.getInstance();
+	private Finder finder = new Finder();
 
 	@Override
 	public String addComment(String sessionId, String postId, String texto)
@@ -211,39 +214,24 @@ public class BlogWSImpl implements BlogWS {
 		webElementManager.deleteInteractiveContent(soundId);
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#findBlogByName(java.lang.String)
-	 */
 	@Override
-	public void findBlogByName(String match) {
-		// TODO Auto-generated method stub
-		
+	public List<String> findBlogByName(String match) {
+		return finder.findBlogsWithName(match);
+	}
+	
+	@Override
+	public List<String> findProfileByGender(String match) {
+		return finder.findUsersWithGender(match);
+	}
+	
+	@Override
+	public List<String> findProfileByInterests(String match) {
+		return finder.findUsersWithInterests(match);
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#findProfileByGender(java.lang.String)
-	 */
 	@Override
-	public void findProfileByGender(String match) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#findProfileByInterests(java.lang.String)
-	 */
-	@Override
-	public void findProfileByInterests(String match) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#findProfileByName(java.lang.String)
-	 */
-	@Override
-	public void findProfileByName(String match) {
-		// TODO Auto-generated method stub
+	public List<String> findProfileByName(String match) {
+		return finder.findUsersWithName(match);
 		
 	}
 

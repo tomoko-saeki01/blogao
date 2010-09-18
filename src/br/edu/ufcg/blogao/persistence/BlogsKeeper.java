@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import br.edu.ufcg.blogao.blog.Blog;
@@ -87,6 +89,18 @@ public class BlogsKeeper {
 	
 	boolean existsBlogInDatabase(String id) {
 		return (new File(BLOGS_PARENT_PATH + id + BLOGS_FILE_EXTENSION)).exists();
+	}
+
+	public List<String> listBlogsInDatabase() {
+		File blogsDirectory = new File(BLOGS_PARENT_PATH);
+		blogsDirectory.mkdirs();
+		File[] blogsFiles = blogsDirectory.listFiles();
+		List<String> blogsIds = new ArrayList<String>();
+		for (File blogFile : blogsFiles) {
+			String blogFileName = blogFile.getName();
+			blogsIds.add(blogFileName.substring(0, blogFileName.length() - BLOGS_FILE_EXTENSION.length()));
+		}
+		return blogsIds;
 	}
 
 }

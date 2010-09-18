@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import br.edu.ufcg.blogao.user.UserIF;
@@ -87,6 +89,18 @@ public class UserIFsKeeper {
 
 	boolean existsUserInDatabase(String id) {
 		return (new File(USERS_PARENT_PATH + id + USERS_FILE_EXTENSION)).exists();
+	}
+	
+	List<String> listUsersInDatabase() {
+		File usersDirectory = new File(USERS_PARENT_PATH);
+		usersDirectory.mkdirs();
+		File[] usersFiles = usersDirectory.listFiles();
+		List<String> usersIds = new ArrayList<String>();
+		for (File userFile : usersFiles) {
+			String userFileName = userFile.getName();
+			usersIds.add(userFileName.substring(0, userFileName.length() - USERS_FILE_EXTENSION.length()));
+		}
+		return usersIds;
 	}
 
 }

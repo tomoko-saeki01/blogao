@@ -58,7 +58,7 @@ public class UsersHandler {
 		DatabaseFacade.getInstance().updateUser(user);
 	}
 	
-public void removeBlogFromUser(String blogId, String login) throws Exception {
+	public void removeBlogFromUser(String blogId, String login) throws Exception {
 		UserIF user = getUser(login);
 		user.removeBlog(blogId);
 		DatabaseFacade.getInstance().updateUser(user);
@@ -287,7 +287,7 @@ public void removeBlogFromUser(String blogId, String login) throws Exception {
 		return new GregorianCalendar(year, month, dayOfMonth);
 	}
 	
-	private String convertSexToStringSex(Sex sex) {
+	public String convertSexToStringSex(Sex sex) {
 		for (String sexString : ACCEPTABLE_SEXES.keySet()) {
 			if (ACCEPTABLE_SEXES.get(sexString).equals(sex)) {
 				return sexString;

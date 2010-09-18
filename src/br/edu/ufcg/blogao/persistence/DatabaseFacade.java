@@ -1,5 +1,6 @@
 package br.edu.ufcg.blogao.persistence;
 
+import java.util.List;
 import java.util.Map;
 
 import br.edu.ufcg.blogao.blog.Blog;
@@ -10,7 +11,7 @@ import br.edu.ufcg.blogao.user.UserIF;
 
 public class DatabaseFacade {
 	
-	private final String INVALID_BLOG_MESSAGE = "Blog inv‡lido aa";
+	private final String INVALID_BLOG_MESSAGE = "Blog inv‡lido";
 	private final String INVALID_COMMENT_MESSAGE = "Coment‡rio inv‡lido";
 	private final String INVALID_USER_MESSAGE = "Usu‡rio inv‡lido";
 	private final String INVALID_POST_MESSAGE = "Post inv‡lido";
@@ -202,12 +203,20 @@ public class DatabaseFacade {
 		return icKeeper.existsInteractiveContentInDatabase(icId);
 	}
 	
+	public List<String> listUsersInDatabase() {
+		return usersKeeper.listUsersInDatabase();
+	}
+	
 	public boolean existsPostInDatabase(String postId) {
 		return postsKeeper.existsPostInDatabase(postId);
 	}
 	
 	private boolean isInvalidString(String str) {
 		return str == null || str.trim().isEmpty();
+	}
+
+	public List<String> listBlogsInDatabase() {
+		return blogsKeeper.listBlogsInDatabase();
 	}
 	
 }

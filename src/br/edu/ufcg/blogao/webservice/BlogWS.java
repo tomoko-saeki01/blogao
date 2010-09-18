@@ -1,5 +1,7 @@
 package br.edu.ufcg.blogao.webservice;
 
+import java.util.List;
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 
@@ -241,19 +243,19 @@ public interface BlogWS {
 	String sessionId) throws Exception;
 
 	@WebMethod
-	public void findProfileByName(@WebParam(name = "match")
+	public List<String> findProfileByName(@WebParam(name = "match")
 	String match);
 
 	@WebMethod
-	public void findProfileByInterests(@WebParam(name = "match")
+	public List<String> findProfileByInterests(@WebParam(name = "match")
 	String match);
 
 	@WebMethod
-	public void findProfileByGender(@WebParam(name = "match")
+	public List<String> findProfileByGender(@WebParam(name = "match")
 	String match);
 
 	@WebMethod
-	public void findBlogByName(@WebParam(name = "match")
+	public List<String> findBlogByName(@WebParam(name = "match")
 	String match);
 
 	@WebMethod
