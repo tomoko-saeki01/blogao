@@ -15,7 +15,7 @@ public class UserIFsKeeper {
 	
 	private final String SEP = System.getProperty("file.separator");
 	private final String USERS_PARENT_PATH = "resources" + SEP + "db" + SEP + "users" + SEP;
-	private final String USERS_FILE_EXTENSION = ".usr";
+	private final String USERS_FILE_EXTENSION = ".user";
 	private final String EXISTENT_USER_MESSAGE = "Usu‡rio existente";
 	private final String UNEXISTENT_USER_MESSAGE = "Usu‡rio inexistente";
 	

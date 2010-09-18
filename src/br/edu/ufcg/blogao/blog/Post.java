@@ -162,4 +162,16 @@ public class Post implements WebElement {
 	public void setTitle(StaticContent title) {
 		this.title = title;
 	}
+
+	public void removeInteractiveContent(String icId) {
+		if (attachments.get(MOVIES_KEY).contains(icId)) {
+			attachments.get(MOVIES_KEY).remove(icId);
+			
+		} else if (attachments.get(PICTURES_KEY).contains(icId)) {
+			attachments.get(PICTURES_KEY).remove(icId);
+			
+		} else if (attachments.get(SOUNDS_KEY).contains(icId)) {
+			attachments.get(SOUNDS_KEY).remove(icId);
+		}
+	}
 }

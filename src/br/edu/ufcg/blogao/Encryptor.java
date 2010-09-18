@@ -2,6 +2,7 @@ package br.edu.ufcg.blogao;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Random;
 
 public class Encryptor {
 	
@@ -9,15 +10,26 @@ public class Encryptor {
 	private Encryptor() {
 	}
 	
-	public static String encrypt(int i) {
-		return encrypt(String.valueOf(i));
-	}
-	
 	public static String encrypt(String str) {
 		try {
 			MessageDigest md = MessageDigest.getInstance(ENCRYPT_ALGORITHM);
 			md.update(str.getBytes());
-			return encryptToIntegers(new String(hexCodes(md.digest())));
+			return new String(hexCodes(md.digest()));
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public static String randomEncrypt(int i) {
+		return randomEncrypt(String.valueOf(i));
+	}
+	
+	public static String randomEncrypt(String str) {
+		try {
+			MessageDigest md = MessageDigest.getInstance(ENCRYPT_ALGORITHM);
+			md.update(str.getBytes());
+			return cutAQuarterString(encryptToIntegers(encrypt(str)));
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
@@ -51,6 +63,12 @@ public class Encryptor {
 		str = str.replaceAll("E", VALUE_OF_E);
 		str = str.replaceAll("F", VALUE_OF_F);
 		return str;
+	}
+	
+	private static String cutAQuarterString(String str) {
+		final int startIndex = (new Random()).nextInt(str.length() / 2);
+		final int endIndex = startIndex + str.length()/4;
+		return str.substring(startIndex, endIndex);
 	}
 
 }

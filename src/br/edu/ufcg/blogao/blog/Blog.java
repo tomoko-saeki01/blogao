@@ -163,18 +163,8 @@ public class Blog implements WebElement {
 	 * @return A blog's post.
 	 * @throws Exception 
 	 */
-	public Post getPost(int index) throws Exception {
-		return DatabaseFacade.getInstance().retrievePost(posts.get(index));
-	}
-	
-	/**
-	 * Return a blog's post by postId.
-	 * @param postId Id of wanted post.
-	 * @return the Post.
-	 * @throws Exception 
-	 */
-	public Post getPost(String postId) throws Exception {
-		return DatabaseFacade.getInstance().retrievePost(postId);
+	public String getPost(int index) throws Exception {
+		return posts.get(index);
 	}
 
 	/**

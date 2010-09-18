@@ -26,6 +26,12 @@ public interface InteractiveContent extends Identifiable {
 	public StaticContent getDescription();
 	
 	/**
+	 * Return the id of this interactive content.
+	 * @return parent id.
+	 */
+	public String getParentId();
+	
+	/**
 	 * Set the data.
 	 * @param data The data to be set.
 	 */
@@ -36,4 +42,10 @@ public interface InteractiveContent extends Identifiable {
 	 * @param description The description to be set.
 	 */
 	public void setDescription(StaticContent description);
+	
+	/**
+	 * Set the parent id of this interactive content.
+	 * @param parentId id of the parent.
+	 */
+	public void setParentId(String parentId);
 }

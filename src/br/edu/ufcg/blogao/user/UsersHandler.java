@@ -63,15 +63,19 @@ public class UsersHandler {
 		}
 		return DatabaseFacade.getInstance().retrieveUser(login);
 	}
+	
+	public Integer getNumberOfBlogsFromUser(String userId) throws Exception {
+		UserIF user = getUser(userId);
+		return user.getNumberOfBlogs();
+	}
+	
+	public String getBlogFromUser(String login, Integer index) throws Exception {
+		return getUser(login).getBlogIdAtIndex(index);
+	}
 
 	public void changeUserInformation(String login, String attribute, String value) throws Exception {
 		// Required parameters
-		if (isInvalidString(login)) {
-			throw new IllegalArgumentException(INVALID_LOGIN_MESSAGE);
-		}
-		if (!existsUserWithLogin(login)) {
-			throw new IllegalStateException(UNEXISTENT_USER_MESSAGE);
-		}
+		UserIF user = getUser(login);
 		if (isInvalidString(attribute)) {
 			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
 		}
@@ -103,8 +107,6 @@ public class UsersHandler {
 		if (attribute.equals(SEX) && isInvalidSex(value)) {
 			throw new IllegalArgumentException(INVALID_SEX_MESSAGE);
 		}
-		
-		UserIF user = getUser(login);
 		
 		if (attribute.equals(LOGIN)) {
 			user.setId(value);

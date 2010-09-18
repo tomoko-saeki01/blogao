@@ -11,11 +11,13 @@ package br.edu.ufcg.blogao.blog.data;
 public class Movie implements InteractiveContent {
 	
 	private String id;
+	private String parentId;
 	private StaticContent description;
 	private String data;
 	
-	public Movie(String id, StaticContent description, String data) {
+	public Movie(String id, String parentId, StaticContent description, String data) {
 		this.id = id;
+		this.setParentId(parentId);
 		this.setDescription(description);
 		this.setData(data);
 	}
@@ -43,6 +45,10 @@ public class Movie implements InteractiveContent {
 	public String getId() {
 		return id;
 	}
+	
+	public String getParentId() {
+		return parentId;
+	}
 
 	/**
 	 * Set the data.
@@ -58,5 +64,9 @@ public class Movie implements InteractiveContent {
 	@Override
 	public void setDescription(StaticContent description) {
 		this.description = description;
+	}
+	
+	public void setParentId(String parentId) {
+		this.parentId = parentId;
 	}
 }

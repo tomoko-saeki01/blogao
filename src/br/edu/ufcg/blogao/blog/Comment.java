@@ -19,6 +19,7 @@ import br.edu.ufcg.blogao.blog.data.StaticContent;
 public class Comment implements WebElement {
 	
 	private String id;
+	private String parentId;
 	private String authorId;
 	private StaticContent text;
 	private Calendar date;
@@ -29,14 +30,23 @@ public class Comment implements WebElement {
 	 * @param author Comment's author.
 	 * @param text Comment.
 	 */
-	public Comment(String id, String authorId, StaticContent text) {
+	public Comment(String id, String parentId, String authorId, StaticContent text) {
 		this.id = id;
+		this.setParentId(parentId);
 		this.setAuthorId(authorId);
 		this.setText(text);
 		this.date = Calendar.getInstance();
 		this.subComments = new HashMap<String, Comment>();
 	}
 	
+	public String getParentId() {
+		return parentId;
+	}
+	
+	public void setParentId(String parentId) {
+		this.parentId = parentId;
+	}
+
 	/**
 	 * Add a subComment to the comment.
 	 * @param subComment The subComment.

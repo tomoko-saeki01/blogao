@@ -22,14 +22,14 @@ public class BlogWSImpl implements BlogWS {
 	private SessionManager sessionManager = SessionManager.getInstance();
 	private WebElementManager webElementManager = WebElementManager.getInstance();
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#addComment(java.lang.String, java.lang.String, java.lang.String)
-	 */
 	@Override
 	public String addComment(String sessionId, String postId, String texto)
 			throws Exception {
-//		return Finder.findSession(sessionId).getPost(postId).addComment(texto);
-		return null;
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		if (!userId.equals(webElementManager.getPostAuthor(postId))) {
+			throw new IllegalArgumentException(INVALID_SESSION_MESSAGE);
+		}
+		return webElementManager.addComment(postId, userId, texto);
 	}
 
 	/* (non-Javadoc)
@@ -90,13 +90,14 @@ public class BlogWSImpl implements BlogWS {
 		}
 		webElementManager.changeBlogInformation(blogId, atributo, valor);
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#changePostInformation(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
+	
 	@Override
 	public void changePostInformation(String sessionId, String postId, String atributo, String valor) throws Exception {
-		// TODO Auto-generated method stub		
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		if (!userId.equals(webElementManager.getPostAuthor(postId))) {
+			throw new IllegalArgumentException(INVALID_SESSION_MESSAGE);
+		}
+		webElementManager.changePostInformation(postId, atributo, valor);
 	}
 
 	@Override
@@ -169,20 +170,22 @@ public class BlogWSImpl implements BlogWS {
 		// TODO Auto-generated method stub
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#deleteMovie(java.lang.String, java.lang.String)
-	 */
 	@Override
 	public void deleteMovie(String sessionId, String videoId) throws Exception {
-//		Finder.findSession(sessionId).deleteMovie(videoId);
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		if (!userId.equals(webElementManager.getInteractiveContentAuthor(videoId))) {
+			throw new IllegalArgumentException(INVALID_SESSION_MESSAGE);
+		}
+		webElementManager.deleteInteractiveContent(videoId);
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#deletePicture(java.lang.String, java.lang.String)
-	 */
+	
 	@Override
 	public void deletePicture(String sessionId, String pictureId) throws Exception {
-//		Finder.findSession(sessionId).deletePicture(pictureId);		
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		if (!userId.equals(webElementManager.getInteractiveContentAuthor(pictureId))) {
+			throw new IllegalArgumentException(INVALID_SESSION_MESSAGE);
+		}
+		webElementManager.deleteInteractiveContent(pictureId);
 	}
 
 	/* (non-Javadoc)
@@ -202,13 +205,14 @@ public class BlogWSImpl implements BlogWS {
 		// TODO Auto-generated method stub
 		
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#deleteSound(java.lang.String, java.lang.String)
-	 */
+	
 	@Override
 	public void deleteSound(String sessionId, String soundId) throws Exception {
-//		Finder.findSession(sessionId).deleteSound(soundId);
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		if (!userId.equals(webElementManager.getInteractiveContentAuthor(soundId))) {
+			throw new IllegalArgumentException(INVALID_SESSION_MESSAGE);
+		}
+		webElementManager.deleteInteractiveContent(soundId);
 	}
 
 	/* (non-Javadoc)
@@ -257,24 +261,15 @@ public class BlogWSImpl implements BlogWS {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getBlogByLogin(java.lang.String, java.lang.Integer)
-	 */
 	@Override
 	public Integer getBlogByLogin(String login, Integer index) throws Exception {
-		//TODO esse metodo ta estranho. REVER! (catha)
-//		return Finder.findUser(login).getBlog(index);
-		return null;
+		return Integer.parseInt(usersHandler.getBlogFromUser(login, index));
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getBlogBySessionId(java.lang.String, java.lang.Integer)
-	 */
 	@Override
-	public Integer getBlogBySessionId(String sessiongId, Integer index) throws Exception {
-		//TODO esse metodo ta estranho. REVER! (catha)
-//		return Finder.findSession(sessiongId).getBlog(index);
-		return null;
+	public Integer getBlogBySessionId(String sessionId, Integer index) throws Exception {
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		return Integer.parseInt((usersHandler.getBlogFromUser(userId, index)));
 	}
 
 	@Override
@@ -310,9 +305,6 @@ public class BlogWSImpl implements BlogWS {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getMovie(java.lang.String, java.lang.Integer)
-	 */
 	@Override
 	public String getMovie(String postId, Integer index) throws Exception {
 		return webElementManager.getPostAttachmentsInformation(postId, WebElementManager.MOVIE, index);
@@ -346,33 +338,21 @@ public class BlogWSImpl implements BlogWS {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getNumberOfBlogsByLogin(java.lang.String)
-	 */
 	@Override
 	public Integer getNumberOfBlogsByLogin(String login) throws Exception {
-//		return Finder.findUser(login).getNumberOfBlogs();
-		return null;
+		return usersHandler.getNumberOfBlogsFromUser(login);
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getNumberOfBlogsBySessionId(java.lang.String)
-	 */
 	@Override
-	public Integer getNumberOfBlogsBySessionId(String sessiongId)
+	public Integer getNumberOfBlogsBySessionId(String sessionId)
 			throws Exception {
-//		return Finder.findSession(sessiongId).getNumberOfBlogs();
-		return null;
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		return usersHandler.getNumberOfBlogsFromUser(userId);
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getNumberOfComments(java.lang.String)
-	 */
+	
 	@Override
 	public Integer getNumberOfComments(String postId) throws Exception {
-		// TODO Auto-generated method stub
-//		return Finder.findPost(postId).getNumberOfComments();
-		return null;
+		return webElementManager.getNumberOfCommentsFromPost(postId);
 	}
 	
 	@Override
@@ -393,14 +373,9 @@ public class BlogWSImpl implements BlogWS {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getNumberOfPosts(java.lang.String)
-	 */
 	@Override
 	public Integer getNumberOfPosts(String blogId) throws Exception {
-		// TODO Auto-generated method stub
-//		return Finder.fingBlog(blogId).getNumberOfPost();
-		return null;
+		return webElementManager.getNumberOfPostsFromBlog(blogId);
 	}
 
 	@Override
@@ -453,15 +428,10 @@ public class BlogWSImpl implements BlogWS {
 	public String getPictureDescription(String pictureId) throws Exception {
 		return webElementManager.getInteractiveContentsInformation(pictureId, WebElementManager.CONTENT_DESCRIPTION);
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getPost(java.lang.String, java.lang.Integer)
-	 */
+	
 	@Override
 	public Integer getPost(String blogId, Integer index) throws Exception {
-		// TODO Ajeitar!! (catha)
-//		return Finder.fingBlog(blogId).getPost(index);
-		return null;
+		return Integer.parseInt(webElementManager.getPostFromBlog(blogId, index));
 	}
 
 	@Override

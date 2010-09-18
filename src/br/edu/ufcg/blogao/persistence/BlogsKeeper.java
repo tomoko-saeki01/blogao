@@ -15,7 +15,7 @@ public class BlogsKeeper {
 
 	private final String SEP = System.getProperty("file.separator");
 	private final String BLOGS_PARENT_PATH = "resources" + SEP + "db" + SEP + "blogs" + SEP;
-	private final String BLOGS_FILE_EXTENSION = ".blo";
+	private final String BLOGS_FILE_EXTENSION = ".blog";
 	private final String EXISTENT_BLOG_MESSAGE = "Blog existente";
 	private final String UNEXISTENT_BLOG_MESSAGE = "Blog inexistente";
 

@@ -26,7 +26,7 @@ public class BlogaoTest {
 		for (int i = 1; i <= 14; i++) {
 			acceptanceTests.add(EASY_ACCEPT_TESTS_PATH + "us" + i + ".txt");
 		}
-//		acceptanceTests.add(EASY_ACCEPT_TESTS_PATH + "us6.txt");
+//		acceptanceTests.add(EASY_ACCEPT_TESTS_PATH + "us7.txt");
 		BlogWSImpl testFacade = new BlogWSImpl();
 		EasyAcceptFacade eaFacade = new EasyAcceptFacade(testFacade, acceptanceTests);
 		eaFacade.executeTests();
