@@ -10,7 +10,7 @@ import br.edu.ufcg.blogao.user.UserIF;
 
 public class DatabaseFacade {
 	
-	private final String INVALID_BLOG_MESSAGE = "Blog inv‡lido";
+	private final String INVALID_BLOG_MESSAGE = "Blog inv‡lido aa";
 	private final String INVALID_COMMENT_MESSAGE = "Coment‡rio inv‡lido";
 	private final String INVALID_USER_MESSAGE = "Usu‡rio inv‡lido";
 	private final String INVALID_POST_MESSAGE = "Post inv‡lido";
@@ -27,9 +27,10 @@ public class DatabaseFacade {
 		postsKeeper = new PostsKeeper();
 		usersKeeper = new UserIFsKeeper();
 		icKeeper = new InteractiveContentsKeeper();
+		commentsKeeper = new CommentsKeeper();
 	}
 	
-	public static DatabaseFacade getInstance() {
+	public synchronized static DatabaseFacade getInstance() {
 		if (selfInstance == null) {
 			selfInstance = new DatabaseFacade();
 		}
@@ -173,6 +174,7 @@ public class DatabaseFacade {
 		blogsKeeper.deleteAllBlogs();
 		usersKeeper.deleteAllUsers();
 		postsKeeper.deleteAllPosts();
+		commentsKeeper.deleteAllComments();
 		icKeeper.deleteAllInteractiveContents();
 	}
 

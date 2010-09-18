@@ -112,4 +112,3 @@ logoff sessionId=${sessionId2}
 
 #Salva os dados de forma permanente
 saveData
-
