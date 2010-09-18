@@ -131,6 +131,18 @@ public class Post implements WebElement {
 		return title;
 	}
 	
+	public List<String> getAttachments() {
+		List<String> attachmentsList = new ArrayList<String>();
+		attachmentsList.addAll(attachments.get(MOVIES_KEY));
+		attachmentsList.addAll(attachments.get(PICTURES_KEY));
+		attachmentsList.addAll(attachments.get(SOUNDS_KEY));
+		return attachmentsList;
+	}
+	
+	public List<String> getCommentsId() {
+		return comments;
+	}
+	
 	public String getPictureId(int index) {
 		return attachments.get(PICTURES_KEY).get(index);
 	}
@@ -161,6 +173,10 @@ public class Post implements WebElement {
 	 */
 	public void setTitle(StaticContent title) {
 		this.title = title;
+	}
+	
+	public void removeComment(String commentId) {
+		comments.remove(commentId);
 	}
 
 	public void removeInteractiveContent(String icId) {

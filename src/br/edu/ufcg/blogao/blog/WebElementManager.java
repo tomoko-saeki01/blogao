@@ -39,6 +39,8 @@ public class WebElementManager {
 	public static final String SOUND = "sound";
 	public static final String CONTENT_DATA = "content_data";
 	public static final String CONTENT_DESCRIPTION = "content_description";
+	public static final String COMMENT_TEXT = "comment_text";
+	public static final String COMMENT_AUTHOR = "comment_author";
 	
 	private WebElementManager() {
 	}
@@ -327,6 +329,14 @@ public class WebElementManager {
 		Blog blog = getBlog(blogId);
 		return blog.getPost(index);
 	}
+	
+	public void deleteComment(String commentId) throws Exception {
+		Comment comment = getComment(commentId);
+		Post post = getPost(comment.getParentId());
+		DatabaseFacade.getInstance().deleteComment(commentId);
+		post.removeComment(commentId);
+		DatabaseFacade.getInstance().updatePost(post);
+	}
 
 	public void deleteInteractiveContent(String icId) throws Exception {
 		InteractiveContent ic = getInteractiveContent(icId);
@@ -354,6 +364,51 @@ public class WebElementManager {
 	public Integer getNumberOfCommentsFromPost(String postId) throws Exception {
 		Post post = getPost(postId);
 		return post.getNumberOfComments();
+	}
+
+	public String getCommentInformation(String commentId, String attribute) throws Exception {
+		Comment comment = getComment(commentId);
+		if (isInvalidString(attribute)) {
+			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
+		}
+		
+		if (attribute.equals(COMMENT_TEXT)) {
+			return comment.getText().getText();
+		} else if (attribute.equals(COMMENT_AUTHOR)) {
+			return comment.getAuthorId();
+		}
+		throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
+	}
+
+	public String getCommentFromPost(String postId, Integer index) throws Exception {
+		Post post = getPost(postId);
+		if (index == null || index.compareTo(0) < 0 || (index.compareTo(post.getNumberOfComments()) > 0)) {
+			throw new IllegalArgumentException(INVALID_INDEX_MESSAGE);
+		}
+		return post.getCommentId(index);
+	}
+
+	public void deletePost(String postId) throws Exception {
+		Post post = getPost(postId);
+		for (String icId : post.getAttachments()) {
+			deleteInteractiveContent(icId);
+		}
+		for (String commentId : post.getCommentsId()) {
+			deleteComment(commentId);
+		}
+		DatabaseFacade.getInstance().deletePost(postId);
+		Blog blog = getBlog(post.getParentId());
+		blog.removePost(post.getId());
+		DatabaseFacade.getInstance().updateBlog(blog);
+	}
+
+	public void deleteBlog(String blogId) throws Exception {
+		Blog blog = getBlog(blogId);
+		for (String postId : blog.getPostsId()) {
+			deletePost(postId);
+		}
+		DatabaseFacade.getInstance().deleteBlog(blog.getId());
+		
 	}
 
 }

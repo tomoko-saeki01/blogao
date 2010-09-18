@@ -26,9 +26,6 @@ public class BlogWSImpl implements BlogWS {
 	public String addComment(String sessionId, String postId, String texto)
 			throws Exception {
 		String userId = sessionManager.getLoggedUserId(sessionId);
-		if (!userId.equals(webElementManager.getPostAuthor(postId))) {
-			throw new IllegalArgumentException(INVALID_SESSION_MESSAGE);
-		}
 		return webElementManager.addComment(postId, userId, texto);
 	}
 
@@ -161,13 +158,15 @@ public class BlogWSImpl implements BlogWS {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#deleteBlog(java.lang.String, java.lang.String)
-	 */
+	
 	@Override
 	public void deleteBlog(String sessionId, String blogId) throws Exception {
-		// TODO Auto-generated method stub
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		if (!userId.equals(webElementManager.getBlogAuthor(blogId))) {
+			throw new IllegalArgumentException(INVALID_SESSION_MESSAGE);
+		}
+		webElementManager.deleteBlog(blogId);
+		usersHandler.removeBlogFromUser(blogId, userId);
 	}
 
 	@Override
@@ -187,23 +186,20 @@ public class BlogWSImpl implements BlogWS {
 		}
 		webElementManager.deleteInteractiveContent(pictureId);
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#deletePost(java.lang.String, java.lang.String)
-	 */
+	
 	@Override
 	public void deletePost(String sessionId, String postId) throws Exception {
-		// TODO Auto-generated method stub
-		
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		if (!userId.equals(webElementManager.getPostAuthor(postId))) {
+			throw new IllegalArgumentException(INVALID_SESSION_MESSAGE);
+		}
+		webElementManager.deletePost(postId);
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#deleteProfile(java.lang.String)
-	 */
+	
 	@Override
 	public void deleteProfile(String sessionId) throws Exception {
-		// TODO Auto-generated method stub
-		
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		usersHandler.deleteUser(userId);
 	}
 	
 	@Override
@@ -277,32 +273,20 @@ public class BlogWSImpl implements BlogWS {
 			throws Exception {
 		return webElementManager.getBlogInformation(blogId, atributo);
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getComment(java.lang.String, java.lang.Integer)
-	 */
+	
 	@Override
 	public String getComment(String postId, Integer index) throws Exception {
-//		return Finder.findPost(postId).getComment(index);
-		return null;
+		return webElementManager.getCommentFromPost(postId, index);
 	}
 
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getCommentAuthor(java.lang.String)
-	 */
 	@Override
 	public String getCommentAuthor(String commentId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return webElementManager.getCommentInformation(commentId, WebElementManager.COMMENT_AUTHOR);
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getCommentText(java.lang.String)
-	 */
+	
 	@Override
 	public String getCommentText(String commentId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return webElementManager.getCommentInformation(commentId, WebElementManager.COMMENT_TEXT);
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import br.edu.ufcg.blogao.Encryptor;
+import br.edu.ufcg.blogao.blog.WebElementManager;
 import br.edu.ufcg.blogao.persistence.DatabaseFacade;
 
 public class UsersHandler {
@@ -54,6 +55,12 @@ public class UsersHandler {
 	public void addBlogToUser(String blogId, String login) throws Exception {
 		UserIF user = getUser(login);
 		user.addBlog(blogId);
+		DatabaseFacade.getInstance().updateUser(user);
+	}
+	
+public void removeBlogFromUser(String blogId, String login) throws Exception {
+		UserIF user = getUser(login);
+		user.removeBlog(blogId);
 		DatabaseFacade.getInstance().updateUser(user);
 	}
 	
@@ -340,6 +347,14 @@ public class UsersHandler {
 	
 	private boolean isInvalidString(String str) {
 		return str == null || str.trim().isEmpty();
+	}
+
+	public void deleteUser(String login) throws Exception {
+		UserIF user = getUser(login);
+		for (String blogId : user.getBlogs()) {
+			WebElementManager.getInstance().deleteBlog(blogId);
+		}
+		DatabaseFacade.getInstance().deleteUser(login);
 	}
 	
 

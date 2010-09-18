@@ -182,4 +182,10 @@ public interface UserIF extends Identifiable {
 	 */
 	public void setWhoIAm(String whoIAm);
 
+	/**
+	 * Remove a user Blog.
+	 * @param blogId Blog id
+	 */
+	public void removeBlog(String blogId);
+	
 }

@@ -229,5 +229,10 @@ public class UserImpl implements UserIF {
 	public void setWhoIAm(String whoIAm) {
 		this.whoIAm = whoIAm;
 	}
+
+	@Override
+	public void removeBlog(String blogId) {
+		blogs.remove(blogId);
+	}
 	
 }

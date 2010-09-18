@@ -23,7 +23,7 @@ public class BlogaoTest {
 		String EASY_ACCEPT_TESTS_PATH = "test" + sep + "easyaccepttests" + sep; 
 		
 		List<String> acceptanceTests = new ArrayList<String>();
-		for (int i = 1; i <= 8; i++) {
+		for (int i = 1; i <= 11; i++) {
 			acceptanceTests.add(EASY_ACCEPT_TESTS_PATH + "us" + i + ".txt");
 		}
 //		acceptanceTests.add(EASY_ACCEPT_TESTS_PATH + "us99.txt");

@@ -166,6 +166,10 @@ public class Blog implements WebElement {
 	public String getPost(int index) throws Exception {
 		return posts.get(index);
 	}
+	
+	public List<String> getPostsId() {
+		return posts;
+	}
 
 	/**
 	 * Set the blog's title.
@@ -173,6 +177,10 @@ public class Blog implements WebElement {
 	 */
 	public void setTitle(StaticContent title) {
 		this.title = title;
+	}
+	
+	public void removePost(String postId) {
+		posts.remove(postId);
 	}
 
 }
