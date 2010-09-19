@@ -142,22 +142,6 @@ public class Blog implements WebElement {
 	}
 	
 	/**
-	 * Sets the blog's author id.
-	 * @param authorId Id of blog's author.
-	 */
-	public void setAuthorId(String authorId) {
-		this.authorId = authorId;
-	}
-
-	/**
-	 * Set the blog's description.
-	 */
-	@Override
-	public void setText(StaticContent text) {
-		this.description = text;
-	}
-	
-	/**
 	 * Return a blog's post.
 	 * @param index The post's ID.
 	 * @return A blog's post.
@@ -167,8 +151,36 @@ public class Blog implements WebElement {
 		return posts.get(index);
 	}
 	
+	/**
+	 * Return the IDs of all blog's posts.
+	 * @return The IDs of all blog's posts.
+	 */
 	public List<String> getPostsId() {
 		return posts;
+	}
+	
+	/**
+	 * Remove a blog's post.
+	 * @param postId The post's ID.
+	 */
+	public void removePost(String postId) {
+		posts.remove(postId);
+	}
+	
+	/**
+	 * Sets the blog's author id.
+	 * @param authorId Id of blog's author.
+	 */
+	public void setAuthorId(String authorId) {
+		this.authorId = authorId;
+	}
+	
+	/**
+	 * Set the blog's description.
+	 */
+	@Override
+	public void setText(StaticContent text) {
+		this.description = text;
 	}
 
 	/**
@@ -178,9 +190,4 @@ public class Blog implements WebElement {
 	public void setTitle(StaticContent title) {
 		this.title = title;
 	}
-	
-	public void removePost(String postId) {
-		posts.remove(postId);
-	}
-
 }
