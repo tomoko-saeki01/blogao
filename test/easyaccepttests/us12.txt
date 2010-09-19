@@ -30,7 +30,7 @@ expect "[zefina]" findProfileByInterests match="seriados"
 expect "[sicrano]" findProfileByGender match="Masculino"
 expect "[mariasilva]" findProfileByGender match="Feminino"
 # Se o usuário buscar colocar sexo nao informado, devem ser considerados todos os gêneros
-expect "[mariasilva, sicrano, zefina]" findProfileByGender match="Não informado"
+expect "[mariasilva,sicrano,zefina]" findProfileByGender match="Não informado"
 
 blogId1=createBlog sessionId=${sessionId1} titulo="Meu primeiro blog" descricao="Quidquid latine dictum sit, altum viditur"
 blogId2=createBlog sessionId=${sessionId1} titulo="Meu segundo blog" descricao="Quidquid latine dictum sit, altum viditur"
