@@ -1,0 +1,16 @@
+<br.edu.ufcg.blogao.blog.Blog>
+  <title class="br.edu.ufcg.blogao.blog.data.Text">
+    <text>Meu primeiro blog</text>
+  </title>
+  <id>12299195</id>
+  <authorId>sicrano</authorId>
+  <creationDate>
+    <time>1284860649269</time>
+    <timezone>GMT-03:00</timezone>
+  </creationDate>
+  <description class="br.edu.ufcg.blogao.blog.data.Text">
+    <text>Quidquid latine dictum sit, altum viditur</text>
+  </description>
+  <subBlogs/>
+  <posts/>
+</br.edu.ufcg.blogao.blog.Blog>

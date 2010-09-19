@@ -1,0 +1,13 @@
+<br.edu.ufcg.blogao.blog.Comment>
+  <id>97434160</id>
+  <parentId>54499672</parentId>
+  <authorId>mariasilva</authorId>
+  <text class="br.edu.ufcg.blogao.blog.data.Text">
+    <text>mais um post</text>
+  </text>
+  <date>
+    <time>1284860649553</time>
+    <timezone>GMT-03:00</timezone>
+  </date>
+  <subComments/>
+</br.edu.ufcg.blogao.blog.Comment>

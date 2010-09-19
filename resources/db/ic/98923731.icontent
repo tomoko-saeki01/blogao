@@ -1,0 +1,8 @@
+<br.edu.ufcg.blogao.blog.data.Movie>
+  <id>98923731</id>
+  <parentId>78899003</parentId>
+  <description class="br.edu.ufcg.blogao.blog.data.Text">
+    <text>Meu primeiro video</text>
+  </description>
+  <data>meu video1</data>
+</br.edu.ufcg.blogao.blog.data.Movie>

@@ -1,0 +1,24 @@
+<br.edu.ufcg.blogao.user.UserImpl>
+  <login>sicrano</login>
+  <password>42DBD9B466D6516F9305D4FAB4076ED5</password>
+  <name></name>
+  <address>Rua das cocadas</address>
+  <email>sicrano@gmail.com</email>
+  <interests>ping pong</interests>
+  <whoIAm>E... boa pergunta!</whoIAm>
+  <dateOfBirthday>
+    <time>315543600000</time>
+    <timezone>GMT-03:00</timezone>
+  </dateOfBirthday>
+  <sex>Uninformed</sex>
+  <musics>MPB</musics>
+  <movies>e o vento levou</movies>
+  <books>poeira em alto mar</books>
+  <blogs>
+    <string>90779760</string>
+    <string>12299195</string>
+    <string>36936173</string>
+    <string>15457995</string>
+    <string>82547041</string>
+  </blogs>
+</br.edu.ufcg.blogao.user.UserImpl>

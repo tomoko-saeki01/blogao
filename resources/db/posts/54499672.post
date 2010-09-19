@@ -1,0 +1,34 @@
+<br.edu.ufcg.blogao.blog.Post>
+  <MOVIES__KEY>0</MOVIES__KEY>
+  <PICTURES__KEY>1</PICTURES__KEY>
+  <SOUNDS__KEY>2</SOUNDS__KEY>
+  <id>54499672</id>
+  <parentId>15457995</parentId>
+  <title class="br.edu.ufcg.blogao.blog.data.Text">
+    <text>Meu segundo post</text>
+  </title>
+  <text class="br.edu.ufcg.blogao.blog.data.Text">
+    <text></text>
+  </text>
+  <creationDate>
+    <time>1284860649535</time>
+    <timezone>GMT-03:00</timezone>
+  </creationDate>
+  <attachments>
+    <entry>
+      <string>2</string>
+      <list/>
+    </entry>
+    <entry>
+      <string>1</string>
+      <list/>
+    </entry>
+    <entry>
+      <string>0</string>
+      <list/>
+    </entry>
+  </attachments>
+  <comments>
+    <string>97434160</string>
+  </comments>
+</br.edu.ufcg.blogao.blog.Post>
