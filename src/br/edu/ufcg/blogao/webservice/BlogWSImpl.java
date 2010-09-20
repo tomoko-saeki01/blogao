@@ -38,7 +38,10 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public void addPostAnnouncements(String sessionId, String blogId)
 			throws Exception {
-		// TODO Auto-generated method stub		
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		if (sessionManager.isUserLogged(userId)) {
+			webElementManager.addPostAnnouncement(blogId, userId);
+		}	
 	}
 
 	/* (non-Javadoc)
@@ -156,10 +159,10 @@ public class BlogWSImpl implements BlogWS {
 	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#deleteAnnouncement(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public String deleteAnnouncement(String sessionId, String announcementId)
+	public void deleteAnnouncement(String sessionId, String announcementId)
 			throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		webElementManager.deleteAnnouncement(userId, announcementId.toString());
 	}
 	
 	@Override
@@ -241,8 +244,8 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public String getAnnouncement(String sessionId, Integer index)
 			throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		String usrId = sessionManager.getLoggedUserId(sessionId);
+		return usersHandler.getAnnouncement(usrId, index);
 	}
 
 	@Override
@@ -306,8 +309,8 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public Integer getNumberOfAnnouncements(String sessionId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		return usersHandler.getNumberOfAnnouncements(userId);
 	}
 
 	@Override
@@ -417,8 +420,7 @@ public class BlogWSImpl implements BlogWS {
 	 */
 	@Override
 	public String getPostJustCreated(String announcementId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return webElementManager.getAnnouncementTarget(announcementId);
 	}
 
 	@Override

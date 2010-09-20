@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import br.edu.ufcg.blogao.persistence.DatabaseFacade;
+
 /**
  * Represents a simple user's blog implementation.
  * @author Caio
@@ -31,7 +33,8 @@ public class UserImpl implements UserIF {
 	
 	//
 	private List<String> blogs; //<blog id>
-			
+	private List<String> announcementsListening;
+	
 	/**
 	 * Default constructor.
 	 * @param login User's login.
@@ -83,6 +86,7 @@ public class UserImpl implements UserIF {
 		this.setBooks(books);
 		
 		blogs = new ArrayList<String>();
+		announcementsListening = new ArrayList<String>();
 	}
 	
 	@Override
@@ -233,6 +237,19 @@ public class UserImpl implements UserIF {
 	@Override
 	public void removeBlog(String blogId) {
 		blogs.remove(blogId);
+	}
+	
+	@Override
+	public void doNotify(String Id) {
+		announcementsListening.add(Id);
+		try {
+			DatabaseFacade.getInstance().updateUser(this);
+		} catch (Exception e) {}
+	}
+	
+	@Override
+	public List<String> getAnnouncements() {
+		return announcementsListening;
 	}
 	
 }

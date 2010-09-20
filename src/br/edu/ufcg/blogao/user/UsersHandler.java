@@ -16,10 +16,11 @@ public class UsersHandler {
 	
 	private final String INVALID_LOGIN_MESSAGE ="Login inv‡lido";
 	private final String INVALID_PASSWORD_MESSAGE = "Senha inv‡lida";
-	private final String  INVALID_EMAIL_MESSAGE = "Email inv‡lido";
+	private final String INVALID_EMAIL_MESSAGE = "Email inv‡lido";
 	private final String INVALID_SEX_MESSAGE = "Sexo inv‡lido";
 	private final String INVALID_DATE_MESSAGE = "Data inv‡lida";
 	private final String INVALID_ATTRIBUTE_MESSAGE = "Atributo Inv‡lido";
+	private final String INVALID_INDEX_MESSAGE = "êndice inv‡lido";
 	
 	private final String EXISTENT_LOGIN_MESSAGE = "Login existente";
 	private final String EXISTENT_EMAIL_MESSAGE = "Email existente";
@@ -203,6 +204,14 @@ public class UsersHandler {
 		return getUser(userId).getBlogs();
 	}
 	
+	public String getAnnouncement(String userId, Integer index) throws Exception {
+		Notifiable usr = getUser(userId);
+		if (isInvalidIndex(index, usr.getAnnouncements().size())) {
+			throw new IllegalArgumentException(INVALID_INDEX_MESSAGE);
+		}
+		return usr.getAnnouncements().get(index);
+	}
+	
 	public String getUserInformation(String login, String attribute) throws Exception {
 		if (isInvalidString(login)) {
 			throw new IllegalArgumentException(INVALID_LOGIN_MESSAGE);
@@ -245,6 +254,11 @@ public class UsersHandler {
 	
 	public boolean existsUserWithLogin(String login) {
 		return DatabaseFacade.getInstance().existsUserInDatabase(login);
+	}
+	
+	public int getNumberOfAnnouncements(String userId) throws Exception {
+		UserIF usr = getUser(userId);
+		return usr.getAnnouncements().size();
 	}
 	
 	public boolean isPasswordFromUser(String login, String password) throws Exception {
@@ -355,6 +369,13 @@ public class UsersHandler {
 			WebElementManager.getInstance().deleteBlog(blogId);
 		}
 		DatabaseFacade.getInstance().deleteUser(login);
+	}
+	
+	private boolean isInvalidIndex(Integer index, Integer size) {
+		if (index < 0 || index >= size) {
+			return true;
+		}
+		return false;
 	}
 	
 

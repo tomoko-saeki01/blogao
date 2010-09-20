@@ -3,6 +3,7 @@ package br.edu.ufcg.blogao.persistence;
 import java.util.List;
 import java.util.Map;
 
+import br.edu.ufcg.blogao.blog.AnnouncementIF;
 import br.edu.ufcg.blogao.blog.Blog;
 import br.edu.ufcg.blogao.blog.Comment;
 import br.edu.ufcg.blogao.blog.Post;
@@ -16,12 +17,14 @@ public class DatabaseFacade {
 	private final String INVALID_USER_MESSAGE = "Usu‡rio inv‡lido";
 	private final String INVALID_POST_MESSAGE = "Post inv‡lido";
 	private final String INVALID_IC_MESSAGE = "Conteœdo inv‡lido";
+	private final String INVALID_ANNOUNCEMENT_MESSAGE = "Anuncio inv‡lido";
 	private static DatabaseFacade selfInstance = null;
 	private BlogsKeeper blogsKeeper = null;
 	private CommentsKeeper commentsKeeper = null;
 	private InteractiveContentsKeeper icKeeper = null;
 	private PostsKeeper postsKeeper = null;
 	private UserIFsKeeper usersKeeper = null;
+	private AnnouncementsKeeper annKeeper = null;
 	
 	private DatabaseFacade(){
 		blogsKeeper = new BlogsKeeper();
@@ -29,6 +32,7 @@ public class DatabaseFacade {
 		usersKeeper = new UserIFsKeeper();
 		icKeeper = new InteractiveContentsKeeper();
 		commentsKeeper = new CommentsKeeper();
+		annKeeper = new AnnouncementsKeeper();
 	}
 	
 	public synchronized static DatabaseFacade getInstance() {
@@ -73,6 +77,13 @@ public class DatabaseFacade {
 		usersKeeper.deleteUser(userId);
 	}
 	
+	public synchronized void deleteAnnouncement(String announcementId) throws Exception {
+		if (isInvalidString(announcementId)) {
+			throw new IllegalArgumentException(INVALID_ANNOUNCEMENT_MESSAGE);
+		}
+		annKeeper.deleteAnnouncement(announcementId);
+	}
+	
 	public synchronized void insertBlog(Blog blog) throws Exception {
 		if (blog == null) {
 			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
@@ -108,6 +119,13 @@ public class DatabaseFacade {
 		usersKeeper.insertUser(user);
 	}
 	
+	public synchronized void insertAnnouncement(AnnouncementIF ann) throws Exception {
+		if (ann == null) {
+			throw new IllegalArgumentException(INVALID_ANNOUNCEMENT_MESSAGE);
+		}
+		annKeeper.insertAnnouncement(ann);
+	}
+	
 	public Blog retrieveBlog(String blogId) throws Exception{
 		if (isInvalidString(blogId)) {
 			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
@@ -141,6 +159,13 @@ public class DatabaseFacade {
 			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
 		}
 		return usersKeeper.retrieveUser(userId);
+	}
+	
+	public AnnouncementIF retrieveAnnouncement(String announcementId) throws Exception{
+		if (isInvalidString(announcementId)) {
+			throw new IllegalArgumentException(INVALID_ANNOUNCEMENT_MESSAGE);
+		}
+		return annKeeper.retrieveAnnouncement(announcementId);
 	}
 	
 	public synchronized void updateBlog(Blog blog) throws Exception {
@@ -209,6 +234,10 @@ public class DatabaseFacade {
 	
 	public boolean existsPostInDatabase(String postId) {
 		return postsKeeper.existsPostInDatabase(postId);
+	}
+	
+	public boolean existsAnnouncementInDatabase(String announcementId) {
+		return annKeeper.existsAnnouncementInDatabase(announcementId);
 	}
 	
 	private boolean isInvalidString(String str) {
