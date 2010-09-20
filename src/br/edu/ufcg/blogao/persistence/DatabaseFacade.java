@@ -202,6 +202,7 @@ public class DatabaseFacade {
 		postsKeeper.deleteAllPosts();
 		commentsKeeper.deleteAllComments();
 		icKeeper.deleteAllInteractiveContents();
+		annKeeper.deleteAllAnnouncements();
 	}
 
 	public Map<String, UserIF> getAllUsers() {

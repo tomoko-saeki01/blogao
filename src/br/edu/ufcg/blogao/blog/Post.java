@@ -65,16 +65,40 @@ public class Post implements WebElement {
 		comments.add(commentId);
 	}
 	
+	/**
+	 * Attach a movie to the post.
+	 * @param movieId The movie's ID.
+	 */
 	public void attachMovie(String movieId) {
 		attachments.get(MOVIES_KEY).add(movieId);
 	}
 	
+	/**
+	 * Attach a picture to the post.
+	 * @param pictureId The post's ID.
+	 */
 	public void attachPicture(String pictureId) {
 		attachments.get(PICTURES_KEY).add(pictureId);
 	}
 	
+	/**
+	 * Attach a sound to the picture.
+	 * @param soundId The sound's ID.
+	 */
 	public void attachSound(String soundId) {
 		attachments.get(SOUNDS_KEY).add(soundId);
+	}
+	
+	/**
+	 * Return all the post's attachments.
+	 * @return The post's attachments.
+	 */
+	public List<String> getAttachments() {
+		List<String> attachmentsList = new ArrayList<String>();
+		attachmentsList.addAll(attachments.get(MOVIES_KEY));
+		attachmentsList.addAll(attachments.get(PICTURES_KEY));
+		attachmentsList.addAll(attachments.get(SOUNDS_KEY));
+		return attachmentsList;
 	}
 	
 	/**
@@ -87,6 +111,14 @@ public class Post implements WebElement {
 	}
 	
 	/**
+	 * Return the IDs of all post's comments.
+	 * @return The IDs of all post's comments.
+	 */
+	public List<String> getCommentsId() {
+		return comments;
+	}
+	
+	/**
 	 * Return post's creation date.
 	 */
 	@Override
@@ -94,11 +126,19 @@ public class Post implements WebElement {
 		return creationDate;
 	}
 	
+	/**
+	 * Return the ID.
+	 */
 	@Override
 	public String getId() {
 		return id;
 	}
 
+	/**
+	 * Return the movie's ID.
+	 * @param index The index of the movie.
+	 * @return The movie's ID.
+	 */
 	public String getMovieId(int index) {
 		return attachments.get(MOVIES_KEY).get(index);
 	}
@@ -111,16 +151,46 @@ public class Post implements WebElement {
 		return comments.size();
 	}
 	
+	/**
+	 * Return the number of movies.
+	 * @return The number of movies.
+	 */
 	public Integer getNumberOfMovies() {
 		return attachments.get(MOVIES_KEY).size();
 	}
 	
+	/**
+	 * Return the number of pictures.
+	 * @return The number of pictures.
+	 */
 	public Integer getNumberOfPictures() {
 		return attachments.get(PICTURES_KEY).size();
 	}
 	
+	/**
+	 * Return the number of sounds.
+	 * @return The number of sounds.
+	 */
 	public Integer getNumberOfSounds() {
 		return attachments.get(SOUNDS_KEY).size();
+	}
+	
+	/**
+	 * Return a picture's ID.
+	 * @param index The index of the picture.
+	 * @return The picture's ID.
+	 */
+	public String getPictureId(int index) {
+		return attachments.get(PICTURES_KEY).get(index);
+	}
+	
+	/**
+	 * Return a sound's ID.
+	 * @param index The index of the sound.
+	 * @return A sound's ID.
+	 */
+	public String getSoundId(int index) {
+		return attachments.get(SOUNDS_KEY).get(index);
 	}
 	
 	/**
@@ -131,26 +201,6 @@ public class Post implements WebElement {
 		return title;
 	}
 	
-	public List<String> getAttachments() {
-		List<String> attachmentsList = new ArrayList<String>();
-		attachmentsList.addAll(attachments.get(MOVIES_KEY));
-		attachmentsList.addAll(attachments.get(PICTURES_KEY));
-		attachmentsList.addAll(attachments.get(SOUNDS_KEY));
-		return attachmentsList;
-	}
-	
-	public List<String> getCommentsId() {
-		return comments;
-	}
-	
-	public String getPictureId(int index) {
-		return attachments.get(PICTURES_KEY).get(index);
-	}
-	
-	public String getSoundId(int index) {
-		return attachments.get(SOUNDS_KEY).get(index);
-	}
-	
 	/**
 	 * Return post's text.
 	 */
@@ -159,6 +209,30 @@ public class Post implements WebElement {
 		return text;
 	}
 
+	/**
+	 * Remove a post's comment.
+	 * @param commentId The comment's ID.
+	 */
+	public void removeComment(String commentId) {
+		comments.remove(commentId);
+	}
+
+	/**
+	 * Remove a interactive content from the post.
+	 * @param icId The ID of the interactive content. 
+	 */
+	public void removeInteractiveContent(String icId) {
+		if (attachments.get(MOVIES_KEY).contains(icId)) {
+			attachments.get(MOVIES_KEY).remove(icId);
+			
+		} else if (attachments.get(PICTURES_KEY).contains(icId)) {
+			attachments.get(PICTURES_KEY).remove(icId);
+			
+		} else if (attachments.get(SOUNDS_KEY).contains(icId)) {
+			attachments.get(SOUNDS_KEY).remove(icId);
+		}
+	}
+		
 	/**
 	 * Set the post's text.
 	 */
@@ -173,21 +247,5 @@ public class Post implements WebElement {
 	 */
 	public void setTitle(StaticContent title) {
 		this.title = title;
-	}
-	
-	public void removeComment(String commentId) {
-		comments.remove(commentId);
-	}
-
-	public void removeInteractiveContent(String icId) {
-		if (attachments.get(MOVIES_KEY).contains(icId)) {
-			attachments.get(MOVIES_KEY).remove(icId);
-			
-		} else if (attachments.get(PICTURES_KEY).contains(icId)) {
-			attachments.get(PICTURES_KEY).remove(icId);
-			
-		} else if (attachments.get(SOUNDS_KEY).contains(icId)) {
-			attachments.get(SOUNDS_KEY).remove(icId);
-		}
 	}
 }

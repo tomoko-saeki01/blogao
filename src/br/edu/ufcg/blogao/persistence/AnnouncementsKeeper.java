@@ -16,8 +16,8 @@ public class AnnouncementsKeeper {
 	private final String SEP = System.getProperty("file.separator");
 	private final String ANNOUNCEMENTS_PARENT_PATH = "resources" + SEP + "db" + SEP + "announcements" + SEP;
 	private final String ANNOUNCEMENTS_FILE_EXTENSION = ".ann";
-	private final String EXISTENT_ANNOUNCEMENT_MESSAGE = "Anuncio existente";
-	private final String UNEXISTENT_ANNOUNCEMENT_MESSAGE = "Anuncio inexistente";
+	private final String EXISTENT_ANNOUNCEMENT_MESSAGE = "Notificação existente";
+	private final String UNEXISTENT_ANNOUNCEMENT_MESSAGE = "Notificação inexistente";
 
 	private XStream xstream = null;	
 	

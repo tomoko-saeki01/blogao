@@ -42,10 +42,4 @@ public interface InteractiveContent extends Identifiable {
 	 * @param description The description to be set.
 	 */
 	public void setDescription(StaticContent description);
-	
-	/**
-	 * Set the parent id of this interactive content.
-	 * @param parentId id of the parent.
-	 */
-	public void setParentId(String parentId);
 }
