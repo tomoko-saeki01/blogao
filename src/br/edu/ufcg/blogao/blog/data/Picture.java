@@ -6,7 +6,7 @@ package br.edu.ufcg.blogao.blog.data;
  * @author Catharine
  * @author Demontie
  * @author Matheus
- * @version 1.0 - 31th August, 2010.
+ * @version 2.0 - 31th August, 2010.
  */
 public class Picture implements InteractiveContent {
 	
@@ -15,18 +15,25 @@ public class Picture implements InteractiveContent {
 	private StaticContent description;
 	private String data;
 	
+	/**
+	 * Default contructor.
+	 * @param id The picture's ID.
+	 * @param parentId The parent's ID.
+	 * @param description The picture's description.
+	 * @param data The data.
+	 */
 	public Picture(String id, String parentId, StaticContent description, String data) {
 		this.id = id;
-		this.setParentId(parentId);
+		this.parentId = parentId;
 		this.setDescription(description);
 		this.setData(data);
 	}
-	
+
 	@Override
 	public String getData() {
 		return data;
 	}
-	
+
 	@Override
 	public StaticContent getDescription() {
 		return description;
@@ -50,10 +57,5 @@ public class Picture implements InteractiveContent {
 	@Override
 	public void setDescription(StaticContent description) {
 		this.description = description;
-	}
-	
-	@Override
-	public void setParentId(String parentId) {
-		this.parentId = parentId;
 	}
 }
