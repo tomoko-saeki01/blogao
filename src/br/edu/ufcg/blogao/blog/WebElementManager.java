@@ -1,5 +1,14 @@
 package br.edu.ufcg.blogao.blog;
 
+/**
+ * @author Caio
+ * @author Carlos
+ * @author Catharine
+ * @author Demontie
+ * @author Matheus
+ * @version 2.0 - 19th September, 2010.
+ */
+
 import br.edu.ufcg.blogao.IdGenerator;
 import br.edu.ufcg.blogao.blog.data.InteractiveContent;
 import br.edu.ufcg.blogao.blog.data.Movie;
@@ -15,15 +24,15 @@ public class WebElementManager {
 	
 	private static WebElementManager selfInstance = null;
 	
-	private final String INVALID_BLOG_MESSAGE = "Blog inválido";
-	private final String INVALID_AUTHOR_MESSAGE = "Autor inválido";
-	private final String INVALID_TITLE_BLOG_MESSAGE = "Você deve especificar um título para o blog";
-	private final String INVALID_COMMENT_MESSAGE = "Comentário inválido";
-	private final String INVALID_POST_MESSAGE = "Post inválido";
-	private final String INVALID_TITLE_POST_MESSAGE = "Título obrigatório";
-	private final String INVALID_INTERACTIVE_CONTENT_MESSAGE = "Id do conteúdo é inválido";
-	private final String INVALID_ATTRIBUTE_MESSAGE = "Atributo inválido";
-	private final String INVALID_DATA_MESSAGE = "Dado inválido";
+	private final String INVALID_BLOG_MESSAGE = "Blog inv·lido";
+	private final String INVALID_AUTHOR_MESSAGE = "Autor inv·lido";
+	private final String INVALID_TITLE_BLOG_MESSAGE = "VocÍ deve especificar um tÌtulo para o blog";
+	private final String INVALID_COMMENT_MESSAGE = "Coment·rio inv·lido";
+	private final String INVALID_POST_MESSAGE = "Post inv·lido";
+	private final String INVALID_TITLE_POST_MESSAGE = "TÌtulo obrigatÛrio";
+	private final String INVALID_INTERACTIVE_CONTENT_MESSAGE = "Id do conte˙do È inv·lido";
+	private final String INVALID_ATTRIBUTE_MESSAGE = "Atributo inv·lido";
+	private final String INVALID_DATA_MESSAGE = "Dado inv·lido";
 	private final String INVALID_INDEX_MESSAGE = "Índice incorreto";
 	private final String INVALID_ANNOUNCEMENT_MESSAGE = "Anuncio invalido";
 	
@@ -47,6 +56,10 @@ public class WebElementManager {
 	private WebElementManager() {
 	}
 	
+	/**
+	 * Return the instance of the WebElementManager.
+	 * @return The instance of the WebElementManager.
+	 */
 	public static WebElementManager getInstance() {
 		if (selfInstance == null) {
 			selfInstance = new WebElementManager();
@@ -54,6 +67,51 @@ public class WebElementManager {
 		return selfInstance;
 	}
 	
+	/**
+	 * Add a comment to the post.
+	 * @param postId The post's ID.
+	 * @param authorId The author's ID.
+	 * @param text The comment's text.
+	 * @return The comment's ID.
+	 * @throws Exception If the postId is null, empty or doesn't exist a post with the passed postId.
+	 * 					 If the authorId is null or empty or doesn't exist a author with the passed authorId.
+	 */
+	public String addComment(String postId, String authorId, String text) throws Exception {
+		Post post = getPost(postId);
+		if (isInvalidString(authorId)) {
+			throw new IllegalArgumentException(INVALID_AUTHOR_MESSAGE);
+		}
+		
+		String commentId = IdGenerator.getInstance().getNextId();
+		StaticContent commentText = new Text(text);
+		Comment newComment = new Comment(commentId, postId, authorId, commentText);
+		DatabaseFacade.getInstance().insertComment(newComment);
+		post.addComment(newComment.getId());
+		DatabaseFacade.getInstance().updatePost(post);
+		return newComment.getId();
+	}
+	
+	/**
+	 * Add a announcement to the post.
+	 * @param blogId The blog's ID.
+	 * @param userId The user's ID. 
+	 * @throws Exception If the blogId is null, empty or doesn't exist a blog with the passed blogId.
+	 */
+	public void addPostAnnouncement(String blogId, String userId) throws Exception {
+		UserIF usr = DatabaseFacade.getInstance().retrieveUser(userId);
+		Blog blog = getBlog(blogId);
+		blog.addNotifiable(usr);
+		DatabaseFacade.getInstance().updateBlog(blog);
+	}
+	
+	/**
+	 * Attach a movie to the post.
+	 * @param postId The post's ID.
+	 * @param description The description. 
+	 * @param data The data.
+	 * @return The movie's ID.
+	 * @throws Exception If data is null or empty. If the postId is null, empty or doesn't exist a post with passed postId.
+	 */
 	public String attachMovieOnPost(String postId, String description, String data) throws Exception {
 		Post post = getPost(postId);
 		if (isInvalidString(data)) {
@@ -70,6 +128,14 @@ public class WebElementManager {
 		return movie.getId();
 	}
 	
+	/**
+	 * Attach a picture to the post.
+	 * @param postId The post's ID.
+	 * @param description The description.
+	 * @param data The data.
+	 * @return The picture's ID.
+	 * @throws Exception If data is null or empty. If postId is null, empty or doesn't exist a post with passed postId. 
+	 */
 	public String attachPictureOnPost(String postId, String description, String data) throws Exception {
 		Post post = getPost(postId);
 		if (isInvalidString(data)) {
@@ -86,6 +152,14 @@ public class WebElementManager {
 		return picture.getId();
 	}
 
+	/**
+	 * Attach a sound to the post.
+	 * @param postId The post's ID.
+	 * @param description The description.
+	 * @param data The data.
+	 * @return The sound's ID.
+	 * @throws Exception If data is null or empty doesn't exist a post with passed postId.
+	 */
 	public String attachSoundOnPost(String postId, String description, String data) throws Exception {
 		Post post = getPost(postId);
 		if (isInvalidString(data)) {
@@ -102,6 +176,13 @@ public class WebElementManager {
 		return sound.getId();
 	}
 	
+	/**
+	 * Change the blog's informatation.
+	 * @param blogId The blog's ID.
+	 * @param attribute The attribute that will change.
+	 * @param value The value.
+	 * @throws Exception If attribute, or value, is null or empty. If the blogId is null, empty doesn't exist a blog with passed blogId.
+	 */
 	public void changeBlogInformation(String blogId, String attribute, String value) throws Exception {
 		Blog blog = getBlog(blogId);
 		if (isInvalidString(attribute)) {
@@ -125,6 +206,13 @@ public class WebElementManager {
 		DatabaseFacade.getInstance().updateBlog(blog);
 	}
 	
+	/**
+	 * Change post's textual information.
+	 * @param postId The post's ID.
+	 * @param attribute The attribute that will change.
+	 * @param value The value.
+	 * @throws Exception If attribute, or value, is null or empty. If the postId is null, empty doesn't exist a post with passed postId.
+	 */
 	public void changePostInformation(String postId, String attribute, String value) throws Exception {
 		Post post = getPost(postId);
 		if (isInvalidString(attribute)) {
@@ -149,6 +237,14 @@ public class WebElementManager {
 		
 	}
 	
+	/**
+	 * Create a new blog.
+	 * @param authorId The blog's author.
+	 * @param title The blog's title. 
+	 * @param description The blog's description.
+	 * @return The blog's ID.
+	 * @throws Exception If authorID, or title, is null or empty. 
+	 */
 	public String createBlog(String authorId, String title, String description) throws Exception {
 		if (isInvalidString(authorId)) {
 			throw new IllegalArgumentException(INVALID_AUTHOR_MESSAGE);
@@ -165,6 +261,14 @@ public class WebElementManager {
 		return newBlog.getId();
 	}
 	
+	/**
+	 * Create a new post for a blog.
+	 * @param blogId The blog where que post will be create.
+	 * @param title The post's title.
+	 * @param text The post's title.
+	 * @return The post's id.
+	 * @throws Exception If title is null or empty. If the blogId is null, empty doesn't exist a blog with passed blogId.
+	 */
 	public String createPost(String blogId, String title, String text) throws Exception {
 		Blog blog = getBlog(blogId);
 		if (isInvalidString(title)) {
@@ -186,6 +290,115 @@ public class WebElementManager {
 		return newPost.getId();
 	}
 	
+	/**
+	 * Delete a specific announcement.
+	 * @param userId The user's ID.
+	 * @param announcementId The announcement's ID.
+	 * @throws Exception If the announcement or the user doesn't exist.
+	 */
+	public void deleteAnnouncement(String userId, String announcementId) throws Exception {
+		UserIF usr = DatabaseFacade.getInstance().retrieveUser(userId);
+		//AnnouncementIF ann = DatabaseFacade.getInstance().retrieveAnnouncement(announcementId);
+		//Post post = DatabaseFacade.getInstance().retrievePost(ann.getTargetId());
+		//Blog blog = DatabaseFacade.getInstance().retrieveBlog(post.getParentId());
+		//blog.removeNotifiable(usr)
+		//Ainda nao entendi direito como deve funcionar o delete Announcement
+		//Deve apenas remover o anuncio (funcionalidade atual) ou deve
+		//remover o usuario da lista de notificadores do blog (funcionalidade se remover os comments)?
+		usr.getAnnouncements().remove(announcementId);
+		DatabaseFacade.getInstance().deleteAnnouncement(announcementId);
+		DatabaseFacade.getInstance().updateUser(usr);
+	}
+	
+	/**
+	 * Delete a specific blog.
+	 * @param blogId The blog's ID.
+	 * @throws Exception If the blogId is null, empty or doesn't exist the blog with the passed blogId.
+	 */
+	public void deleteBlog(String blogId) throws Exception {
+		Blog blog = getBlog(blogId);
+		for (String postId : blog.getPostsId()) {
+			deletePost(postId);
+		}
+		DatabaseFacade.getInstance().deleteBlog(blog.getId());
+		
+	}
+	
+	/**
+	 * Delete a comment in a post.
+	 * @param commentId The comment's ID.
+	 * @throws Exception If commentId is null, empty or doesn't exist the comment with the passed ID.
+	 */
+	public void deleteComment(String commentId) throws Exception {
+		Comment comment = getComment(commentId);
+		Post post = getPost(comment.getParentId());
+		DatabaseFacade.getInstance().deleteComment(commentId);
+		post.removeComment(commentId);
+		DatabaseFacade.getInstance().updatePost(post);
+	}
+	
+	/**
+	 * Delete a interactive content in a post.
+	 * @param icId The ID of the interactive content.
+	 * @throws Exception If the icId is null, empty or doesn't exist the IC with the passed icId.
+	 */
+	public void deleteInteractiveContent(String icId) throws Exception {
+		InteractiveContent ic = getInteractiveContent(icId);
+		Post post = getPost(ic.getParentId());
+		DatabaseFacade.getInstance().deleteInteractiveContent(icId);
+		post.removeInteractiveContent(ic.getId());
+		DatabaseFacade.getInstance().updatePost(post);
+	}
+	
+	/**
+	 * Delete a specific post.
+	 * @param postId The post's ID.
+	 * @throws Exception If the postId is null, empty or doesn't exist the post with the passed postId.
+	 */
+	public void deletePost(String postId) throws Exception {
+		Post post = getPost(postId);
+		for (String icId : post.getAttachments()) {
+			deleteInteractiveContent(icId);
+		}
+		for (String commentId : post.getCommentsId()) {
+			deleteComment(commentId);
+		}
+		DatabaseFacade.getInstance().deletePost(postId);
+		Blog blog = getBlog(post.getParentId());
+
+		blog.removePost(post.getId());
+		DatabaseFacade.getInstance().updateBlog(blog);
+	}
+	
+	/**
+	 * Return the ID of a announcement target..
+	 * @param announcementId The announcement's ID.
+	 * @return The ID of a announcement target.
+	 * @throws Exception If announcementId is null, empty or doesn't exist the announcement with the passed ID.
+	 */
+	public String getAnnouncementTarget(String announcementId) throws Exception {
+		AnnouncementIF ann = getAnnouncement(announcementId);
+		return ann.getTargetId();
+	}
+	
+	/**
+	 * Return the author's ID of a specific blog.
+	 * @param blogId The blog's ID.
+	 * @return The author's ID.
+	 * @throws Exception If the blogId is null, empty or doesn't exist a blog with the passed blogId.
+	 */
+	public String getBlogAuthor(String blogId) throws Exception {
+		return getBlog(blogId).getAuthorId();
+	}
+	
+	/**
+	 * Return the blog's information.
+	 * @param blogId The blog's ID.
+	 * @param attribute The information that the blog has (title, author or description).
+	 * 					The attributes: "titulo", "dono", "descricao".
+	 * @return The blog's information.
+	 * @throws Exception If attribute is null or empty. If blogID is null, empty or doesn't exist a blog with passed blogId. 
+	 */
 	public String getBlogInformation(String blogId, String attribute) throws Exception {
 		Blog blog = getBlog(blogId);
 		if (isInvalidString(attribute)) {
@@ -202,83 +415,108 @@ public class WebElementManager {
 		throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
 	}
 	
+	/**
+	 * Return the comment's ID from a specific post.
+	 * @param postId The post's id.
+	 * @param index The comment's index.
+	 * @return The comment's ID.
+	 * @throws Exception If the postID is null, empty or doesn't exist the post with the passed postId.
+	 * 					 If the index is null or less then 0 (zero).
+	 */
+	public String getCommentFromPost(String postId, Integer index) throws Exception {
+		Post post = getPost(postId);
+		if (index == null || index.compareTo(0) < 0 || (index.compareTo(post.getNumberOfComments()) > 0)) {
+			throw new IllegalArgumentException(INVALID_INDEX_MESSAGE);
+		}
+		return post.getCommentId(index);
+	}
+	
+	/**
+	 * Return comment's information.
+	 * @param commentId The comment's ID.
+	 * @param attribute The information that comment has (text, author).
+	 * 					The attribute: "comment_text", "comment_author".
+	 * @return The comment's author's ID to author information. The comment's text to the text.
+	 * @throws Exception If the commented, or attribute, is null, empty or doesn't exit a comment with the passed commentId.
+	 */
+	public String getCommentInformation(String commentId, String attribute) throws Exception {
+		Comment comment = getComment(commentId);
+		if (isInvalidString(attribute)) {
+			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
+		}
+		
+		if (attribute.equals(COMMENT_TEXT)) {
+			return comment.getText().getText();
+		} else if (attribute.equals(COMMENT_AUTHOR)) {
+			return comment.getAuthorId();
+		}
+		throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
+	}
+	
+	/**
+	 * Return the author's ID of a specific interactive content.
+	 * @param icId The ID of the interactive content.
+	 * @return The author's ID of a specific interactive content.
+	 * @throws Exception If the icId is null, empty or doesn't exist a interactive content with passed icId.
+	 */
+	public String getInteractiveContentAuthor(String icId) throws Exception {
+		return getBlog(getPost(getInteractiveContent(icId).getParentId()).getParentId()).getAuthorId();
+	}
+	
+	/**
+	 * Return the post's interactive contents information.
+	 * @param icId The ID of the interactive contents.
+	 * @param attribute The information that the IC has (data, description).
+	 * 					The attributes: "content_data", "content_description".
+	 * @return The post's interactive contents information.
+	 * @throws Exception If attribute is null, empty or different of the expected.
+	 */
+	public String getInteractiveContentsInformation(String icId, String attribute) throws Exception {
+		InteractiveContent iContent = getInteractiveContent(icId);
+		if (isInvalidString(attribute)) {
+			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
+		}
+		
+		if (attribute.equals(CONTENT_DATA)) {
+			return iContent.getData();
+		} else if (attribute.equals(CONTENT_DESCRIPTION)) {
+			return iContent.getDescription().getText();
+		}
+		throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
+	}
+		
+	/**
+	 * Return the number of comments from a specific post.
+	 * @param postId The post's ID.
+	 * @return The number of comments.
+	 * @throws Exception If the postId is null, empty or doesn't exist a post with the passed postId.
+	 */
+	public Integer getNumberOfCommentsFromPost(String postId) throws Exception {
+		Post post = getPost(postId);
+		return post.getNumberOfComments();
+	}
+	
+	/**
+	 * The number of post of a specific blog.
+	 * @param blogId The blog's ID.
+	 * @return The number of blog's posts.
+	 * @throws Exception If blogId is null, empty doesn't exist a blog with passed blogId.
+	 */
 	public Integer getNumberOfPostsFromBlog(String blogId) throws Exception {
 		Blog blog = getBlog(blogId);
 		return blog.getNumberOfPosts();
 	}
 	
-	public String getPostInformation(String postId, String attribute) throws Exception {
-		Post post = getPost(postId);
-		if (isInvalidString(attribute)) {
-			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
-		}
-		if (attribute.equals(TITLE)) {
-			return post.getTitle().getText();
-		} else if (attribute.equals(TEXT)) {
-			return post.getText().getText();
-		} else if(attribute.equals(CREATION_DATE)) {
-			return UsersHandler.getInstance().convertCalendarToStringDate(post.getCreationDate());
-		}
-		throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
-		
-	}
-	
-	private Blog getBlog(String blogId) throws Exception {
-		if (isInvalidString(blogId) || !DatabaseFacade.getInstance().existsBlogInDatabase(blogId)) {
-			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
-		}
-		return DatabaseFacade.getInstance().retrieveBlog(blogId);
-	}
-	
-	private Comment getComment(String commentId) throws Exception {
-		if (isInvalidString(commentId) || !DatabaseFacade.getInstance().existsCommentInDatabase(commentId)) {
-			throw new IllegalArgumentException(INVALID_COMMENT_MESSAGE);
-		}
-		return DatabaseFacade.getInstance().retrieveComment(commentId);
-	}
-	
-	private Post getPost(String postId) throws Exception {
-		if (isInvalidString(postId) || !DatabaseFacade.getInstance().existsPostInDatabase(postId)) {
-			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
-		}
-		return DatabaseFacade.getInstance().retrievePost(postId);
-	}
-	
-	private InteractiveContent getInteractiveContent(String interactiveContentId) throws Exception {
-		if (isInvalidString(interactiveContentId) || 
-				!DatabaseFacade.getInstance().existsInteractiveContentInDatabase(interactiveContentId)) {
-			throw new IllegalArgumentException(INVALID_INTERACTIVE_CONTENT_MESSAGE);
-		}
-		return DatabaseFacade.getInstance().retrieveInteractiveContent(interactiveContentId);
-	}
-	
-	private AnnouncementIF getAnnouncement(String announcementId) throws Exception {
-		if (isInvalidString(announcementId) || !DatabaseFacade.getInstance().existsAnnouncementInDatabase(announcementId)) {
-			throw new IllegalArgumentException(INVALID_ANNOUNCEMENT_MESSAGE);
-		}
-		return DatabaseFacade.getInstance().retrieveAnnouncement(announcementId);
-	}
-	
-	private boolean isInvalidString(String str) {
-		return str == null || str.trim().isEmpty();
-	}
-
-	public Integer getPostAttachmentsNumericInformation(String postId, String attribute) throws Exception {
-		Post post = getPost(postId);
-		if (isInvalidString(attribute)) {
-			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
-		}
-		
-		if (attribute.equals(NUMBER_OF_SOUNDS)) {
-			return post.getNumberOfSounds();
-		} else if (attribute.equals(NUMBER_OF_PICTURES)) {
-			return post.getNumberOfPictures();
-		} else if (attribute.equals(NUMBER_OF_MOVIES)) {
-			return post.getNumberOfMovies();
-		}
-		throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
-	}
-
+	/**
+	 * Return the ID of a specific attachment.
+	 * @param postId The post's ID.
+	 * @param attribute The information that the post has (sound, movie, picture).
+	 * 					The attributes: "sound", "movie", "picture".
+	 * @param index The index.
+	 * @return The ID of a specific attachment.
+	 * @throws Exception If the attribute is null or empty. If index is null or less than 0 (zero).
+	 *                   If the postId is null, empty doesn't exist a post with passed postId.
+	 */
 	public String getPostAttachmentsInformation(String postId, String attribute, Integer index) throws Exception {
 		Post post = getPost(postId);
 		if (isInvalidString(attribute)) {
@@ -311,149 +549,173 @@ public class WebElementManager {
 		}
 	}
 	
-	public String getInteractiveContentsInformation(String icId, String attribute) throws Exception {
-		InteractiveContent iContent = getInteractiveContent(icId);
+	/**
+	 * Return a numerical informal about the post's information.
+	 * @param postId The post's ID.
+	 * @param attribute The information that the post has (number of sounds, number of pictures, number of movies).
+	 *                  The attributes: "number_of_sounds", "number_of_movies", "number_of_pictures".
+	 * @return The number of determinate post's attachments.
+	 * @throws Exception Is attribute is null or empty. If the postId is null, empty or doesn't exist a post with passed postId.
+	 */
+	public Integer getPostAttachmentsNumericInformation(String postId, String attribute) throws Exception {
+		Post post = getPost(postId);
 		if (isInvalidString(attribute)) {
 			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
 		}
 		
-		if (attribute.equals(CONTENT_DATA)) {
-			return iContent.getData();
-		} else if (attribute.equals(CONTENT_DESCRIPTION)) {
-			return iContent.getDescription().getText();
+		if (attribute.equals(NUMBER_OF_SOUNDS)) {
+			return post.getNumberOfSounds();
+		} else if (attribute.equals(NUMBER_OF_PICTURES)) {
+			return post.getNumberOfPictures();
+		} else if (attribute.equals(NUMBER_OF_MOVIES)) {
+			return post.getNumberOfMovies();
 		}
 		throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
 	}
 	
-	public String getInteractiveContentAuthor(String icId) throws Exception {
-		return getBlog(getPost(getInteractiveContent(icId).getParentId()).getParentId()).getAuthorId();
-	}
-
+	/**
+	 * Return the author's ID of a specific post.
+	 * @param postId The post's ID.
+	 * @return The author's ID.
+	 * @throws Exception If postId if null, empty or doesn't exist a post with the passed postId.
+	 */
 	public String getPostAuthor(String postId) throws Exception {
 		return getBlog(getPost(postId).getParentId()).getAuthorId();
 	}
-
-	public String getBlogAuthor(String blogId) throws Exception {
-		return getBlog(blogId).getAuthorId();
-	}
-
-	public String getPostFromBlog(String blogId, Integer index) throws Exception {
-		Blog blog = getBlog(blogId);
-		return blog.getPost(index);
-	}
 	
-	public String getAnnouncementTarget(String announcementId) throws Exception {
-		AnnouncementIF ann = getAnnouncement(announcementId);
-		return ann.getTargetId();
-	}
-	
-	public void deleteComment(String commentId) throws Exception {
-		Comment comment = getComment(commentId);
-		Post post = getPost(comment.getParentId());
-		DatabaseFacade.getInstance().deleteComment(commentId);
-		post.removeComment(commentId);
-		DatabaseFacade.getInstance().updatePost(post);
-	}
-
-	public void deleteInteractiveContent(String icId) throws Exception {
-		InteractiveContent ic = getInteractiveContent(icId);
-		Post post = getPost(ic.getParentId());
-		DatabaseFacade.getInstance().deleteInteractiveContent(icId);
-		post.removeInteractiveContent(ic.getId());
-		DatabaseFacade.getInstance().updatePost(post);
-	}
-
-	public String addComment(String postId, String authorId, String text) throws Exception {
+	/**
+	 * Return the post's information.
+	 * @param postId The post's ID.
+	 * @param attribute The information that the post has (title, text, creation date). 
+	 * 					The attributes: "dono", "texto", "data_criacao".
+	 * @return The post's information.
+	 * @throws Exception If attribute is null or empty. If the postId is null, empty or doesn't exist a post with passed postId.
+	 */
+	public String getPostInformation(String postId, String attribute) throws Exception {
 		Post post = getPost(postId);
-		if (isInvalidString(authorId)) {
-			throw new IllegalArgumentException(INVALID_AUTHOR_MESSAGE);
-		}
-		
-		String commentId = IdGenerator.getInstance().getNextId();
-		StaticContent commentText = new Text(text);
-		Comment newComment = new Comment(commentId, postId, authorId, commentText);
-		DatabaseFacade.getInstance().insertComment(newComment);
-		post.addComment(newComment.getId());
-		DatabaseFacade.getInstance().updatePost(post);
-		return newComment.getId();
-	}
-	
-	public void addPostAnnouncement(String blogId, String userId) throws Exception {
-		UserIF usr = DatabaseFacade.getInstance().retrieveUser(userId);
-		Blog blog = getBlog(blogId);
-		blog.addNotifiable(usr);
-		DatabaseFacade.getInstance().updateBlog(blog);
-	}
-
-	public Integer getNumberOfCommentsFromPost(String postId) throws Exception {
-		Post post = getPost(postId);
-		return post.getNumberOfComments();
-	}
-
-	public String getCommentInformation(String commentId, String attribute) throws Exception {
-		Comment comment = getComment(commentId);
 		if (isInvalidString(attribute)) {
 			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
 		}
-		
-		if (attribute.equals(COMMENT_TEXT)) {
-			return comment.getText().getText();
-		} else if (attribute.equals(COMMENT_AUTHOR)) {
-			return comment.getAuthorId();
+		if (attribute.equals(TITLE)) {
+			return post.getTitle().getText();
+		} else if (attribute.equals(TEXT)) {
+			return post.getText().getText();
+		} else if(attribute.equals(CREATION_DATE)) {
+			return UsersHandler.getInstance().convertCalendarToStringDate(post.getCreationDate());
 		}
 		throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
-	}
-
-	public String getCommentFromPost(String postId, Integer index) throws Exception {
-		Post post = getPost(postId);
-		if (index == null || index.compareTo(0) < 0 || (index.compareTo(post.getNumberOfComments()) > 0)) {
-			throw new IllegalArgumentException(INVALID_INDEX_MESSAGE);
-		}
-		return post.getCommentId(index);
-	}
-
-	public void deletePost(String postId) throws Exception {
-		Post post = getPost(postId);
-		for (String icId : post.getAttachments()) {
-			deleteInteractiveContent(icId);
-		}
-		for (String commentId : post.getCommentsId()) {
-			deleteComment(commentId);
-		}
-		DatabaseFacade.getInstance().deletePost(postId);
-		Blog blog = getBlog(post.getParentId());
-
-		blog.removePost(post.getId());
-		DatabaseFacade.getInstance().updateBlog(blog);
-	}
-
-	public void deleteBlog(String blogId) throws Exception {
-		Blog blog = getBlog(blogId);
-		for (String postId : blog.getPostsId()) {
-			deletePost(postId);
-		}
-		DatabaseFacade.getInstance().deleteBlog(blog.getId());
 		
 	}
-	
-	public void deleteAnnouncement(String userId, String announcementId) throws Exception {
-		UserIF usr = DatabaseFacade.getInstance().retrieveUser(userId);
-		//AnnouncementIF ann = DatabaseFacade.getInstance().retrieveAnnouncement(announcementId);
-		//Post post = DatabaseFacade.getInstance().retrievePost(ann.getTargetId());
-		//Blog blog = DatabaseFacade.getInstance().retrieveBlog(post.getParentId());
-		//blog.removeNotifiable(usr)
-		//Ainda nao entendi direito como deve funcionar o delete Announcement
-		//Deve apenas remover o anuncio (funcionalidade atual) ou deve
-		//remover o usuario da lista de notificadores do blog (funcionalidade se remover os comments)?
-		usr.getAnnouncements().remove(announcementId);
-		DatabaseFacade.getInstance().deleteAnnouncement(announcementId);
-		DatabaseFacade.getInstance().updateUser(usr);
+		
+	/**
+	 * Return the post's ID from a blog.
+	 * @param blogId The blog's ID.
+	 * @param index The index of the post on the blog.
+	 * @return The post's ID.
+	 * @throws Exception If blogId is null, empty or doesn't exist a blog with the passed blogId.
+	 * 					 If the index is less then 0 (zero).
+	 */
+	public String getPostFromBlog(String blogId, Integer index) throws Exception {
+		Blog blog = getBlog(blogId);
+		
+		if (isInvalidIndex(index)) {
+			throw new IllegalArgumentException(INVALID_INDEX_MESSAGE);
+		}
+		return blog.getPost(index);
 	}
 	
+	/**
+	 * Create a announcement.
+	 * @param targetId The target ID.
+	 * @return The new announcement.
+	 */
 	private AnnouncementIF createAnnouncement(String targetId) {
 		String announcementId = IdGenerator.getInstance().getNextId();
 		AnnouncementIF ann = new AnnouncementImpl(announcementId, targetId);
 		return ann;
 	}
+	
+	/**
+	 * Return a specific blog.
+	 * @param blogId The blog's ID.
+	 * @return The blog.
+	 * @throws Exception If the blogId is null, empty or doesn't exist the blog with passed blogId.
+	 */
+	private Blog getBlog(String blogId) throws Exception {
+		if (isInvalidString(blogId) || !DatabaseFacade.getInstance().existsBlogInDatabase(blogId)) {
+			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
+		}
+		return DatabaseFacade.getInstance().retrieveBlog(blogId);
+	}
+	
+	/**
+	 * Return a announcement.
+	 * @param announcementId The announcement's ID.
+	 * @return The announcement.
+	 * @throws Exception If the announcementId is null, empty or doesn't existe a announcement with the passed ID.
+	 */
+	private AnnouncementIF getAnnouncement(String announcementId) throws Exception {
+		if (isInvalidString(announcementId) || !DatabaseFacade.getInstance().existsAnnouncementInDatabase(announcementId)) {
+			throw new IllegalArgumentException(INVALID_ANNOUNCEMENT_MESSAGE);
+		}
+		return DatabaseFacade.getInstance().retrieveAnnouncement(announcementId);
+	}
+	
+	/**
+	 * Return a specific comment.
+	 * @param commentId The comment's ID.
+	 * @return The comment.
+	 * @throws Exception If the commentId is null, empty or doesn't exist the comment with the passed commentId.
+	 */
+	private Comment getComment(String commentId) throws Exception {
+		if (isInvalidString(commentId) || !DatabaseFacade.getInstance().existsCommentInDatabase(commentId)) {
+			throw new IllegalArgumentException(INVALID_COMMENT_MESSAGE);
+		}
+		return DatabaseFacade.getInstance().retrieveComment(commentId);
+	}
+	
+	/**
+	 * Return a interactive content.
+	 * @param interactiveContentId The ID of a interactive content.
+	 * @return The interactive content.
+	 * @throws Exception If the icID id null, empty ot doesn't exist a IC with the passed ID.
+	 */
+	private InteractiveContent getInteractiveContent(String interactiveContentId) throws Exception {
+		if (isInvalidString(interactiveContentId) || 
+				!DatabaseFacade.getInstance().existsInteractiveContentInDatabase(interactiveContentId)) {
+			throw new IllegalArgumentException(INVALID_INTERACTIVE_CONTENT_MESSAGE);
+		}
+		return DatabaseFacade.getInstance().retrieveInteractiveContent(interactiveContentId);
+	}
+	
+	/**
+	 * Return a specific post.
+	 * @param postId The post's ID.
+	 * @return The post.
+	 * @throws Exception If the postId is null, empty or doesn't exist the postId.
+	 */
+	private Post getPost(String postId) throws Exception {
+		if (isInvalidString(postId) || !DatabaseFacade.getInstance().existsPostInDatabase(postId)) {
+			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
+		}
+		return DatabaseFacade.getInstance().retrievePost(postId);
+	}
+		
+	/**
+	 * Verify if the string is null or empty.
+	 * @param str The string that will be verified.
+	 * @return True case the string is null or empty, and False otherwise.
+	 */
+	private boolean isInvalidString(String str) {
+		return str == null || str.trim().isEmpty();
+	}
 
+	/**
+	 * Verify if the integer is null or negative.
+	 * @param index The integer that will be verified. 
+	 * @return True case the integer is null or negative, and False otherwise.
+	 */
+	private boolean isInvalidIndex(Integer index) {
+		return index == null || index < 0;
+	}
 }
