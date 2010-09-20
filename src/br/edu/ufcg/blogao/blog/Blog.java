@@ -52,6 +52,15 @@ public class Blog implements WebElement {
 	public void addPost(String postId) {
 		posts.add(postId);
 	}
+
+	/**
+	 * Adds a notifiable to this blog so that it will listen to
+	 * changes made on this object.
+	 * @param usr The notifiable
+	 */
+	public void addNotifiable(Notifiable usr) {
+		this.notifiables.add(usr);
+	}
 	
 	/**
 	 * Verify if blog contains the post.
@@ -60,6 +69,15 @@ public class Blog implements WebElement {
 	 */
 	public boolean containsPost(String postId) {
 		return posts.contains(postId);
+	}
+	
+	/**
+	 * Notifies all notifiables
+	 */
+	public void doNotifyAll(String announcementId) {
+		for (Notifiable usr : notifiables) {
+			usr.doNotify(announcementId);
+		}
 	}
 	
 	/**
@@ -111,6 +129,23 @@ public class Blog implements WebElement {
 	}
 	
 	/**
+	 * Return a blog's post ID.
+	 * @param index The post's ID.
+	 * @return A blog's post ID.
+	 */
+	public String getPost(int index) {
+		return posts.get(index);
+	}
+	
+	/**
+	 * Return the list of all post's ID.
+	 * @return All post's ID.
+	 */
+	public List<String> getPostsId() {
+		return posts;
+	}
+	
+	/**
 	 * Return the total number of subBlogs.
 	 * @return The total number of subBlogs.
 	 */
@@ -145,6 +180,14 @@ public class Blog implements WebElement {
 	}
 	
 	/**
+	 * Remove a blog's post.
+	 * @param postId The post's ID.
+	 */
+	public void removePost(String postId) {
+		posts.remove(postId);
+	}
+	
+	/**
 	 * Sets the blog's author id.
 	 * @param authorId Id of blog's author.
 	 */
@@ -161,47 +204,10 @@ public class Blog implements WebElement {
 	}
 	
 	/**
-	 * Return a blog's post.
-	 * @param index The post's ID.
-	 * @return A blog's post.
-	 * @throws Exception 
-	 */
-	public String getPost(int index) throws Exception {
-		return posts.get(index);
-	}
-	
-	public List<String> getPostsId() {
-		return posts;
-	}
-
-	/**
 	 * Set the blog's title.
 	 * @param title The blog's title.
 	 */
 	public void setTitle(StaticContent title) {
 		this.title = title;
 	}
-	
-	public void removePost(String postId) {
-		posts.remove(postId);
-	}
-	
-	/**
-	 * Adds a notifiable to this blog so that it will listen to
-	 * changes made on this object.
-	 * @param usr The notifiable
-	 */
-	public void addNotifiable(Notifiable usr) {
-		this.notifiables.add(usr);
-	}
-
-	/**
-	 * Notifies all notifiables
-	 */
-	public void doNotifyAll(String announcementId) {
-		for (Notifiable usr : notifiables) {
-			usr.doNotify(announcementId);
-		}
-	}
-
 }

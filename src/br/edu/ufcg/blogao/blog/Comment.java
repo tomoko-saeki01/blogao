@@ -6,15 +6,15 @@ package br.edu.ufcg.blogao.blog;
  * @author Catharine
  * @author Demontie
  * @author Matheus
- * @version 2.0 - 31th August, 2010.
+ * @version 3.0 - 31th August, 2010.
  */
 
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import br.edu.ufcg.blogao.blog.data.StaticContent;
+import br.edu.ufcg.blogao.persistence.DatabaseFacade;
 
 public class Comment implements WebElement {
 	
@@ -23,7 +23,7 @@ public class Comment implements WebElement {
 	private String authorId;
 	private StaticContent text;
 	private Calendar date;
-	private Map<String, Comment> subComments;
+	private List<String> subComments; //<subCommentsID>
 
 	/**
 	 * Default constructor.
@@ -34,20 +34,19 @@ public class Comment implements WebElement {
 	 */
 	public Comment(String id, String parentId, String authorId, StaticContent text) {
 		this.id = id;
-		this.setParentId(parentId);
+		this.parentId = parentId;
 		this.setAuthorId(authorId);
 		this.setText(text);
 		this.date = Calendar.getInstance();
-		this.subComments = new HashMap<String, Comment>();
+		this.subComments = new ArrayList<String>();
 	}
 	
 	/**
 	 * Add a subComment to the comment.
-	 * @param subComment The subComment.
-	 * @param id The subComment's ID.
+	 * @param subcommentID The subComment's ID.
 	 */
-	public void addSubComment(Comment subComment, String id) {
-		subComments.put(id, subComment);
+	public void addSubComment(String subcommentID) {
+		subComments.add(subcommentID);
 	}
 	
 	/**
@@ -58,17 +57,11 @@ public class Comment implements WebElement {
 		return authorId;
 	}
 	
-	/**
-	 * Return creation date.
-	 */
 	@Override
 	public Calendar getCreationDate() {
 		return date;
 	}
 
-	/**
-	 * Return comment's ID.
-	 */
 	@Override
 	public String getId() {
 		return id;
@@ -79,12 +72,7 @@ public class Comment implements WebElement {
 	 * @return The total number of all subComments.
 	 */
 	public Integer getNumberOfAllSubComments() {
-		int total = 0;
-		Collection<Comment> sub = subComments.values();
-		for (Comment b: sub) {
-			total += b.getNumberOfSubComments();
-		}		
-		return total;
+		return subComments.size();
 	}
 	
 	/**
@@ -95,9 +83,6 @@ public class Comment implements WebElement {
 		return subComments.size();
 	}
 	
-	/**
-	 * Return comment's text.
-	 */
 	@Override
 	public StaticContent getText() {
 		return text;
@@ -105,6 +90,7 @@ public class Comment implements WebElement {
 	
 	/**
 	 * Return the parent's ID.
+	 * @return The parent's ID.
 	 */
 	public String getParentId() {
 		return parentId;
@@ -114,9 +100,10 @@ public class Comment implements WebElement {
 	 * Return a subComment.
 	 * @param index The index of the subComment.
 	 * @return A subComment.
+	 * @throws Exception If subCommentId is null or "" or doesn't exist a subComment with passed subCommentId. 
 	 */
-	public Comment getSubComment(int index) {
-		return subComments.get(index);
+	public Comment getSubComment(int index) throws Exception {
+		return DatabaseFacade.getInstance().retrieveComment(subComments.get(index));
 	}
 
 	/**
@@ -127,18 +114,8 @@ public class Comment implements WebElement {
 		this.authorId = authorId;
 	}
 	
-	/**
-	 * Set the comment's text.
-	 */
 	@Override
 	public void setText(StaticContent text) {
 		this.text = text;
-	}
-	
-	/**
-	 * Set the parent's ID.
-	 */
-	public void setParentId(String parentId) {
-		this.parentId = parentId;
 	}
 }

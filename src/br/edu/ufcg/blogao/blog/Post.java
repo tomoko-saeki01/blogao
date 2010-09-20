@@ -37,10 +37,12 @@ public class Post implements WebElement {
 	 * @param text The post's text.
 	 */
 	public Post(String parentId, String id, StaticContent title, StaticContent text) {
-		this.setParentId(parentId);
+		
+		this.parentId = parentId;
 		this.id = id;
 		this.setTitle(title);
 		this.setText(text);
+		
 		creationDate = Calendar.getInstance();
 		attachments = new HashMap<String, List<String>>();
 		attachments.put(MOVIES_KEY, new ArrayList<String>());
@@ -48,15 +50,7 @@ public class Post implements WebElement {
 		attachments.put(SOUNDS_KEY, new ArrayList<String>());
 		comments = new ArrayList<String>();
 	}
-	
-	public String getParentId() {
-		return parentId;
-	}
-	
-	public void setParentId(String parentId) {
-		this.parentId = parentId;
-	}
-	
+			
 	/**
 	 * Add a comment to the post.
 	 * @param id Comment's ID.
@@ -118,17 +112,11 @@ public class Post implements WebElement {
 		return comments;
 	}
 	
-	/**
-	 * Return post's creation date.
-	 */
 	@Override
 	public Calendar getCreationDate() {
 		return creationDate;
 	}
 	
-	/**
-	 * Return the ID.
-	 */
 	@Override
 	public String getId() {
 		return id;
@@ -176,6 +164,14 @@ public class Post implements WebElement {
 	}
 	
 	/**
+	 * Return the parent's ID.
+	 * @return The parent's ID.
+	 */
+	public String getParentId() {
+		return parentId;
+	}
+	
+	/**
 	 * Return a picture's ID.
 	 * @param index The index of the picture.
 	 * @return The picture's ID.
@@ -201,9 +197,6 @@ public class Post implements WebElement {
 		return title;
 	}
 	
-	/**
-	 * Return post's text.
-	 */
 	@Override
 	public StaticContent getText() {
 		return text;
@@ -233,9 +226,6 @@ public class Post implements WebElement {
 		}
 	}
 		
-	/**
-	 * Set the post's text.
-	 */
 	@Override
 	public void setText(StaticContent text) {
 		this.text = text;
