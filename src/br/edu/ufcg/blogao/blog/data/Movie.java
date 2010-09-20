@@ -6,7 +6,7 @@ package br.edu.ufcg.blogao.blog.data;
  * @author Catharine
  * @author Demontie
  * @author Matheus
- * @version 1.0 - 31th August, 2010.
+ * @version 2.0 - 31th August, 2010.
  */
 public class Movie implements InteractiveContent {
 	
@@ -15,32 +15,30 @@ public class Movie implements InteractiveContent {
 	private StaticContent description;
 	private String data;
 	
+	/**
+	 * Default Constructor.
+	 * @param id The movie's ID.
+	 * @param parentId The parent's ID.
+	 * @param description The movie's description.
+	 * @param data The data.
+	 */
 	public Movie(String id, String parentId, StaticContent description, String data) {
 		this.id = id;
-		this.setParentId(parentId);
+		this.parentId = parentId;
 		this.setDescription(description);
 		this.setData(data);
 	}
 
-	/**
-	 * Return the data.
-	 */
 	@Override
 	public String getData() {
 		return data;
 	}
 	
-	/**
-	 * Return the description.
-	 */
 	@Override
 	public StaticContent getDescription() {
 		return description;
 	}
 	
-	/**
-	 * Return the ID.
-	 */
 	@Override
 	public String getId() {
 		return id;
@@ -50,23 +48,13 @@ public class Movie implements InteractiveContent {
 		return parentId;
 	}
 
-	/**
-	 * Set the data.
-	 */
 	@Override
 	public void setData(String data) {
 		this.data = data;
 	}
 
-	/**
-	 * Set the description.
-	 */
 	@Override
 	public void setDescription(StaticContent description) {
 		this.description = description;
-	}
-	
-	public void setParentId(String parentId) {
-		this.parentId = parentId;
 	}
 }

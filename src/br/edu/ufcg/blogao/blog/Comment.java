@@ -27,8 +27,10 @@ public class Comment implements WebElement {
 
 	/**
 	 * Default constructor.
-	 * @param author Comment's author.
-	 * @param text Comment.
+	 * @param id The comment's ID.
+	 * @param parentId
+	 * @param authorId The comment's author ID.
+	 * @param text The text of the comment.
 	 */
 	public Comment(String id, String parentId, String authorId, StaticContent text) {
 		this.id = id;
@@ -39,14 +41,6 @@ public class Comment implements WebElement {
 		this.subComments = new HashMap<String, Comment>();
 	}
 	
-	public String getParentId() {
-		return parentId;
-	}
-	
-	public void setParentId(String parentId) {
-		this.parentId = parentId;
-	}
-
 	/**
 	 * Add a subComment to the comment.
 	 * @param subComment The subComment.
@@ -110,6 +104,13 @@ public class Comment implements WebElement {
 	}
 	
 	/**
+	 * Return the parent's ID.
+	 */
+	public String getParentId() {
+		return parentId;
+	}
+	
+	/**
 	 * Return a subComment.
 	 * @param index The index of the subComment.
 	 * @return A subComment.
@@ -133,5 +134,11 @@ public class Comment implements WebElement {
 	public void setText(StaticContent text) {
 		this.text = text;
 	}
-
+	
+	/**
+	 * Set the parent's ID.
+	 */
+	public void setParentId(String parentId) {
+		this.parentId = parentId;
+	}
 }
