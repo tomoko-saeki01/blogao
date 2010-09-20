@@ -5,7 +5,7 @@ import java.util.List;
 
 import br.edu.ufcg.blogao.Identifiable;
 
-public interface UserIF extends Identifiable {
+public interface UserIF extends Identifiable, Notifiable {
 
 	/**
 	 * Add a new blog's reference to user. (blog id)

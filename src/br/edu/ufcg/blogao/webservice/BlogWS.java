@@ -277,7 +277,7 @@ public interface BlogWS {
 	String announcementId) throws Exception;
 
 	@WebMethod
-	public String deleteAnnouncement(@WebParam(name = "sessionId")
+	public void deleteAnnouncement(@WebParam(name = "sessionId")
 	String sessionId, @WebParam(name = "announcementId")
 	String announcementId) throws Exception;
 

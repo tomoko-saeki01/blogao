@@ -8,6 +8,7 @@ import br.edu.ufcg.blogao.blog.data.Sound;
 import br.edu.ufcg.blogao.blog.data.StaticContent;
 import br.edu.ufcg.blogao.blog.data.Text;
 import br.edu.ufcg.blogao.persistence.DatabaseFacade;
+import br.edu.ufcg.blogao.user.UserIF;
 import br.edu.ufcg.blogao.user.UsersHandler;
 
 public class WebElementManager {
@@ -16,7 +17,7 @@ public class WebElementManager {
 	
 	private final String INVALID_BLOG_MESSAGE = "Blog inválido";
 	private final String INVALID_AUTHOR_MESSAGE = "Autor inválido";
-	private final String INVALID_TITLE_BLOG_MESSAGE = "Você deve especificar um título para o blog";
+	private final String INVALID_TITLE_BLOG_MESSAGE = "VocÍ deve especificar um título para o blog";
 	private final String INVALID_COMMENT_MESSAGE = "Comentário inválido";
 	private final String INVALID_POST_MESSAGE = "Post inválido";
 	private final String INVALID_TITLE_POST_MESSAGE = "Título obrigatório";
@@ -24,6 +25,7 @@ public class WebElementManager {
 	private final String INVALID_ATTRIBUTE_MESSAGE = "Atributo inválido";
 	private final String INVALID_DATA_MESSAGE = "Dado inválido";
 	private final String INVALID_INDEX_MESSAGE = "Índice incorreto";
+	private final String INVALID_ANNOUNCEMENT_MESSAGE = "Anuncio invalido";
 	
 	private final String CREATION_DATE = "data_criacao";
 	private final String TEXT = "texto";
@@ -177,6 +179,9 @@ public class WebElementManager {
 		Post newPost = new Post(blogId, postId, postTitle, postText);
 		DatabaseFacade.getInstance().insertPost(newPost);
 		blog.addPost(newPost.getId());
+		AnnouncementIF ann = createAnnouncement(newPost.getId());
+		blog.doNotifyAll(ann.getId());
+		DatabaseFacade.getInstance().insertAnnouncement(ann);
 		DatabaseFacade.getInstance().updateBlog(blog);
 		return newPost.getId();
 	}
@@ -245,6 +250,13 @@ public class WebElementManager {
 			throw new IllegalArgumentException(INVALID_INTERACTIVE_CONTENT_MESSAGE);
 		}
 		return DatabaseFacade.getInstance().retrieveInteractiveContent(interactiveContentId);
+	}
+	
+	private AnnouncementIF getAnnouncement(String announcementId) throws Exception {
+		if (isInvalidString(announcementId) || !DatabaseFacade.getInstance().existsAnnouncementInDatabase(announcementId)) {
+			throw new IllegalArgumentException(INVALID_ANNOUNCEMENT_MESSAGE);
+		}
+		return DatabaseFacade.getInstance().retrieveAnnouncement(announcementId);
 	}
 	
 	private boolean isInvalidString(String str) {
@@ -330,6 +342,11 @@ public class WebElementManager {
 		return blog.getPost(index);
 	}
 	
+	public String getAnnouncementTarget(String announcementId) throws Exception {
+		AnnouncementIF ann = getAnnouncement(announcementId);
+		return ann.getTargetId();
+	}
+	
 	public void deleteComment(String commentId) throws Exception {
 		Comment comment = getComment(commentId);
 		Post post = getPost(comment.getParentId());
@@ -359,6 +376,13 @@ public class WebElementManager {
 		post.addComment(newComment.getId());
 		DatabaseFacade.getInstance().updatePost(post);
 		return newComment.getId();
+	}
+	
+	public void addPostAnnouncement(String blogId, String userId) throws Exception {
+		UserIF usr = DatabaseFacade.getInstance().retrieveUser(userId);
+		Blog blog = getBlog(blogId);
+		blog.addNotifiable(usr);
+		DatabaseFacade.getInstance().updateBlog(blog);
 	}
 
 	public Integer getNumberOfCommentsFromPost(String postId) throws Exception {
@@ -398,6 +422,7 @@ public class WebElementManager {
 		}
 		DatabaseFacade.getInstance().deletePost(postId);
 		Blog blog = getBlog(post.getParentId());
+
 		blog.removePost(post.getId());
 		DatabaseFacade.getInstance().updateBlog(blog);
 	}
@@ -409,6 +434,26 @@ public class WebElementManager {
 		}
 		DatabaseFacade.getInstance().deleteBlog(blog.getId());
 		
+	}
+	
+	public void deleteAnnouncement(String userId, String announcementId) throws Exception {
+		UserIF usr = DatabaseFacade.getInstance().retrieveUser(userId);
+		//AnnouncementIF ann = DatabaseFacade.getInstance().retrieveAnnouncement(announcementId);
+		//Post post = DatabaseFacade.getInstance().retrievePost(ann.getTargetId());
+		//Blog blog = DatabaseFacade.getInstance().retrieveBlog(post.getParentId());
+		//blog.removeNotifiable(usr)
+		//Ainda nao entendi direito como deve funcionar o delete Announcement
+		//Deve apenas remover o anuncio (funcionalidade atual) ou deve
+		//remover o usuario da lista de notificadores do blog (funcionalidade se remover os comments)?
+		usr.getAnnouncements().remove(announcementId);
+		DatabaseFacade.getInstance().deleteAnnouncement(announcementId);
+		DatabaseFacade.getInstance().updateUser(usr);
+	}
+	
+	private AnnouncementIF createAnnouncement(String targetId) {
+		String announcementId = IdGenerator.getInstance().getNextId();
+		AnnouncementIF ann = new AnnouncementImpl(announcementId, targetId);
+		return ann;
 	}
 
 }

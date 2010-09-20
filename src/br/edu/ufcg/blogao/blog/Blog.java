@@ -16,6 +16,7 @@ import java.util.List;
 
 import br.edu.ufcg.blogao.blog.data.StaticContent;
 import br.edu.ufcg.blogao.persistence.DatabaseFacade;
+import br.edu.ufcg.blogao.user.Notifiable;
 
 public class Blog implements WebElement {
 	//Blog "default" attributes.
@@ -26,6 +27,7 @@ public class Blog implements WebElement {
 	private StaticContent description;
 	private List<String> subBlogs; //<subBlogId>
 	private List<String> posts; //<postId>
+	private List<Notifiable> notifiables;
 	
 	/**
 	 * Another constructor.
@@ -40,6 +42,7 @@ public class Blog implements WebElement {
 		this.creationDate = Calendar.getInstance();
 		this.subBlogs = new ArrayList<String>();
 		this.posts = new ArrayList<String>();
+		this.notifiables = new ArrayList<Notifiable>();
 	}
 	
 	/**
@@ -181,6 +184,24 @@ public class Blog implements WebElement {
 	
 	public void removePost(String postId) {
 		posts.remove(postId);
+	}
+	
+	/**
+	 * Adds a notifiable to this blog so that it will listen to
+	 * changes made on this object.
+	 * @param usr The notifiable
+	 */
+	public void addNotifiable(Notifiable usr) {
+		this.notifiables.add(usr);
+	}
+
+	/**
+	 * Notifies all notifiables
+	 */
+	public void doNotifyAll(String announcementId) {
+		for (Notifiable usr : notifiables) {
+			usr.doNotify(announcementId);
+		}
 	}
 
 }
