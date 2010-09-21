@@ -1,11 +1,13 @@
 package br.edu.ufcg.blogao.blog.data;
 
 /**
- * @author Caio
- * @author Carlos
- * @author Catharine
- * @author Demontie
- * @author Matheus
+ * The picture that can be attached to the blog's post.
+ * 
+ * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
+ * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
+ * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
+ * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
+ * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
  * @version 2.0 - 31th August, 2010.
  */
 public class Picture implements InteractiveContent {
