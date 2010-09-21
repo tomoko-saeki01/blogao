@@ -1,11 +1,13 @@
 package br.edu.ufcg.blogao.blog.data;
 
 /**
- * @author Caio
- * @author Carlos
- * @author Catharine
- * @author Demontie
- * @author Matheus
+ * The interactive content of the blog's post.
+ * 
+ * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
+ * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
+ * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
+ * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
+ * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
  * @version 1.0 - 31th August, 2010.
  */
 
@@ -20,14 +22,14 @@ public interface InteractiveContent extends Identifiable {
 	public String getData();
 	
 	/**
-	 * Return the description.
-	 * @return The description.
+	 * Return the description of the interactive content.
+	 * @return The description of the interactive content.
 	 */
 	public StaticContent getDescription();
 	
 	/**
-	 * Return the id of this interactive content.
-	 * @return parent id.
+	 * Return the parent id of the interactive content.
+	 * @return The parent id of the interactive content.
 	 */
 	public String getParentId();
 	
@@ -38,7 +40,7 @@ public interface InteractiveContent extends Identifiable {
 	public void setData(String data);
 	
 	/**
-	 * Set the description.
+	 * Set the description of the interactive content.
 	 * @param description The description to be set.
 	 */
 	public void setDescription(StaticContent description);

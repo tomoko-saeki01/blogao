@@ -1,11 +1,13 @@
 package br.edu.ufcg.blogao.blog.data;
 
 /**
- * @author Caio
- * @author Carlos
- * @author Catharine
- * @author Demontie
- * @author Matheus
+ *  The text of the blog's.
+ * 
+ * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
+ * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
+ * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
+ * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
+ * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
  * @version 1.0 - 19th September, 2010.
  */
 
@@ -15,23 +17,18 @@ public class Text implements StaticContent {
 	
 	/**
 	 * Default constructor.
-	 * @param text The text.
+	 * @param text The static content of the blog, the text.
 	 */
 	public Text(String text) {
 		this.setText(text);
 	}
 
-	/**
-	 * Return the text.
-	 */
+
 	@Override
 	public String getText() {
 		return text;
 	}
 
-	/**
-	 * Set the text.
-	 */
 	@Override
 	public void setText(String text) {
 		this.text = text;
