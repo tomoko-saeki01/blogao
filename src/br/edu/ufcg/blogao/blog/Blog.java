@@ -1,5 +1,12 @@
 package br.edu.ufcg.blogao.blog;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+import br.edu.ufcg.blogao.blog.data.StaticContent;
+import br.edu.ufcg.blogao.user.Notifiable;
+
 /**
  * Represents a blog.
  * @author Caio
@@ -9,19 +16,11 @@ package br.edu.ufcg.blogao.blog;
  * @author Matheus
  * @version 2.0 - 7th September, 2010.
  */
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
-import br.edu.ufcg.blogao.blog.data.StaticContent;
-import br.edu.ufcg.blogao.persistence.DatabaseFacade;
-import br.edu.ufcg.blogao.user.Notifiable;
-
 public class Blog implements WebElement {
 	//Blog "default" attributes.
 	private StaticContent title;
 	private String id;
+	private String parentId;
 	private String authorId;
 	private Calendar creationDate;
 	private StaticContent description;
@@ -34,8 +33,9 @@ public class Blog implements WebElement {
 	 * @param title The blog's title.
 	 * @param description The blog's description.
 	 */
-	public Blog(String id, String authorId, StaticContent title, StaticContent description) {
+	public Blog(String id, String parentId, String authorId, StaticContent title, StaticContent description) {
 		this.id = id;
+		this.parentId = parentId;
 		this.setAuthorId(authorId);
 		this.setTitle(title);
 		this.setText(description);
@@ -46,20 +46,28 @@ public class Blog implements WebElement {
 	}
 	
 	/**
-	 * Add a post to the blog.
-	 * @param postId The post's ID.
-	 */
-	public void addPost(String postId) {
-		posts.add(postId);
-	}
-
-	/**
 	 * Adds a notifiable to this blog so that it will listen to
 	 * changes made on this object.
 	 * @param usr The notifiable
 	 */
 	public void addNotifiable(Notifiable usr) {
 		this.notifiables.add(usr);
+	}
+	
+	/**
+	 * Add a post to the blog.
+	 * @param postId The post's ID.
+	 */
+	public void addPost(String postId) {
+		posts.add(postId);
+	}
+	
+	/**
+	 * Add a subBlog to the blog.
+	 * @param subBlogId Id of subBlog added.
+	 */
+	public void addSubBlog(String subBlogId) {
+		subBlogs.add(subBlogId);
 	}
 	
 	/**
@@ -113,19 +121,11 @@ public class Blog implements WebElement {
 	}
 	
 	/**
-	 * Return the total number of all subBlogs.
-	 * @return The total number of all subBlogs.
+	 * Return the parent's ID.
+	 * @return The parent's ID.
 	 */
-	public Integer getNumberOfAllSubBlogs() {
-		int total = 0;
-		for (String blogId : subBlogs) {
-			try {
-				total += (1 + DatabaseFacade.getInstance().retrieveBlog(blogId).getNumberOfAllSubBlogs());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		return total;
+	public String getParentId() {
+		return parentId;
 	}
 	
 	/**
@@ -154,13 +154,11 @@ public class Blog implements WebElement {
 	}
 	
 	/**
-	 * Return a blog's subBlog.
-	 * @param index The subBlog's ID.
-	 * @return A blog's subBlog.
-	 * @throws Exception If blogId is null or "" or doesn't exist a blog with passed blogId.
+	 * Returns the list of subBlogs
+	 * @return all subBlogs of this blog.
 	 */
-	public Blog getSubBlog(int index) throws Exception {
-		return DatabaseFacade.getInstance().retrieveBlog(subBlogs.get(index));
+	public List<String> getSubBlogs() {
+		return subBlogs;
 	}
 	
 	/**
@@ -188,6 +186,14 @@ public class Blog implements WebElement {
 	}
 	
 	/**
+	 * Removes a subBlog.
+	 * @param subBlogId Id of subBlog to be removed.
+	 */
+	public void removeSubBlog(String subBlogId) {
+		subBlogs.remove(subBlogId);
+	}
+	
+	/**
 	 * Sets the blog's author id.
 	 * @param authorId Id of blog's author.
 	 */
@@ -210,4 +216,5 @@ public class Blog implements WebElement {
 	public void setTitle(StaticContent title) {
 		this.title = title;
 	}
+	
 }

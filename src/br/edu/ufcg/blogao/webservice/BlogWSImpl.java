@@ -4,7 +4,6 @@
 package br.edu.ufcg.blogao.webservice;
 
 import java.util.Calendar;
-import java.util.List;
 
 import br.edu.ufcg.blogao.Finder;
 import br.edu.ufcg.blogao.blog.WebElementManager;
@@ -13,8 +12,14 @@ import br.edu.ufcg.blogao.session.SessionManager;
 import br.edu.ufcg.blogao.user.UsersHandler;
 
 /**
- * @author ivocalado
- *
+ * Web Service facade for Blogao application.
+ * 
+ * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
+ * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
+ * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
+ * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
+ * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
+ * @version 1.0 20/09/2010
  */
 public class BlogWSImpl implements BlogWS {
 	
@@ -31,10 +36,7 @@ public class BlogWSImpl implements BlogWS {
 		String userId = sessionManager.getLoggedUserId(sessionId);
 		return webElementManager.addComment(postId, userId, texto);
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#addPostAnnouncements(java.lang.String, java.lang.String)
-	 */
+	
 	@Override
 	public void addPostAnnouncements(String sessionId, String blogId)
 			throws Exception {
@@ -43,15 +45,12 @@ public class BlogWSImpl implements BlogWS {
 			webElementManager.addPostAnnouncement(blogId, userId);
 		}	
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#addSubComment(java.lang.String, java.lang.String, java.lang.String)
-	 */
+	
 	@Override
 	public String addSubComment(String sessionId, String commentId, String texto)
 			throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		String userId = sessionManager.getLoggedUserId(sessionId);
+		return webElementManager.addSubComment(commentId, userId, texto);
 	}
 
 	@Override
@@ -122,10 +121,7 @@ public class BlogWSImpl implements BlogWS {
 		usersHandler.addBlogToUser(blogId, userId);
 		return blogId;
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#createPost(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
+	
 	@Override
 	public String createPost(String sessionId, String blogId, String titulo,
 			String texto) throws Exception {
@@ -144,20 +140,15 @@ public class BlogWSImpl implements BlogWS {
 		
 		usersHandler.createUser(login, senha, nome_exibicao, email, sexo, dataNasc, endereco, interesses, quem_sou_eu, filmes, musicas, livros);
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#createSubBlog(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
+	
 	@Override
 	public String createSubBlog(String sessionId, String blogId, String titulo,
 			String descricao) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		sessionManager.getLoggedUserId(sessionId);
+		String subBlogId = webElementManager.createSubBlog(blogId, titulo, descricao);
+		return subBlogId;
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#deleteAnnouncement(java.lang.String, java.lang.String)
-	 */
+	
 	@Override
 	public void deleteAnnouncement(String sessionId, String announcementId)
 			throws Exception {
@@ -218,29 +209,26 @@ public class BlogWSImpl implements BlogWS {
 	}
 
 	@Override
-	public List<String> findBlogByName(String match) {
+	public String findBlogByName(String match) {
 		return finder.findBlogsWithName(match);
 	}
 	
 	@Override
-	public List<String> findProfileByGender(String match) {
+	public String findProfileByGender(String match) {
 		return finder.findUsersWithGender(match);
 	}
 	
 	@Override
-	public List<String> findProfileByInterests(String match) {
+	public String findProfileByInterests(String match) {
 		return finder.findUsersWithInterests(match);
 	}
 
 	@Override
-	public List<String> findProfileByName(String match) {
+	public String findProfileByName(String match) {
 		return finder.findUsersWithName(match);
 		
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getAnnouncement(java.lang.String, java.lang.Integer)
-	 */
+	
 	@Override
 	public String getAnnouncement(String sessionId, Integer index)
 			throws Exception {
@@ -294,19 +282,12 @@ public class BlogWSImpl implements BlogWS {
 	public String getMovieDescription(String movieId) throws Exception {
 		return webElementManager.getInteractiveContentsInformation(movieId, WebElementManager.CONTENT_DESCRIPTION);
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getNumberOfAllSubComments(java.lang.String)
-	 */
+	
 	@Override
 	public Integer getNumberOfAllSubComments(String commentId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return webElementManager.getNumberOfAllSubComments(commentId);
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getNumberOfAnnouncements(java.lang.String)
-	 */
+	
 	@Override
 	public Integer getNumberOfAnnouncements(String sessionId) throws Exception {
 		String userId = sessionManager.getLoggedUserId(sessionId);
@@ -328,6 +309,11 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public Integer getNumberOfComments(String postId) throws Exception {
 		return webElementManager.getNumberOfCommentsFromPost(postId);
+	}
+	
+	@Override
+	public Integer getNumberOfComments(String login, String blogId) throws Exception {
+		return webElementManager.getNumberOfCommentsFromAuthorOnBlog(login, blogId);
 	}
 	
 	@Override
@@ -361,32 +347,25 @@ public class BlogWSImpl implements BlogWS {
 			return null;
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getNumberOfSubAllBlogs(java.lang.String)
-	 */
+	
 	@Override
-	public Integer getNumberOfSubAllBlogs(String blogId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public Integer getNumberOfAllSubBlogs(String blogId) throws Exception {
+		return webElementManager.getNumberOfAllSubBlogs(blogId);
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getNumberOfSubBlogs(java.lang.String)
-	 */
+	
+	@Override
+	public Integer getNumberOfAllPosts(String blogId) throws Exception {
+		return webElementManager.getNumberOfAllPostsFromBlog(blogId);
+	}
+	
 	@Override
 	public Integer getNumberOfSubBlogs(String blogId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return webElementManager.getNumberOfSubBlogs(blogId);
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getNumberOfSubComments(java.lang.String)
-	 */
+	
 	@Override
 	public Integer getNumberOfSubComments(String commentId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return webElementManager.getNumberOfSubComments(commentId);
 	}
 
 	@Override
@@ -414,10 +393,7 @@ public class BlogWSImpl implements BlogWS {
 			throws Exception {
 		return webElementManager.getPostInformation(postId, atributo);
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getPostJustCreated(java.lang.String)
-	 */
+	
 	@Override
 	public String getPostJustCreated(String announcementId) throws Exception {
 		return webElementManager.getAnnouncementTarget(announcementId);
@@ -450,24 +426,16 @@ public class BlogWSImpl implements BlogWS {
 	public String getSoundDescription(String soundId) throws Exception {
 		return webElementManager.getInteractiveContentsInformation(soundId, WebElementManager.CONTENT_DESCRIPTION);
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getSubBlog(java.lang.String, java.lang.Integer)
-	 */
+	
 	@Override
 	public Integer getSubBlog(String blogId, Integer index) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return Integer.parseInt(webElementManager.getSubBlog(blogId, index));
 	}
-
-	/* (non-Javadoc)
-	 * @see br.edu.ufcg.dsc.si.blog.webservice.BlogWS#getSubComment(java.lang.String, java.lang.Integer)
-	 */
+	
 	@Override
 	public String getSubComment(String commentId, Integer index)
 			throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return webElementManager.getSubComment(commentId, index);
 	}
 
 	@Override
