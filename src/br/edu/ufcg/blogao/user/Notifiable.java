@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface Notifiable {
 
-	public void doNotify(String Id);
+	public void receiveAnnouncement(String Id);
 	
 	public List<String> getAnnouncements();
 }

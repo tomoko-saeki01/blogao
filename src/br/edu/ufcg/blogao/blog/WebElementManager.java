@@ -8,6 +8,7 @@ import br.edu.ufcg.blogao.blog.data.Sound;
 import br.edu.ufcg.blogao.blog.data.StaticContent;
 import br.edu.ufcg.blogao.blog.data.Text;
 import br.edu.ufcg.blogao.persistence.DatabaseFacade;
+import br.edu.ufcg.blogao.user.Notifiable;
 import br.edu.ufcg.blogao.user.UserIF;
 import br.edu.ufcg.blogao.user.UsersHandler;
 
@@ -25,7 +26,7 @@ public class WebElementManager {
 	
 	private final String INVALID_BLOG_MESSAGE = "Blog inválido";
 	private final String INVALID_AUTHOR_MESSAGE = "Autor inválido";
-	private final String INVALID_TITLE_BLOG_MESSAGE = "Você deve especificar um título para o blog";
+	private final String INVALID_TITLE_BLOG_MESSAGE = "VocÍ deve especificar um título para o blog";
 	private final String INVALID_COMMENT_MESSAGE = "Comentário inválido";
 	private final String INVALID_POST_MESSAGE = "Post inválido";
 	private final String INVALID_TITLE_POST_MESSAGE = "Título obrigatório";
@@ -305,6 +306,9 @@ public class WebElementManager {
 		blog.doNotifyAll(ann.getId());
 		DatabaseFacade.getInstance().insertAnnouncement(ann);
 		DatabaseFacade.getInstance().updateBlog(blog);
+		for (Notifiable usr : blog.getNotifiables()) {
+			DatabaseFacade.getInstance().updateUser((UserIF) usr);
+		}
 		return newPost.getId();
 	}
 	

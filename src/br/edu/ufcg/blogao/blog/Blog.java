@@ -80,12 +80,20 @@ public class Blog implements WebElement {
 	}
 	
 	/**
-	 * Notifies all notifiables
+	 * Notifies all notifiables.
 	 */
 	public void doNotifyAll(String announcementId) {
 		for (Notifiable usr : notifiables) {
-			usr.doNotify(announcementId);
+			usr.receiveAnnouncement(announcementId);
 		}
+	}
+	
+	/**
+	 * Returns the list of notifiables listening to changes on this blog.
+	 * @return the notifiables list.
+	 */
+	public List<Notifiable> getNotifiables() {
+		return notifiables;
 	}
 	
 	/**

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import br.edu.ufcg.blogao.persistence.DatabaseFacade;
-
 /**
  * Represents a simple user's blog implementation.
  * @author Caio
@@ -240,11 +238,8 @@ public class UserImpl implements UserIF {
 	}
 	
 	@Override
-	public void doNotify(String Id) {
+	public void receiveAnnouncement(String Id) {
 		announcementsListening.add(Id);
-		try {
-			DatabaseFacade.getInstance().updateUser(this);
-		} catch (Exception e) {}
 	}
 	
 	@Override
