@@ -1,7 +1,5 @@
 package br.edu.ufcg.blogao.webservice;
 
-import java.util.List;
-
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 
@@ -214,6 +212,11 @@ public interface BlogWS {
 	@WebMethod
 	public Integer getNumberOfComments(@WebParam(name = "postId")
 	String postId) throws Exception;
+	
+	@WebMethod
+	public Integer getNumberOfComments(@WebParam(name = "login")
+	String login, @WebParam(name = "blogId")
+	String blogId) throws Exception;
 
 	@WebMethod
 	public String getComment(@WebParam(name = "postId")
@@ -243,19 +246,19 @@ public interface BlogWS {
 	String sessionId) throws Exception;
 
 	@WebMethod
-	public List<String> findProfileByName(@WebParam(name = "match")
+	public String findProfileByName(@WebParam(name = "match")
 	String match);
 
 	@WebMethod
-	public List<String> findProfileByInterests(@WebParam(name = "match")
+	public String findProfileByInterests(@WebParam(name = "match")
 	String match);
 
 	@WebMethod
-	public List<String> findProfileByGender(@WebParam(name = "match")
+	public String findProfileByGender(@WebParam(name = "match")
 	String match);
 
 	@WebMethod
-	public List<String> findBlogByName(@WebParam(name = "match")
+	public String findBlogByName(@WebParam(name = "match")
 	String match);
 
 	@WebMethod
@@ -293,7 +296,11 @@ public interface BlogWS {
 	String blogId) throws Exception;
 
 	@WebMethod
-	public Integer getNumberOfSubAllBlogs(@WebParam(name = "blogId")
+	public Integer getNumberOfAllSubBlogs(@WebParam(name = "blogId")
+	String blogId) throws Exception;
+	
+	@WebMethod
+	public Integer getNumberOfAllPosts(@WebParam(name = "blogId")
 	String blogId) throws Exception;
 
 	@WebMethod

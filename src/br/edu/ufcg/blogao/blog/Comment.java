@@ -1,12 +1,12 @@
 package br.edu.ufcg.blogao.blog;
 
 /**
- * @author Caio
- * @author Carlos
- * @author Catharine
- * @author Demontie
- * @author Matheus
- * @version 3.0 - 31th August, 2010.
+ * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
+ * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
+ * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
+ * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
+ * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
+ * @version 1.0 20/09/2010
  */
 
 import java.util.ArrayList;
@@ -14,7 +14,6 @@ import java.util.Calendar;
 import java.util.List;
 
 import br.edu.ufcg.blogao.blog.data.StaticContent;
-import br.edu.ufcg.blogao.persistence.DatabaseFacade;
 
 public class Comment implements WebElement {
 	
@@ -68,14 +67,6 @@ public class Comment implements WebElement {
 	}
 	
 	/**
-	 * Return the total number of all subComments.
-	 * @return The total number of all subComments.
-	 */
-	public Integer getNumberOfAllSubComments() {
-		return subComments.size();
-	}
-	
-	/**
 	 * Return the number of subComments.
 	 * @return The number of subComments.
 	 */
@@ -97,13 +88,11 @@ public class Comment implements WebElement {
 	}
 	
 	/**
-	 * Return a subComment.
-	 * @param index The index of the subComment.
-	 * @return A subComment.
-	 * @throws Exception If subCommentId is null or "" or doesn't exist a subComment with passed subCommentId. 
+	 * Returns subComments.
+	 * @return All subComments ids of this Comment.
 	 */
-	public Comment getSubComment(int index) throws Exception {
-		return DatabaseFacade.getInstance().retrieveComment(subComments.get(index));
+	public List<String> getSubComments() {
+		return subComments;
 	}
 
 	/**
@@ -117,5 +106,9 @@ public class Comment implements WebElement {
 	@Override
 	public void setText(StaticContent text) {
 		this.text = text;
+	}
+	
+	public void removeSubComment(String subCommentId) {
+		subComments.remove(subCommentId);
 	}
 }

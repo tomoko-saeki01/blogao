@@ -1,14 +1,5 @@
 package br.edu.ufcg.blogao.blog;
 
-/**
- * @author Caio
- * @author Carlos
- * @author Catharine
- * @author Demontie
- * @author Matheus
- * @version 2.0 - 19th September, 2010.
- */
-
 import br.edu.ufcg.blogao.IdGenerator;
 import br.edu.ufcg.blogao.blog.data.InteractiveContent;
 import br.edu.ufcg.blogao.blog.data.Movie;
@@ -20,21 +11,29 @@ import br.edu.ufcg.blogao.persistence.DatabaseFacade;
 import br.edu.ufcg.blogao.user.UserIF;
 import br.edu.ufcg.blogao.user.UsersHandler;
 
+/**
+ * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
+ * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
+ * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
+ * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
+ * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
+ * @version 1.0 20/09/2010
+ */
 public class WebElementManager {
 	
 	private static WebElementManager selfInstance = null;
 	
-	private final String INVALID_BLOG_MESSAGE = "Blog inv·lido";
-	private final String INVALID_AUTHOR_MESSAGE = "Autor inv·lido";
-	private final String INVALID_TITLE_BLOG_MESSAGE = "VocÍ deve especificar um tÌtulo para o blog";
-	private final String INVALID_COMMENT_MESSAGE = "Coment·rio inv·lido";
-	private final String INVALID_POST_MESSAGE = "Post inv·lido";
-	private final String INVALID_TITLE_POST_MESSAGE = "TÌtulo obrigatÛrio";
-	private final String INVALID_INTERACTIVE_CONTENT_MESSAGE = "Id do conte˙do È inv·lido";
-	private final String INVALID_ATTRIBUTE_MESSAGE = "Atributo inv·lido";
-	private final String INVALID_DATA_MESSAGE = "Dado inv·lido";
+	private final String INVALID_BLOG_MESSAGE = "Blog inválido";
+	private final String INVALID_AUTHOR_MESSAGE = "Autor inválido";
+	private final String INVALID_TITLE_BLOG_MESSAGE = "Você deve especificar um título para o blog";
+	private final String INVALID_COMMENT_MESSAGE = "Comentário inválido";
+	private final String INVALID_POST_MESSAGE = "Post inválido";
+	private final String INVALID_TITLE_POST_MESSAGE = "Título obrigatório";
+	private final String INVALID_INTERACTIVE_CONTENT_MESSAGE = "Id do conteúdo é inválido";
+	private final String INVALID_ATTRIBUTE_MESSAGE = "Atributo inválido";
+	private final String INVALID_DATA_MESSAGE = "Dado inválido";
 	private final String INVALID_INDEX_MESSAGE = "Índice incorreto";
-	private final String INVALID_ANNOUNCEMENT_MESSAGE = "Anuncio invalido";
+	private final String INVALID_ANNOUNCEMENT_MESSAGE = "Notificacao invalida";
 	
 	private final String CREATION_DATE = "data_criacao";
 	private final String TEXT = "texto";
@@ -102,6 +101,25 @@ public class WebElementManager {
 		Blog blog = getBlog(blogId);
 		blog.addNotifiable(usr);
 		DatabaseFacade.getInstance().updateBlog(blog);
+	}
+	
+	/**
+	 * Creates a new comment like a sub comment of an existent comment.
+	 * @param parentCommentId Id of Comment that will be sub commented.
+	 * @param userId Author of subComment been added.
+	 * @param text Sub comment text.
+	 * @return created sub comment id.
+	 * @throws Exception If the parent Comment doesn't exist. (Invalid parentCommentId)
+	 */
+	public String addSubComment(String parentCommentId, String userId, String text) throws Exception {
+		Comment parentComment = getComment(parentCommentId);
+		String subCommentId = IdGenerator.getInstance().getNextId();
+		StaticContent subCommentText = new Text(text);
+		Comment subComment = new Comment(subCommentId, parentCommentId, userId, subCommentText);
+		DatabaseFacade.getInstance().insertComment(subComment);
+		parentComment.addSubComment(subComment.getId());
+		DatabaseFacade.getInstance().updateComment(parentComment);
+		return subComment.getId();
 	}
 	
 	/**
@@ -256,7 +274,7 @@ public class WebElementManager {
 		String blogId = IdGenerator.getInstance().getNextId();
 		StaticContent blogTitle = new Text(title);
 		StaticContent blogDescription = new Text(description);
-		Blog newBlog = new Blog(blogId, authorId, blogTitle, blogDescription);
+		Blog newBlog = new Blog(blogId, null, authorId, blogTitle, blogDescription);
 		DatabaseFacade.getInstance().insertBlog(newBlog);
 		return newBlog.getId();
 	}
@@ -290,6 +308,23 @@ public class WebElementManager {
 		return newPost.getId();
 	}
 	
+	public String createSubBlog(String parentBlogId, String title, String description) throws Exception {
+		Blog parentBlog = getBlog(parentBlogId);
+		if (isInvalidString(title)) {
+			throw new IllegalArgumentException(INVALID_TITLE_BLOG_MESSAGE);
+		}
+		description = (description == null? "" : description);
+		
+		String subBlogId = IdGenerator.getInstance().getNextId();
+		StaticContent subBlogTitle = new Text(title);
+		StaticContent subBlogDescription = new Text(description);
+		Blog subBlog = new Blog(subBlogId, parentBlog.getId(), parentBlog.getAuthorId(), subBlogTitle, subBlogDescription);
+		DatabaseFacade.getInstance().insertBlog(subBlog);
+		parentBlog.addSubBlog(subBlog.getId());
+		DatabaseFacade.getInstance().updateBlog(parentBlog);
+		return subBlog.getId();
+	}
+	
 	/**
 	 * Delete a specific announcement.
 	 * @param userId The user's ID.
@@ -321,6 +356,11 @@ public class WebElementManager {
 			deletePost(postId);
 		}
 		DatabaseFacade.getInstance().deleteBlog(blog.getId());
+		if (blog.getParentId() != null) {
+			Blog parentBlog = getBlog(blog.getParentId());
+			parentBlog.removeSubBlog(blog.getId());
+			DatabaseFacade.getInstance().updateBlog(parentBlog);
+		}
 		
 	}
 	
@@ -425,7 +465,7 @@ public class WebElementManager {
 	 */
 	public String getCommentFromPost(String postId, Integer index) throws Exception {
 		Post post = getPost(postId);
-		if (index == null || index.compareTo(0) < 0 || (index.compareTo(post.getNumberOfComments()) > 0)) {
+		if (isInvalidIndex(index) || (index.compareTo(post.getNumberOfComments()) > 0)) {
 			throw new IllegalArgumentException(INVALID_INDEX_MESSAGE);
 		}
 		return post.getCommentId(index);
@@ -484,6 +524,85 @@ public class WebElementManager {
 		}
 		throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
 	}
+	
+	/**
+	 * Calculates the number of Posts in Hierarchy tree of a Blog (inluding Posts on his subBlogs).
+	 * @param blogId Blog id.
+	 * @return Number of posts in this Blog + all posts in subBlogs.
+	 * @throws Exception If doesn't exist a Blog with the passes id.
+	 */
+	public Integer getNumberOfAllPostsFromBlog(String blogId) throws Exception {
+		Blog blog = getBlog(blogId);
+		int numberOfPosts = blog.getNumberOfPosts();
+		for (String subBlogId : blog.getSubBlogs()) {
+			numberOfPosts += getNumberOfAllPostsFromBlog(subBlogId);
+		}
+		return numberOfPosts;
+	}
+	
+	/**
+	 * Calculates the number of subBlogs in hierarchy tree of this blog.
+	 * @param blogId Id of parent Blog.
+	 * @return Number of subBlogs from this blog.
+	 * @throws Exception If blog with id passes doesn't exist.
+	 */
+	public Integer getNumberOfAllSubBlogs(String blogId) throws Exception {
+		Blog blog = getBlog(blogId);
+		int numOfSubBlogs = 0;
+		for (String subBlogId : blog.getSubBlogs()) {
+			numOfSubBlogs += 1 + getNumberOfAllSubBlogs(subBlogId);
+		}
+		return numOfSubBlogs;
+	}
+	
+	/**
+	 * Calculates the number of sub comments in Tree Hierarchy of a given comment.
+	 * @param commentId Id of the parent comment.
+	 * @return Number of sub comments in all levels.
+	 * @throws Exception If the sub comment doesn't exist.
+	 */
+	public Integer getNumberOfAllSubComments(String commentId) throws Exception {
+		Comment comment = getComment(commentId);
+		int numOfsubComments = 0;
+		for (String subCommentId : comment.getSubComments()) {
+			numOfsubComments += 1 + getNumberOfAllSubComments(subCommentId);
+		}
+		return numOfsubComments;
+	}
+	
+	/**
+	 * Calculates the number of comments from passed author on a blog.
+	 * @param login Login of probably comments author.
+	 * @param blogId Blog's id witch the comments are counted.
+	 * @return Number of comments from an Author in a given blog.
+	 * @throws Exception If the blogId doesn't references an existent blog.
+	 */
+	public Integer getNumberOfCommentsFromAuthorOnBlog(String login, String blogId) throws Exception {
+		Blog blog = getBlog(blogId);
+		int numOfComments = 0;
+		for (String postId : blog.getPostsId()) {
+			numOfComments += getNumberOfCommentsFromAuthorOnPost(login, postId);
+		}
+		return numOfComments;
+	}
+
+	/**
+	 * Calculates the number of comments from passed author on a post.
+	 * @param login Login of comments probably author. 
+	 * @param postId Post's id witch the comments are counted.
+	 * @return Number of comments from an Author in a given post.
+	 * @throws Exception If the postId doesn't references an existent post.
+	 */
+	public int getNumberOfCommentsFromAuthorOnPost(String login, String postId) throws Exception {
+		Post post = getPost(postId);
+		int numOfComments = 0;
+		for (String commentId : post.getCommentsId()) {
+			if (getComment(commentId).getAuthorId().equals(login)) {
+				numOfComments++;
+			}
+		}
+		return numOfComments;
+	}
 		
 	/**
 	 * Return the number of comments from a specific post.
@@ -508,6 +627,28 @@ public class WebElementManager {
 	}
 	
 	/**
+	 * Returns the number of first level subBlogs of that Blog.
+	 * @param blogId Id of Blog.
+	 * @return Number of first level subBlogs in a blog.
+	 * @throws Exception If the blog with passed blogId doesn't exist.
+	 */
+	public Integer getNumberOfSubBlogs(String blogId) throws Exception {
+		Blog blog = getBlog(blogId);
+		return blog.getNumberOfSubBlogs();
+	}
+	
+	/**
+	 * Returns the number of sub comments of a comment.
+	 * @param commentId Id of existent comment.
+	 * @return Number of sub comment in first level of this comment.
+	 * @throws Exception If doesn't exist a comment with given id.
+	 */
+	public Integer getNumberOfSubComments(String commentId) throws Exception {
+		Comment comment = getComment(commentId);
+		return comment.getNumberOfSubComments();
+	}
+	
+	/**
 	 * Return the ID of a specific attachment.
 	 * @param postId The post's ID.
 	 * @param attribute The information that the post has (sound, movie, picture).
@@ -522,7 +663,7 @@ public class WebElementManager {
 		if (isInvalidString(attribute)) {
 			throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
 		}
-		if (index == null || index.compareTo(0) < 0) {
+		if (isInvalidIndex(index)) {
 			throw new IllegalArgumentException(INVALID_INDEX_MESSAGE);
 		}
 		
@@ -584,6 +725,23 @@ public class WebElementManager {
 	}
 	
 	/**
+	 * Return the post's ID from a blog.
+	 * @param blogId The blog's ID.
+	 * @param index The index of the post on the blog.
+	 * @return The post's ID.
+	 * @throws Exception If blogId is null, empty or doesn't exist a blog with the passed blogId.
+	 * 					 If the index is less then 0 (zero).
+	 */
+	public String getPostFromBlog(String blogId, Integer index) throws Exception {
+		Blog blog = getBlog(blogId);
+		
+		if (isInvalidIndex(index)) {
+			throw new IllegalArgumentException(INVALID_INDEX_MESSAGE);
+		}
+		return blog.getPost(index);
+	}
+	
+	/**
 	 * Return the post's information.
 	 * @param postId The post's ID.
 	 * @param attribute The information that the post has (title, text, creation date). 
@@ -604,24 +762,36 @@ public class WebElementManager {
 			return UsersHandler.getInstance().convertCalendarToStringDate(post.getCreationDate());
 		}
 		throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
-		
 	}
-		
+	
 	/**
-	 * Return the post's ID from a blog.
-	 * @param blogId The blog's ID.
-	 * @param index The index of the post on the blog.
-	 * @return The post's ID.
-	 * @throws Exception If blogId is null, empty or doesn't exist a blog with the passed blogId.
-	 * 					 If the index is less then 0 (zero).
+	 * Returns the subComment at Index passed.
+	 * @param parentCommentId Parent Comment Id.
+	 * @param index Index of searched subComment. (0<=x<numOfSubComments)
+	 * @return Searched sub comment id.
+	 * @throws Exception If the parent comment passed doesn't exist or if was passed an invalid index.
 	 */
-	public String getPostFromBlog(String blogId, Integer index) throws Exception {
-		Blog blog = getBlog(blogId);
-		
-		if (isInvalidIndex(index)) {
+	public String getSubComment(String parentCommentId, Integer index) throws Exception {
+		Comment parentComment = getComment(parentCommentId);
+		if (isInvalidIndex(index) || index.compareTo(parentComment.getNumberOfSubComments()) >= 0) {
 			throw new IllegalArgumentException(INVALID_INDEX_MESSAGE);
 		}
-		return blog.getPost(index);
+		return parentComment.getSubComments().get(index);
+	}
+	
+	/**
+	 * Returns the subBlog at passed index (Ordered by creation time).
+	 * @param blogId Blog id.
+	 * @param index Index of the wanted subBlog.
+	 * @return SubBlog id.
+	 * @throws Exception If doesn't exists a Blog with passed id.
+	 */
+	public String getSubBlog(String blogId, Integer index) throws Exception {
+		Blog blog = getBlog(blogId);
+		if (isInvalidIndex(index) || index.compareTo(blog.getNumberOfSubBlogs()) >= 0) {
+			throw new IllegalArgumentException(INVALID_INDEX_MESSAGE);
+		}
+		return blog.getSubBlogs().get(index);
 	}
 	
 	/**
@@ -636,19 +806,6 @@ public class WebElementManager {
 	}
 	
 	/**
-	 * Return a specific blog.
-	 * @param blogId The blog's ID.
-	 * @return The blog.
-	 * @throws Exception If the blogId is null, empty or doesn't exist the blog with passed blogId.
-	 */
-	private Blog getBlog(String blogId) throws Exception {
-		if (isInvalidString(blogId) || !DatabaseFacade.getInstance().existsBlogInDatabase(blogId)) {
-			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
-		}
-		return DatabaseFacade.getInstance().retrieveBlog(blogId);
-	}
-	
-	/**
 	 * Return a announcement.
 	 * @param announcementId The announcement's ID.
 	 * @return The announcement.
@@ -659,6 +816,19 @@ public class WebElementManager {
 			throw new IllegalArgumentException(INVALID_ANNOUNCEMENT_MESSAGE);
 		}
 		return DatabaseFacade.getInstance().retrieveAnnouncement(announcementId);
+	}
+	
+	/**
+	 * Return a specific blog.
+	 * @param blogId The blog's ID.
+	 * @return The blog.
+	 * @throws Exception If the blogId is null, empty or doesn't exist the blog with passed blogId.
+	 */
+	private Blog getBlog(String blogId) throws Exception {
+		if (isInvalidString(blogId) || !DatabaseFacade.getInstance().existsBlogInDatabase(blogId)) {
+			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
+		}
+		return DatabaseFacade.getInstance().retrieveBlog(blogId);
 	}
 	
 	/**
@@ -716,6 +886,7 @@ public class WebElementManager {
 	 * @return True case the integer is null or negative, and False otherwise.
 	 */
 	private boolean isInvalidIndex(Integer index) {
-		return index == null || index < 0;
+		return index == null || index.compareTo(0) < 0;
 	}
+	
 }

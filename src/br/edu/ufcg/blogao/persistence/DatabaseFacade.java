@@ -10,6 +10,15 @@ import br.edu.ufcg.blogao.blog.Post;
 import br.edu.ufcg.blogao.blog.data.InteractiveContent;
 import br.edu.ufcg.blogao.user.UserIF;
 
+/**
+ * /**
+ * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
+ * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
+ * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
+ * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
+ * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
+ * @version 1.0 20/09/2010
+ */
 public class DatabaseFacade {
 	
 	private final String INVALID_BLOG_MESSAGE = "Blog inv‡lido";
