@@ -802,23 +802,12 @@ public class WebElementManager {
 		return blog.getSubBlogs().get(index);
 	}
 	
-	/**
-	 * Create a announcement.
-	 * @param targetId The target ID.
-	 * @return The new announcement.
-	 */
 	private AnnouncementIF createAnnouncement(String targetId) {
 		String announcementId = IdGenerator.getInstance().getNextId();
 		AnnouncementIF ann = new AnnouncementImpl(announcementId, targetId);
 		return ann;
 	}
 	
-	/**
-	 * Return a announcement.
-	 * @param announcementId The announcement's ID.
-	 * @return The announcement.
-	 * @throws Exception If the announcementId is null, empty or doesn't existe a announcement with the passed ID.
-	 */
 	private AnnouncementIF getAnnouncement(String announcementId) throws Exception {
 		if (isInvalidString(announcementId) || !DatabaseFacade.getInstance().existsAnnouncementInDatabase(announcementId)) {
 			throw new IllegalArgumentException(INVALID_ANNOUNCEMENT_MESSAGE);
@@ -826,12 +815,6 @@ public class WebElementManager {
 		return DatabaseFacade.getInstance().retrieveAnnouncement(announcementId);
 	}
 	
-	/**
-	 * Return a specific blog.
-	 * @param blogId The blog's ID.
-	 * @return The blog.
-	 * @throws Exception If the blogId is null, empty or doesn't exist the blog with passed blogId.
-	 */
 	private Blog getBlog(String blogId) throws Exception {
 		if (isInvalidString(blogId) || !DatabaseFacade.getInstance().existsBlogInDatabase(blogId)) {
 			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
@@ -839,12 +822,6 @@ public class WebElementManager {
 		return DatabaseFacade.getInstance().retrieveBlog(blogId);
 	}
 	
-	/**
-	 * Return a specific comment.
-	 * @param commentId The comment's ID.
-	 * @return The comment.
-	 * @throws Exception If the commentId is null, empty or doesn't exist the comment with the passed commentId.
-	 */
 	private Comment getComment(String commentId) throws Exception {
 		if (isInvalidString(commentId) || !DatabaseFacade.getInstance().existsCommentInDatabase(commentId)) {
 			throw new IllegalArgumentException(INVALID_COMMENT_MESSAGE);
@@ -852,12 +829,6 @@ public class WebElementManager {
 		return DatabaseFacade.getInstance().retrieveComment(commentId);
 	}
 	
-	/**
-	 * Return a interactive content.
-	 * @param interactiveContentId The ID of a interactive content.
-	 * @return The interactive content.
-	 * @throws Exception If the icID id null, empty ot doesn't exist a IC with the passed ID.
-	 */
 	private InteractiveContent getInteractiveContent(String interactiveContentId) throws Exception {
 		if (isInvalidString(interactiveContentId) || 
 				!DatabaseFacade.getInstance().existsInteractiveContentInDatabase(interactiveContentId)) {
@@ -866,33 +837,17 @@ public class WebElementManager {
 		return DatabaseFacade.getInstance().retrieveInteractiveContent(interactiveContentId);
 	}
 	
-	/**
-	 * Return a specific post.
-	 * @param postId The post's ID.
-	 * @return The post.
-	 * @throws Exception If the postId is null, empty or doesn't exist the postId.
-	 */
 	private Post getPost(String postId) throws Exception {
 		if (isInvalidString(postId) || !DatabaseFacade.getInstance().existsPostInDatabase(postId)) {
 			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
 		}
 		return DatabaseFacade.getInstance().retrievePost(postId);
 	}
-		
-	/**
-	 * Verify if the string is null or empty.
-	 * @param str The string that will be verified.
-	 * @return True case the string is null or empty, and False otherwise.
-	 */
+	
 	private boolean isInvalidString(String str) {
 		return str == null || str.trim().isEmpty();
 	}
 
-	/**
-	 * Verify if the integer is null or negative.
-	 * @param index The integer that will be verified. 
-	 * @return True case the integer is null or negative, and False otherwise.
-	 */
 	private boolean isInvalidIndex(Integer index) {
 		return index == null || index.compareTo(0) < 0;
 	}	

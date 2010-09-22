@@ -1,21 +1,21 @@
 package br.edu.ufcg.blogao.user;
 
+/**
+ *  Represents a user's blog implementation.
+ *  
+ * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
+ * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
+ * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
+ * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
+ * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
+ * @version 0.1
+ */
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-/**
- * Represents a simple user's blog implementation.
- * @author Caio
- * @author Carlos
- * @author Catharine
- * @author Demontie
- * @author Matheus
- * @version 0.4 - 12nd September, 2010.
- */
 public class UserImpl implements UserIF {
-	
-	//User "default" attributes.
 	private String login;
 	private String password;
 	private String name;
@@ -28,9 +28,7 @@ public class UserImpl implements UserIF {
 	private String musics;
 	private String movies;
 	private String books;
-	
-	//
-	private List<String> blogs; //<blog id>
+	private List<String> blogs;
 	private List<String> announcementsListening;
 	
 	/**
@@ -96,6 +94,11 @@ public class UserImpl implements UserIF {
 	public String getAddress() {
 		return address;
 	}
+	
+	@Override
+	public List<String> getAnnouncements() {
+		return announcementsListening;
+	}	
 
 	@Override
 	public String getBooks() {
@@ -168,8 +171,18 @@ public class UserImpl implements UserIF {
 	}
 	
 	@Override
+	public void receiveAnnouncement(String Id) {
+		announcementsListening.add(Id);
+	}
+	
+	@Override
 	public void removeBlogIdAtIndex(int index) {
 		blogs.remove(index);
+	}
+
+	@Override
+	public void removeBlog(String blogId) {
+		blogs.remove(blogId);
 	}
 	
 	@Override
@@ -231,20 +244,4 @@ public class UserImpl implements UserIF {
 	public void setWhoIAm(String whoIAm) {
 		this.whoIAm = whoIAm;
 	}
-
-	@Override
-	public void removeBlog(String blogId) {
-		blogs.remove(blogId);
-	}
-	
-	@Override
-	public void receiveAnnouncement(String Id) {
-		announcementsListening.add(Id);
-	}
-	
-	@Override
-	public List<String> getAnnouncements() {
-		return announcementsListening;
-	}
-	
 }

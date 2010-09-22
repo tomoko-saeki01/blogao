@@ -1,5 +1,16 @@
 package br.edu.ufcg.blogao.user;
 
+/**
+ *  Represents the user of Blogao.
+ *  
+ * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
+ * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
+ * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
+ * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
+ * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
+ * @version 0.1
+ */
+
 import java.util.Calendar;
 import java.util.List;
 
@@ -8,13 +19,13 @@ import br.edu.ufcg.blogao.Identifiable;
 public interface UserIF extends Identifiable, Notifiable {
 
 	/**
-	 * Add a new blog's reference to user. (blog id)
-	 * @param blog User's blog reference.
+	 * Add a new blog's reference to user.
+	 * @param blogId The blog's ID.
 	 */
 	public void addBlog(String blogId);
 	
 	/**
-	 * Return user's address.
+	 * Return the user's address.
 	 * @return The user's address.
 	 */
 	public String getAddress();
@@ -28,7 +39,7 @@ public interface UserIF extends Identifiable, Notifiable {
 	/**
 	 * Gets the blogId at given index.
 	 * @param index Index of wanted blogId.
-	 * @return blogId
+	 * @return The blog's ID.
 	 */
 	public String getBlogIdAtIndex(int index);
 
@@ -102,22 +113,28 @@ public interface UserIF extends Identifiable, Notifiable {
 	 * @return The user's self description.
 	 */
 	public String getWhoIAm();
+
+	/**
+	 * Remove a user's blog.
+	 * @param blogId The blog's ID.
+	 */
+	public void removeBlog(String blogId);	
 	
 	/**
-	 * Removes an existent blogId.
-	 * @param blogId Index of blog id to be removed.
+	 * Remove a blog.
+	 * @param index The index of blog to be removed.
 	 */
 	public void removeBlogIdAtIndex(int index);
 
 	/**
 	 * Set the user's address.
-	 * @param address User's address.
+	 * @param address The user's address.
 	 */
 	public void setAddress(String address);
 	
 	/**
 	 * Set the user's favorite books.
-	 * @param books The users books.
+	 * @param books The user's books.
 	 */
 	public void setBooks(String books);
 
@@ -133,6 +150,7 @@ public interface UserIF extends Identifiable, Notifiable {
 	 */
 	public void setEmail(String email);
 	
+	//TODO checar.
 	/**
 	 * Sets the user id (login).
 	 * @param id User unique identification.
@@ -147,13 +165,13 @@ public interface UserIF extends Identifiable, Notifiable {
 	
 	/**
 	 * Set the user's musics.
-	 * @param musics The user's musics.
+	 * @param musics The user's favorites musics.
 	 */
 	public void setMusics(String musics);
 	
 	/**
 	 * Set the user's favorite movies;
-	 * @param movies The user's movies;
+	 * @param movies The user's favorites movies;
 	 */
 	public void setMovies(String movies);
 
@@ -181,11 +199,4 @@ public interface UserIF extends Identifiable, Notifiable {
 	 * @param whoIAm The user's self description.
 	 */
 	public void setWhoIAm(String whoIAm);
-
-	/**
-	 * Remove a user Blog.
-	 * @param blogId Blog id
-	 */
-	public void removeBlog(String blogId);
-	
 }
