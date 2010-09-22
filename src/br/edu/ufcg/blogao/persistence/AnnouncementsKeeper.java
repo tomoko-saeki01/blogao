@@ -42,7 +42,7 @@ public class AnnouncementsKeeper {
 	/**
 	 * Delete all existing announcements.
 	 */
-	public void deleteAllAnnouncements() {
+	void deleteAllAnnouncements() {
 		File announcementsDirectory = new File(ANNOUNCEMENTS_PARENT_PATH);
 		announcementsDirectory.mkdirs();
 		File[] announcementsFiles = announcementsDirectory.listFiles();
@@ -56,7 +56,7 @@ public class AnnouncementsKeeper {
 	 * @param announcementId The announcement's ID that will be deleted.
 	 * @throws Exception If the annoucemetnId doesn't exist in database.
 	 */
-	public void deleteAnnouncement(String announcementId) throws Exception {
+	void deleteAnnouncement(String announcementId) throws Exception {
 		if (!existsAnnouncementInDatabase(announcementId)) {
 			throw new IllegalStateException(UNEXISTENT_ANNOUNCEMENT_MESSAGE);
 		}
@@ -68,7 +68,7 @@ public class AnnouncementsKeeper {
 	 * @param id The announcement's ID.
 	 * @return True case the announcement exist or False otherwise.
 	 */
-	public boolean existsAnnouncementInDatabase(String id) {
+	boolean existsAnnouncementInDatabase(String id) {
 		return (new File(ANNOUNCEMENTS_PARENT_PATH + id + ANNOUNCEMENTS_FILE_EXTENSION)).exists();
 	}
 	
@@ -76,7 +76,7 @@ public class AnnouncementsKeeper {
 	 * Return a map with all the announcements existing.
 	 * @return A map with all the announcements.
 	 */
-	public Map<String, AnnouncementIF> getAllAnnouncements() {
+	Map<String, AnnouncementIF> getAllAnnouncements() {
 		File announcementsDirectory = new File(ANNOUNCEMENTS_PARENT_PATH);
 		announcementsDirectory.mkdirs();
 		File[] announcementsFiles = announcementsDirectory.listFiles();
@@ -99,7 +99,7 @@ public class AnnouncementsKeeper {
 	 * @param ann The new announcement that will be inserted.
 	 * @throws Exception If already exist the announcement in database. 
 	 */
-	public void insertAnnouncement(AnnouncementIF ann) throws Exception {
+	void insertAnnouncement(AnnouncementIF ann) throws Exception {
 		if (existsAnnouncementInDatabase(ann.getId())) {
 			throw new IllegalStateException(EXISTENT_ANNOUNCEMENT_MESSAGE);
 		}
@@ -115,7 +115,7 @@ public class AnnouncementsKeeper {
 	 * @return The announcement.
 	 * @throws Exception If the announcementId doesn't exist in database.
 	 */
-	public AnnouncementIF retrieveAnnouncement(String announcementId) throws Exception {
+	AnnouncementIF retrieveAnnouncement(String announcementId) throws Exception {
 		if (!existsAnnouncementInDatabase(announcementId)) {
 			throw new IllegalStateException(UNEXISTENT_ANNOUNCEMENT_MESSAGE);
 		}

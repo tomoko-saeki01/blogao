@@ -41,7 +41,7 @@ public class PostsKeeper {
 	/**
 	 * Delete all existing posts.
 	 */
-	public void deleteAllPosts() {
+	void deleteAllPosts() {
 		File postsDirectory = new File(POSTS_PARENT_PATH);
 		postsDirectory.mkdirs();
 		File[] postsFiles = postsDirectory.listFiles();
@@ -55,7 +55,7 @@ public class PostsKeeper {
 	 * @param postId The post's ID that will be deleted.
 	 * @throws Exception If the post doesn't exist in database.
 	 */
-	public void deletePost(String postId) throws Exception {
+	void deletePost(String postId) throws Exception {
 		if (!existsPostInDatabase(postId)) {
 			throw new IllegalStateException(UNEXISTENT_POST_MESSAGE);
 		}
@@ -67,7 +67,7 @@ public class PostsKeeper {
 	 * @param id The post's ID that will be checked.
 	 * @return True case the post exist or False otherwise.
 	 */
-	public boolean existsPostInDatabase(String id) {
+	boolean existsPostInDatabase(String id) {
 		return (new File(POSTS_PARENT_PATH + id + POSTS_FILE_EXTENSION)).exists();
 	}
 
@@ -75,7 +75,7 @@ public class PostsKeeper {
 	 * Return a map with all existing posts.
 	 * @return A map with all posts.
 	 */
-	public Map<String, Post> getAllPosts() {
+	Map<String, Post> getAllPosts() {
 		File postsDirectory = new File(POSTS_PARENT_PATH);
 		postsDirectory.mkdirs();
 		File[] postsFiles = postsDirectory.listFiles();
@@ -98,7 +98,7 @@ public class PostsKeeper {
 	 * @param post The post that will be inserted.
 	 * @throws Exception If the post already exist in database.
 	 */
-	public void insertPost(Post post) throws Exception {
+	void insertPost(Post post) throws Exception {
 		if (existsPostInDatabase(post.getId())) {
 			throw new IllegalStateException(EXISTENT_POST_MESSAGE);
 		}
@@ -114,7 +114,7 @@ public class PostsKeeper {
 	 * @return The post.
 	 * @throws Exception If the post doesn't exist in database.
 	 */
-	public Post retrievePost(String postId) throws Exception {
+	Post retrievePost(String postId) throws Exception {
 		if (!existsPostInDatabase(postId)) {
 			throw new IllegalStateException(UNEXISTENT_POST_MESSAGE);
 		}

@@ -43,7 +43,7 @@ public class BlogsKeeper {
 	/**
 	 * Delete all existing blogs.
 	 */
-	public void deleteAllBlogs() {
+	void deleteAllBlogs() {
 		File blogsDirectory = new File(BLOGS_PARENT_PATH);
 		blogsDirectory.mkdirs();
 		File[] blogsFiles = blogsDirectory.listFiles();
@@ -57,7 +57,7 @@ public class BlogsKeeper {
 	 * @param blogId The blog's ID that will be deleted.
 	 * @throws Exception If the blogId doesn't exist in database.
 	 */
-	public void deleteBlog(String blogId) throws Exception {
+	void deleteBlog(String blogId) throws Exception {
 		if (!existsBlogInDatabase(blogId)) {
 			throw new IllegalStateException(UNEXISTENT_BLOG_MESSAGE);
 		}
@@ -69,7 +69,7 @@ public class BlogsKeeper {
 	 * @param id The blog's ID that will be verified.
 	 * @return True case the blog exist or False otherwise.
 	 */
-	public boolean existsBlogInDatabase(String id) {
+	boolean existsBlogInDatabase(String id) {
 		return (new File(BLOGS_PARENT_PATH + id + BLOGS_FILE_EXTENSION)).exists();
 	}
 	
@@ -77,7 +77,7 @@ public class BlogsKeeper {
 	 * Return a map with all blogs existing.
 	 * @return A map with all blogs.
 	 */
-	public Map<String, Blog> getAllBlogs() {
+	Map<String, Blog> getAllBlogs() {
 		File blogsDirectory = new File(BLOGS_PARENT_PATH);
 		blogsDirectory.mkdirs();
 		File[] blogsFiles = blogsDirectory.listFiles();
@@ -100,7 +100,7 @@ public class BlogsKeeper {
 	 * @param blog The new blog that will be inserted.
 	 * @throws Exception If the blog already exist in database.
 	 */
-	public void insertBlog(Blog blog) throws Exception {
+	void insertBlog(Blog blog) throws Exception {
 		if (existsBlogInDatabase(blog.getId())) {
 			throw new IllegalStateException(EXISTENT_BLOG_MESSAGE);
 		}
@@ -132,7 +132,7 @@ public class BlogsKeeper {
 	 * @return The blog.
 	 * @throws Exception If the blogId doesn't exist in database.
 	 */
-	public Blog retrieveBlog(String blogId) throws Exception {
+	Blog retrieveBlog(String blogId) throws Exception {
 		if (!existsBlogInDatabase(blogId)) {
 			throw new IllegalStateException(UNEXISTENT_BLOG_MESSAGE);
 		}
