@@ -1,5 +1,16 @@
 package br.edu.ufcg.blogao;
 
+/**
+ * Generate a unique ID.
+ *  
+ * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
+ * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
+ * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
+ * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
+ * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
+ * @version 0.1
+ */
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,6 +27,10 @@ public class IdGenerator {
 	private IdGenerator() {
 	}
 
+	/**
+	 * Return the instance of IdGenerator.
+	 * @return The instance of IdGenerator.
+	 */
 	public synchronized static IdGenerator getInstance() {
 		if (selfInstance == null) {
 			selfInstance = new IdGenerator();
@@ -23,6 +38,10 @@ public class IdGenerator {
 		return selfInstance;
 	}
 	
+	/**
+	 * Return the next ID.
+	 * @return The next ID.
+	 */
 	public synchronized String getNextId() {
 		if (nextId == 0) {
 			nextId = retriveBackupId();
@@ -73,5 +92,4 @@ public class IdGenerator {
 		}
 		return 0;
 	}
-
 }
