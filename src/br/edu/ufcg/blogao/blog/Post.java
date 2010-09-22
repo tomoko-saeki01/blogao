@@ -1,13 +1,5 @@
 package br.edu.ufcg.blogao.blog;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import br.edu.ufcg.blogao.blog.data.StaticContent;
-
 /**
  * Represents the post of a blog.
  *
@@ -16,8 +8,17 @@ import br.edu.ufcg.blogao.blog.data.StaticContent;
  * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
  * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
  * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
- * @version 2.0 - 31th August, 2010.
+ * @version 0.1
  */
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import br.edu.ufcg.blogao.blog.data.StaticContent;
+
 public class Post implements WebElement {
 	
 	private final String MOVIES_KEY = "0";
