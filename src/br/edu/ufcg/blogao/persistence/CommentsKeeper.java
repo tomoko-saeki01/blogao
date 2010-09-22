@@ -41,7 +41,7 @@ public class CommentsKeeper {
 	/**
 	 * Delete all existing comments.
 	 */
-	public void deleteAllComments() {
+	void deleteAllComments() {
 		File commentsDirectory = new File(COMMENTS_PARENT_PATH);
 		commentsDirectory.mkdirs();
 		File[] commentsFiles = commentsDirectory.listFiles();
@@ -55,7 +55,7 @@ public class CommentsKeeper {
 	 * @param commentId The comment's ID that will be deleted.
 	 * @throws Exception If the comment doesn't exist in database.
 	 */
-	public void deleteComment(String commentId) throws Exception {
+	void deleteComment(String commentId) throws Exception {
 		if (!existsCommentInDatabase(commentId)) {
 			throw new IllegalStateException(UNEXISTENT_COMMENT_MESSAGE);
 		}
@@ -67,7 +67,7 @@ public class CommentsKeeper {
 	 * @param id The comment's ID that will be verified.
 	 * @return True case the comment exist or False otherwise.
 	 */
-	public boolean existsCommentInDatabase(String id) {
+	boolean existsCommentInDatabase(String id) {
 		return (new File(COMMENTS_PARENT_PATH + id + COMMENTS_FILE_EXTENSION)).exists();
 	}
 
@@ -75,7 +75,7 @@ public class CommentsKeeper {
 	 * Return a map with all the comments existing.
 	 * @return A map with all the comments.
 	 */
-	public Map<String, Comment> getAllComments() {
+	Map<String, Comment> getAllComments() {
 		File commentsDirectory = new File(COMMENTS_PARENT_PATH);
 		commentsDirectory.mkdirs();
 		File[] commentsFiles = commentsDirectory.listFiles();
@@ -98,7 +98,7 @@ public class CommentsKeeper {
 	 * @param comment The comment that will  be inserted.
 	 * @throws Exception If the comment already exist.
 	 */
-	public void insertComment(Comment comment) throws Exception {
+	void insertComment(Comment comment) throws Exception {
 		if (existsCommentInDatabase(comment.getId())) {
 			throw new IllegalStateException(EXISTENT_COMMENT_MESSAGE);
 		}
@@ -114,7 +114,7 @@ public class CommentsKeeper {
 	 * @return The comment.
 	 * @throws Exception If the comment doesn't exist.
 	 */
-	public Comment retrieveComment(String commentId) throws Exception {
+	Comment retrieveComment(String commentId) throws Exception {
 		if (!existsCommentInDatabase(commentId)) {
 			throw new IllegalStateException(UNEXISTENT_COMMENT_MESSAGE);
 		}
@@ -127,7 +127,7 @@ public class CommentsKeeper {
 	 * @param comment The comment that will be updated.
 	 * @throws Exception If the comment doesn't exist.
 	 */
-	public void updateComment(Comment comment) throws Exception {
+	void updateComment(Comment comment) throws Exception {
 		if (!existsCommentInDatabase(comment.getId())) {
 			throw new IllegalStateException(UNEXISTENT_COMMENT_MESSAGE);
 		}

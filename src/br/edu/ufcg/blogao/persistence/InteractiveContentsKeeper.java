@@ -41,7 +41,7 @@ public class InteractiveContentsKeeper {
 	/**
 	 * Delete all existing interactive contents.
 	 */
-	public void deleteAllInteractiveContents() {
+	void deleteAllInteractiveContents() {
 		File icsDirectory = new File(INTERACTIVE_CONTENT_PARENT_PATH);
 		icsDirectory.mkdirs();
 		File[] icsFiles = icsDirectory.listFiles();
@@ -55,7 +55,7 @@ public class InteractiveContentsKeeper {
 	 * @param icId The ID of the interactive content that will be deleted.
 	 * @throws Exception If the interactive content doesn't exist.
 	 */
-	public void deleteInteractiveContent(String icId) throws Exception {
+	void deleteInteractiveContent(String icId) throws Exception {
 		if (!existsInteractiveContentInDatabase(icId)) {
 			throw new IllegalStateException(UNEXISTENT_POST_MESSAGE);
 		}
@@ -67,7 +67,7 @@ public class InteractiveContentsKeeper {
 	 * @param id The ID of the interactive content that will be verified.
 	 * @return True case the interactive content exist or False otherwise.
 	 */
-	public boolean existsInteractiveContentInDatabase(String id) {
+	boolean existsInteractiveContentInDatabase(String id) {
 		return (new File(INTERACTIVE_CONTENT_PARENT_PATH + id + INTERACTIVE_CONTENT_FILE_EXTENSION)).exists();
 	}
 	
@@ -75,7 +75,7 @@ public class InteractiveContentsKeeper {
 	 * Return a map with all the interactive contents existing.
 	 * @return A map with all the interactive contents.
 	 */
-	public Map<String, InteractiveContent> getAllInteractiveContents() {
+	Map<String, InteractiveContent> getAllInteractiveContents() {
 		File icsDirectory = new File(INTERACTIVE_CONTENT_PARENT_PATH);
 		icsDirectory.mkdirs();
 		File[] icsFiles = icsDirectory.listFiles();
@@ -98,7 +98,7 @@ public class InteractiveContentsKeeper {
 	 * @param ic The ID of the interactive content that will be inserted.
 	 * @throws Exception If the interactive content already exist in database.
 	 */
-	public void insertInteractiveContent(InteractiveContent ic) throws Exception {
+	void insertInteractiveContent(InteractiveContent ic) throws Exception {
 		if (existsInteractiveContentInDatabase(ic.getId())) {
 			throw new IllegalStateException(EXISTENT_POST_MESSAGE);
 		}
@@ -114,7 +114,7 @@ public class InteractiveContentsKeeper {
 	 * @return The interactive content.
 	 * @throws Exception If the interactive content doesn't exist in database.
 	 */
-	public InteractiveContent retrieveInteractiveContent(String icId) throws Exception {
+	InteractiveContent retrieveInteractiveContent(String icId) throws Exception {
 		if (!existsInteractiveContentInDatabase(icId)) {
 			throw new IllegalStateException(UNEXISTENT_POST_MESSAGE);
 		}
@@ -127,7 +127,7 @@ public class InteractiveContentsKeeper {
 	 * @param ic The interactive content that will be updated.
 	 * @throws Exception If the interactive content doesn't exist in database.
 	 */
-	public void updateInteractiveContent(InteractiveContent ic) throws Exception {
+	void updateInteractiveContent(InteractiveContent ic) throws Exception {
 		if (!existsInteractiveContentInDatabase(ic.getId())) {
 			throw new IllegalStateException(UNEXISTENT_POST_MESSAGE);
 		}

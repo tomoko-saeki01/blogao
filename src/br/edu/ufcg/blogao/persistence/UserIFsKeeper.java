@@ -43,7 +43,7 @@ public class UserIFsKeeper {
 	/**
 	 * Delete all existing users.
 	 */
-	public void deleteAllUsers() {
+	void deleteAllUsers() {
 		File usersDirectory = new File(USERS_PARENT_PATH);
 		usersDirectory.mkdirs();
 		File[] usersFiles = usersDirectory.listFiles();
@@ -57,7 +57,7 @@ public class UserIFsKeeper {
 	 * @param userId The user's ID that will be deleted.
 	 * @throws Exception If the user doesn't exist in database.
 	 */
-	public void deleteUser(String userId) throws Exception {
+	void deleteUser(String userId) throws Exception {
 		if (!existsUserInDatabase(userId)) {
 			throw new IllegalStateException(UNEXISTENT_USER_MESSAGE);
 		}
@@ -69,7 +69,7 @@ public class UserIFsKeeper {
 	 * @param id The user's ID that will be verified.
 	 * @return True case the user exist or False otherwise.
 	 */
-	public boolean existsUserInDatabase(String id) {
+	boolean existsUserInDatabase(String id) {
 		return (new File(USERS_PARENT_PATH + id + USERS_FILE_EXTENSION)).exists();
 	}
 
@@ -77,7 +77,7 @@ public class UserIFsKeeper {
 	 * Return a map with all existing users.
 	 * @return A map with all users.
 	 */
-	public Map<String, UserIF> getAllUsers() {
+	Map<String, UserIF> getAllUsers() {
 		File usersDirectory = new File(USERS_PARENT_PATH);
 		usersDirectory.mkdirs();
 		File[] usersFiles = usersDirectory.listFiles();
@@ -100,7 +100,7 @@ public class UserIFsKeeper {
 	 * @param user The user that will be inserted.
 	 * @throws Exception If the user already exist in database.
 	 */
-	public void insertUser(UserIF user) throws Exception {
+	void insertUser(UserIF user) throws Exception {
 		if (existsUserInDatabase(user.getId())) {
 			throw new IllegalStateException(EXISTENT_USER_MESSAGE);
 		}
@@ -132,7 +132,7 @@ public class UserIFsKeeper {
 	 * @return The user.
 	 * @throws Exception If the user doesn't exist.
 	 */
-	public UserIF retrieveUser(String userId) throws Exception {
+	UserIF retrieveUser(String userId) throws Exception {
 		if (!existsUserInDatabase(userId)) {
 			throw new IllegalStateException(UNEXISTENT_USER_MESSAGE);
 		}
@@ -145,7 +145,7 @@ public class UserIFsKeeper {
 	 * @param user The user that will be updated.
 	 * @throws Exception If the user doesn't exist in database.
 	 */
-	public void updateUser(UserIF user) throws Exception {
+	void updateUser(UserIF user) throws Exception {
 		if (!existsUserInDatabase(user.getId())) {
 			throw new IllegalStateException(UNEXISTENT_USER_MESSAGE);
 		}
