@@ -144,18 +144,18 @@ public class SessionManager {
 	}
 	
 	/**
-	 * Verify if the session is valid.
+	 * Verify if the session is invalid.
 	 * @param sessionId The session's ID that will be verified.
-	 * @return True case the session is valid or False otherwise.
+	 * @return True case the session is invalid or False otherwise.
 	 */
 	private boolean isInvalidSession(String sessionId) {
 		return !actualSessions.containsKey(sessionId);
 	}
 
 	/**
-	 * Verify if the string is valid.
+	 * Verify if the string is invalid.
 	 * @param str The string that will be verified.
-	 * @return True case the string is valid or False otherwise.
+	 * @return True case the string is invalid or False otherwise.
 	 */
 	private boolean isInvalidString(String str) {
 		return str == null || str.trim().isEmpty();

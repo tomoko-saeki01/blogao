@@ -1,5 +1,16 @@
 package br.edu.ufcg.blogao.user;
 
+/**
+ * Handles with users.
+ * 
+ * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
+ * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
+ * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
+ * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
+ * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
+ * @version 0.1
+ */
+
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -10,14 +21,6 @@ import br.edu.ufcg.blogao.Encryptor;
 import br.edu.ufcg.blogao.blog.WebElementManager;
 import br.edu.ufcg.blogao.persistence.DatabaseFacade;
 
-/**
- * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
- * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
- * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
- * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
- * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
- * @version 1.0 20/09/2010
- */
 public class UsersHandler {
 	
 	private static UsersHandler selfInstance = null;
@@ -54,6 +57,10 @@ public class UsersHandler {
 	private UsersHandler(){
 	}
 	
+	/**
+	 * Return the instance of the Users Handler.
+	 * @return The instance of the Users Hnadler.
+	 */
 	public synchronized static UsersHandler getInstance() {
 		if (selfInstance == null) {
 			selfInstance = new UsersHandler();
@@ -61,34 +68,25 @@ public class UsersHandler {
 		return selfInstance;
 	}
 	
+	/**
+	 * Add a blog to the user.
+	 * @param blogId The blog's ID.
+	 * @param login The user's login.
+	 * @throws Exception If the login is null or the user doesn't exist.
+	 */
 	public void addBlogToUser(String blogId, String login) throws Exception {
 		UserIF user = getUser(login);
 		user.addBlog(blogId);
 		DatabaseFacade.getInstance().updateUser(user);
 	}
 	
-	public void removeBlogFromUser(String blogId, String login) throws Exception {
-		UserIF user = getUser(login);
-		user.removeBlog(blogId);
-		DatabaseFacade.getInstance().updateUser(user);
-	}
-	
-	private UserIF getUser(String login) throws Exception {
-		if (isInvalidString(login) || !existsUserWithLogin(login)) {
-			throw new IllegalArgumentException(INVALID_LOGIN_MESSAGE);
-		}
-		return DatabaseFacade.getInstance().retrieveUser(login);
-	}
-	
-	public Integer getNumberOfBlogsFromUser(String userId) throws Exception {
-		UserIF user = getUser(userId);
-		return user.getNumberOfBlogs();
-	}
-	
-	public String getBlogFromUser(String login, Integer index) throws Exception {
-		return getUser(login).getBlogIdAtIndex(index);
-	}
-
+	/**
+	 * Change the user's information.
+	 * @param login The user's login. 
+	 * @param attribute The attribute that will change.
+	 * @param value The value.
+	 * @throws Exception If the attribute is null or empty.
+	 */
 	public void changeUserInformation(String login, String attribute, String value) throws Exception {
 		// Required parameters
 		UserIF user = getUser(login);
@@ -154,6 +152,50 @@ public class UsersHandler {
 		DatabaseFacade.getInstance().updateUser(user);
 	}
 	
+	/**
+	 * Convert the calendar to the format: dd/mm/yyyy.
+	 * @param cal The calendar that will be converted.
+	 * @return The date. Formate: dd/mm/yyyy.
+	 */
+	public String convertCalendarToStringDate(Calendar cal) {
+		int dayOfMonth = cal.get(GregorianCalendar.DAY_OF_MONTH);
+		// In GregorianCalendar the month is from 0 (January) to 11 (December)
+		int month = cal.get(GregorianCalendar.MONTH) + 1;
+		int year = cal.get(GregorianCalendar.YEAR);
+		
+		return String.format(DATE_FORMAT, dayOfMonth, month, year);
+	}
+	
+	/**
+	 * Convert the sex to string.
+	 * @param sex The sex that will be converted.
+	 * @return The sex in format string.
+	 */
+	public String convertSexToStringSex(Sex sex) {
+		for (String sexString : ACCEPTABLE_SEXES.keySet()) {
+			if (ACCEPTABLE_SEXES.get(sexString).equals(sex)) {
+				return sexString;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Create a new user.
+	 * @param login The user's login.
+	 * @param password The user's password.
+	 * @param name The user's name.
+	 * @param email The user's e-mail.
+	 * @param sex The user's sex.
+	 * @param dateOfBirthday The user's dateOfBirthday.
+	 * @param address The user's address.
+	 * @param interests The user's interests.
+	 * @param whoIAm The user's self description.
+	 * @param movies The user's favorites movies.
+	 * @param musics The user's favorites musics.
+	 * @param books The user's favorites books.
+	 * @throws Exception If some parameter is invalid.
+	 */
 	public synchronized void createUser(String login, String password, String name,
 			String email, String sex, String dateOfBirthday, String address,
 			String interests, String whoIAm, String movies,
@@ -206,12 +248,49 @@ public class UsersHandler {
 		String userPassword = Encryptor.encrypt(password);
 		UserIF newUser = new UserImpl(login, userPassword, name, email, userSex, userBirthday, address, interests, whoIAm, movies, musics, books);
 		DatabaseFacade.getInstance().insertUser(newUser);
+	}	
+	
+	/**
+	 * Delete a user.
+	 * @param login The user's login.  
+	 * @throws Exception If the login is null or empty.
+	 *  				 If the user's doesn't exist.
+	 */
+	public void deleteUser(String login) throws Exception {
+		UserIF user = getUser(login);
+		for (String blogId : user.getBlogs()) {
+			WebElementManager.getInstance().deleteBlog(blogId);
+		}
+		DatabaseFacade.getInstance().deleteUser(login);
 	}
 	
+	/**
+	 * Verify if exist a user with the specific login.
+	 * @param login The login of the supposed user.
+	 * @return True case the user exist or False otherwise.
+	 */
+	public boolean existsUserWithLogin(String login) {
+		return DatabaseFacade.getInstance().existsUserInDatabase(login);
+	}
+	
+	/**
+	 * Return a list with all blog's ID from a specific user.
+	 * @param userId The user's ID.
+	 * @return The list with all blog's ID.
+	 * @throws Exception If the userId is null or empty.
+	 * 					 If the user doesn't exist.
+	 */
 	public List<String> getAllBlogsFromUser(String userId) throws Exception {
 		return getUser(userId).getBlogs();
 	}
 	
+	/**
+	 * Return the announcement.
+	 * @param userId The user's ID.
+	 * @param index The index;
+	 * @return The announcement.
+	 * @throws Exception If the index is invalid.
+	 */
 	public String getAnnouncement(String userId, Integer index) throws Exception {
 		Notifiable usr = getUser(userId);
 		if (isInvalidIndex(index, usr.getAnnouncements().size())) {
@@ -220,6 +299,48 @@ public class UsersHandler {
 		return usr.getAnnouncements().get(index);
 	}
 	
+	/**
+	 * Return the blog's ID from a specific user.
+	 * @param login The user's login.
+	 * @param index The index of the blog.
+	 * @return The blog's ID.
+	 * @throws Exception If the login is null or the user doesn't exist.
+	 */
+	public String getBlogFromUser(String login, Integer index) throws Exception {
+		return getUser(login).getBlogIdAtIndex(index);
+	}
+	
+	/**
+	 * Return the number of announcements.
+	 * @param userId The user's ID.
+	 * @return The number of announcements.
+	 * @throws Exception If the userId is null or empty.
+	 * 					 If the user doesn't exist.
+	 */
+	public int getNumberOfAnnouncements(String userId) throws Exception {
+		UserIF usr = getUser(userId);
+		return usr.getAnnouncements().size();
+	}
+	
+	/**
+	 * Return the number of blogs of the user.
+	 * @param userId The user's ID.
+	 * @return The total number of blogs.
+	 * @throws Exception If the userId is null or the user doesn't exist.
+	 */
+	public Integer getNumberOfBlogsFromUser(String userId) throws Exception {
+		UserIF user = getUser(userId);
+		return user.getNumberOfBlogs();
+	}
+	
+	/**
+	 * Return the user's information.
+	 * @param login The user's login.
+	 * @param attribute The attribute of the information. 
+	 * @return The user's information.
+	 * @throws Exception If login, or attribute, is null or empty.
+	 * 					 If the user doesn't exist.
+	 */
 	public String getUserInformation(String login, String attribute) throws Exception {
 		if (isInvalidString(login)) {
 			throw new IllegalArgumentException(INVALID_LOGIN_MESSAGE);
@@ -260,15 +381,30 @@ public class UsersHandler {
 		throw new IllegalArgumentException(INVALID_ATTRIBUTE_MESSAGE);
 	}
 	
-	public boolean existsUserWithLogin(String login) {
-		return DatabaseFacade.getInstance().existsUserInDatabase(login);
+	/**
+	 * Verify if the blog belongs to the user.
+	 * @param login The user's login.
+	 * @param blogId The blog's ID.
+	 * @return True case the blog belongs to the user or False otherwise.
+	 * @throws Exception If the login is null or empty.
+	 * 					 If the user doesn't exist.
+	 */
+	public boolean isBlogFromUser(String login, String blogId) throws Exception {
+		UserIF user = getUser(login);
+		if (isInvalidString(blogId)) {
+			throw new IllegalArgumentException(INVALID_PASSWORD_MESSAGE);
+		}
+		return user.getBlogs().contains(blogId);
 	}
 	
-	public int getNumberOfAnnouncements(String userId) throws Exception {
-		UserIF usr = getUser(userId);
-		return usr.getAnnouncements().size();
-	}
-	
+	/**
+	 * Verify if the password belongs to the user.
+	 * @param login The user's login.
+	 * @param password The password.
+	 * @return True case the password belongs to the user or False otherwise.
+	 * @throws Exception If the login is null or empty.
+	 * 					 If the user doesn't exist.
+	 */
 	public boolean isPasswordFromUser(String login, String password) throws Exception {
 		UserIF user = getUser(login);
 		if (isInvalidString(password)) {
@@ -278,25 +414,20 @@ public class UsersHandler {
 		String userPassword = user.getPassword();
 		return userPassword.equals(passedPassword);
 	}
-	
-	public boolean isBlogFromUser(String login, String blogId) throws Exception {
-		UserIF user = getUser(login);
-		if (isInvalidString(blogId)) {
-			throw new IllegalArgumentException(INVALID_PASSWORD_MESSAGE);
-		}
-		return user.getBlogs().contains(blogId);
-	}
-	
-	public String convertCalendarToStringDate(Calendar cal) {
-		int dayOfMonth = cal.get(GregorianCalendar.DAY_OF_MONTH);
-		// In GregorianCalendar the month is from 0 (January) to 11 (December)
-		int month = cal.get(GregorianCalendar.MONTH) + 1;
-		int year = cal.get(GregorianCalendar.YEAR);
 		
-		return String.format(DATE_FORMAT, dayOfMonth, month, year);
+	/**
+	 * Remove a blog to the user.
+	 * @param blogId The blog's ID.
+	 * @param login The user's login.
+	 * @throws Exception If the login is null or the user doesn't exist.
+	 */
+	public void removeBlogFromUser(String blogId, String login) throws Exception {
+		UserIF user = getUser(login);
+		user.removeBlog(blogId);
+		DatabaseFacade.getInstance().updateUser(user);
 	}
 	
-	/**
+	/*
 	 * This method assumes this date format 'DD/MM/YYYY'.
 	 * @param stringDate String representation of user's birthday.
 	 * @return Correspondent Calendar to stringDate.
@@ -309,19 +440,10 @@ public class UsersHandler {
 		return new GregorianCalendar(year, month, dayOfMonth);
 	}
 	
-	public String convertSexToStringSex(Sex sex) {
-		for (String sexString : ACCEPTABLE_SEXES.keySet()) {
-			if (ACCEPTABLE_SEXES.get(sexString).equals(sex)) {
-				return sexString;
-			}
-		}
-		return null;
-	}
-	
 	private Sex convertStringSexToSex(String sex) {
 		return ACCEPTABLE_SEXES.get(sex);
 	}
-	
+
 	private boolean existsUserWithEmail(String email) {
 		for (UserIF user : DatabaseFacade.getInstance().getAllUsers().values()) {
 			if (user.getEmail().equals(email)) {
@@ -330,13 +452,19 @@ public class UsersHandler {
 		}
 		return false;
 	}
-	
 	private Map<String, Sex> getAcceptableSexes() {
 		Map<String, Sex> acceptableSexes = new HashMap<String, Sex>();
 		acceptableSexes.put("Masculino", Sex.Male);
 		acceptableSexes.put("Feminino", Sex.Female);
 		acceptableSexes.put("N‹o informado", Sex.Uninformed);
 		return acceptableSexes;
+	}
+	
+	private UserIF getUser(String login) throws Exception {
+		if (isInvalidString(login) || !existsUserWithLogin(login)) {
+			throw new IllegalArgumentException(INVALID_LOGIN_MESSAGE);
+		}
+		return DatabaseFacade.getInstance().retrieveUser(login);
 	}
 	
 	private boolean isInvalidDate(String date) {
@@ -362,23 +490,7 @@ public class UsersHandler {
 		}
 		return false;
 	}
-	
-	private boolean isInvalidSex(String sex) {
-		return !ACCEPTABLE_SEXES.containsKey(sex);
-	}
-	
-	private boolean isInvalidString(String str) {
-		return str == null || str.trim().isEmpty();
-	}
 
-	public void deleteUser(String login) throws Exception {
-		UserIF user = getUser(login);
-		for (String blogId : user.getBlogs()) {
-			WebElementManager.getInstance().deleteBlog(blogId);
-		}
-		DatabaseFacade.getInstance().deleteUser(login);
-	}
-	
 	private boolean isInvalidIndex(Integer index, Integer size) {
 		if (index < 0 || index >= size) {
 			return true;
@@ -386,5 +498,11 @@ public class UsersHandler {
 		return false;
 	}
 	
-
+	private boolean isInvalidString(String str) {
+		return str == null || str.trim().isEmpty();
+	}
+	
+	private boolean isInvalidSex(String sex) {
+		return !ACCEPTABLE_SEXES.containsKey(sex);
+	}
 }
