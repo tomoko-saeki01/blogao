@@ -1,15 +1,4 @@
-/**
- * 
- */
 package br.edu.ufcg.blogao.webservice;
-
-import java.util.Calendar;
-
-import br.edu.ufcg.blogao.Finder;
-import br.edu.ufcg.blogao.blog.WebElementManager;
-import br.edu.ufcg.blogao.persistence.DatabaseFacade;
-import br.edu.ufcg.blogao.session.SessionManager;
-import br.edu.ufcg.blogao.user.UsersHandler;
 
 /**
  * Web Service facade for Blogao application.
@@ -19,8 +8,17 @@ import br.edu.ufcg.blogao.user.UsersHandler;
  * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
  * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
  * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
- * @version 1.0 20/09/2010
+ * @version 0.1
  */
+
+import java.util.Calendar;
+
+import br.edu.ufcg.blogao.Finder;
+import br.edu.ufcg.blogao.blog.WebElementManager;
+import br.edu.ufcg.blogao.persistence.DatabaseFacade;
+import br.edu.ufcg.blogao.session.SessionManager;
+import br.edu.ufcg.blogao.user.UsersHandler;
+
 public class BlogWSImpl implements BlogWS {
 	
 	private final String INVALID_SESSION_MESSAGE = "Sess‹o inv‡lida";
@@ -111,6 +109,14 @@ public class BlogWSImpl implements BlogWS {
 		if (atributo.equals(LOGIN_USERID_ATTRIBUTE)) {
 			sessionManager.updateLoggedUserId(userId, valor);
 		}
+	}
+	
+	/**
+	 * Clean the persistence.
+	 */
+	public void cleanPersistence() {
+		DatabaseFacade.getInstance().cleanPersistence();
+		sessionManager.logoffAllSessions();
 	}
 
 	@Override
@@ -443,20 +449,12 @@ public class BlogWSImpl implements BlogWS {
 		return sessionManager.isUserLogged(login);
 	}
 
-	
-	public void cleanPersistence() {
-		DatabaseFacade.getInstance().cleanPersistence();
-		sessionManager.logoffAllSessions();
-	}
-
 	public void loadData() {
-		// Nao ha necessidade de abrir os dados para que os testes passem. As informacoes sao carregadas assim que necessarias.
+		/* 
+		 * It's not necessary open the datas to validate the tests.
+		 * The informations are loaded as necessary.
+		 */
 	}
-
-	public void saveData() {
-		// Nao ha necessidade de salvar os dados em um momento especifico. Os dados inseridos e modificados sao salvos assim que os webMethods sao executados.
-	}
-	
 
 	@Override
 	public void logoff(String sessionId) throws Exception {
@@ -468,6 +466,18 @@ public class BlogWSImpl implements BlogWS {
 		return sessionManager.logon(login, senha);
 	}
 	
+	public void saveData() {
+		/*
+		 * It's not necessary save the datas in a specific moment.
+		 * The dates are inserted and changed when the webMethods are
+		 * executed.
+		 */
+	}	
+	
+	/**
+	 * Return the date of the day.
+	 * @return The date of the day.
+	 */
 	public String todaysDate() {
 		return usersHandler.convertCalendarToStringDate(Calendar.getInstance());
 	}

@@ -1,5 +1,17 @@
 package br.edu.ufcg.blogao.blog;
 
+/**
+ * Manages the elements (Post, Comment, User, Blog, Interactive Contents, etc)
+ * that act as objects on the web.
+ * 
+ * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
+ * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
+ * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
+ * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
+ * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
+ * @version 0.1
+ */
+
 import br.edu.ufcg.blogao.IdGenerator;
 import br.edu.ufcg.blogao.blog.data.InteractiveContent;
 import br.edu.ufcg.blogao.blog.data.Movie;
@@ -12,17 +24,6 @@ import br.edu.ufcg.blogao.user.Notifiable;
 import br.edu.ufcg.blogao.user.UserIF;
 import br.edu.ufcg.blogao.user.UsersHandler;
 
-/**
- * Manages the elements (Post, Comment, User, Blog, Interactive Contents, etc)
- * that act as objects on the web
- * 
- * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
- * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
- * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
- * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
- * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
- * @version 1.0 20th September, 2010.
- */
 public class WebElementManager {
 	
 	private static WebElementManager selfInstance = null;
@@ -95,7 +96,7 @@ public class WebElementManager {
 	}
 	
 	/**
-	 * Add a announcement to the post.
+	 * Add a announcement to the blog.
 	 * @param blogId The blog's ID.
 	 * @param userId The user's ID. 
 	 * @throws Exception If the blogId is null, empty or doesn't exist a blog with the passed blogId.

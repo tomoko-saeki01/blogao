@@ -1,12 +1,5 @@
 package br.edu.ufcg.blogao.blog;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
-import br.edu.ufcg.blogao.blog.data.StaticContent;
-import br.edu.ufcg.blogao.user.Notifiable;
-
 /**
  * Represents a blog.
  * 
@@ -15,8 +8,16 @@ import br.edu.ufcg.blogao.user.Notifiable;
  * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
  * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
  * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
- * @version 2.0 - 7th September, 2010.
+ * @version 0.1
  */
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+import br.edu.ufcg.blogao.blog.data.StaticContent;
+import br.edu.ufcg.blogao.user.Notifiable;
+
 public class Blog implements WebElement {
 	private StaticContent title;
 	private String id;

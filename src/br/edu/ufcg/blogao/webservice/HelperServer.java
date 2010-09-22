@@ -1,13 +1,25 @@
 package br.edu.ufcg.blogao.webservice;
 
+/**
+ * 
+ * 
+ * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
+ * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
+ * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
+ * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
+ * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
+ * @version 0.1
+ */
+
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 
 public class HelperServer {
+	
 	/**
-	 * Inicia o servidor no endereco especificado
-	 * @param port endereco do WS (ex.: http://192.168.1.190:9000)
+	 * Starts the server on the specified address.
+	 * @param port  WebService's address (ex.: http://192.168.1.190:9000)
 	 */
 	public static void startServer(String port) {
 		BlogWSImpl implementor = new BlogWSImpl();
