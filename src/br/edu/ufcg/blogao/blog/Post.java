@@ -9,11 +9,13 @@ import java.util.Map;
 import br.edu.ufcg.blogao.blog.data.StaticContent;
 
 /**
- * @author Caio
- * @author Carlos
- * @author Catharine
- * @author Demontie
- * @author Matheus
+ * Represents the post of a blog.
+ *
+ * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
+ * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
+ * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
+ * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
+ * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
  * @version 2.0 - 31th August, 2010.
  */
 public class Post implements WebElement {
@@ -32,7 +34,7 @@ public class Post implements WebElement {
 
 	/**
 	 * Default constructor.
-	 * @param id the post's id
+	 * @param id The post's id
 	 * @param title The post's title.
 	 * @param text The post's text.
 	 */
@@ -53,7 +55,7 @@ public class Post implements WebElement {
 			
 	/**
 	 * Add a comment to the post.
-	 * @param id Comment's ID.
+	 * @param id The comment's ID.
 	 */
 	public void addComment(String commentId) {
 		comments.add(commentId);
@@ -69,7 +71,7 @@ public class Post implements WebElement {
 	
 	/**
 	 * Attach a picture to the post.
-	 * @param pictureId The post's ID.
+	 * @param pictureId The picture's ID.
 	 */
 	public void attachPicture(String pictureId) {
 		attachments.get(PICTURES_KEY).add(pictureId);
@@ -96,9 +98,9 @@ public class Post implements WebElement {
 	}
 	
 	/**
-	 * Return a post's comment id.
-	 * @param index Comment's id index.
-	 * @return A post's commentId.
+	 * Return the comment's ID of a post.
+	 * @param index The index of the comment.
+	 * @return The comment's ID.
 	 */
 	public String getCommentId(int index) {
 		return comments.get(index);
@@ -140,24 +142,24 @@ public class Post implements WebElement {
 	}
 	
 	/**
-	 * Return the number of movies.
-	 * @return The number of movies.
+	 * Return the total number of movies.
+	 * @return The total number of movies.
 	 */
 	public Integer getNumberOfMovies() {
 		return attachments.get(MOVIES_KEY).size();
 	}
 	
 	/**
-	 * Return the number of pictures.
-	 * @return The number of pictures.
+	 * Return the total number of pictures.
+	 * @return The total number of pictures.
 	 */
 	public Integer getNumberOfPictures() {
 		return attachments.get(PICTURES_KEY).size();
 	}
 	
 	/**
-	 * Return the number of sounds.
-	 * @return The number of sounds.
+	 * Return the total number of sounds.
+	 * @return The total number of sounds.
 	 */
 	public Integer getNumberOfSounds() {
 		return attachments.get(SOUNDS_KEY).size();
@@ -203,8 +205,8 @@ public class Post implements WebElement {
 	}
 
 	/**
-	 * Remove a post's comment.
-	 * @param commentId The comment's ID.
+	 * Remove a comment of the post.
+	 * @param commentId The ID of the comment that will be removed.
 	 */
 	public void removeComment(String commentId) {
 		comments.remove(commentId);
@@ -233,7 +235,7 @@ public class Post implements WebElement {
 	
 	/**
 	 * Set post's title.
-	 * @param title Post's title.
+	 * @param title The post's title.
 	 */
 	public void setTitle(StaticContent title) {
 		this.title = title;

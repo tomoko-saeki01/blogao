@@ -9,15 +9,15 @@ import br.edu.ufcg.blogao.user.Notifiable;
 
 /**
  * Represents a blog.
- * @author Caio
- * @author Carlos
- * @author Catharine
- * @author Demontie
- * @author Matheus
+ * 
+ * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
+ * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
+ * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
+ * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
+ * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
  * @version 2.0 - 7th September, 2010.
  */
 public class Blog implements WebElement {
-	//Blog "default" attributes.
 	private StaticContent title;
 	private String id;
 	private String parentId;
@@ -29,13 +29,16 @@ public class Blog implements WebElement {
 	private List<Notifiable> notifiables;
 	
 	/**
-	 * Another constructor.
+	 * Default constructor.
+	 * @param id The blog's ID.
+	 * @param parentId The parent's ID.
+	 * @param authorId The author's ID.
 	 * @param title The blog's title.
 	 * @param description The blog's description.
 	 */
 	public Blog(String id, String parentId, String authorId, StaticContent title, StaticContent description) {
 		this.id = id;
-		this.parentId = parentId;
+		this.parentId = parentId;		
 		this.setAuthorId(authorId);
 		this.setTitle(title);
 		this.setText(description);
@@ -48,7 +51,7 @@ public class Blog implements WebElement {
 	/**
 	 * Adds a notifiable to this blog so that it will listen to
 	 * changes made on this object.
-	 * @param usr The notifiable
+	 * @param usr The notifiable.
 	 */
 	public void addNotifiable(Notifiable usr) {
 		this.notifiables.add(usr);
@@ -64,7 +67,7 @@ public class Blog implements WebElement {
 	
 	/**
 	 * Add a subBlog to the blog.
-	 * @param subBlogId Id of subBlog added.
+	 * @param subBlogId The subBlog's ID.
 	 */
 	public void addSubBlog(String subBlogId) {
 		subBlogs.add(subBlogId);
@@ -72,15 +75,15 @@ public class Blog implements WebElement {
 	
 	/**
 	 * Verify if blog contains the post.
-	 * @param postId Id searched.
-	 * @return true if the blog contains this postId. 
+	 * @param postId The ID of the post to be checked.
+	 * @return True case the blog contains the postId, or False otherwise. 
 	 */
 	public boolean containsPost(String postId) {
 		return posts.contains(postId);
 	}
 	
 	/**
-	 * Notifies all notifiables.
+	 * Notifies all the notifiers.
 	 */
 	public void doNotifyAll(String announcementId) {
 		for (Notifiable usr : notifiables) {
@@ -89,40 +92,34 @@ public class Blog implements WebElement {
 	}
 	
 	/**
-	 * Returns the list of notifiables listening to changes on this blog.
-	 * @return the notifiables list.
+	 * Returns the list of notifier listening to changes on this blog.
+	 * @return The notifiers list.
 	 */
 	public List<Notifiable> getNotifiables() {
 		return notifiables;
 	}
 	
 	/**
-	 * Gets the blog's author id.
+	 * Gets the blog's author ID.
 	 * @return author id.
 	 */
 	public String getAuthorId() {
 		return authorId;
 	}
 	
-	/**
-	 * Return blog's creation date.
-	 */
 	@Override
 	public Calendar getCreationDate() {
 		return creationDate;
 	}
 	
-	/**
-	 * Return the blog's ID.
-	 */
 	@Override
 	public String getId() {
 		return id;
 	}
 	
 	/**
-	 * Return the total number of posts.
-	 * @return The total number of posts.
+	 * Return the total number of posts of the blog.
+	 * @return The total number of posts of the blog.
 	 */
 	public Integer getNumberOfPosts() {
 		return posts.size();
@@ -137,9 +134,9 @@ public class Blog implements WebElement {
 	}
 	
 	/**
-	 * Return a blog's post ID.
-	 * @param index The post's ID.
-	 * @return A blog's post ID.
+	 * Return the ID of a blog's post.
+	 * @param index The index of the post.
+	 * @return The post's ID.
 	 */
 	public String getPost(int index) {
 		return posts.get(index);
@@ -163,15 +160,12 @@ public class Blog implements WebElement {
 	
 	/**
 	 * Returns the list of subBlogs
-	 * @return all subBlogs of this blog.
+	 * @return All subBlogs of the blog.
 	 */
 	public List<String> getSubBlogs() {
 		return subBlogs;
 	}
 	
-	/**
-	 * Return the blog's description. 
-	 */
 	@Override
 	public StaticContent getText() {
 		return description;
@@ -187,31 +181,28 @@ public class Blog implements WebElement {
 	
 	/**
 	 * Remove a blog's post.
-	 * @param postId The post's ID.
+	 * @param postId The ID of the post to be removed.
 	 */
 	public void removePost(String postId) {
 		posts.remove(postId);
 	}
 	
 	/**
-	 * Removes a subBlog.
-	 * @param subBlogId Id of subBlog to be removed.
+	 * Removes a blog's subBlog.
+	 * @param subBlogId The ID of the subBlog to be removed.
 	 */
 	public void removeSubBlog(String subBlogId) {
 		subBlogs.remove(subBlogId);
 	}
 	
 	/**
-	 * Sets the blog's author id.
-	 * @param authorId Id of blog's author.
+	 * Sets the ID of the blog's author.
+	 * @param authorId The ID of the blog's author.
 	 */
 	public void setAuthorId(String authorId) {
 		this.authorId = authorId;
 	}
 
-	/**
-	 * Set the blog's description.
-	 */
 	@Override
 	public void setText(StaticContent text) {
 		this.description = text;
@@ -219,10 +210,9 @@ public class Blog implements WebElement {
 	
 	/**
 	 * Set the blog's title.
-	 * @param title The blog's title.
+	 * @param title The blog's title to the seted.
 	 */
 	public void setTitle(StaticContent title) {
 		this.title = title;
-	}
-	
+	}	
 }

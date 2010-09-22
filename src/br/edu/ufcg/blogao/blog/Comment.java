@@ -1,12 +1,14 @@
 package br.edu.ufcg.blogao.blog;
 
 /**
+ * Represents the comment of a post.
+ * 
  * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
  * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
  * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
  * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
  * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
- * @version 1.0 20/09/2010
+ * @version 1.0 20th September, 2010
  */
 
 import java.util.ArrayList;
@@ -27,7 +29,7 @@ public class Comment implements WebElement {
 	/**
 	 * Default constructor.
 	 * @param id The comment's ID.
-	 * @param parentId
+	 * @param parentId The parent's ID.
 	 * @param authorId The comment's author ID.
 	 * @param text The text of the comment.
 	 */
@@ -49,7 +51,7 @@ public class Comment implements WebElement {
 	}
 	
 	/**
-	 * Return comment's author id.
+	 * Return the author's ID of the comment.
 	 * @return The comment's author id.
 	 */
 	public String getAuthorId() {
@@ -67,8 +69,8 @@ public class Comment implements WebElement {
 	}
 	
 	/**
-	 * Return the number of subComments.
-	 * @return The number of subComments.
+	 * Return the total number of subComments.
+	 * @return The total number of subComments.
 	 */
 	public Integer getNumberOfSubComments() {
 		return subComments.size();
@@ -88,16 +90,16 @@ public class Comment implements WebElement {
 	}
 	
 	/**
-	 * Returns subComments.
-	 * @return All subComments ids of this Comment.
+	 * Returns a list with all the subComments.
+	 * @return All subComments' IDs of the comment.
 	 */
 	public List<String> getSubComments() {
 		return subComments;
 	}
 
 	/**
-	 * Set the comment's author id.
-	 * @param author The comment's author id.
+	 * Set the author's ID of the comment.
+	 * @param author The author's ID of the comment.
 	 */
 	public void setAuthorId(String authorId) {
 		this.authorId = authorId;
@@ -108,6 +110,10 @@ public class Comment implements WebElement {
 		this.text = text;
 	}
 	
+	/**
+	 * Remove a subComment of the comment.
+	 * @param subCommentId The ID of the subComment that will be removed.
+	 */
 	public void removeSubComment(String subCommentId) {
 		subComments.remove(subCommentId);
 	}
