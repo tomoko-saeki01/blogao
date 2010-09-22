@@ -1,11 +1,13 @@
 package br.edu.ufcg.blogao.blog;
 
 /**
- * @author Caio
- * @author Carlos
- * @author Catharine
- * @author Demontie
- * @author Matheus
+ * Describes the behavior of a notifier.
+ * 
+ * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
+ * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
+ * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
+ * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
+ * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
  * @version 1.0 - 19th September, 2010.
  */
 
