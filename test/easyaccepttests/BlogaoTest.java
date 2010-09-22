@@ -8,13 +8,12 @@ import easyaccept.EasyAcceptFacade;
 import br.edu.ufcg.blogao.webservice.BlogWSImpl;
 
 /**
- * 
- * @author caiopaes
- * @author Carlos
- * @author Catharine
- * @author Demontiê
- * @author Matheus
- *
+ * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
+ * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
+ * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
+ * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
+ * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
+ * @version 0.1
  */
 public class BlogaoTest {
 	
@@ -33,5 +32,4 @@ public class BlogaoTest {
 		System.out.println(eaFacade.getCompleteResults());
 		System.out.println((eaFacade.getTotalNumberOfPassedTests() / eaFacade.getTotalNumberOfTests()) * 100 + "% dos testes passando");
 	}
-
 }
