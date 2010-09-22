@@ -1,5 +1,16 @@
 package br.edu.ufcg.blogao;
 
+/** 
+ * Encrypt a string.
+ *   
+ * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
+ * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
+ * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
+ * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
+ * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
+ * @version 0.1
+ */
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
@@ -10,6 +21,11 @@ public class Encryptor {
 	private Encryptor() {
 	}
 	
+	/**
+	 * Encrypt the string passed as parameter.
+	 * @param str The string that will be encrypted.
+	 * @return The encrypted string.
+	 */
 	public static String encrypt(String str) {
 		try {
 			MessageDigest md = MessageDigest.getInstance(ENCRYPT_ALGORITHM);
@@ -21,10 +37,20 @@ public class Encryptor {
 		return null;
 	}
 	
+	/**
+	 * Encrypt the integer randomly.
+	 * @param i The integer that will be encrypted.
+	 * @return The encrypted integer.
+	 */
 	public static String randomIntEncrypt(int i) {
 		return randomIntEncrypt(String.valueOf(i));
 	}
 	
+	/**
+	 * Encrypt the string randomly.
+	 * @param str The string that will be encrypted.
+	 * @return The encrypted string.
+	 */
 	public static String randomIntEncrypt(String str) {
 		try {
 			MessageDigest md = MessageDigest.getInstance(ENCRYPT_ALGORITHM);
@@ -79,5 +105,4 @@ public class Encryptor {
 		final int endIndex = startIndex + str.length()/4;
 		return str.substring(startIndex, endIndex);
 	}
-
 }
