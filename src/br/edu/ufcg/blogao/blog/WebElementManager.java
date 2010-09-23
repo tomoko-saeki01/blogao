@@ -30,7 +30,7 @@ public class WebElementManager {
 	
 	private final String INVALID_BLOG_MESSAGE = "Blog inválido";
 	private final String INVALID_AUTHOR_MESSAGE = "Autor inválido";
-	private final String INVALID_TITLE_BLOG_MESSAGE = "VocÍ deve especificar um título para o blog";
+	private final String INVALID_TITLE_BLOG_MESSAGE = "Você deve especificar um título para o blog";
 	private final String INVALID_COMMENT_MESSAGE = "Comentário inválido";
 	private final String INVALID_POST_MESSAGE = "Post inválido";
 	private final String INVALID_TITLE_POST_MESSAGE = "Título obrigatório";
