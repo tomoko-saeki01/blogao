@@ -123,7 +123,7 @@ public class UsersHandler {
 		}
 		
 		if (attribute.equals(LOGIN)) {
-			user.setId(value);
+			user.setLogin(value);
 		} else if (attribute.equals(PASSWORD)) {
 			user.setPassword(value);
 		} else if (attribute.equals(NAME)) {

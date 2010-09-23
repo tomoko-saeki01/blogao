@@ -68,7 +68,7 @@ public class UserImpl implements UserIF {
 	public UserImpl(String login, String password, String name, String email, 
 			Sex sex, Calendar dateOfBirthday, String address, String interests, 
 			String whoIAm, String movies, String musics, String books) {
-		this.setId(login);
+		this.setLogin(login);
 		this.setPassword(password);
 		this.setName(name);
 		this.setEmail(email);
@@ -206,8 +206,8 @@ public class UserImpl implements UserIF {
 	}
 	
 	@Override
-	public void setId(String id) {
-		this.login = id;
+	public void setLogin(String login) {
+		this.login = login;
 	}
 	
 	@Override

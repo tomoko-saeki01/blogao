@@ -150,12 +150,11 @@ public interface UserIF extends Identifiable, Notifiable {
 	 */
 	public void setEmail(String email);
 	
-	//TODO checar.
 	/**
-	 * Sets the user id (login).
-	 * @param id User unique identification.
+	 * Sets the user's login.
+	 * @param login User unique identification.
 	 */
-	public void setId(String id);
+	public void setLogin(String login);
 
 	/**
 	 * Set the user's interests.
