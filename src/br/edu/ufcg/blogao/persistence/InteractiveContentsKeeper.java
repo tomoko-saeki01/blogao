@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,6 +47,7 @@ public class InteractiveContentsKeeper {
 		icsDirectory.mkdirs();
 		File[] icsFiles = icsDirectory.listFiles();
 		for (File icFile : icsFiles) {
+			icFile.setWritable(true, true);
 			icFile.delete();
 		}
 	}
@@ -59,7 +61,9 @@ public class InteractiveContentsKeeper {
 		if (!existsInteractiveContentInDatabase(icId)) {
 			throw new IllegalStateException(UNEXISTENT_POST_MESSAGE);
 		}
-		new File(INTERACTIVE_CONTENT_PARENT_PATH + icId + INTERACTIVE_CONTENT_FILE_EXTENSION).delete();
+		File file = new File(INTERACTIVE_CONTENT_PARENT_PATH + icId + INTERACTIVE_CONTENT_FILE_EXTENSION);
+		file.setWritable(true, true);
+		file.delete();
 	}
 
 	/**
@@ -78,14 +82,19 @@ public class InteractiveContentsKeeper {
 	Map<String, InteractiveContent> getAllInteractiveContents() {
 		File icsDirectory = new File(INTERACTIVE_CONTENT_PARENT_PATH);
 		icsDirectory.mkdirs();
+		FileInputStream reader = null;
 		File[] icsFiles = icsDirectory.listFiles();
 		Map<String, InteractiveContent> ics = new HashMap<String, InteractiveContent>();
 		for (File icFile : icsFiles) {
 			if (icFile.getName().endsWith(INTERACTIVE_CONTENT_FILE_EXTENSION)) {
 				try {
-					InteractiveContent ic = (InteractiveContent) xstream.fromXML(new FileInputStream(icFile));
+					reader = new FileInputStream(icFile);
+					InteractiveContent ic = (InteractiveContent) xstream.fromXML(reader);
 					ics.put(ic.getId(), ic);
+					reader.close();
 				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
@@ -104,8 +113,9 @@ public class InteractiveContentsKeeper {
 		}
 		File directoryStructure = new File(INTERACTIVE_CONTENT_PARENT_PATH);
 		directoryStructure.mkdirs();
-		File file = new File(INTERACTIVE_CONTENT_PARENT_PATH + ic.getId() + INTERACTIVE_CONTENT_FILE_EXTENSION);
-		xstream.toXML(ic, new FileOutputStream(file));
+		FileOutputStream writer = new FileOutputStream(new File(INTERACTIVE_CONTENT_PARENT_PATH + ic.getId() + INTERACTIVE_CONTENT_FILE_EXTENSION));
+		xstream.toXML(ic, writer);
+		writer.close();
 	}
 
 	/**
@@ -118,8 +128,10 @@ public class InteractiveContentsKeeper {
 		if (!existsInteractiveContentInDatabase(icId)) {
 			throw new IllegalStateException(UNEXISTENT_POST_MESSAGE);
 		}
-		File file = new File(INTERACTIVE_CONTENT_PARENT_PATH + icId + INTERACTIVE_CONTENT_FILE_EXTENSION);
-		return (InteractiveContent) xstream.fromXML(new FileInputStream(file));
+		FileInputStream reader = new FileInputStream(new File(INTERACTIVE_CONTENT_PARENT_PATH + icId + INTERACTIVE_CONTENT_FILE_EXTENSION));
+		InteractiveContent ic = (InteractiveContent) xstream.fromXML(reader);
+		reader.close();
+		return ic;
 	}
 	
 	/**
@@ -131,7 +143,8 @@ public class InteractiveContentsKeeper {
 		if (!existsInteractiveContentInDatabase(ic.getId())) {
 			throw new IllegalStateException(UNEXISTENT_POST_MESSAGE);
 		}
-		File file = new File(INTERACTIVE_CONTENT_PARENT_PATH + ic.getId() + INTERACTIVE_CONTENT_FILE_EXTENSION);
-		xstream.toXML(ic, new FileOutputStream(file));
+		FileOutputStream writer = new FileOutputStream(new File(INTERACTIVE_CONTENT_PARENT_PATH + ic.getId() + INTERACTIVE_CONTENT_FILE_EXTENSION));
+		xstream.toXML(ic, writer);
+		writer.close();
 	}
 }
