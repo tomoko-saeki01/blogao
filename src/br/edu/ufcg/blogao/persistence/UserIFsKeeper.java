@@ -12,9 +12,10 @@ package br.edu.ufcg.blogao.persistence;
  */
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +50,7 @@ public class UserIFsKeeper {
 		File[] usersFiles = usersDirectory.listFiles();
 		for (File userFile : usersFiles) {
 			userFile.delete();
+			userFile.delete();
 		}
 	}
 
@@ -61,7 +63,9 @@ public class UserIFsKeeper {
 		if (!existsUserInDatabase(userId)) {
 			throw new IllegalStateException(UNEXISTENT_USER_MESSAGE);
 		}
-		new File(USERS_PARENT_PATH + userId + USERS_FILE_EXTENSION).delete();
+		File file = new File(USERS_PARENT_PATH + userId + USERS_FILE_EXTENSION);
+		file.setWritable(true, true);
+		file.delete();
 	}
 
 	/**
@@ -80,14 +84,19 @@ public class UserIFsKeeper {
 	Map<String, UserIF> getAllUsers() {
 		File usersDirectory = new File(USERS_PARENT_PATH);
 		usersDirectory.mkdirs();
+		FileReader reader = null;
 		File[] usersFiles = usersDirectory.listFiles();
 		Map<String, UserIF> users = new HashMap<String, UserIF>();
 		for (File userFile : usersFiles) {
 			if (userFile.getName().endsWith(USERS_FILE_EXTENSION)) {
 				try {
-					UserIF user = (UserIF) xstream.fromXML(new FileInputStream(userFile));
+					reader = new FileReader(userFile);
+					UserIF user = (UserIF) xstream.fromXML(reader);
 					users.put(user.getId(), user);
+					reader.close();
 				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
@@ -106,8 +115,9 @@ public class UserIFsKeeper {
 		}
 		File directoryStructure = new File(USERS_PARENT_PATH);
 		directoryStructure.mkdirs();
-		File file = new File(USERS_PARENT_PATH + user.getId() + USERS_FILE_EXTENSION);
-		xstream.toXML(user, new FileOutputStream(file));
+		FileWriter writer = new FileWriter(new File(USERS_PARENT_PATH + user.getId() + USERS_FILE_EXTENSION));
+		xstream.toXML(user, writer);
+		writer.close();
 	}
 	
 	/**
@@ -136,8 +146,10 @@ public class UserIFsKeeper {
 		if (!existsUserInDatabase(userId)) {
 			throw new IllegalStateException(UNEXISTENT_USER_MESSAGE);
 		}
-		File file = new File(USERS_PARENT_PATH + userId + USERS_FILE_EXTENSION);
-		return (UserIF) xstream.fromXML(new FileInputStream(file));
+		FileReader reader = new FileReader(new File(USERS_PARENT_PATH + userId + USERS_FILE_EXTENSION));
+		UserIF user = (UserIF) xstream.fromXML(reader);
+		reader.close();
+		return user;
 	}
 	
 	/**
@@ -149,7 +161,8 @@ public class UserIFsKeeper {
 		if (!existsUserInDatabase(user.getId())) {
 			throw new IllegalStateException(UNEXISTENT_USER_MESSAGE);
 		}
-		File file = new File(USERS_PARENT_PATH + user.getId() + USERS_FILE_EXTENSION);
-		xstream.toXML(user, new FileOutputStream(file));
+		FileWriter writer = new FileWriter(new File(USERS_PARENT_PATH + user.getId() + USERS_FILE_EXTENSION));
+		xstream.toXML(user, writer);
+		writer.close();
 	}
 }

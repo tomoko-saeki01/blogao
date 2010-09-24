@@ -12,9 +12,10 @@ package br.edu.ufcg.blogao.persistence;
  */
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,6 +47,7 @@ public class CommentsKeeper {
 		commentsDirectory.mkdirs();
 		File[] commentsFiles = commentsDirectory.listFiles();
 		for (File commentFile : commentsFiles) {
+			commentFile.setWritable(true, true);
 			commentFile.delete();
 		}
 	}
@@ -59,7 +61,9 @@ public class CommentsKeeper {
 		if (!existsCommentInDatabase(commentId)) {
 			throw new IllegalStateException(UNEXISTENT_COMMENT_MESSAGE);
 		}
-		new File(COMMENTS_PARENT_PATH + commentId + COMMENTS_FILE_EXTENSION).delete();
+		File file = new File(COMMENTS_PARENT_PATH + commentId + COMMENTS_FILE_EXTENSION);
+		file.setWritable(true, true);
+		file.delete();
 	}
 	
 	/**
@@ -78,14 +82,19 @@ public class CommentsKeeper {
 	Map<String, Comment> getAllComments() {
 		File commentsDirectory = new File(COMMENTS_PARENT_PATH);
 		commentsDirectory.mkdirs();
+		FileReader reader = null;
 		File[] commentsFiles = commentsDirectory.listFiles();
 		Map<String, Comment> comments = new HashMap<String, Comment>();
 		for (File commentFile : commentsFiles) {
 			if (commentFile.getName().endsWith(COMMENTS_FILE_EXTENSION)) {
 				try {
-					Comment comment = (Comment) xstream.fromXML(new FileInputStream(commentFile));
+					reader = new FileReader(commentFile);
+					Comment comment = (Comment) xstream.fromXML(reader);
 					comments.put(comment.getId(), comment);
+					reader.close();
 				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
@@ -104,8 +113,9 @@ public class CommentsKeeper {
 		}
 		File directoryStructure = new File(COMMENTS_PARENT_PATH);
 		directoryStructure.mkdirs();
-		File file = new File(COMMENTS_PARENT_PATH + comment.getId() + COMMENTS_FILE_EXTENSION);
-		xstream.toXML(comment, new FileOutputStream(file));
+		FileWriter writer = new FileWriter(new File(COMMENTS_PARENT_PATH + comment.getId() + COMMENTS_FILE_EXTENSION));
+		xstream.toXML(comment, writer);
+		writer.close();
 	}
 
 	/**
@@ -118,8 +128,10 @@ public class CommentsKeeper {
 		if (!existsCommentInDatabase(commentId)) {
 			throw new IllegalStateException(UNEXISTENT_COMMENT_MESSAGE);
 		}
-		File file = new File(COMMENTS_PARENT_PATH + commentId + COMMENTS_FILE_EXTENSION);
-		return (Comment) xstream.fromXML(new FileInputStream(file));
+		FileReader reader = new FileReader(new File(COMMENTS_PARENT_PATH + commentId + COMMENTS_FILE_EXTENSION));
+		Comment comment = (Comment) xstream.fromXML(reader);
+		reader.close();
+		return comment;
 	}
 	
 	/**
@@ -131,7 +143,8 @@ public class CommentsKeeper {
 		if (!existsCommentInDatabase(comment.getId())) {
 			throw new IllegalStateException(UNEXISTENT_COMMENT_MESSAGE);
 		}
-		File file = new File(COMMENTS_PARENT_PATH + comment.getId() + COMMENTS_FILE_EXTENSION);
-		xstream.toXML(comment, new FileOutputStream(file));
+		FileWriter writer = new FileWriter(new File(COMMENTS_PARENT_PATH + comment.getId() + COMMENTS_FILE_EXTENSION));
+		xstream.toXML(comment, writer);
+		writer.close();
 	}
 }

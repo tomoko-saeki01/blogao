@@ -12,9 +12,10 @@ package br.edu.ufcg.blogao.persistence;
  */
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,6 +47,7 @@ public class PostsKeeper {
 		postsDirectory.mkdirs();
 		File[] postsFiles = postsDirectory.listFiles();
 		for (File postFile : postsFiles) {
+			postFile.setWritable(true, true);
 			postFile.delete();
 		}
 	}	
@@ -59,7 +61,9 @@ public class PostsKeeper {
 		if (!existsPostInDatabase(postId)) {
 			throw new IllegalStateException(UNEXISTENT_POST_MESSAGE);
 		}
-		new File(POSTS_PARENT_PATH + postId + POSTS_FILE_EXTENSION).delete();
+		File file = new File(POSTS_PARENT_PATH + postId + POSTS_FILE_EXTENSION);
+		file.setWritable(true, true);
+		file.delete();
 	}
 	
 	/**
@@ -78,14 +82,19 @@ public class PostsKeeper {
 	Map<String, Post> getAllPosts() {
 		File postsDirectory = new File(POSTS_PARENT_PATH);
 		postsDirectory.mkdirs();
+		FileReader reader = null;
 		File[] postsFiles = postsDirectory.listFiles();
 		Map<String, Post> posts = new HashMap<String, Post>();
 		for (File postFile : postsFiles) {
 			if (postFile.getName().endsWith(POSTS_FILE_EXTENSION)) {
 				try {
-					Post post = (Post) xstream.fromXML(new FileInputStream(postFile));
+					reader = new FileReader(postFile);
+					Post post = (Post) xstream.fromXML(reader);
 					posts.put(post.getId(), post);
+					reader.close();
 				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
@@ -104,8 +113,9 @@ public class PostsKeeper {
 		}
 		File directoryStructure = new File(POSTS_PARENT_PATH);
 		directoryStructure.mkdirs();
-		File file = new File(POSTS_PARENT_PATH + post.getId() + POSTS_FILE_EXTENSION);
-		xstream.toXML(post, new FileOutputStream(file));
+		FileWriter writer = new FileWriter(new File(POSTS_PARENT_PATH + post.getId() + POSTS_FILE_EXTENSION));
+		xstream.toXML(post, writer);
+		writer.close();
 	}
 
 	/**
@@ -118,8 +128,10 @@ public class PostsKeeper {
 		if (!existsPostInDatabase(postId)) {
 			throw new IllegalStateException(UNEXISTENT_POST_MESSAGE);
 		}
-		File file = new File(POSTS_PARENT_PATH + postId + POSTS_FILE_EXTENSION);
-		return (Post) xstream.fromXML(new FileInputStream(file));
+		FileReader reader = new FileReader(new File(POSTS_PARENT_PATH + postId + POSTS_FILE_EXTENSION));
+		Post post = (Post) xstream.fromXML(reader);
+		reader.close();
+		return post;
 	}
 	
 	/**
@@ -131,7 +143,8 @@ public class PostsKeeper {
 		if (!existsPostInDatabase(post.getId())) {
 			throw new IllegalStateException(UNEXISTENT_POST_MESSAGE);
 		}
-		File file = new File(POSTS_PARENT_PATH + post.getId() + POSTS_FILE_EXTENSION);
-		xstream.toXML(post, new FileOutputStream(file));
+		FileWriter writer = new FileWriter(new File(POSTS_PARENT_PATH + post.getId() + POSTS_FILE_EXTENSION));
+		xstream.toXML(post, writer);
+		writer.close();
 	}
 }

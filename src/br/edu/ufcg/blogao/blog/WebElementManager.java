@@ -363,12 +363,15 @@ public class WebElementManager {
 		for (String postId : blog.getPostsId()) {
 			deletePost(postId);
 		}
-		DatabaseFacade.getInstance().deleteBlog(blog.getId());
+		for (String subBlogId: blog.getSubBlogs()) {
+			deleteBlog(subBlogId);
+		}
 		if (blog.getParentId() != null) {
 			Blog parentBlog = getBlog(blog.getParentId());
 			parentBlog.removeSubBlog(blog.getId());
 			DatabaseFacade.getInstance().updateBlog(parentBlog);
 		}
+		DatabaseFacade.getInstance().deleteBlog(blog.getId());
 		
 	}
 	
