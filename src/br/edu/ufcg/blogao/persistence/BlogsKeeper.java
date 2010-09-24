@@ -12,9 +12,10 @@ package br.edu.ufcg.blogao.persistence;
  */
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +49,7 @@ public class BlogsKeeper {
 		blogsDirectory.mkdirs();
 		File[] blogsFiles = blogsDirectory.listFiles();
 		for (File blogFile : blogsFiles) {
+			blogFile.setWritable(true, true);
 			blogFile.delete();
 		}
 	}
@@ -61,7 +63,9 @@ public class BlogsKeeper {
 		if (!existsBlogInDatabase(blogId)) {
 			throw new IllegalStateException(UNEXISTENT_BLOG_MESSAGE);
 		}
-		new File(BLOGS_PARENT_PATH + blogId + BLOGS_FILE_EXTENSION).delete();
+		File file = new File(BLOGS_PARENT_PATH + blogId + BLOGS_FILE_EXTENSION);
+		file.setWritable(true, true);
+		file.delete();
 	}
 	
 	/**
@@ -80,14 +84,19 @@ public class BlogsKeeper {
 	Map<String, Blog> getAllBlogs() {
 		File blogsDirectory = new File(BLOGS_PARENT_PATH);
 		blogsDirectory.mkdirs();
+		FileReader reader = null;
 		File[] blogsFiles = blogsDirectory.listFiles();
 		Map<String, Blog> blogs = new HashMap<String, Blog>();
 		for (File blogFile : blogsFiles) {
 			if (blogFile.getName().endsWith(BLOGS_FILE_EXTENSION)) {
 				try {
-					Blog blog = (Blog) xstream.fromXML(new FileInputStream(blogFile));
+					reader = new FileReader(blogFile);
+					Blog blog = (Blog) xstream.fromXML(reader);
 					blogs.put(blog.getId(), blog);
+					reader.close();
 				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
@@ -106,8 +115,9 @@ public class BlogsKeeper {
 		}
 		File directoryStructure = new File(BLOGS_PARENT_PATH);
 		directoryStructure.mkdirs();
-		File file = new File(BLOGS_PARENT_PATH + blog.getId() + BLOGS_FILE_EXTENSION);
-		xstream.toXML(blog, new FileOutputStream(file));
+		FileWriter writer = new FileWriter(new File(BLOGS_PARENT_PATH + blog.getId() + BLOGS_FILE_EXTENSION));
+		xstream.toXML(blog, writer);
+		writer.close();
 	}
 	
 	/**
@@ -136,15 +146,18 @@ public class BlogsKeeper {
 		if (!existsBlogInDatabase(blogId)) {
 			throw new IllegalStateException(UNEXISTENT_BLOG_MESSAGE);
 		}
-		File file = new File(BLOGS_PARENT_PATH + blogId + BLOGS_FILE_EXTENSION);
-		return (Blog) xstream.fromXML(new FileInputStream(file));
+		FileReader reader = new FileReader(new File(BLOGS_PARENT_PATH + blogId + BLOGS_FILE_EXTENSION));
+		Blog blog = (Blog) xstream.fromXML(reader);
+		reader.close();
+		return blog;
 	}
 	
 	void updateBlog(Blog blog) throws Exception {
 		if (!existsBlogInDatabase(blog.getId())) {
 			throw new IllegalStateException(UNEXISTENT_BLOG_MESSAGE);
 		}
-		File file = new File(BLOGS_PARENT_PATH + blog.getId() + BLOGS_FILE_EXTENSION);
-		xstream.toXML(blog, new FileOutputStream(file));
+		FileWriter writer = new FileWriter(new File(BLOGS_PARENT_PATH + blog.getId() + BLOGS_FILE_EXTENSION));
+		xstream.toXML(blog, writer);
+		writer.close();
 	}	
 }
