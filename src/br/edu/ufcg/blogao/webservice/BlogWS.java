@@ -510,26 +510,22 @@ public interface BlogWS {
 	String sessiongId) throws Exception;
 	
 	/**
-	 * Return the number of comments on a specific post.
-	 * @param postId The post's ID.
-	 * @return The number of comments.
-	 * @throws Exception
+	 * This signature was accept in our Google groups discussion. Provided by William.
+	 * This method decides what implementation should be called.
 	 */
 	@WebMethod
-	public Integer getNumberOfComments(@WebParam(name = "postId")
-	String postId) throws Exception;
+	public Integer getNumberOfComments(@WebParam(name = "parametros")
+	String... parametros) throws Exception;
 	
-	/**
-	 * Return the number of comments on a specific blog.
-	 * @param login The login.
-	 * @param blogId The blog's ID.
-	 * @return The number of comments.
-	 * @throws Exception
-	 */
-	@WebMethod
-	public Integer getNumberOfComments(@WebParam(name = "login")
-	String login, @WebParam(name = "blogId")
-	String blogId) throws Exception;
+//	@WebMethod
+//	public Integer getNumberOfComments(@WebParam(name = "postId")
+//	String postId) throws Exception;
+	
+	
+//	@WebMethod
+//	public Integer getNumberOfComments(@WebParam(name = "login")
+//	String login, @WebParam(name = "blogId")
+//	String blogId) throws Exception;
 	
 	/**
 	 * Return the number of movies on a specific post.
@@ -569,7 +565,7 @@ public interface BlogWS {
 	String postId);
 	
 	/**
-	 * Return the number of subBlogs on a specific blog.
+	 * Return the number of subBlogs in first level from a specific blog.
 	 * @param blogId The blog's ID.
 	 * @return The number of subBlogs.
 	 * @throws Exception
@@ -579,7 +575,7 @@ public interface BlogWS {
 	String blogId) throws Exception;
 	
 	/**
-	 * Return the number of all subComments on a specific comment.
+	 * Return the number of subComments in first level from a specific comment.
 	 * @param commentId The comment's ID.
 	 * @return The number of all subComments.
 	 * @throws Exception
@@ -736,7 +732,7 @@ public interface BlogWS {
 	Integer index) throws Exception;
 	
 	/**
-	 * Verifu if a user is loggend on "Blogao".
+	 * Verify if a user is logged on "Blogao".
 	 * @param login The user's login.
 	 * @return True if the user is logged, or False otherwise.
 	 * @throws Exception

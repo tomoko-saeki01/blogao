@@ -20,12 +20,13 @@ import br.edu.ufcg.blogao.session.SessionManager;
 import br.edu.ufcg.blogao.user.UsersHandler;
 
 public class BlogWSImpl implements BlogWS {
-	
+
 	private final String INVALID_SESSION_MESSAGE = "Sess‹o inv‡lida";
-	
+
 	private UsersHandler usersHandler = UsersHandler.getInstance();
 	private SessionManager sessionManager = SessionManager.getInstance();
-	private WebElementManager webElementManager = WebElementManager.getInstance();
+	private WebElementManager webElementManager = WebElementManager
+			.getInstance();
 	private Finder finder = new Finder();
 
 	@Override
@@ -34,16 +35,16 @@ public class BlogWSImpl implements BlogWS {
 		String userId = sessionManager.getLoggedUserId(sessionId);
 		return webElementManager.addComment(postId, userId, texto);
 	}
-	
+
 	@Override
 	public void addPostAnnouncements(String sessionId, String blogId)
 			throws Exception {
 		String userId = sessionManager.getLoggedUserId(sessionId);
 		if (sessionManager.isUserLogged(userId)) {
 			webElementManager.addPostAnnouncement(blogId, userId);
-		}	
+		}
 	}
-	
+
 	@Override
 	public String addSubComment(String sessionId, String commentId, String texto)
 			throws Exception {
@@ -90,9 +91,10 @@ public class BlogWSImpl implements BlogWS {
 		}
 		webElementManager.changeBlogInformation(blogId, atributo, valor);
 	}
-	
+
 	@Override
-	public void changePostInformation(String sessionId, String postId, String atributo, String valor) throws Exception {
+	public void changePostInformation(String sessionId, String postId,
+			String atributo, String valor) throws Exception {
 		String userId = sessionManager.getLoggedUserId(sessionId);
 		if (!userId.equals(webElementManager.getPostAuthor(postId))) {
 			throw new IllegalArgumentException(INVALID_SESSION_MESSAGE);
@@ -101,8 +103,8 @@ public class BlogWSImpl implements BlogWS {
 	}
 
 	@Override
-	public void changeProfileInformation(String sessionId, String atributo, String valor)
-			throws Exception {
+	public void changeProfileInformation(String sessionId, String atributo,
+			String valor) throws Exception {
 		final String LOGIN_USERID_ATTRIBUTE = "login";
 		String userId = sessionManager.getLoggedUserId(sessionId);
 		usersHandler.changeUserInformation(userId, atributo, valor);
@@ -110,7 +112,7 @@ public class BlogWSImpl implements BlogWS {
 			sessionManager.updateLoggedUserId(userId, valor);
 		}
 	}
-	
+
 	/**
 	 * Clean the persistence.
 	 */
@@ -127,7 +129,7 @@ public class BlogWSImpl implements BlogWS {
 		usersHandler.addBlogToUser(blogId, userId);
 		return blogId;
 	}
-	
+
 	@Override
 	public String createPost(String sessionId, String blogId, String titulo,
 			String texto) throws Exception {
@@ -143,25 +145,28 @@ public class BlogWSImpl implements BlogWS {
 			String email, String sexo, String dataNasc, String endereco,
 			String interesses, String quem_sou_eu, String filmes,
 			String musicas, String livros) throws Exception {
-		
-		usersHandler.createUser(login, senha, nome_exibicao, email, sexo, dataNasc, endereco, interesses, quem_sou_eu, filmes, musicas, livros);
+
+		usersHandler.createUser(login, senha, nome_exibicao, email, sexo,
+				dataNasc, endereco, interesses, quem_sou_eu, filmes, musicas,
+				livros);
 	}
-	
+
 	@Override
 	public String createSubBlog(String sessionId, String blogId, String titulo,
 			String descricao) throws Exception {
 		sessionManager.getLoggedUserId(sessionId);
-		String subBlogId = webElementManager.createSubBlog(blogId, titulo, descricao);
+		String subBlogId = webElementManager.createSubBlog(blogId, titulo,
+				descricao);
 		return subBlogId;
 	}
-	
+
 	@Override
 	public void deleteAnnouncement(String sessionId, String announcementId)
 			throws Exception {
 		String userId = sessionManager.getLoggedUserId(sessionId);
 		webElementManager.deleteAnnouncement(userId, announcementId.toString());
 	}
-	
+
 	@Override
 	public void deleteBlog(String sessionId, String blogId) throws Exception {
 		String userId = sessionManager.getLoggedUserId(sessionId);
@@ -175,21 +180,24 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public void deleteMovie(String sessionId, String videoId) throws Exception {
 		String userId = sessionManager.getLoggedUserId(sessionId);
-		if (!userId.equals(webElementManager.getInteractiveContentAuthor(videoId))) {
+		if (!userId.equals(webElementManager
+				.getInteractiveContentAuthor(videoId))) {
 			throw new IllegalArgumentException(INVALID_SESSION_MESSAGE);
 		}
 		webElementManager.deleteInteractiveContent(videoId);
 	}
-	
+
 	@Override
-	public void deletePicture(String sessionId, String pictureId) throws Exception {
+	public void deletePicture(String sessionId, String pictureId)
+			throws Exception {
 		String userId = sessionManager.getLoggedUserId(sessionId);
-		if (!userId.equals(webElementManager.getInteractiveContentAuthor(pictureId))) {
+		if (!userId.equals(webElementManager
+				.getInteractiveContentAuthor(pictureId))) {
 			throw new IllegalArgumentException(INVALID_SESSION_MESSAGE);
 		}
 		webElementManager.deleteInteractiveContent(pictureId);
 	}
-	
+
 	@Override
 	public void deletePost(String sessionId, String postId) throws Exception {
 		String userId = sessionManager.getLoggedUserId(sessionId);
@@ -198,17 +206,18 @@ public class BlogWSImpl implements BlogWS {
 		}
 		webElementManager.deletePost(postId);
 	}
-	
+
 	@Override
 	public void deleteProfile(String sessionId) throws Exception {
 		String userId = sessionManager.getLoggedUserId(sessionId);
 		usersHandler.deleteUser(userId);
 	}
-	
+
 	@Override
 	public void deleteSound(String sessionId, String soundId) throws Exception {
 		String userId = sessionManager.getLoggedUserId(sessionId);
-		if (!userId.equals(webElementManager.getInteractiveContentAuthor(soundId))) {
+		if (!userId.equals(webElementManager
+				.getInteractiveContentAuthor(soundId))) {
 			throw new IllegalArgumentException(INVALID_SESSION_MESSAGE);
 		}
 		webElementManager.deleteInteractiveContent(soundId);
@@ -218,12 +227,12 @@ public class BlogWSImpl implements BlogWS {
 	public String findBlogByName(String match) {
 		return finder.findBlogsWithName(match);
 	}
-	
+
 	@Override
 	public String findProfileByGender(String match) {
 		return finder.findUsersWithGender(match);
 	}
-	
+
 	@Override
 	public String findProfileByInterests(String match) {
 		return finder.findUsersWithInterests(match);
@@ -232,9 +241,9 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public String findProfileByName(String match) {
 		return finder.findUsersWithName(match);
-		
+
 	}
-	
+
 	@Override
 	public String getAnnouncement(String sessionId, Integer index)
 			throws Exception {
@@ -248,7 +257,8 @@ public class BlogWSImpl implements BlogWS {
 	}
 
 	@Override
-	public Integer getBlogBySessionId(String sessionId, Integer index) throws Exception {
+	public Integer getBlogBySessionId(String sessionId, Integer index)
+			throws Exception {
 		String userId = sessionManager.getLoggedUserId(sessionId);
 		return Integer.parseInt((usersHandler.getBlogFromUser(userId, index)));
 	}
@@ -258,7 +268,7 @@ public class BlogWSImpl implements BlogWS {
 			throws Exception {
 		return webElementManager.getBlogInformation(blogId, atributo);
 	}
-	
+
 	@Override
 	public String getComment(String postId, Integer index) throws Exception {
 		return webElementManager.getCommentFromPost(postId, index);
@@ -266,34 +276,39 @@ public class BlogWSImpl implements BlogWS {
 
 	@Override
 	public String getCommentAuthor(String commentId) throws Exception {
-		return webElementManager.getCommentInformation(commentId, WebElementManager.COMMENT_AUTHOR);
+		return webElementManager.getCommentInformation(commentId,
+				WebElementManager.COMMENT_AUTHOR);
 	}
-	
+
 	@Override
 	public String getCommentText(String commentId) throws Exception {
-		return webElementManager.getCommentInformation(commentId, WebElementManager.COMMENT_TEXT);
+		return webElementManager.getCommentInformation(commentId,
+				WebElementManager.COMMENT_TEXT);
 	}
 
 	@Override
 	public String getMovie(String postId, Integer index) throws Exception {
-		return webElementManager.getPostAttachmentsInformation(postId, WebElementManager.MOVIE, index);
+		return webElementManager.getPostAttachmentsInformation(postId,
+				WebElementManager.MOVIE, index);
 	}
 
 	@Override
 	public String getMovieData(String movieId) throws Exception {
-		return webElementManager.getInteractiveContentsInformation(movieId, WebElementManager.CONTENT_DATA);
+		return webElementManager.getInteractiveContentsInformation(movieId,
+				WebElementManager.CONTENT_DATA);
 	}
 
 	@Override
 	public String getMovieDescription(String movieId) throws Exception {
-		return webElementManager.getInteractiveContentsInformation(movieId, WebElementManager.CONTENT_DESCRIPTION);
+		return webElementManager.getInteractiveContentsInformation(movieId,
+				WebElementManager.CONTENT_DESCRIPTION);
 	}
-	
+
 	@Override
 	public Integer getNumberOfAllSubComments(String commentId) throws Exception {
 		return webElementManager.getNumberOfAllSubComments(commentId);
 	}
-	
+
 	@Override
 	public Integer getNumberOfAnnouncements(String sessionId) throws Exception {
 		String userId = sessionManager.getLoggedUserId(sessionId);
@@ -311,30 +326,60 @@ public class BlogWSImpl implements BlogWS {
 		String userId = sessionManager.getLoggedUserId(sessionId);
 		return usersHandler.getNumberOfBlogsFromUser(userId);
 	}
-	
+
 	@Override
+	public Integer getNumberOfComments(String... parametros) throws Exception {
+		if (parametros.length == 1) {
+			return this.getNumberOfComments(parametros[0]);
+		} else if (parametros.length == 2) {
+			return this.getNumberOfComments(parametros[0], parametros[1]);
+		}
+		return -1;
+	}
+
+	/**
+	 * Return the number of comments on a specific post.
+	 * 
+	 * @param postId
+	 *            The post's ID.
+	 * @return The number of comments.
+	 * @throws Exception
+	 */
 	public Integer getNumberOfComments(String postId) throws Exception {
 		return webElementManager.getNumberOfCommentsFromPost(postId);
 	}
-	
-	@Override
-	public Integer getNumberOfComments(String login, String blogId) throws Exception {
-		return webElementManager.getNumberOfCommentsFromAuthorOnBlog(login, blogId);
+
+	/**
+	 * Return the number of comments from an user on a specific blog.
+	 * 
+	 * @param login
+	 *            The login.
+	 * @param blogId
+	 *            The blog's ID.
+	 * @return The number of comments.
+	 * @throws Exception
+	 */
+	public Integer getNumberOfComments(String login, String blogId)
+			throws Exception {
+		return webElementManager.getNumberOfCommentsFromAuthorOnBlog(login,
+				blogId);
 	}
-	
+
 	@Override
 	public Integer getNumberOfMovies(String postId) {
 		try {
-			return webElementManager.getPostAttachmentsNumericInformation(postId, WebElementManager.NUMBER_OF_MOVIES);
+			return webElementManager.getPostAttachmentsNumericInformation(
+					postId, WebElementManager.NUMBER_OF_MOVIES);
 		} catch (Exception e) {
 			return null;
 		}
 	}
-	
+
 	@Override
 	public Integer getNumberOfPictures(String postId) {
 		try {
-			return webElementManager.getPostAttachmentsNumericInformation(postId, WebElementManager.NUMBER_OF_PICTURES);
+			return webElementManager.getPostAttachmentsNumericInformation(
+					postId, WebElementManager.NUMBER_OF_PICTURES);
 		} catch (Exception e) {
 			return null;
 		}
@@ -348,27 +393,28 @@ public class BlogWSImpl implements BlogWS {
 	@Override
 	public Integer getNumberOfSounds(String postId) {
 		try {
-			return webElementManager.getPostAttachmentsNumericInformation(postId, WebElementManager.NUMBER_OF_SOUNDS);
+			return webElementManager.getPostAttachmentsNumericInformation(
+					postId, WebElementManager.NUMBER_OF_SOUNDS);
 		} catch (Exception e) {
 			return null;
 		}
 	}
-	
+
 	@Override
 	public Integer getNumberOfAllSubBlogs(String blogId) throws Exception {
 		return webElementManager.getNumberOfAllSubBlogs(blogId);
 	}
-	
+
 	@Override
 	public Integer getNumberOfAllPosts(String blogId) throws Exception {
 		return webElementManager.getNumberOfAllPostsFromBlog(blogId);
 	}
-	
+
 	@Override
 	public Integer getNumberOfSubBlogs(String blogId) throws Exception {
 		return webElementManager.getNumberOfSubBlogs(blogId);
 	}
-	
+
 	@Override
 	public Integer getNumberOfSubComments(String commentId) throws Exception {
 		return webElementManager.getNumberOfSubComments(commentId);
@@ -376,22 +422,26 @@ public class BlogWSImpl implements BlogWS {
 
 	@Override
 	public String getPicture(String postId, Integer index) throws Exception {
-		return webElementManager.getPostAttachmentsInformation(postId, WebElementManager.PICTURE, index);
+		return webElementManager.getPostAttachmentsInformation(postId,
+				WebElementManager.PICTURE, index);
 	}
 
 	@Override
 	public String getPictureData(String pictureId) throws Exception {
-		return webElementManager.getInteractiveContentsInformation(pictureId, WebElementManager.CONTENT_DATA);
+		return webElementManager.getInteractiveContentsInformation(pictureId,
+				WebElementManager.CONTENT_DATA);
 	}
 
 	@Override
 	public String getPictureDescription(String pictureId) throws Exception {
-		return webElementManager.getInteractiveContentsInformation(pictureId, WebElementManager.CONTENT_DESCRIPTION);
+		return webElementManager.getInteractiveContentsInformation(pictureId,
+				WebElementManager.CONTENT_DESCRIPTION);
 	}
-	
+
 	@Override
 	public Integer getPost(String blogId, Integer index) throws Exception {
-		return Integer.parseInt(webElementManager.getPostFromBlog(blogId, index));
+		return Integer.parseInt(webElementManager
+				.getPostFromBlog(blogId, index));
 	}
 
 	@Override
@@ -399,7 +449,7 @@ public class BlogWSImpl implements BlogWS {
 			throws Exception {
 		return webElementManager.getPostInformation(postId, atributo);
 	}
-	
+
 	@Override
 	public String getPostJustCreated(String announcementId) throws Exception {
 		return webElementManager.getAnnouncementTarget(announcementId);
@@ -420,24 +470,27 @@ public class BlogWSImpl implements BlogWS {
 
 	@Override
 	public String getSound(String postId, Integer index) throws Exception {
-		return webElementManager.getPostAttachmentsInformation(postId, WebElementManager.SOUND, index);
+		return webElementManager.getPostAttachmentsInformation(postId,
+				WebElementManager.SOUND, index);
 	}
 
 	@Override
 	public String getSoundData(String soundId) throws Exception {
-		return webElementManager.getInteractiveContentsInformation(soundId, WebElementManager.CONTENT_DATA);
+		return webElementManager.getInteractiveContentsInformation(soundId,
+				WebElementManager.CONTENT_DATA);
 	}
 
 	@Override
 	public String getSoundDescription(String soundId) throws Exception {
-		return webElementManager.getInteractiveContentsInformation(soundId, WebElementManager.CONTENT_DESCRIPTION);
+		return webElementManager.getInteractiveContentsInformation(soundId,
+				WebElementManager.CONTENT_DESCRIPTION);
 	}
-	
+
 	@Override
 	public Integer getSubBlog(String blogId, Integer index) throws Exception {
 		return Integer.parseInt(webElementManager.getSubBlog(blogId, index));
 	}
-	
+
 	@Override
 	public String getSubComment(String commentId, Integer index)
 			throws Exception {
@@ -450,9 +503,9 @@ public class BlogWSImpl implements BlogWS {
 	}
 
 	public void loadData() {
-		/* 
-		 * It's not necessary open the datas to validate the tests.
-		 * The informations are loaded as necessary.
+		/*
+		 * It's not necessary open the datas to validate the tests. The
+		 * informations are loaded as necessary.
 		 */
 	}
 
@@ -465,17 +518,17 @@ public class BlogWSImpl implements BlogWS {
 	public String logon(String login, String senha) throws Exception {
 		return sessionManager.logon(login, senha);
 	}
-	
+
 	public void saveData() {
 		/*
-		 * It's not necessary save the datas in a specific moment.
-		 * The dates are inserted and changed when the webMethods are
-		 * executed.
+		 * It's not necessary save the datas in a specific moment. The dates are
+		 * inserted and changed when the webMethods are executed.
 		 */
-	}	
-	
+	}
+
 	/**
 	 * Return the date of the day.
+	 * 
 	 * @return The date of the day.
 	 */
 	public String todaysDate() {

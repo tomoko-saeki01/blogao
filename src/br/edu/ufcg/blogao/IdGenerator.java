@@ -21,7 +21,7 @@ import java.io.IOException;
 public class IdGenerator {
 	
 	private static IdGenerator selfInstance = null;
-	private final String ID_BACKUP_FILE = "resources" + System.getProperty("file.separator") + ".id";  
+	private final String ID_BACKUP_FILE = "resources" + System.getProperty("file.separator") + "db" + System.getProperty("file.separator") + ".id";  
 	private static int nextId = 0;
 	
 	private IdGenerator() {
@@ -50,8 +50,11 @@ public class IdGenerator {
 		return Encryptor.randomIntEncrypt(nextId);
 	}
 
+	/**
+	 * Saves the actual id in IdBackupFile. 
+	 * @param i Actual value of id.
+	 */
 	private void saveBackupId(int i) {
-	
 		FileWriter writer;
 		try {
 			writer = new FileWriter(new File(ID_BACKUP_FILE));
@@ -62,20 +65,20 @@ public class IdGenerator {
 		}
 	}
 
-	/*
-	 * This method is incomplete.
+	/**
+	 * This method retrieves System last id. If the server stops and than restarts, the last id will be catch.
+	 * @return Last id saved in backup file.
 	 */
 	private int retriveBackupId() {
 		File idBackupFile = new File(ID_BACKUP_FILE);
 		BufferedReader reader = null;
-		String value = "";
+		String value = "0";
 		try {
 			reader = new BufferedReader(new FileReader(idBackupFile)); 
 			value = reader.readLine();
 		} catch (FileNotFoundException e) {
 			System.err.println("ID backup File Corrupted! Blogao is creating a new ID primary key...");
-			// TODO We need to decide how to regenerate a valid ID.
-			saveBackupId(nextId);
+			createBackupIdFile();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -91,5 +94,14 @@ public class IdGenerator {
 			return Integer.parseInt(value);
 		}
 		return 0;
+	}
+
+	/**
+	 * Creates the backup id file if it was deleted.
+	 */
+	private void createBackupIdFile() {
+		File backupFile = new File(ID_BACKUP_FILE);
+		backupFile.getParentFile().mkdirs();
+		saveBackupId(nextId);
 	}
 }

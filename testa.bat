@@ -1,5 +1,5 @@
 @echo off
-set DO=java -cp .;lib\easyaccept.jar easyaccept.EasyAccept bin.br.edu.ufcg.blogao.webservice.BlogWSImpl
+set DO=java -cp .;lib\easyaccept.jar easyaccept.EasyAccept build.br.edu.ufcg.blogao.webservice.BlogWSImpl
 set LO=test\easyaccepttests\
 
 echo Testando US 1
