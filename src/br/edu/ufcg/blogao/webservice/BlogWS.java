@@ -236,11 +236,11 @@ public interface BlogWS {
 	public void deleteAnnouncement(@WebParam(name = "sessionId")
 	String sessionId, @WebParam(name = "announcementId")
 	String announcementId) throws Exception;
-	
+		
 	/**
-	 * Delete a blog.
-	 * @param session Id The session's ID.
-	 * @param blogId The blog's ID.
+	 * Delete a blog.	
+	 * @param sessionId The session's ID.
+	 * @param blogId  The blog's ID.
 	 * @throws Exception
 	 */
 	@WebMethod
@@ -304,7 +304,7 @@ public interface BlogWS {
 	/**
 	 * Find a blog by name.
 	 * @param match The name.
-	 * @return
+	 * @return Blogs with the specific name.
 	 */
 	@WebMethod
 	public String findBlogByName(@WebParam(name = "match")
@@ -313,7 +313,7 @@ public interface BlogWS {
 	/**
 	 * Find a profile by name.
 	 * @param match The name.
-	 * @return
+	 * @return All profiles with the name.
 	 */
 	@WebMethod
 	public String findProfileByName(@WebParam(name = "match")
@@ -322,7 +322,7 @@ public interface BlogWS {
 	/**
 	 * Find a profile by gender.
 	 * @param match The gender.
-	 * @return
+	 * @return All profile with the specific gender.
 	 */
 	@WebMethod
 	public String findProfileByGender(@WebParam(name = "match")
@@ -331,8 +331,8 @@ public interface BlogWS {
 	/**
 	 * Find a profile by interests.
 	 * @param match The interests.
-	 * @return
-	 */
+	 * @return All profile with the same interests.
+	 */ 
 	@WebMethod
 	public String findProfileByInterests(@WebParam(name = "match")
 	String match);

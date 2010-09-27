@@ -182,8 +182,7 @@ public interface UserIF extends Identifiable, Notifiable {
 
 	/**
 	 * Set the user's password.
-	 * @param newPassword User's new password.
-	 * @param oldPassword User's old password.
+	 * @param password User's new password.
 	 */
 	public void setPassword(String password);
 

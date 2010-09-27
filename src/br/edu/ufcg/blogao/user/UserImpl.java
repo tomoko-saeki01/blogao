@@ -61,7 +61,7 @@ public class UserImpl implements UserIF {
 	 * @param interests User's interests.
 	 * @param dateOfBirthday User's anniversary date.
 	 * @param sex User's sex.
-	 * @param music User's music.
+	 * @param musics User's music.
 	 * @param movies User's movies.
 	 * @param books User's books.
 	 */
