@@ -99,7 +99,7 @@ public class Comment implements WebElement {
 
 	/**
 	 * Set the author's ID of the comment.
-	 * @param author The author's ID of the comment.
+	 * @param authorId The author's ID of the comment.
 	 */
 	public void setAuthorId(String authorId) {
 		this.authorId = authorId;

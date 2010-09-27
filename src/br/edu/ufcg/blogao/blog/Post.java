@@ -56,7 +56,7 @@ public class Post implements WebElement {
 			
 	/**
 	 * Add a comment to the post.
-	 * @param id The comment's ID.
+	 * @param commentId The comment's ID.
 	 */
 	public void addComment(String commentId) {
 		comments.add(commentId);
