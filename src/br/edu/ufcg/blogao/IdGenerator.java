@@ -54,7 +54,7 @@ public class IdGenerator {
 	 * Saves the actual id in IdBackupFile. 
 	 * @param i Actual value of id.
 	 */
-	private void saveBackupId(int i) {
+	private void saveBackupId(Integer i) {
 		FileWriter writer;
 		try {
 			writer = new FileWriter(new File(ID_BACKUP_FILE));
