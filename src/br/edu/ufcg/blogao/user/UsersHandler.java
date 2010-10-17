@@ -427,7 +427,7 @@ public class UsersHandler {
 		DatabaseFacade.getInstance().updateUser(user);
 	}
 	
-	/*
+	/**
 	 * This method assumes this date format 'DD/MM/YYYY'.
 	 * @param stringDate String representation of user's birthday.
 	 * @return Correspondent Calendar to stringDate.
@@ -440,10 +440,20 @@ public class UsersHandler {
 		return new GregorianCalendar(year, month, dayOfMonth);
 	}
 	
+	/**
+	 * Convert the string to a accpetable sex.
+	 * @param sex The string that will be converted.
+	 * @return The sex corresponding to the string.
+	 */
 	private Sex convertStringSexToSex(String sex) {
 		return ACCEPTABLE_SEXES.get(sex);
 	}
 
+	/**
+	 * Verify if already exist a user with the email.
+	 * @param email The email that will be checked.
+	 * @return True case the email already exist, or False otherwise.
+	 */
 	private boolean existsUserWithEmail(String email) {
 		for (UserIF user : DatabaseFacade.getInstance().getAllUsers().values()) {
 			if (user.getEmail().equals(email)) {
@@ -452,6 +462,11 @@ public class UsersHandler {
 		}
 		return false;
 	}
+	
+	/**
+	 * Return a map with all the acceptable sexes.
+	 * @return The acceptable sexes.
+	 */
 	private Map<String, Sex> getAcceptableSexes() {
 		Map<String, Sex> acceptableSexes = new HashMap<String, Sex>();
 		acceptableSexes.put("Masculino", Sex.Male);
@@ -460,6 +475,12 @@ public class UsersHandler {
 		return acceptableSexes;
 	}
 	
+	/**
+	 * Return a user by login.
+	 * @param login The user's login.
+	 * @return The user that has the login.
+	 * @throws Exception Throw if the login is null, empty or doesn't exist.
+	 */
 	private UserIF getUser(String login) throws Exception {
 		if (isInvalidString(login) || !existsUserWithLogin(login)) {
 			throw new IllegalArgumentException(INVALID_LOGIN_MESSAGE);
@@ -467,6 +488,11 @@ public class UsersHandler {
 		return DatabaseFacade.getInstance().retrieveUser(login);
 	}
 	
+	/**
+	 * Verify is the date is invalid.
+	 * @param date The date that will be checked.
+	 * @return True case the date is invalid, or False otherwise.
+	 */
 	private boolean isInvalidDate(String date) {
 		if (!date.matches(ACCEPTABLE_DATE_REGEX)) {
 			return true;
@@ -491,6 +517,12 @@ public class UsersHandler {
 		return false;
 	}
 
+	/**
+	 * Verify if a integer is valid.
+	 * @param index The integer that will be checked.
+	 * @param size The maximum value that the integer can be.
+	 * @return True case is invalid, or False otherwise.
+	 */
 	private boolean isInvalidIndex(Integer index, Integer size) {
 		if (index < 0 || index >= size) {
 			return true;
@@ -498,10 +530,20 @@ public class UsersHandler {
 		return false;
 	}
 	
+	/**
+	 * Verify if a string is invalid.
+	 * @param str The string that will be verified.
+	 * @return True if the string is invalid, or False otherwise.
+	 */
 	private boolean isInvalidString(String str) {
 		return str == null || str.trim().isEmpty();
 	}
 	
+	/**
+	 * Verify if a sex if invalid.
+	 * @param sex The string corresponding to the sex that will be verified.
+	 * @return True case invalid, or False otherwise.
+	 */
 	private boolean isInvalidSex(String sex) {
 		return !ACCEPTABLE_SEXES.containsKey(sex);
 	}
