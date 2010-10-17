@@ -41,7 +41,7 @@ public interface UserIF extends Identifiable, Notifiable {
 	 * @param index Index of wanted blogId.
 	 * @return The blog's ID.
 	 */
-	public String getBlogIdAtIndex(int index);
+	public String getBlogIdAtIndex(Integer index);
 
 	/**
 	 * Return all user's blogs.
@@ -124,7 +124,7 @@ public interface UserIF extends Identifiable, Notifiable {
 	 * Remove a blog.
 	 * @param index The index of blog to be removed.
 	 */
-	public void removeBlogIdAtIndex(int index);
+	public void removeBlogIdAtIndex(Integer index);
 
 	/**
 	 * Set the user's address.
