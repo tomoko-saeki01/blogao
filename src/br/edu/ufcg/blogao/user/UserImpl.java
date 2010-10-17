@@ -106,7 +106,7 @@ public class UserImpl implements UserIF {
 	}
 	
 	@Override
-	public String getBlogIdAtIndex(int index) {
+	public String getBlogIdAtIndex(Integer index) {
 		return blogs.get(index);
 	}
 
@@ -176,7 +176,7 @@ public class UserImpl implements UserIF {
 	}
 	
 	@Override
-	public void removeBlogIdAtIndex(int index) {
+	public void removeBlogIdAtIndex(Integer index) {
 		blogs.remove(index);
 	}
 
