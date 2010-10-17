@@ -103,7 +103,7 @@ public class Post implements WebElement {
 	 * @param index The index of the comment.
 	 * @return The comment's ID.
 	 */
-	public String getCommentId(int index) {
+	public String getCommentId(Integer index) {
 		return comments.get(index);
 	}
 	
@@ -179,7 +179,7 @@ public class Post implements WebElement {
 	 * @param index The index of the picture.
 	 * @return The picture's ID.
 	 */
-	public String getPictureId(int index) {
+	public String getPictureId(Integer index) {
 		return attachments.get(PICTURES_KEY).get(index);
 	}
 	
@@ -188,7 +188,7 @@ public class Post implements WebElement {
 	 * @param index The index of the sound.
 	 * @return A sound's ID.
 	 */
-	public String getSoundId(int index) {
+	public String getSoundId(Integer index) {
 		return attachments.get(SOUNDS_KEY).get(index);
 	}
 	
