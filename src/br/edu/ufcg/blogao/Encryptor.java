@@ -42,7 +42,7 @@ public class Encryptor {
 	 * @param i The integer that will be encrypted.
 	 * @return The encrypted integer.
 	 */
-	public static String randomIntEncrypt(int i) {
+	public static String randomIntEncrypt(Integer i) {
 		return randomIntEncrypt(String.valueOf(i));
 	}
 	
