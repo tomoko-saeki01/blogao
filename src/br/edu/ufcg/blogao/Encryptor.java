@@ -62,6 +62,11 @@ public class Encryptor {
 		return null;
 	}
 
+	/**
+	 * Return the text in hexCodes.
+	 * @param text The text that will be modified.
+	 * @return The text in hexCodes.
+	 */
 	private static char[] hexCodes(byte[] text) {
         char[] hexOutput = new char[text.length * 2];
         String hexString;
@@ -74,6 +79,11 @@ public class Encryptor {
         return hexOutput;
     }
 	
+	/**
+	 * Encrypt the string to integers.
+	 * @param str The string that will be encrypted.
+	 * @return The string encrypted.
+	 */
 	private static String encryptToIntegers(String str) {
 		final String VALUE_OF_A = "3";
 		final String VALUE_OF_B = "1";
@@ -91,6 +101,11 @@ public class Encryptor {
 		return str;
 	}
 	
+	/**
+	 * 
+	 * @param str
+	 * @return
+	 */
 	private static String cutAQuarterString(String str) {
 		final int MAXIMUM_START_INDEX = (3*(str.length())) / 4;
 		int startIndex = (new Random()).nextInt(MAXIMUM_START_INDEX);

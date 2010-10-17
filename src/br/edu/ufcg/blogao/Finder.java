@@ -123,7 +123,12 @@ public class Finder {
 		} catch (Exception e) {}
 		return sortList(result).toString().replaceAll(INCORRECT_FORMAT, CORRECT_FORMAT);
 	}
-		
+	
+	/**
+	 * Convert a list with blogs to a list with the blog's ID.
+	 * @param blogList The list that will be converted.
+	 * @return The list contain the blog's ID.
+	 */
 	private List<String> convertBlogListToIdList(List<Blog> blogList) {
 		List<String> idList = new ArrayList<String>();
 		for (Blog blog : blogList) {
@@ -132,6 +137,12 @@ public class Finder {
 		return idList;
 	}
 		
+	/**
+	 * Insert a blog, in a list, in order according to the creation date.
+	 * @param blogs The list where the new blog will be inserted.
+	 * @param newBlog The blog that will be inserted.
+	 * @return The list sorted.
+	 */
 	private List<Blog> insertBlogSortingByCreationDate(List<Blog> blogs, Blog newBlog) {
 		int i;
 		for (i = 0; i < blogs.size(); i++) {
@@ -143,10 +154,20 @@ public class Finder {
 		return blogs;
 	}
 	
+	/**
+	 * Verify if the string is invalid.
+	 * @param str The string that will be verified.
+	 * @return
+	 */
 	private boolean isInvalidString(String str) {
 		return str == null || str.trim().equals("");
 	}
 
+	/**
+	 * Sort a list.
+	 * @param list The list that will be sorted.
+	 * @return A sorted list.
+	 */
 	private List<String> sortList(List<String> list) {
 		String[] array = list.toArray(new String[0]);
 		Arrays.sort(array);

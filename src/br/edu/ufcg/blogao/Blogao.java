@@ -13,5 +13,4 @@ public class Blogao {
 	public static void main(String[] args) {
 		HelperServer.startServer("http://localhost:8080/blogao");
 	}
-
 }
