@@ -152,13 +152,17 @@ public class Finder {
 	 * @return The list sorted.
 	 */
 	private List<Blog> insertBlogSortingByCreationDate(Iterator<Blog> blogs, Blog newBlog) {
-		List<Blog> blogsList = (List) blogs;
+		List<Blog> blogsList = new ArrayList<Blog>();		
+		while (blogs.hasNext()) {
+			blogsList.add(blogs.next());
+		}	
+		
 		int i = 0;
 		while (blogs.hasNext()) {
+			i++;
 			if (blogs.next().getCreationDate().after(newBlog.getCreationDate())) {
 				break;
 			}
-			i++;
 		}
 		blogsList.add(i, newBlog);
 		return blogsList;
@@ -189,8 +193,11 @@ public class Finder {
 	 * @return A sorted list.
 	 */
 	private List<String> sortList(Iterator<String> list) {
-		List<String> newList = (List) list;
-		String[] array = (String[]) newList.toArray(new String[0]);
+		List<String> newList = new ArrayList<String>();		
+		while (list.hasNext()) {
+			newList.add(list.next());
+		}	
+		String[] array = newList.toArray(new String[0]);
 		
 		Arrays.sort(array);
 		newList.clear();
