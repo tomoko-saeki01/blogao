@@ -130,7 +130,7 @@ public class Post implements WebElement {
 	 * @param index The index of the movie.
 	 * @return The movie's ID.
 	 */
-	public String getMovieId(int index) {
+	public String getMovieId(Integer index) {
 		return attachments.get(MOVIES_KEY).get(index);
 	}
 	
