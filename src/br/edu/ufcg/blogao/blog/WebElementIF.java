@@ -17,7 +17,7 @@ import java.util.Calendar;
 import br.edu.ufcg.blogao.Identifiable;
 import br.edu.ufcg.blogao.blog.data.StaticContent;
 
-public interface WebElement extends Identifiable {
+public interface WebElementIF extends Identifiable {
 	
 	/**
 	 * Return a text.

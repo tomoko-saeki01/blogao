@@ -12,126 +12,36 @@ package br.edu.ufcg.blogao.persistence;
  */
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import br.edu.ufcg.blogao.blog.AnnouncementIF;
 
-import com.thoughtworks.xstream.XStream;
+public class AnnouncementsKeeper extends AbstractKeeper<AnnouncementIF>{
 
-public class AnnouncementsKeeper {
-
-	private final String SEP = System.getProperty("file.separator");
 	private final String ANNOUNCEMENTS_PARENT_PATH = "resources" + SEP + "db" + SEP + "announcements" + SEP;
 	private final String ANNOUNCEMENTS_FILE_EXTENSION = ".ann";
 	private final String EXISTENT_ANNOUNCEMENT_MESSAGE = "Notificação existente";
 	private final String UNEXISTENT_ANNOUNCEMENT_MESSAGE = "Notificação inexistente";
-
-	private XStream xstream = null;	
 	
-	/**
-	 * Default constructor.
-	 */
-	public AnnouncementsKeeper() {
-		xstream = new XStream();
+	@Override
+	protected File createFileReference(String fileName) {
+		return new File(ANNOUNCEMENTS_PARENT_PATH + fileName + ANNOUNCEMENTS_FILE_EXTENSION);
 	}
-
-	/**
-	 * Delete all existing announcements.
-	 */
-	void deleteAllAnnouncements() {
-		File announcementsDirectory = new File(ANNOUNCEMENTS_PARENT_PATH);
-		announcementsDirectory.mkdirs();
-		File[] announcementsFiles = announcementsDirectory.listFiles();
-		for (File announcementFile : announcementsFiles) {
-			announcementFile.setWritable(true, true);
-			announcementFile.delete();
-		}
+	@Override
+	protected File createDirectoryReference() {
+		return new File(ANNOUNCEMENTS_PARENT_PATH + SEP);
 	}
-	
-	/**
-	 * Delete a specific announcement. 
-	 * @param announcementId The announcement's ID that will be deleted.
-	 * @throws Exception If the annoucemetnId doesn't exist in database.
-	 */
-	void deleteAnnouncement(String announcementId) throws Exception {
-		if (!existsAnnouncementInDatabase(announcementId)) {
-			throw new IllegalStateException(UNEXISTENT_ANNOUNCEMENT_MESSAGE);
-		}
-		File file = new File(ANNOUNCEMENTS_PARENT_PATH + announcementId + ANNOUNCEMENTS_FILE_EXTENSION);
-		file.setWritable(true, true);
-		file.delete();
-	}
-	
-	/**
-	 * Verify if exist a specific announcement in database.
-	 * @param id The announcement's ID.
-	 * @return True case the announcement exist or False otherwise.
-	 */
-	boolean existsAnnouncementInDatabase(String id) {
-		return (new File(ANNOUNCEMENTS_PARENT_PATH + id + ANNOUNCEMENTS_FILE_EXTENSION)).exists();
-	}
-	
-	/**
-	 * Return a map with all the announcements existing.
-	 * @return A map with all the announcements.
-	 */
-	Map<String, AnnouncementIF> getAllAnnouncements() {
-		File announcementsDirectory = new File(ANNOUNCEMENTS_PARENT_PATH);
-		announcementsDirectory.mkdirs();
-		FileReader reader = null;
-		File[] announcementsFiles = announcementsDirectory.listFiles();
-		Map<String, AnnouncementIF> announcements = new HashMap<String, AnnouncementIF>();
-		for (File announcementFile : announcementsFiles) {
-			if (announcementFile.getName().endsWith(ANNOUNCEMENTS_FILE_EXTENSION)) {
-				try {
-					reader = new FileReader(announcementFile);
-					AnnouncementIF announcement = (AnnouncementIF) xstream.fromXML(reader);
-					announcements.put(announcement.getId(), announcement);
-					reader.close();
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return announcements;
-	}
-	
-	/**
-	 * Insert a new announcement.
-	 * @param ann The new announcement that will be inserted.
-	 * @throws Exception If already exist the announcement in database. 
-	 */
-	void insertAnnouncement(AnnouncementIF ann) throws Exception {
-		if (existsAnnouncementInDatabase(ann.getId())) {
+	@Override
+	protected void throwExistenceElementException(Existence existence) {
+		if (existence == Existence.EXISTENT)
 			throw new IllegalStateException(EXISTENT_ANNOUNCEMENT_MESSAGE);
-		}
-		File directoryStructure = new File(ANNOUNCEMENTS_PARENT_PATH);
-		directoryStructure.mkdirs();
-		FileWriter writer = new FileWriter(new File(ANNOUNCEMENTS_PARENT_PATH + ann.getId() + ANNOUNCEMENTS_FILE_EXTENSION));
-		xstream.toXML(ann, writer);
-		writer.close();
+		else
+			throw new IllegalStateException(UNEXISTENT_ANNOUNCEMENT_MESSAGE);
+		
+	}
+	@Override
+	protected String createFileExtension() {
+		return ANNOUNCEMENTS_FILE_EXTENSION;
 	}
 
-	/**
-	 * Retrieve a specific announcement.
-	 * @param announcementId The announcement's ID that will be retrieved.
-	 * @return The announcement.
-	 * @throws Exception If the announcementId doesn't exist in database.
-	 */
-	AnnouncementIF retrieveAnnouncement(String announcementId) throws Exception {
-		if (!existsAnnouncementInDatabase(announcementId)) {
-			throw new IllegalStateException(UNEXISTENT_ANNOUNCEMENT_MESSAGE);
-		}
-		FileReader reader = new FileReader(new File(ANNOUNCEMENTS_PARENT_PATH + announcementId + ANNOUNCEMENTS_FILE_EXTENSION));
-		AnnouncementIF ann =  (AnnouncementIF) xstream.fromXML(reader);
-		reader.close();
-		return ann;
-	}
+	
 }
