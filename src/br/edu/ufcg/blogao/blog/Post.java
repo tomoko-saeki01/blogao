@@ -19,7 +19,7 @@ import java.util.Map;
 
 import br.edu.ufcg.blogao.blog.data.StaticContent;
 
-public class Post implements WebElement {
+public class Post implements WebElementIF {
 	
 	private final String MOVIES_KEY = "0";
 	private final String PICTURES_KEY = "1";

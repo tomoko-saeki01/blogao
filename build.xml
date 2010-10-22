@@ -42,7 +42,6 @@
 	<!-- creates the executable .jar of the project to the folder dir -->
 
 	<target name="cria_jar" depends="compila">
-		<delete dir="${dist}"/>
 		<mkdir dir="${dist}"/>
 		<echo> Creating the .jar.</echo>
 		<jar jarfile="${dist}/${jar_name}.jar" basedir="${build}">

@@ -18,6 +18,7 @@ import br.edu.ufcg.blogao.blog.AnnouncementIF;
 import br.edu.ufcg.blogao.blog.Blog;
 import br.edu.ufcg.blogao.blog.Comment;
 import br.edu.ufcg.blogao.blog.Post;
+import br.edu.ufcg.blogao.blog.WebElementIF;
 import br.edu.ufcg.blogao.blog.data.InteractiveContent;
 import br.edu.ufcg.blogao.user.UserIF;
 
@@ -30,14 +31,15 @@ public class DatabaseFacade {
 	private final String INVALID_IC_MESSAGE = "Conteœdo inv‡lido";
 	private final String INVALID_ANNOUNCEMENT_MESSAGE = "Anuncio inv‡lido";
 	private static DatabaseFacade selfInstance = null;
-	private BlogsKeeper blogsKeeper = null;
-	private CommentsKeeper commentsKeeper = null;
-	private InteractiveContentsKeeper icKeeper = null;
-	private PostsKeeper postsKeeper = null;
-	private UserIFsKeeper usersKeeper = null;
-	private AnnouncementsKeeper annKeeper = null;	
+	private AbstractKeeper<Blog> blogsKeeper = null;
+	private AbstractKeeper<Comment> commentsKeeper = null;
+	private AbstractKeeper<InteractiveContent> icKeeper = null;
+	private AbstractKeeper<Post> postsKeeper = null;
+	private AbstractKeeper<UserIF> usersKeeper = null;
+	private AbstractKeeper<AnnouncementIF> annKeeper = null;	
 	
-	private DatabaseFacade(){		
+	@SuppressWarnings("unchecked")
+	protected DatabaseFacade(){		
 		blogsKeeper = new BlogsKeeper();
 		postsKeeper = new PostsKeeper();
 		usersKeeper = new UserIFsKeeper();
@@ -61,12 +63,12 @@ public class DatabaseFacade {
 	 * Clean the persistence of datas.
 	 */
 	public void cleanPersistence() {
-		blogsKeeper.deleteAllBlogs();
-		usersKeeper.deleteAllUsers();
-		postsKeeper.deleteAllPosts();
-		commentsKeeper.deleteAllComments();
-		icKeeper.deleteAllInteractiveContents();
-		annKeeper.deleteAllAnnouncements();
+		blogsKeeper.deleteAllElements();
+		usersKeeper.deleteAllElements();
+		postsKeeper.deleteAllElements();
+		commentsKeeper.deleteAllElements();
+		icKeeper.deleteAllElements();
+		annKeeper.deleteAllElements();
 	}
 	
 	/**
@@ -78,7 +80,7 @@ public class DatabaseFacade {
 		if (isInvalidString(announcementId)) {
 			throw new IllegalArgumentException(INVALID_ANNOUNCEMENT_MESSAGE);
 		}
-		annKeeper.deleteAnnouncement(announcementId);
+		annKeeper.deleteElement(announcementId);
 	}
 	
 	/**
@@ -90,7 +92,7 @@ public class DatabaseFacade {
 		if (isInvalidString(blogId)) {
 			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
 		}
-		blogsKeeper.deleteBlog(blogId);
+		blogsKeeper.deleteElement(blogId);
 	}
 	
 	/**
@@ -102,7 +104,7 @@ public class DatabaseFacade {
 		if (isInvalidString(commentId)) {
 			throw new IllegalArgumentException(INVALID_COMMENT_MESSAGE);
 		}
-		commentsKeeper.deleteComment(commentId);
+		commentsKeeper.deleteElement(commentId);
 	}
 	
 	/**
@@ -114,7 +116,7 @@ public class DatabaseFacade {
 		if (isInvalidString(icId)) {
 			throw new IllegalArgumentException(INVALID_IC_MESSAGE);
 		}
-		icKeeper.deleteInteractiveContent(icId);
+		icKeeper.deleteElement(icId);
 	}
 	
 	/**
@@ -126,7 +128,7 @@ public class DatabaseFacade {
 		if (isInvalidString(postId)) {
 			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
 		}
-		postsKeeper.deletePost(postId);
+		postsKeeper.deleteElement(postId);
 	}
 	
 	/**
@@ -138,7 +140,7 @@ public class DatabaseFacade {
 		if (isInvalidString(userId)) {
 			throw new IllegalArgumentException(INVALID_USER_MESSAGE);
 		}
-		usersKeeper.deleteUser(userId);
+		usersKeeper.deleteElement(userId);
 	}
 	
 	/**
@@ -147,7 +149,7 @@ public class DatabaseFacade {
 	 * @return True case the announcement exist or False otherwise.
 	 */
 	public boolean existsAnnouncementInDatabase(String announcementId) {
-		return annKeeper.existsAnnouncementInDatabase(announcementId);
+		return annKeeper.existsElementInDatabase(announcementId);
 	}
 	
 	/**
@@ -156,7 +158,7 @@ public class DatabaseFacade {
 	 * @return True case the blog exist or False otherwise.
 	 */
 	public boolean existsBlogInDatabase(String blogId) {
-		return blogsKeeper.existsBlogInDatabase(blogId);
+		return blogsKeeper.existsElementInDatabase(blogId);
 	}
 	
 	/**
@@ -165,7 +167,7 @@ public class DatabaseFacade {
 	 * @return True case the comment exist or False otherwise.
 	 */
 	public boolean existsCommentInDatabase(String commentId) {
-		return commentsKeeper.existsCommentInDatabase(commentId);
+		return commentsKeeper.existsElementInDatabase(commentId);
 	}
 
 	/**
@@ -174,7 +176,7 @@ public class DatabaseFacade {
 	 * @return True case the IC exist or False otherwise.
 	 */
 	public boolean existsInteractiveContentInDatabase(String icId) {
-		return icKeeper.existsInteractiveContentInDatabase(icId);
+		return icKeeper.existsElementInDatabase(icId);
 	}
 	
 	/**
@@ -183,7 +185,7 @@ public class DatabaseFacade {
 	 * @return True case the post exist or False otherwise.
 	 */
 	public boolean existsPostInDatabase(String postId) {
-		return postsKeeper.existsPostInDatabase(postId);
+		return postsKeeper.existsElementInDatabase(postId);
 	}
 	
 	/**
@@ -192,7 +194,7 @@ public class DatabaseFacade {
 	 * @return True case the user exist or False otherwise.
 	 */
 	public boolean existsUserInDatabase(String userId) {
-		return usersKeeper.existsUserInDatabase(userId);
+		return usersKeeper.existsElementInDatabase(userId);
 	}
 	
 	/**
@@ -200,7 +202,7 @@ public class DatabaseFacade {
 	 * @return All the users existing.
 	 */
 	public Map<String, UserIF> getAllUsers() {
-		return usersKeeper.getAllUsers();
+		return usersKeeper.getAllElements();
 	}
 	
 	/**
@@ -208,7 +210,7 @@ public class DatabaseFacade {
 	 * @return All the blogs existing.
 	 */
 	public Map<String, Blog> getAllBlogs() {
-		return blogsKeeper.getAllBlogs();
+		return blogsKeeper.getAllElements();
 	}
 		
 	/**
@@ -220,7 +222,7 @@ public class DatabaseFacade {
 		if (ann == null) {
 			throw new IllegalArgumentException(INVALID_ANNOUNCEMENT_MESSAGE);
 		}
-		annKeeper.insertAnnouncement(ann);
+		annKeeper.insertElement(ann);
 	}
 	
 	/**
@@ -232,7 +234,7 @@ public class DatabaseFacade {
 		if (blog == null) {
 			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
 		}
-		blogsKeeper.insertBlog(blog);
+		blogsKeeper.insertElement(blog);
 	}
 	
 	/**
@@ -244,7 +246,7 @@ public class DatabaseFacade {
 		if (comment == null) {
 			throw new IllegalArgumentException(INVALID_COMMENT_MESSAGE);
 		}
-		commentsKeeper.insertComment(comment);
+		commentsKeeper.insertElement(comment);
 	}
 	
 	/**
@@ -256,7 +258,7 @@ public class DatabaseFacade {
 		if (content == null) {
 			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
 		}
-		icKeeper.insertInteractiveContent(content);
+		icKeeper.insertElement(content);
 	}
 	
 	/**
@@ -268,7 +270,7 @@ public class DatabaseFacade {
 		if (post == null) {
 			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
 		}
-		postsKeeper.insertPost(post);
+		postsKeeper.insertElement(post);
 	}
 	
 	/**
@@ -280,7 +282,7 @@ public class DatabaseFacade {
 		if (user == null) {
 			throw new IllegalArgumentException(INVALID_USER_MESSAGE);
 		}
-		usersKeeper.insertUser(user);
+		usersKeeper.insertElement(user);
 	}
 	
 	/**
@@ -288,7 +290,7 @@ public class DatabaseFacade {
 	 * @return A list with all the blogs stored in database.
 	 */
 	public List<String> listBlogsInDatabase() {
-		return blogsKeeper.listBlogsInDatabase();
+		return blogsKeeper.listElementsInDatabase();
 	}
 	
 	/**
@@ -296,7 +298,7 @@ public class DatabaseFacade {
 	 * @return A list with all the users stored in database.
 	 */
 	public List<String> listUsersInDatabase() {
-		return usersKeeper.listUsersInDatabase();
+		return usersKeeper.listElementsInDatabase();
 	}
 	
 	/**
@@ -309,7 +311,7 @@ public class DatabaseFacade {
 		if (isInvalidString(announcementId)) {
 			throw new IllegalArgumentException(INVALID_ANNOUNCEMENT_MESSAGE);
 		}
-		return annKeeper.retrieveAnnouncement(announcementId);
+		return annKeeper.retrieveElement(announcementId);
 	}
 	
 	/**
@@ -322,7 +324,7 @@ public class DatabaseFacade {
 		if (isInvalidString(blogId)) {
 			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
 		}
-		return blogsKeeper.retrieveBlog(blogId);
+		return blogsKeeper.retrieveElement(blogId);
 	}
 	
 	/**
@@ -335,7 +337,7 @@ public class DatabaseFacade {
 		if (isInvalidString(commentId)) {
 			throw new IllegalArgumentException(INVALID_COMMENT_MESSAGE);
 		}
-		return commentsKeeper.retrieveComment(commentId);
+		return commentsKeeper.retrieveElement(commentId);
 	}
 	
 	/**
@@ -348,7 +350,7 @@ public class DatabaseFacade {
 		if (isInvalidString(icId)) {
 			throw new IllegalArgumentException(INVALID_IC_MESSAGE);
 		}
-		return icKeeper.retrieveInteractiveContent(icId);
+		return icKeeper.retrieveElement(icId);
 	}
 	
 	/**
@@ -361,7 +363,7 @@ public class DatabaseFacade {
 		if (isInvalidString(postId)) {
 			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
 		}
-		return postsKeeper.retrievePost(postId);
+		return postsKeeper.retrieveElement(postId);
 	}
 	
 	/**
@@ -374,7 +376,7 @@ public class DatabaseFacade {
 		if (isInvalidString(userId)) {
 			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
 		}
-		return usersKeeper.retrieveUser(userId);
+		return usersKeeper.retrieveElement(userId);
 	}
 		
 	/**
@@ -386,7 +388,7 @@ public class DatabaseFacade {
 		if (blog == null) {
 			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
 		}
-		blogsKeeper.updateBlog(blog);
+		blogsKeeper.updateElement(blog);
 	}
 	
 	/**
@@ -398,7 +400,7 @@ public class DatabaseFacade {
 		if (comment == null) {
 			throw new IllegalArgumentException(INVALID_COMMENT_MESSAGE);
 		}
-		commentsKeeper.updateComment(comment);
+		commentsKeeper.updateElement(comment);
 	}
 	
 	/**
@@ -410,7 +412,7 @@ public class DatabaseFacade {
 		if (post == null) {
 			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
 		}
-		postsKeeper.updatePost(post);
+		postsKeeper.updateElement(post);
 	}
 	
 	/**
@@ -422,7 +424,7 @@ public class DatabaseFacade {
 		if (user == null) {
 			throw new IllegalArgumentException(INVALID_USER_MESSAGE);
 		}
-		usersKeeper.updateUser(user);
+		usersKeeper.updateElement(user);
 	}
 		
 	private boolean isInvalidString(String str) {

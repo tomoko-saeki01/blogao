@@ -17,7 +17,7 @@ import java.util.List;
 
 import br.edu.ufcg.blogao.blog.data.StaticContent;
 
-public class Comment implements WebElement {
+public class Comment implements WebElementIF {
 	
 	private String id;
 	private String parentId;

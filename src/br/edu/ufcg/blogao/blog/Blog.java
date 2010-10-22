@@ -18,7 +18,7 @@ import java.util.List;
 import br.edu.ufcg.blogao.blog.data.StaticContent;
 import br.edu.ufcg.blogao.user.Notifiable;
 
-public class Blog implements WebElement {
+public class Blog implements WebElementIF {
 	private StaticContent title;
 	private String id;
 	private String parentId;
