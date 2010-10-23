@@ -18,7 +18,6 @@ import br.edu.ufcg.blogao.blog.AnnouncementIF;
 import br.edu.ufcg.blogao.blog.Blog;
 import br.edu.ufcg.blogao.blog.Comment;
 import br.edu.ufcg.blogao.blog.Post;
-import br.edu.ufcg.blogao.blog.WebElementIF;
 import br.edu.ufcg.blogao.blog.data.InteractiveContent;
 import br.edu.ufcg.blogao.user.UserIF;
 
@@ -38,7 +37,6 @@ public class DatabaseFacade {
 	private AbstractKeeper<UserIF> usersKeeper = null;
 	private AbstractKeeper<AnnouncementIF> annKeeper = null;	
 	
-	@SuppressWarnings("unchecked")
 	protected DatabaseFacade(){		
 		blogsKeeper = new BlogsKeeper();
 		postsKeeper = new PostsKeeper();
