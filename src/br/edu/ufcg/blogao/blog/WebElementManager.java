@@ -28,16 +28,16 @@ public class WebElementManager {
 	
 	private static WebElementManager selfInstance = null;
 	
-	private final String INVALID_BLOG_MESSAGE = "Blog inv‡lido";
-	private final String INVALID_AUTHOR_MESSAGE = "Autor inv‡lido";
-	private final String INVALID_TITLE_BLOG_MESSAGE = "Você deve especificar um t’tulo para o blog";
-	private final String INVALID_COMMENT_MESSAGE = "Coment‡rio inv‡lido";
-	private final String INVALID_POST_MESSAGE = "Post inv‡lido";
-	private final String INVALID_TITLE_POST_MESSAGE = "T’tulo obrigat—rio";
-	private final String INVALID_INTERACTIVE_CONTENT_MESSAGE = "Id do conteœdo Ž inv‡lido";
-	private final String INVALID_ATTRIBUTE_MESSAGE = "Atributo inv‡lido";
-	private final String INVALID_DATA_MESSAGE = "Dado inv‡lido";
-	private final String INVALID_INDEX_MESSAGE = "êndice incorreto";
+	private final String INVALID_BLOG_MESSAGE = "Blog invï¿½lido";
+	private final String INVALID_AUTHOR_MESSAGE = "Autor invï¿½lido";
+	private final String INVALID_TITLE_BLOG_MESSAGE = "Vocï¿½ deve especificar um tï¿½tulo para o blog";
+	private final String INVALID_COMMENT_MESSAGE = "Comentï¿½rio invï¿½lido";
+	private final String INVALID_POST_MESSAGE = "Post invï¿½lido";
+	private final String INVALID_TITLE_POST_MESSAGE = "Tï¿½tulo obrigatï¿½rio";
+	private final String INVALID_INTERACTIVE_CONTENT_MESSAGE = "Id do conteï¿½do ï¿½ invï¿½lido";
+	private final String INVALID_ATTRIBUTE_MESSAGE = "Atributo invï¿½lido";
+	private final String INVALID_DATA_MESSAGE = "Dado invï¿½lido";
+	private final String INVALID_INDEX_MESSAGE = "ï¿½ndice incorreto";
 	private final String INVALID_ANNOUNCEMENT_MESSAGE = "Notificacao invalida";
 	
 	private final String CREATION_DATE = "data_criacao";
@@ -550,7 +550,7 @@ public class WebElementManager {
 		}
 		return numberOfPosts;
 	}
-	
+		
 	/**
 	 * Calculates the number of subBlogs in hierarchy tree of this blog.
 	 * @param blogId Id of parent Blog.
