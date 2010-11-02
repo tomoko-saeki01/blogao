@@ -19,8 +19,8 @@ public class CommentsKeeper extends AbstractKeeper<Comment>{
 	
 	private final String COMMENTS_PARENT_PATH = "resources" + SEP + "db" + SEP + "comments" + SEP;
 	private final String COMMENTS_FILE_EXTENSION = ".comment";
-	private final String EXISTENT_COMMENT_MESSAGE = "Coment‡rio existente no banco de dados";
-	private final String UNEXISTENT_COMMENT_MESSAGE = "Coment‡rio inexistente no banco de dados";
+	private final String EXISTENT_COMMENT_MESSAGE = "Comentï¿½rio existente no banco de dados";
+	private final String UNEXISTENT_COMMENT_MESSAGE = "Comentï¿½rio inexistente no banco de dados";
 	
 	@Override
 	protected File createFileReference(String fileName) {
@@ -42,6 +42,4 @@ public class CommentsKeeper extends AbstractKeeper<Comment>{
 	protected String createFileExtension() {
 		return COMMENTS_FILE_EXTENSION;
 	}
-	
-	
 }

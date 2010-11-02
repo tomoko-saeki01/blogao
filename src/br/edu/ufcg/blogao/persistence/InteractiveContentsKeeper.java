@@ -19,8 +19,8 @@ public class InteractiveContentsKeeper extends AbstractKeeper<InteractiveContent
 	
 	private final String INTERACTIVE_CONTENT_PARENT_PATH = "resources" + SEP + "db" + SEP + "ic" + SEP;
 	private final String INTERACTIVE_CONTENT_FILE_EXTENSION = ".icontent";
-	private final String EXISTENT_INTERACTIVE_CONTENT_MESSAGE = "Conteœdo existente no banco de dados";
-	private final String UNEXISTENT_INTERACTIVE_CONTENT_MESSAGE = "Conteœdo inexistente no banco de dados";
+	private final String EXISTENT_INTERACTIVE_CONTENT_MESSAGE = "Conteï¿½do existente no banco de dados";
+	private final String UNEXISTENT_INTERACTIVE_CONTENT_MESSAGE = "Conteï¿½do inexistente no banco de dados";
 	
 	@Override
 	protected File createFileReference(String fileName) {
@@ -42,6 +42,4 @@ public class InteractiveContentsKeeper extends AbstractKeeper<InteractiveContent
 	protected String createFileExtension() {
 		return INTERACTIVE_CONTENT_FILE_EXTENSION;
 	}
-
-	
 }

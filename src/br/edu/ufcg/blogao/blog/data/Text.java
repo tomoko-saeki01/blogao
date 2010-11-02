@@ -23,7 +23,6 @@ public class Text implements StaticContent {
 		this.setText(text);
 	}
 
-
 	@Override
 	public String getText() {
 		return text;
