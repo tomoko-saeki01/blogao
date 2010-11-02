@@ -35,12 +35,11 @@ public class PostsKeeper extends AbstractKeeper<Post>{
 		if (existence == Existence.EXISTENT)
 			throw new IllegalStateException(EXISTENT_POST_MESSAGE);
 		else
-			throw new IllegalStateException(UNEXISTENT_POST_MESSAGE);
-		
+			throw new IllegalStateException(UNEXISTENT_POST_MESSAGE);		
 	}
+	
 	@Override
 	protected String createFileExtension() {
 		return POSTS_FILE_EXTENSION;
 	}
-
 }

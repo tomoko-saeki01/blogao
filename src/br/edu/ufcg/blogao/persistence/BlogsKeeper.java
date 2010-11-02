@@ -42,5 +42,4 @@ public class BlogsKeeper extends AbstractKeeper<Blog>{
 	protected String createFileExtension() {
 		return BLOGS_FILE_EXTENSION;
 	}
-	
 }

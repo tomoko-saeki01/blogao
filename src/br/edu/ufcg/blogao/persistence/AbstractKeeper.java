@@ -54,8 +54,7 @@ public abstract class AbstractKeeper<T extends Identifiable> {
 				try {
 					reader = new FileReader(elementFile);
 					@SuppressWarnings("unchecked")
-					T element = (T)xstream
-							.fromXML(reader);
+					T element = (T) xstream.fromXML(reader);
 					elements.put(element.getId(), element);
 					reader.close();
 				} catch (FileNotFoundException e) {
@@ -97,20 +96,21 @@ public abstract class AbstractKeeper<T extends Identifiable> {
 		List<String> elementsIds = new ArrayList<String>();
 		for (File elementFile : elementsFiles) {
 			String elementFileName = elementFile.getName();
-			elementsIds.add(elementFileName.substring(0,
-					elementFileName.length() - createFileExtension().length()));
+			elementsIds.add(elementFileName.substring(0, elementFileName
+					.length()
+					- createFileExtension().length()));
 		}
 		return elementsIds;
 	}
-	
+
 	void updateElement(T element) throws Exception {
-        if (!existsElementInDatabase(element.getId())) {
-                throwExistenceElementException(Existence.UNEXISTENT);
-        }
-        FileWriter writer = new FileWriter(createFileReference(element.getId()));
-        xstream.toXML(element, writer);
-        writer.close();
-}       
+		if (!existsElementInDatabase(element.getId())) {
+			throwExistenceElementException(Existence.UNEXISTENT);
+		}
+		FileWriter writer = new FileWriter(createFileReference(element.getId()));
+		xstream.toXML(element, writer);
+		writer.close();
+	}
 
 	protected abstract File createFileReference(String fileName);
 
@@ -119,5 +119,4 @@ public abstract class AbstractKeeper<T extends Identifiable> {
 	protected abstract void throwExistenceElementException(Existence existence);
 
 	protected abstract String createFileExtension();
-
 }

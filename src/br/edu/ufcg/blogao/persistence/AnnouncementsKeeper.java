@@ -19,8 +19,8 @@ public class AnnouncementsKeeper extends AbstractKeeper<AnnouncementIF>{
 
 	private final String ANNOUNCEMENTS_PARENT_PATH = "resources" + SEP + "db" + SEP + "announcements" + SEP;
 	private final String ANNOUNCEMENTS_FILE_EXTENSION = ".ann";
-	private final String EXISTENT_ANNOUNCEMENT_MESSAGE = "Notificação existente";
-	private final String UNEXISTENT_ANNOUNCEMENT_MESSAGE = "Notificação inexistente";
+	private final String EXISTENT_ANNOUNCEMENT_MESSAGE = "Notificaï¿½ï¿½o existente";
+	private final String UNEXISTENT_ANNOUNCEMENT_MESSAGE = "Notificaï¿½ï¿½o inexistente";
 	
 	@Override
 	protected File createFileReference(String fileName) {
@@ -42,6 +42,4 @@ public class AnnouncementsKeeper extends AbstractKeeper<AnnouncementIF>{
 	protected String createFileExtension() {
 		return ANNOUNCEMENTS_FILE_EXTENSION;
 	}
-
-	
 }
