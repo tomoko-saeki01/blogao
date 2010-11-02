@@ -18,7 +18,7 @@ public class Picture implements InteractiveContent {
 	private String data;
 	
 	/**
-	 * Default contructor.
+	 * Default constructor.
 	 * @param id The picture's ID.
 	 * @param parentId The parent's ID.
 	 * @param description The picture's description.
