@@ -28,17 +28,17 @@ public class WebElementManager {
 	
 	private static WebElementManager selfInstance = null;
 	
-	private final String INVALID_BLOG_MESSAGE = "Blog invï¿½lido";
-	private final String INVALID_AUTHOR_MESSAGE = "Autor invï¿½lido";
-	private final String INVALID_TITLE_BLOG_MESSAGE = "Vocï¿½ deve especificar um tï¿½tulo para o blog";
-	private final String INVALID_COMMENT_MESSAGE = "Comentï¿½rio invï¿½lido";
-	private final String INVALID_POST_MESSAGE = "Post invï¿½lido";
-	private final String INVALID_TITLE_POST_MESSAGE = "Tï¿½tulo obrigatï¿½rio";
-	private final String INVALID_INTERACTIVE_CONTENT_MESSAGE = "Id do conteï¿½do ï¿½ invï¿½lido";
-	private final String INVALID_ATTRIBUTE_MESSAGE = "Atributo invï¿½lido";
-	private final String INVALID_DATA_MESSAGE = "Dado invï¿½lido";
-	private final String INVALID_INDEX_MESSAGE = "ï¿½ndice incorreto";
-	private final String INVALID_ANNOUNCEMENT_MESSAGE = "Notificacao invalida";
+	private final String INVALID_BLOG_MESSAGE = "Blog inválido";
+	private final String INVALID_AUTHOR_MESSAGE = "Autor inválido";
+	private final String INVALID_TITLE_BLOG_MESSAGE = "Você deve especificar um título para o blog";
+	private final String INVALID_COMMENT_MESSAGE = "Comentário inválido";
+	private final String INVALID_POST_MESSAGE = "Post inválido";
+	private final String INVALID_TITLE_POST_MESSAGE = "Título obrigatório";
+	private final String INVALID_INTERACTIVE_CONTENT_MESSAGE = "Id do conteúdo é inválido";
+	private final String INVALID_ATTRIBUTE_MESSAGE = "Atributo inválido";
+	private final String INVALID_DATA_MESSAGE = "Dado inválido";
+	private final String INVALID_INDEX_MESSAGE = "Índice incorreto";
+	private final String INVALID_ANNOUNCEMENT_MESSAGE = "Notificação inválida";
 	
 	private final String CREATION_DATE = "data_criacao";
 	private final String TEXT = "texto";

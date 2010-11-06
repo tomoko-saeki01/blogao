@@ -43,7 +43,7 @@ public class Finder {
 				Blog blog = dbFacade.retrieveBlog(blogId);
 				String searchedName = blog.getTitle().getText();
 				if (searchedName.toLowerCase().contains(match.toLowerCase())) {
-					result = insertBlogSortingByCreationDate(result.iterator(), blog);
+					result = insertBlogSortingByCreationDate(result, blog);
 				}
 			}
 		} catch (Exception e) {
@@ -137,46 +137,23 @@ public class Finder {
 		}
 		return idList;
 	}
-	/*private List<String> convertBlogListToIdList(List<Blog> blogList) {
-		List<String> idList = new ArrayList<String>();
-		for (Blog blog : blogList) {
-			idList.add(blog.getId());
-		}
-		return idList;
-	} */
 		
 	/**
 	 * Insert a blog, in a list, in order according to the creation date.
-	 * @param blogs The list where the new blog will be inserted.
+	 * @param blogsList The list where the new blog will be inserted.
 	 * @param newBlog The blog that will be inserted.
 	 * @return The list sorted.
 	 */
-	private List<Blog> insertBlogSortingByCreationDate(Iterator<Blog> blogs, Blog newBlog) {
-		List<Blog> blogsList = new ArrayList<Blog>();		
-		while (blogs.hasNext()) {
-			blogsList.add(blogs.next());
-		}	
-		
-		int i = 0;
-		while (blogs.hasNext()) {
-			i++;
-			if (blogs.next().getCreationDate().after(newBlog.getCreationDate())) {
+	private List<Blog> insertBlogSortingByCreationDate(List<Blog> blogsList, Blog newBlog) {
+		int i;
+		for (i = 0; i < blogsList.size(); i++) {
+			if (blogsList.get(i).getCreationDate().after(newBlog.getCreationDate())) {
 				break;
 			}
 		}
 		blogsList.add(i, newBlog);
 		return blogsList;
 	}
-	/*private List<Blog> insertBlogSortingByCreationDate(List<Blog> blogs, Blog newBlog) {
-		int i;
-		for (i = 0; i < blogs.size(); i++) {
-			if (blogs.get(i).getCreationDate().after(newBlog.getCreationDate())) {
-				break;
-			}
-		}
-		blogs.add(i, newBlog);
-		return blogs;
-	} */
 	
 	/**
 	 * Verify if the string is invalid.

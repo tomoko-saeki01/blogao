@@ -30,6 +30,6 @@ public class BlogaoTest {
 		EasyAcceptFacade eaFacade = new EasyAcceptFacade(testFacade, acceptanceTests);
 		eaFacade.executeTests();
 		System.out.println(eaFacade.getCompleteResults());
-		System.out.println((eaFacade.getTotalNumberOfPassedTests() / eaFacade.getTotalNumberOfTests()) * 100 + "% dos testes passando");
+		System.out.println((eaFacade.getTotalNumberOfPassedTests() / Float.valueOf(eaFacade.getTotalNumberOfTests())) * 100.0 + "% dos testes passando");
 	}
 }

@@ -21,7 +21,7 @@ import br.edu.ufcg.blogao.user.UsersHandler;
 
 public class BlogWSImpl implements BlogWS {
 
-	private final String INVALID_SESSION_MESSAGE = "Sess‹o inv‡lida";
+	private final String INVALID_SESSION_MESSAGE = "Sessão inválida";
 
 	private UsersHandler usersHandler = UsersHandler.getInstance();
 	private SessionManager sessionManager = SessionManager.getInstance();

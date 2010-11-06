@@ -1,34 +1,34 @@
 #########################################################################################################
-#User Story-- Gerenciamento de sessão
+#User Story-- Gerenciamento de sess„o
 #
-#O objetivo desse user story é implementar controle de sessão dos usuário no sistema. Caberá a sua API gerar um 'id' de sessão quando um #usuário se logar no sistema e gerenciar requisições a partir desse id. Da mesma forma, os clientes devem se utilizar desse id para efetuar #alguns tipos de requisições  (ex.: alterar informações do perfil do usuário)   
+#O objetivo desse user story È implementar controle de sess„o dos usu·rio no sistema. Caber· a sua API gerar um 'id' de sess„o quando um #usu·rio se logar no sistema e gerenciar requisiÁıes a partir desse id. Da mesma forma, os clientes devem se utilizar desse id para efetuar #alguns tipos de requisiÁıes  (ex.: alterar informaÁıes do perfil do usu·rio)   
 #
-#Restrições:
-#    -O usuário não pode se logar duas vezes ao mesmo tempo no sistema
+#RestriÁıes:
+#    -O usu·rio n„o pode se logar duas vezes ao mesmo tempo no sistema
 ###########################################################################################################
 
 
 #Carrega os dados existentes
 loadData
 
-#Validação: login ou senha inválidos
-expectError "Login ou senha inválido" logon login=mariasilva senha=12345
-expectError "Login ou senha inválido" logon login=josefa senha=qwe2
+#ValidaÁ„o: login ou senha inv·lidos
+expectError "Login ou senha inv·lido" logon login=mariasilva senha=12345
+expectError "Login ou senha inv·lido" logon login=josefa senha=qwe2
 
 expect false isUserLogged login=mariasilva
-expectError "Usuário inexistente" isUserLogged login=josefa
+expectError "Usu·rio inexistente" isUserLogged login=josefa
 
 idSession1=logon login=mariasilva senha=qwe2
 idSession2=logon login=sicrano senha=senhona
 
-#Verifica se os dois valores de sessões são diferentes
+#Verifica se os dois valores de sessıes s„o diferentes
 expectDifferent ${idSession1} echo ${idSession2}
 
 expect true isUserLogged login=mariasilva
-expectError "Usuário já logado" logon login=mariasilva senha=qwe2
+expectError "Usu·rio j· logado" logon login=mariasilva senha=qwe2
 
 
-#Recuperar informações de um perfil a partir de um id de sessão
+#Recuperar informaÁıes de um perfil a partir de um id de sess„o
 expect mariasilva getProfileInformationBySessionId idSession=${idSession1} atributo=login
 expect "Maria Silva" getProfileInformationBySessionId idSession=${idSession1} atributo=nome_exibicao
 expect maria@gmail.com getProfileInformationBySessionId idSession=${idSession1} atributo=email
@@ -43,12 +43,12 @@ expect "poeira em alto mar" getProfileInformationBySessionId idSession=${idSessi
 
 
 
-# Efetua o logoff a partir de um id de sessão
+# Efetua o logoff a partir de um id de sess„o
 logoff idSession=${idSession1}
 logoff idSession=${idSession2}
 
-#Validação: O id de sessão perde sua validade após o deslogamento
-expectError "Sessão inválida" logoff idSession=${idSession2}
+#ValidaÁ„o: O id de sess„o perde sua validade apÛs o deslogamento
+expectError "Sess„o inv·lida" logoff idSession=${idSession2}
 
 expect false isUserLogged login=sicrano
 

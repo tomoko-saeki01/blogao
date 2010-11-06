@@ -25,17 +25,17 @@ public class UsersHandler {
 	
 	private static UsersHandler selfInstance = null;
 	
-	private final String INVALID_LOGIN_MESSAGE ="Login inv‡lido";
-	private final String INVALID_PASSWORD_MESSAGE = "Senha inv‡lida";
-	private final String INVALID_EMAIL_MESSAGE = "Email inv‡lido";
-	private final String INVALID_SEX_MESSAGE = "Sexo inv‡lido";
-	private final String INVALID_DATE_MESSAGE = "Data inv‡lida";
-	private final String INVALID_ATTRIBUTE_MESSAGE = "Atributo Inv‡lido";
-	private final String INVALID_INDEX_MESSAGE = "êndice inv‡lido";
+	private final String INVALID_LOGIN_MESSAGE ="Login inválido";
+	private final String INVALID_PASSWORD_MESSAGE = "Senha inválida";
+	private final String INVALID_EMAIL_MESSAGE = "Email inválido";
+	private final String INVALID_SEX_MESSAGE = "Sexo inválido";
+	private final String INVALID_DATE_MESSAGE = "Data inválida";
+	private final String INVALID_ATTRIBUTE_MESSAGE = "Atributo Inválido";
+	private final String INVALID_INDEX_MESSAGE = "Índice inválido";
 	
 	private final String EXISTENT_LOGIN_MESSAGE = "Login existente";
 	private final String EXISTENT_EMAIL_MESSAGE = "Email existente";
-	private final String UNEXISTENT_USER_MESSAGE = "Usu‡rio inexistente";
+	private final String UNEXISTENT_USER_MESSAGE = "Usuário inexistente";
 	
 	private final Map<String, Sex> ACCEPTABLE_SEXES = getAcceptableSexes();
 	private final String ACCEPTABLE_DATE_REGEX = "\\d\\d/\\d\\d/\\d\\d\\d\\d";
@@ -53,6 +53,10 @@ public class UsersHandler {
 	private final String MOVIES = "filmes";
 	private final String MUSICS = "musicas";
 	private final String BOOKS = "livros";
+	
+	private final String MALE = "Masculino";
+	private final String FEMALE = "Feminino";
+	private final String UNINFORMED = "Não informado";
 	
 	private UsersHandler(){
 	}
@@ -469,9 +473,9 @@ public class UsersHandler {
 	 */
 	private Map<String, Sex> getAcceptableSexes() {
 		Map<String, Sex> acceptableSexes = new HashMap<String, Sex>();
-		acceptableSexes.put("Masculino", Sex.Male);
-		acceptableSexes.put("Feminino", Sex.Female);
-		acceptableSexes.put("N‹o informado", Sex.Uninformed);
+		acceptableSexes.put(MALE, Sex.Male);
+		acceptableSexes.put(FEMALE, Sex.Female);
+		acceptableSexes.put(UNINFORMED, Sex.Uninformed);
 		return acceptableSexes;
 	}
 	

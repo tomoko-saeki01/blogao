@@ -22,11 +22,11 @@ public class SessionManager {
 	private static SessionManager selfInstance = null;
 	private Map<String, SessionIF> actualSessions = null;
 	
-	private final String INVALID_LOGIN_OR_PASSWORD_MESSAGE = "Login ou senha inv‡lido";
-	private final String INVALID_LOGIN_MESSAGE = "Login inv‡lido";
-	private final String INVALID_SESSIONID_MESSAGE = "Sess‹o inv‡lida";
-	private final String UNEXISTENT_USER_MESSAGE = "Usu‡rio inexistente";
-	private final String LOGGED_USER_MESSAGE = "Usu‡rio j‡ logado";
+	private final String INVALID_LOGIN_OR_PASSWORD_MESSAGE = "Login ou senha inválido";
+	private final String INVALID_LOGIN_MESSAGE = "Login inválido";
+	private final String INVALID_SESSIONID_MESSAGE = "Sessão inválida";
+	private final String UNEXISTENT_USER_MESSAGE = "Usuário inexistente";
+	private final String LOGGED_USER_MESSAGE = "Usuário já logado";
 	
 	private SessionManager() {
 		actualSessions = new HashMap<String, SessionIF>();

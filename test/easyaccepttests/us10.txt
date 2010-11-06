@@ -1,15 +1,15 @@
 ###############################################################################
 #User Story-- Deletar blog
-#Permite a deleção de de um blog. Todos os posts e comentários pertencentes aquele blog serão deletados
-#Restrições
-#    -O usuário deve estar logado no sistema (Fornecimento de um id de sessão válido)
+#Permite a deleÁ„o de de um blog. Todos os posts e coment·rios pertencentes aquele blog ser„o deletados
+#RestriÁıes
+#    -O usu·rio deve estar logado no sistema (Fornecimento de um id de sess„o v·lido)
 ################################################################################
 
 #Carrega dados persistidos anteriormente
 loadData
 
 
-#Efetua login dos usuários
+#Efetua login dos usu·rios
 sessionId1=logon login=sicrano senha=senhona
 
 blogId1=getBlogByLogin login=sicrano index=0
@@ -18,10 +18,10 @@ postId1=createPost sessionId=${sessionId1} blogId=${blogId1} titulo="Meu primeir
 postId2=createPost sessionId=${sessionId1} blogId=${blogId1} titulo="Meu segundo post" texto=
 
 deleteBlog sessionId=${sessionId1} blodId=${blogId1}
-expectError "Blog inválido" deleteBlog sessionId=${sessionId1} blodId=${blogId1}
+expectError "Blog inv·lido" deleteBlog sessionId=${sessionId1} blodId=${blogId1}
 
-#Validação: os posts devem ser deletados
-expectError "Post inválido" getPostInformation id=${postId1} atributo=titulo
+#ValidaÁ„o: os posts devem ser deletados
+expectError "Post inv·lido" getPostInformation id=${postId1} atributo=titulo
 
 #Desloga usuarios
 logoff sessionId=${sessionId1}
