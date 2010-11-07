@@ -32,7 +32,7 @@ public interface BlogWS {
 	
 	/**
 	 * Add a announcement to the blog.
-	 * @param sessionId The session's 
+	 * @param sessionId The session's id.
 	 * @param blogId The blog's ID.
 	 * @throws Exception
 	 */

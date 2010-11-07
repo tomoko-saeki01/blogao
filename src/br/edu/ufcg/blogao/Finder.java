@@ -65,7 +65,7 @@ public class Finder {
 		try {
 			List<String> usersId = dbFacade.listUsersInDatabase();
 			if (match.equals(UNINFORMED_SEX)) {
-				return sortList(usersId.iterator()).toString().replaceAll(INCORRECT_FORMAT, CORRECT_FORMAT);
+				return sortList(usersId).toString().replaceAll(INCORRECT_FORMAT, CORRECT_FORMAT);
 			}
 			for (String userId : usersId) {
 				UserIF user = dbFacade.retrieveUser(userId);
@@ -75,7 +75,7 @@ public class Finder {
 				}
 			}
 		} catch (Exception e) {}
-		return sortList(result.iterator()).toString().replaceAll(INCORRECT_FORMAT, CORRECT_FORMAT);
+		return sortList(result).toString().replaceAll(INCORRECT_FORMAT, CORRECT_FORMAT);
 	}
 	
 	/**
@@ -97,7 +97,7 @@ public class Finder {
 				}
 			}
 		} catch (Exception e) {}
-		return sortList(result.iterator()).toString().replaceAll(INCORRECT_FORMAT, CORRECT_FORMAT);
+		return sortList(result).toString().replaceAll(INCORRECT_FORMAT, CORRECT_FORMAT);
 	}
 
 	/**
@@ -122,7 +122,7 @@ public class Finder {
 				}
 			}
 		} catch (Exception e) {}
-		return sortList(result.iterator()).toString().replaceAll(INCORRECT_FORMAT, CORRECT_FORMAT);
+		return sortList(result).toString().replaceAll(INCORRECT_FORMAT, CORRECT_FORMAT);
 	}
 	
 	/**
@@ -168,22 +168,8 @@ public class Finder {
 	 * Sort a list.
 	 * @param list The list that will be sorted.
 	 * @return A sorted list.
-	 */
-	private List<String> sortList(Iterator<String> list) {
-		List<String> newList = new ArrayList<String>();		
-		while (list.hasNext()) {
-			newList.add(list.next());
-		}	
-		String[] array = newList.toArray(new String[0]);
-		
-		Arrays.sort(array);
-		newList.clear();
-		for (String str : array) {
-			newList.add(str);
-		}
-		return newList;
-	}
-	/*private List<String> sortList(List<String> list) {
+	 */;
+	private List<String> sortList(List<String> list) {
 		String[] array = list.toArray(new String[0]);
 		Arrays.sort(array);
 		list.clear();
@@ -191,5 +177,5 @@ public class Finder {
 			list.add(str);
 		}
 		return list;
-	}*/
+	}
 }

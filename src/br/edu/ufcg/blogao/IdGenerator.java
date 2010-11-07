@@ -1,7 +1,7 @@
 package br.edu.ufcg.blogao;
 
 /**
- * Generate a unique ID.
+ * Generate an unique ID.
  *  
  * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
  * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>

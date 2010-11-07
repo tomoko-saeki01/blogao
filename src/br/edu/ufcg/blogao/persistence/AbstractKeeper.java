@@ -89,7 +89,7 @@ public abstract class AbstractKeeper<T extends Identifiable> {
 		return element;
 	}
 
-	public List<String> listElementsInDatabase() {
+	List<String> listElementsInDatabase() {
 		File elementsDirectory = createDirectoryReference();
 		elementsDirectory.mkdirs();
 		File[] elementsFiles = elementsDirectory.listFiles();
