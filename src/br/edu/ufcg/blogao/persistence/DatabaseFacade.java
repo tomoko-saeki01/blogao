@@ -23,13 +23,15 @@ import br.edu.ufcg.blogao.user.UserIF;
 
 public class DatabaseFacade {
 	
-	private final String INVALID_BLOG_MESSAGE = "Blog inv‡lido";
-	private final String INVALID_COMMENT_MESSAGE = "Coment‡rio inv‡lido";
-	private final String INVALID_USER_MESSAGE = "Usu‡rio inv‡lido";
-	private final String INVALID_POST_MESSAGE = "Post inv‡lido";
-	private final String INVALID_IC_MESSAGE = "Conteœdo inv‡lido";
-	private final String INVALID_ANNOUNCEMENT_MESSAGE = "Anuncio inv‡lido";
+	private final String INVALID_BLOG_MESSAGE = "Blog inválido";
+	private final String INVALID_COMMENT_MESSAGE = "Comentário inválido";
+	private final String INVALID_USER_MESSAGE = "Usuário inválido";
+	private final String INVALID_POST_MESSAGE = "Post inválido";
+	private final String INVALID_IC_MESSAGE = "Conteúdo inválido";
+	private final String INVALID_ANNOUNCEMENT_MESSAGE = "Anúncio inválido";
+	
 	private static DatabaseFacade selfInstance = null;
+	
 	private AbstractKeeper<Blog> blogsKeeper = null;
 	private AbstractKeeper<Comment> commentsKeeper = null;
 	private AbstractKeeper<InteractiveContent> icKeeper = null;

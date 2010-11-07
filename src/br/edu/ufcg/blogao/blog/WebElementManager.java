@@ -64,7 +64,7 @@ public class WebElementManager {
 	 * Return the instance of the WebElementManager.
 	 * @return The instance of the WebElementManager.
 	 */
-	public static WebElementManager getInstance() {
+	public static synchronized WebElementManager getInstance() {
 		if (selfInstance == null) {
 			selfInstance = new WebElementManager();
 		}
@@ -341,13 +341,6 @@ public class WebElementManager {
 	 */
 	public void deleteAnnouncement(String userId, String announcementId) throws Exception {
 		UserIF usr = DatabaseFacade.getInstance().retrieveUser(userId);
-		//AnnouncementIF ann = DatabaseFacade.getInstance().retrieveAnnouncement(announcementId);
-		//Post post = DatabaseFacade.getInstance().retrievePost(ann.getTargetId());
-		//Blog blog = DatabaseFacade.getInstance().retrieveBlog(post.getParentId());
-		//blog.removeNotifiable(usr)
-		//Ainda nao entendi direito como deve funcionar o delete Announcement
-		//Deve apenas remover o anuncio (funcionalidade atual) ou deve
-		//remover o usuario da lista de notificadores do blog (funcionalidade se remover os comments)?
 		usr.getAnnouncements().remove(announcementId);
 		DatabaseFacade.getInstance().deleteAnnouncement(announcementId);
 		DatabaseFacade.getInstance().updateUser(usr);

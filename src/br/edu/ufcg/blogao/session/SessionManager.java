@@ -36,7 +36,7 @@ public class SessionManager {
 	 * Return the instance of session manager.
 	 * @return The instance of session manager.
 	 */
-	public static SessionManager getInstance() {
+	public static synchronized SessionManager getInstance() {
 		if (selfInstance == null) {
 			selfInstance = new SessionManager();
 		}

@@ -1,8 +1,0 @@
-Modificação 1:
-		Na classe Finder (package: br.edu.ufcg.blogao) haviam métodos 
-	cujos parâmetros era do tipo List<X>. 
-		Visando poder reutilizar esses métodos com outras coleções,
-	cujas caracteristicas assemelham-se à List, refatoramos o código e
-	passamos a adotar a estrutura Iterator<X>.
-		
-Modificação 2:
