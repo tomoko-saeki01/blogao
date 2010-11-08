@@ -1,5 +1,8 @@
 package br.edu.ufcg.blogao.webservice;
 
+import javax.jws.WebMethod;
+import javax.jws.WebParam;
+
 /**
  * Web Service interface for Blogao application.
  * 
@@ -8,12 +11,8 @@ package br.edu.ufcg.blogao.webservice;
  * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
  * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
  * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
- * @version 0.1
+ * @version 0.2
  */
-
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-
 public interface BlogWS {
 	
 	/**

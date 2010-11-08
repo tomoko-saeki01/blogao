@@ -1,16 +1,5 @@
 package br.edu.ufcg.blogao.user;
 
-/**
- * Handles with users.
- * 
- * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
- * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
- * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
- * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
- * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
- * @version 0.1
- */
-
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -21,6 +10,16 @@ import br.edu.ufcg.blogao.Encryptor;
 import br.edu.ufcg.blogao.blog.WebElementManager;
 import br.edu.ufcg.blogao.persistence.DatabaseFacade;
 
+/**
+ * Handles with users. Saving, retrirving informations, add blogs, updating.
+ * 
+ * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
+ * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
+ * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
+ * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
+ * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
+ * @version 0.2
+ */
 public class UsersHandler {
 	
 	private static UsersHandler selfInstance = null;

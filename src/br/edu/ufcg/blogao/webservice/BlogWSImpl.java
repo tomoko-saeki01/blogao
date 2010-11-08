@@ -1,16 +1,5 @@
 package br.edu.ufcg.blogao.webservice;
 
-/**
- * Web Service facade for Blogao application.
- * 
- * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
- * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
- * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
- * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
- * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
- * @version 0.1
- */
-
 import java.util.Calendar;
 
 import br.edu.ufcg.blogao.Finder;
@@ -19,6 +8,16 @@ import br.edu.ufcg.blogao.persistence.DatabaseFacade;
 import br.edu.ufcg.blogao.session.SessionManager;
 import br.edu.ufcg.blogao.user.UsersHandler;
 
+/**
+ * Web Service facade for Blogao application.
+ * 
+ * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
+ * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
+ * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
+ * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
+ * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
+ * @version 0.2
+ */
 public class BlogWSImpl implements BlogWS {
 
 	private final String INVALID_SESSION_MESSAGE = "Sessão inválida";

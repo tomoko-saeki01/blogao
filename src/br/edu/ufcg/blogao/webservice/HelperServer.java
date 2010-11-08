@@ -1,20 +1,19 @@
 package br.edu.ufcg.blogao.webservice;
 
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+
 /**
- * 
+ * Helper class for start apache cxf web service.
  * 
  * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
  * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
  * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
  * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
  * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
- * @version 0.1
+ * @version 0.2
  */
-
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
-
 public class HelperServer {
 	
 	/**

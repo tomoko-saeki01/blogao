@@ -1,8 +1,12 @@
 package br.edu.ufcg.blogao.blog;
 
+import java.util.Calendar;
+
+import br.edu.ufcg.blogao.Identifiable;
+import br.edu.ufcg.blogao.blog.data.StaticContent;
+
 /**
- * Manages the elements (Post, Comment, User, Blog, Interactive Contents, etc)
- * that act as objects on the web.
+ * Interface for Web elements like Blog, Post, Comment.
  * 
  * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
  * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
@@ -11,12 +15,6 @@ package br.edu.ufcg.blogao.blog;
  * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
  * @version 0.2
  */
-
-import java.util.Calendar;
-
-import br.edu.ufcg.blogao.Identifiable;
-import br.edu.ufcg.blogao.blog.data.StaticContent;
-
 public interface WebElementIF extends Identifiable {
 	
 	/**

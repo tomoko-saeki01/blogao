@@ -1,16 +1,5 @@
 package br.edu.ufcg.blogao;
 
-/**   
- * Find users and blog on Blogao.
- * 
- * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
- * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
- * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
- * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
- * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
- * @version 0.1
- */
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -22,6 +11,16 @@ import br.edu.ufcg.blogao.user.Sex;
 import br.edu.ufcg.blogao.user.UserIF;
 import br.edu.ufcg.blogao.user.UsersHandler;
 
+/**   
+ * Find users and blog on Blogao.
+ * 
+ * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
+ * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
+ * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
+ * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
+ * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
+ * @version 0.2
+ */
 public class Finder {
 	
 	DatabaseFacade dbFacade = DatabaseFacade.getInstance();

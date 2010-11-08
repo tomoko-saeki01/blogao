@@ -32,20 +32,20 @@ public class DatabaseFacade {
 	
 	private static DatabaseFacade selfInstance = null;
 	
-	private AbstractKeeper<Blog> blogsKeeper = null;
-	private AbstractKeeper<Comment> commentsKeeper = null;
-	private AbstractKeeper<InteractiveContent> icKeeper = null;
-	private AbstractKeeper<Post> postsKeeper = null;
-	private AbstractKeeper<UserIF> usersKeeper = null;
-	private AbstractKeeper<AnnouncementIF> annKeeper = null;	
+	private AbstractDAO<Blog> blogDAO = null;
+	private AbstractDAO<Comment> commentDAO = null;
+	private AbstractDAO<InteractiveContent> icDAO = null;
+	private AbstractDAO<Post> postDAO = null;
+	private AbstractDAO<UserIF> userDAO = null;
+	private AbstractDAO<AnnouncementIF> annDAO = null;	
 	
 	protected DatabaseFacade(){		
-		blogsKeeper = new BlogsKeeper();
-		postsKeeper = new PostsKeeper();
-		usersKeeper = new UserIFsKeeper();
-		icKeeper = new InteractiveContentsKeeper();
-		commentsKeeper = new CommentsKeeper();
-		annKeeper = new AnnouncementsKeeper();
+		blogDAO = new BlogDAO();
+		postDAO = new PostDAO();
+		userDAO = new UserIFDAO();
+		icDAO = new InteractiveContentDAO();
+		commentDAO = new CommentDAO();
+		annDAO = new AnnouncementDAO();
 	}
 	
 	/**
@@ -63,12 +63,12 @@ public class DatabaseFacade {
 	 * Clean the persistence of datas.
 	 */
 	public void cleanPersistence() {
-		blogsKeeper.deleteAllElements();
-		usersKeeper.deleteAllElements();
-		postsKeeper.deleteAllElements();
-		commentsKeeper.deleteAllElements();
-		icKeeper.deleteAllElements();
-		annKeeper.deleteAllElements();
+		blogDAO.deleteAllElements();
+		userDAO.deleteAllElements();
+		postDAO.deleteAllElements();
+		commentDAO.deleteAllElements();
+		icDAO.deleteAllElements();
+		annDAO.deleteAllElements();
 	}
 	
 	/**
@@ -80,7 +80,7 @@ public class DatabaseFacade {
 		if (isInvalidString(announcementId)) {
 			throw new IllegalArgumentException(INVALID_ANNOUNCEMENT_MESSAGE);
 		}
-		annKeeper.deleteElement(announcementId);
+		annDAO.deleteElement(announcementId);
 	}
 	
 	/**
@@ -92,7 +92,7 @@ public class DatabaseFacade {
 		if (isInvalidString(blogId)) {
 			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
 		}
-		blogsKeeper.deleteElement(blogId);
+		blogDAO.deleteElement(blogId);
 	}
 	
 	/**
@@ -104,7 +104,7 @@ public class DatabaseFacade {
 		if (isInvalidString(commentId)) {
 			throw new IllegalArgumentException(INVALID_COMMENT_MESSAGE);
 		}
-		commentsKeeper.deleteElement(commentId);
+		commentDAO.deleteElement(commentId);
 	}
 	
 	/**
@@ -116,7 +116,7 @@ public class DatabaseFacade {
 		if (isInvalidString(icId)) {
 			throw new IllegalArgumentException(INVALID_IC_MESSAGE);
 		}
-		icKeeper.deleteElement(icId);
+		icDAO.deleteElement(icId);
 	}
 	
 	/**
@@ -128,7 +128,7 @@ public class DatabaseFacade {
 		if (isInvalidString(postId)) {
 			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
 		}
-		postsKeeper.deleteElement(postId);
+		postDAO.deleteElement(postId);
 	}
 	
 	/**
@@ -140,7 +140,7 @@ public class DatabaseFacade {
 		if (isInvalidString(userId)) {
 			throw new IllegalArgumentException(INVALID_USER_MESSAGE);
 		}
-		usersKeeper.deleteElement(userId);
+		userDAO.deleteElement(userId);
 	}
 	
 	/**
@@ -149,7 +149,7 @@ public class DatabaseFacade {
 	 * @return True case the announcement exist or False otherwise.
 	 */
 	public boolean existsAnnouncementInDatabase(String announcementId) {
-		return annKeeper.existsElementInDatabase(announcementId);
+		return annDAO.existsElementInDatabase(announcementId);
 	}
 	
 	/**
@@ -158,7 +158,7 @@ public class DatabaseFacade {
 	 * @return True case the blog exist or False otherwise.
 	 */
 	public boolean existsBlogInDatabase(String blogId) {
-		return blogsKeeper.existsElementInDatabase(blogId);
+		return blogDAO.existsElementInDatabase(blogId);
 	}
 	
 	/**
@@ -167,7 +167,7 @@ public class DatabaseFacade {
 	 * @return True case the comment exist or False otherwise.
 	 */
 	public boolean existsCommentInDatabase(String commentId) {
-		return commentsKeeper.existsElementInDatabase(commentId);
+		return commentDAO.existsElementInDatabase(commentId);
 	}
 
 	/**
@@ -176,7 +176,7 @@ public class DatabaseFacade {
 	 * @return True case the IC exist or False otherwise.
 	 */
 	public boolean existsInteractiveContentInDatabase(String icId) {
-		return icKeeper.existsElementInDatabase(icId);
+		return icDAO.existsElementInDatabase(icId);
 	}
 	
 	/**
@@ -185,7 +185,7 @@ public class DatabaseFacade {
 	 * @return True case the post exist or False otherwise.
 	 */
 	public boolean existsPostInDatabase(String postId) {
-		return postsKeeper.existsElementInDatabase(postId);
+		return postDAO.existsElementInDatabase(postId);
 	}
 	
 	/**
@@ -194,7 +194,7 @@ public class DatabaseFacade {
 	 * @return True case the user exist or False otherwise.
 	 */
 	public boolean existsUserInDatabase(String userId) {
-		return usersKeeper.existsElementInDatabase(userId);
+		return userDAO.existsElementInDatabase(userId);
 	}
 	
 	/**
@@ -202,7 +202,7 @@ public class DatabaseFacade {
 	 * @return All the users existing.
 	 */
 	public Map<String, UserIF> getAllUsers() {
-		return usersKeeper.getAllElements();
+		return userDAO.getAllElements();
 	}
 	
 	/**
@@ -210,7 +210,7 @@ public class DatabaseFacade {
 	 * @return All the blogs existing.
 	 */
 	public Map<String, Blog> getAllBlogs() {
-		return blogsKeeper.getAllElements();
+		return blogDAO.getAllElements();
 	}
 		
 	/**
@@ -222,7 +222,7 @@ public class DatabaseFacade {
 		if (ann == null) {
 			throw new IllegalArgumentException(INVALID_ANNOUNCEMENT_MESSAGE);
 		}
-		annKeeper.insertElement(ann);
+		annDAO.insertElement(ann);
 	}
 	
 	/**
@@ -234,7 +234,7 @@ public class DatabaseFacade {
 		if (blog == null) {
 			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
 		}
-		blogsKeeper.insertElement(blog);
+		blogDAO.insertElement(blog);
 	}
 	
 	/**
@@ -246,7 +246,7 @@ public class DatabaseFacade {
 		if (comment == null) {
 			throw new IllegalArgumentException(INVALID_COMMENT_MESSAGE);
 		}
-		commentsKeeper.insertElement(comment);
+		commentDAO.insertElement(comment);
 	}
 	
 	/**
@@ -258,7 +258,7 @@ public class DatabaseFacade {
 		if (content == null) {
 			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
 		}
-		icKeeper.insertElement(content);
+		icDAO.insertElement(content);
 	}
 	
 	/**
@@ -270,7 +270,7 @@ public class DatabaseFacade {
 		if (post == null) {
 			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
 		}
-		postsKeeper.insertElement(post);
+		postDAO.insertElement(post);
 	}
 	
 	/**
@@ -282,7 +282,7 @@ public class DatabaseFacade {
 		if (user == null) {
 			throw new IllegalArgumentException(INVALID_USER_MESSAGE);
 		}
-		usersKeeper.insertElement(user);
+		userDAO.insertElement(user);
 	}
 	
 	/**
@@ -290,7 +290,7 @@ public class DatabaseFacade {
 	 * @return A list with all the blogs stored in database.
 	 */
 	public List<String> listBlogsInDatabase() {
-		return blogsKeeper.listElementsInDatabase();
+		return blogDAO.listElementsInDatabase();
 	}
 	
 	/**
@@ -298,7 +298,7 @@ public class DatabaseFacade {
 	 * @return A list with all the users stored in database.
 	 */
 	public List<String> listUsersInDatabase() {
-		return usersKeeper.listElementsInDatabase();
+		return userDAO.listElementsInDatabase();
 	}
 	
 	/**
@@ -311,7 +311,7 @@ public class DatabaseFacade {
 		if (isInvalidString(announcementId)) {
 			throw new IllegalArgumentException(INVALID_ANNOUNCEMENT_MESSAGE);
 		}
-		return annKeeper.retrieveElement(announcementId);
+		return annDAO.retrieveElement(announcementId);
 	}
 	
 	/**
@@ -324,7 +324,7 @@ public class DatabaseFacade {
 		if (isInvalidString(blogId)) {
 			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
 		}
-		return blogsKeeper.retrieveElement(blogId);
+		return blogDAO.retrieveElement(blogId);
 	}
 	
 	/**
@@ -337,7 +337,7 @@ public class DatabaseFacade {
 		if (isInvalidString(commentId)) {
 			throw new IllegalArgumentException(INVALID_COMMENT_MESSAGE);
 		}
-		return commentsKeeper.retrieveElement(commentId);
+		return commentDAO.retrieveElement(commentId);
 	}
 	
 	/**
@@ -350,7 +350,7 @@ public class DatabaseFacade {
 		if (isInvalidString(icId)) {
 			throw new IllegalArgumentException(INVALID_IC_MESSAGE);
 		}
-		return icKeeper.retrieveElement(icId);
+		return icDAO.retrieveElement(icId);
 	}
 	
 	/**
@@ -363,7 +363,7 @@ public class DatabaseFacade {
 		if (isInvalidString(postId)) {
 			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
 		}
-		return postsKeeper.retrieveElement(postId);
+		return postDAO.retrieveElement(postId);
 	}
 	
 	/**
@@ -376,7 +376,7 @@ public class DatabaseFacade {
 		if (isInvalidString(userId)) {
 			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
 		}
-		return usersKeeper.retrieveElement(userId);
+		return userDAO.retrieveElement(userId);
 	}
 		
 	/**
@@ -388,7 +388,7 @@ public class DatabaseFacade {
 		if (blog == null) {
 			throw new IllegalArgumentException(INVALID_BLOG_MESSAGE);
 		}
-		blogsKeeper.updateElement(blog);
+		blogDAO.updateElement(blog);
 	}
 	
 	/**
@@ -400,7 +400,7 @@ public class DatabaseFacade {
 		if (comment == null) {
 			throw new IllegalArgumentException(INVALID_COMMENT_MESSAGE);
 		}
-		commentsKeeper.updateElement(comment);
+		commentDAO.updateElement(comment);
 	}
 	
 	/**
@@ -412,7 +412,7 @@ public class DatabaseFacade {
 		if (post == null) {
 			throw new IllegalArgumentException(INVALID_POST_MESSAGE);
 		}
-		postsKeeper.updateElement(post);
+		postDAO.updateElement(post);
 	}
 	
 	/**
@@ -424,7 +424,7 @@ public class DatabaseFacade {
 		if (user == null) {
 			throw new IllegalArgumentException(INVALID_USER_MESSAGE);
 		}
-		usersKeeper.updateElement(user);
+		userDAO.updateElement(user);
 	}
 		
 	private boolean isInvalidString(String str) {

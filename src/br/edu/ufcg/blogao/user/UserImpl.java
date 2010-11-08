@@ -1,5 +1,9 @@
 package br.edu.ufcg.blogao.user;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
 /**
  *  Represents a user's blog implementation.
  *  
@@ -8,13 +12,8 @@ package br.edu.ufcg.blogao.user;
  * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
  * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
  * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
- * @version 0.1
+ * @version 0.2
  */
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
 public class UserImpl implements UserIF {
 	private String login;
 	private String password;
