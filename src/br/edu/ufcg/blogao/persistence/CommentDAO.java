@@ -1,21 +1,20 @@
 package br.edu.ufcg.blogao.persistence;
 
+import java.io.File;
+
+import br.edu.ufcg.blogao.blog.Comment;
+
 /** 
- * Keep the Blogao's comments.
+ * Override Factory methods for DAO of Blogao's comments.
  * 
  * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
  * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
  * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
  * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
  * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
- * @version 0.1
+ * @version 0.2
  */
-
-import java.io.File;
-
-import br.edu.ufcg.blogao.blog.Comment;
-
-public class CommentsKeeper extends AbstractKeeper<Comment>{
+public class CommentDAO extends AbstractDAO<Comment>{
 	
 	private final String COMMENTS_PARENT_PATH = "resources" + SEP + "db" + SEP + "comments" + SEP;
 	private final String COMMENTS_FILE_EXTENSION = ".comment";

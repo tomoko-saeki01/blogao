@@ -8,7 +8,7 @@ package br.edu.ufcg.blogao.blog.data;
  * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
  * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
  * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
- * @version 0.1
+ * @version 0.2
  */
 
 public class Sound implements InteractiveContent {

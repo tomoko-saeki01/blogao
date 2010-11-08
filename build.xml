@@ -4,9 +4,9 @@
 	<property name="build" value="${basedir}/build" />
 	<property name="dist" value="${basedir}/dist" />
 	<property name="doc" value="${basedir}/doc" />
-	<property name="jar_name" value="projeto1" />
-	<property name="doc_zip" value="projeto1-doc"/>
-	<property name="src_zip" value="projeto1-src"/>
+	<property name="jar_name" value="projeto2" />
+	<property name="doc_zip" value="projeto2-doc"/>
+	<property name="src_zip" value="projeto2-src"/>
 
 	<!-- creates the folders bin, doc and dist -->
 	<target name="limpa">

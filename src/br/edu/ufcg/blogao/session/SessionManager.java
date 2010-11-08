@@ -1,5 +1,11 @@
 package br.edu.ufcg.blogao.session;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import br.edu.ufcg.blogao.IdGenerator;
+import br.edu.ufcg.blogao.user.UsersHandler;
+
 /**
  * Manage the sessions on Blogao.
  * 
@@ -8,15 +14,8 @@ package br.edu.ufcg.blogao.session;
  * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
  * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
  * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
- * @version 0.1
+ * @version 0.2
  */
-
-import java.util.HashMap;
-import java.util.Map;
-
-import br.edu.ufcg.blogao.IdGenerator;
-import br.edu.ufcg.blogao.user.UsersHandler;
-
 public class SessionManager {
 	
 	private static SessionManager selfInstance = null;
@@ -33,7 +32,7 @@ public class SessionManager {
 	}
 	
 	/**
-	 * Return the instance of session manager.
+	 * Returns the instance of session manager.
 	 * @return The instance of session manager.
 	 */
 	public static synchronized SessionManager getInstance() {

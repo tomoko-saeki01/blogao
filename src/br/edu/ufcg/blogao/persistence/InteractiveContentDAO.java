@@ -1,21 +1,20 @@
 package br.edu.ufcg.blogao.persistence;
 
+import java.io.File;
+
+import br.edu.ufcg.blogao.blog.data.InteractiveContent;
+
 /** 
- * Keep the Blogao's Interactive Contents.
+ * Override Factory methods for DAO of Blogao's Interactive Contents.
  * 
  * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
  * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
  * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
  * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
  * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
- * @version 0.1
+ * @version 0.2
  */
-
-import java.io.File;
-
-import br.edu.ufcg.blogao.blog.data.InteractiveContent;
-
-public class InteractiveContentsKeeper extends AbstractKeeper<InteractiveContent>{
+public class InteractiveContentDAO extends AbstractDAO<InteractiveContent>{
 	
 	private final String INTERACTIVE_CONTENT_PARENT_PATH = "resources" + SEP + "db" + SEP + "ic" + SEP;
 	private final String INTERACTIVE_CONTENT_FILE_EXTENSION = ".icontent";

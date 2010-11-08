@@ -1,21 +1,20 @@
 package br.edu.ufcg.blogao.persistence;
 
+import java.io.File;
+
+import br.edu.ufcg.blogao.blog.Blog;
+
 /** 
- * Keep the Blogao's blog.
+ * Override Factory methods for DAO of Blogao's blog.
  * 
  * @author <a href="mailto:caiocmpaes@gmail.com">Caio Paes</a><br>
  * @author <a href="mailto:carlos.artur.n@gmail.com">Carlos Artur</a><br>
  * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
  * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
  * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
- * @version 0.1
+ * @version 0.2
  */
-
-import java.io.File;
-
-import br.edu.ufcg.blogao.blog.Blog;
-
-public class BlogsKeeper extends AbstractKeeper<Blog>{
+public class BlogDAO extends AbstractDAO<Blog>{
 
 	private final String BLOGS_PARENT_PATH = "resources" + SEP + "db" + SEP + "blogs" + SEP;
 	private final String BLOGS_FILE_EXTENSION = ".blog";

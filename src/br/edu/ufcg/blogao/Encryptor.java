@@ -1,5 +1,9 @@
 package br.edu.ufcg.blogao;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Random;
+
 /** 
  * Encrypt a string.
  *   
@@ -8,13 +12,8 @@ package br.edu.ufcg.blogao;
  * @author <a href="mailto:catharinequintans@gmail.com">Catharine Quintans</a><br>
  * @author <a href="mailto:demontiejunior@gmail.com">Demontie Junior</a><br>
  * @author <a href="mailto:teu.araujo@gmail.com">Matheus Araujo</a><br>
- * @version 0.1
+ * @version 0.2
  */
-
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Random;
-
 public class Encryptor {
 	
 	private static final String ENCRYPT_ALGORITHM = "MD5";
