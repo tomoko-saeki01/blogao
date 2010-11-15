@@ -55,7 +55,7 @@ public class LoginFrame extends QWidget {
 	private void onToggled() {
 		if (loginButton.isChecked()) {
 		//TODO
-		System.out.println("true");
+		System.out.println("login");
 		}
 	}
 }
