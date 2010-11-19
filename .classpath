@@ -74,17 +74,9 @@
 	<classpathentry kind="lib" path="lib/ws/XmlSchema-1.4.5.jar"/>
 	<classpathentry kind="lib" path="lib/ws/xmlsec-1.4.3.jar"/>
 	<classpathentry kind="lib" path="lib/easyaccept.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/Downloads/eclipse/qtjambi-win32-lgpl-4.5.2_01/qtjambi-4.5.2_01.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:C:/Users/Catharine/Downloads/eclipse/qtjambi-win32-lgpl-4.5.2_01/doc/html"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Catharine/Downloads/eclipse/qtjambi-win32-lgpl-4.5.2_01/qtjambi-designer-4.5.2_01.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/Downloads/eclipse/qtjambi-win32-lgpl-4.5.2_01/qtjambi-examples-4.5.2_01.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/Downloads/eclipse/qtjambi-win32-lgpl-4.5.2_01/qtjambi-win32-msvc2005-4.5.2_01.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:C:/Users/Catharine/Downloads/eclipse/qtjambi-win32-lgpl-4.5.2_01/doc/html"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/qtjambi-win32-lgpl-4.5.2_01/qtjambi-4.5.2_01.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/qtjambi-win32-lgpl-4.5.2_01/qtjambi-designer-4.5.2_01.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/qtjambi-win32-lgpl-4.5.2_01/qtjambi-examples-4.5.2_01.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/qtjambi-win32-lgpl-4.5.2_01/qtjambi-win32-msvc2005-4.5.2_01.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
