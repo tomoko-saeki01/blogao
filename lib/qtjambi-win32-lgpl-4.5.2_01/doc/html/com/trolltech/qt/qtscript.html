@@ -1,0 +1,744 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>QtScript Module</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>QtScript Module</h1></center><p>[Previous: <a href="qtopengl.html">QtOpenGL Module</a>][<a href="modules.html">Qt's Modules</a>][Next: <a href="qtscripttools.html">QtScriptTools Module</a>]<p><h2>Classes</h2> <table align="center" border="0" cellpadding="2" cellspacing="1" width="100%"><tr valign="top" class="even"><td>QScriptClass</td><td></td></tr><tr valign="top" class="odd"><td>QScriptClassPropertyIterator</td><td></td></tr><tr valign="top" class="even"><td>QScriptContext</td><td></td></tr><tr valign="top" class="odd"><td>QScriptContextInfo</td><td></td></tr><tr valign="top" class="even"><td>QScriptEngine</td><td></td></tr><tr valign="top" class="odd"><td>QScriptEngineAgent</td><td></td></tr><tr valign="top" class="even"><td>QScriptExtensionPlugin</td><td></td></tr><tr valign="top" class="odd"><td>QScriptString</td><td></td></tr><tr valign="top" class="even"><td>QScriptSyntaxCheckResult</td><td></td></tr><tr valign="top" class="odd"><td>QScriptValue</td><td></td></tr><tr valign="top" class="even"><td>QScriptValueIterator</td><td></td></tr><tr valign="top" class="odd"><td>QScriptable</td><td></td></tr></table>The <a href="qtscript.html">QtScript</a> module provides classes for making Qt applications scriptable. <ul><li> <a href="#configuring-the-build-process">Configuring the Build Process</a></li><li> <a href="#language-overview">Language Overview</a></li><li> <a href="#basic-usage">Basic Usage</a></li><li> <a href="#making-a-qobject-available-to-the-script-engine">Making a QObject Available to the Script Engine</a></li> <ul><li> <a href="#using-signals-and-slots">Using Signals and Slots</a></li> <ul><li> <a href="#signal-to-function-connections">Signal to Function Connections</a></li><li> <a href="#signal-to-member-function-connections">Signal to Member Function Connections</a></li><li> <a href="#signal-to-named-member-function-connections">Signal to Named Member Function Connections</a></li><li> <a href="#error-handling">Error Handling</a></li><li> <a href="#emitting-signals-from-scripts">Emitting Signals from Scripts</a></li><li> <a href="#overloaded-signals-and-slots">Overloaded Signals and Slots</a></li></ul><li> <a href="#accessing-properties">Accessing Properties</a></li><li> <a href="#accessing-child-qobjects">Accessing Child QObjects</a></li><li> <a href="#controlling-qobject-ownership">Controlling QObject Ownership</a></li> <ul><li> <a href="#qt-ownership">Qt Ownership</a></li><li> <a href="#script-ownership">Script Ownership</a></li><li> <a href="#auto-ownership">Auto-Ownership</a></li><li> <a href="#what-happens-when-someone-else-deletes-the-qobject">What Happens When Someone Else Deletes the QObject?</a></li></ul><li> <a href="#customizing-access-to-the-qobject">Customizing Access to the QObject</a></li><li> <a href="#making-a-qobject-based-class-new-able-from-a-script">Making a QObject-based Class New-able from a Script</a></li><li> <a href="#enum-values">Enum Values</a></li></ul><li> <a href="#conversion-between-qtscript-and-c-types">Conversion Between QtScript and C++ Types</a></li> <ul><li> <a href="#default-conversion-from-qt-script-to-c">Default Conversion from Qt Script to C++</a></li><li> <a href="#default-conversion-from-c-to-qt-script">Default Conversion from C++ to Qt Script</a></li></ul><li> <a href="#how-to-design-and-implement-application-objects">How to Design and Implement Application Objects</a></li> <ul><li> <a href="#making-a-c-object-available-to-scripts-written-in-qtscript">Making a C++ object available to Scripts Written in QtScript</a></li><li> <a href="#making-c-class-member-functions-available-in-qtscript">Making C++ Class Member Functions Available in QtScript</a></li><li> <a href="#making-c-class-properties-available-in-qtscript">Making C++ Class Properties Available in QtScript</a></li><li> <a href="#reacting-to-c-objects-signals-in-scripts">Reacting to C++ Objects Signals in Scripts</a></li><li> <a href="#design-of-application-objects">Design of Application Objects</a></li> <ul><li> <a href="#returning-qobject-pointers">Returning QObject Pointers</a></li></ul></ul><li> <a href="#function-objects-and-native-functions">Function Objects and Native Functions</a></li> <ul><li> <a href="#calling-a-qt-script-function-from-c">Calling a Qt Script Function from C++</a></li><li> <a href="#the-object">The  Object</a></li><li> <a href="#wrapping-a-native-function">Wrapping a Native Function</a></li><li> <a href="#the-qscriptcontext-object">The QScriptContext Object</a></li><li> <a href="#processing-function-arguments">Processing Function Arguments</a></li> <ul><li> <a href="#formal-parameters-and-the-arguments-object">Formal Parameters and the Arguments Object</a></li><li> <a href="#checking-the-number-of-arguments">Checking the Number of Arguments</a></li><li> <a href="#checking-the-types-of-arguments">Checking the Types of Arguments</a></li><li> <a href="#functions-with-variable-numbers-of-arguments">Functions with Variable Numbers of Arguments</a></li><li> <a href="#accessing-the-arguments-object">Accessing the Arguments Object</a></li></ul><li> <a href="#constructor-functions">Constructor Functions</a></li><li> <a href="#associating-data-with-a-function">Associating Data with a Function</a></li><li> <a href="#native-functions-as-arguments-to-functions">Native Functions as Arguments to Functions</a></li><li> <a href="#the-activation-object">The Activation Object</a></li><li> <a href="#nested-functions-and-the-scope-chain">Nested Functions and the Scope Chain</a></li><li> <a href="#property-getters-and-setters">Property Getters and Setters</a></li></ul><li> <a href="#making-use-of-prototype-based-inheritance">Making Use of Prototype-Based Inheritance</a></li> <ul><li> <a href="#prototype-objects-and-shared-properties">Prototype Objects and Shared Properties</a></li><li> <a href="#defining-classes-in-a-prototype-based-universe">Defining Classes in a Prototype-Based Universe</a></li><li> <a href="#prototype-based-programming-with-the-qtscript-c-api">Prototype-Based Programming with the QtScript C++ API</a></li><li> <a href="#implementing-prototype-objects-for-value-based-types">Implementing Prototype Objects for Value-based Types</a></li><li> <a href="#implementing-constructors-for-value-based-types">Implementing Constructors for Value-based Types</a></li><li> <a href="#managing-non-qobject-based-objects">Managing Non-QObject-based Objects</a></li></ul><li> <a href="#defining-custom-script-classes-with-qscriptclass">Defining Custom Script Classes with QScriptClass</a></li><li> <a href="#error-handling-and-debugging-facilities">Error Handling and Debugging Facilities</a></li> <ul><li> <a href="#redefining-print">Redefining print()</a></li></ul><li> <a href="#using-qtscript-extensions">Using QtScript Extensions</a></li><li> <a href="#internationalization">Internationalization</a></li> <ul><li> <a href="#use-qstr-for-all-literal-text">Use qsTr() for All Literal Text</a></li><li> <a href="#use-string-prototype-arg-for-dynamic-text">Use String.prototype.arg() for Dynamic Text</a></li><li> <a href="#produce-translations">Produce Translations</a></li><li> <a href="#apply-translations">Apply Translations</a></li></ul><li> <a href="#ecmascript-compatibility">ECMAScript Compatibility</a></li><li> <a href="#qtscript-extensions-to-ecmascript">QtScript Extensions to ECMAScript</a></li></ul><a name="configuring-the-build-process"><h2>Configuring the Build Process</h2> Applications that use Qt's Script classes need to be configured to be built against the <a href="qtscript.html">QtScript</a> module. To include the definitions of the module's classes, use the following directive: <pre class="snippet">
+#include &lt;QtScript&gt;
+</pre> To link against the module, add this line to your <a href="qmake-manual.html">qmake</a><tt>.pro</tt> file: <pre class="snippet">
+QT += script
+</pre> The <a href="qtscript.html">QtScript</a> module is part of the <a href="commercialeditions.html">Qt Full Framework Edition</a> and the <a href="opensourceedition.html">Qt Open Source Edition</a>. <p>The <a href="qtscript.html">QtScript</a> module only provides core scripting facilities; the <a href="qtscripttools.html">QtScriptTools</a> module provides additional Qt Script-related components that application developers may find useful.<a name="language-overview"><h2>Language Overview</h2> Qt Script is based on the ECMAScript scripting language, as defined in standard <a href="http://www.ecma-international.org/publications/standards/Ecma-262.htm">ECMA-262</a>. Microsoft's JScript, and Netscape's JavaScript are also based on the ECMAScript standard. For an overview of ECMAScript, see the <a href="ecmascript.html">ECMAScript reference</a>. If you are not familiar with the ECMAScript language, there are several existing tutorials and books that cover this subject, such as <a href="http://www.davidflanagan.com/javascript5/">JavaScript: The Definitive Guide</a>. <p>Existing users of <a href="http://qtsoftware.com/developer/downloads/qt/qsa">Qt Script for Applications (QSA)</a> may find the <a href="porting-qsa.html">Moving from QSA to Qt Script</a> document useful when porting QSA scripts to Qt Script.<a name="basic-usage"><h2>Basic Usage</h2> To evaluate script code, you create a QScriptEngine and call its evaluate() function, passing the script code (text) to evaluate as argument.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QScriptEngine engine;
+    qDebug() &lt;&lt; "the magic number is:" &lt;&lt; engine.evaluate("1 + 2").toNumber();
+</pre> The return value will be the result of the evaluation (represented as a QScriptValue object); this can be converted to standard C++ and Qt types. <p>Custom properties can be made available to scripts by registering them with the script engine. This is most easily done by setting properties of the script engine's Global Object:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QScriptValue val(&engine, 123);
+    engine.globalObject().setProperty("foo", val);
+    qDebug() &lt;&lt; "foo times two is:" &lt;&lt; engine.evaluate("foo * 2").toNumber();
+</pre> This places the properties in the script environment, thus making them available to script code.<a name="making-a-qobject-available-to-the-script-engine"><h2>Making a QObject Available to the Script Engine</h2> Any <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>-based instance can be made available for use with scripts. <p>When a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> is passed to the QScriptEngine::newQObject() function, a Qt Script wrapper object is created that can be used to make the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>'s signals, slots, properties, and child objects available to scripts. <p>Here's an example of making an instance of a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> subclass available to script code under the name <tt>"myObject"</tt>:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QScriptEngine engine;
+    QObject *someObject = new MyObject;
+    QScriptValue objectValue = engine.newQObject(someObject);
+    engine.globalObject().setProperty("myObject", objectValue);
+</pre> This will create a global variable called <tt>myObject</tt> in the script environment. The variable serves as a proxy to the underlying C++ object. Note that the name of the script variable can be anything; i.e., it is not dependent upon <a href="../../../com/trolltech/qt/core/QObject.html#objectName()">QObject::objectName()</a>. <p>The newQObject() function accepts two additional optional arguments: one is the ownership mode, and the other is a collection of options that allow you to control certain aspects of how the QScriptValue that wraps the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> should behave. We will come back to the usage of these arguments later.<a name="using-signals-and-slots"><h3>Using Signals and Slots</h3> Qt Script adapts Qt's central <a href="qtjambi-signalsandslots.html">Signals and Slots</a> feature for scripting. There are three principal ways to use signals and slots with Qt Script: <ul><li> <b>Hybrid C++/script</b>: C++ application code connects a signal to a script function. The script function can, for example, be a function that the user has typed in, or one that you have read from a file. This approach is useful if you have a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> but don't want to expose the object itself to the scripting environment; you just want a script to be able to define how a signal should be reacted to, and leave it up to the C++ side of your application to establish the connection.</li><li> <b>Hybrid script/C++</b>: A script can connect signals and slots to establish connections between pre-defined objects that the application exposes to the scripting environment. In this scenario, the slots themselves are still written in C++, but the definition of the connections is fully dynamic (script-defined).</li><li> <b>Purely script-defined</b>: A script can both define signal handler functions (effectively "slots written in Qt Script"), and set up the connections that utilize those handlers. For example, a script can define a function that will handle the QLineEdit::returnPressed() signal, and then connect that signal to the script function.</li></ul> Use the qScriptConnect() function to connect a C++ signal to a script function. In the following example a script signal handler is defined that will handle the QLineEdit::textChanged() signal: <pre class="snippet">
+QScriptEngine eng;
+QLineEdit *edit = new QLineEdit(...);
+QScriptValue handler = eng.evaluate("function(text) { print('text was changed to', text); }");
+qScriptConnect(edit, SIGNAL(textChanged(const QString &)), QScriptValue(), handler);
+</pre> The first two arguments to qScriptConnect() are the same as you would pass to QObject::connect() to establish a normal C++ connection. The third argument is the script object that will act as the <tt>this</tt> object when the signal handler is invoked; in the above example we pass an invalid script value, so the <tt>this</tt> object will be the Global Object. The fourth argument is the script function ("slot") itself. The following example shows how the <tt>this</tt> argument can be put to use: <pre class="snippet">
+QLineEdit *edit1 = new QLineEdit(...);
+QLineEdit *edit2 = new QLineEdit(...);
+
+QScriptValue handler = eng.evaluate("function() { print('I am', this.name); }");
+QScriptValue obj1 = eng.newObject();
+obj1.setProperty("name", "the walrus");
+QScriptValue obj2 = eng.newObject();
+obj2.setProperty("name", "Sam");
+
+qScriptConnect(edit1, SIGNAL(returnPressed()), obj1, handler);
+qScriptConnect(edit2, SIGNAL(returnPressed()), obj2, handler);
+</pre> We create two <a href="../../../com/trolltech/qt/gui/QLineEdit.html">QLineEdit</a> objects and define a single signal handler function. The connections use the same handler function, but the function will be invoked with a different <tt>this</tt> object depending on which object's signal was triggered, so the output of the print() statement will be different for each. <p>In script code, Qt Script uses a different syntax for connecting to and disconnecting from signals than the familiar C++ syntax; i.e., QObject::connect(). To connect to a signal, you reference the relevant signal as a property of the sender object, and invoke its <tt>connect()</tt> function. There are three overloads of <tt>connect()</tt>, each with a corresponding <tt>disconnect()</tt> overload. The following subsections describe these three forms.<a name="signal-to-function-connections"><h4>Signal to Function Connections</h4> <tt>connect(function)</tt> <p>In this form of connection, the argument to <tt>connect()</tt> is the function to connect to the signal. <pre class="snippet">
+function myInterestingScriptFunction() { ... }
+...
+myQObject.somethingChanged.connect(myInterestingScriptFunction);
+</pre> The argument can be a Qt Script function, as in the above example, or it can be a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> slot, as in the following example: <pre class="snippet">
+myQObject.somethingChanged.connect(myOtherQObject.doSomething);
+</pre> When the argument is a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> slot, the argument types of the signal and slot do not necessarily have to be compatible; <a href="qtscript.html">QtScript</a> will, if necessary, perform conversion of the signal arguments to match the argument types of the slot. <p>To disconnect from a signal, you invoke the signal's <tt>disconnect()</tt> function, passing the function to disconnect as argument: <pre class="snippet">
+myQObject.somethingChanged.disconnect(myInterestingFunction);
+myQObject.somethingChanged.disconnect(myOtherQObject.doSomething);
+</pre> When a script function is invoked in response to a signal, the <tt>this</tt> object will be the Global Object.<a name="signal-to-member-function-connections"><h4>Signal to Member Function Connections</h4> <tt>connect(thisObject, function)</tt> <p>In this form of the <tt>connect()</tt> function, the first argument is the object that will be bound to the variable, <tt>this</tt>, when the function specified using the second argument is invoked. <p>If you have a push button in a form, you typically want to do something involving the form in response to the button's <tt>clicked</tt> signal; passing the form as the <tt>this</tt> object makes sense in such a case. <pre class="snippet">
+var obj = { x: 123 };
+var fun = function() { print(this.x); };
+myQObject.somethingChanged.connect(obj, fun);
+</pre> To disconnect from the signal, pass the same arguments to <tt>disconnect()</tt>: <pre class="snippet">
+myQObject.somethingChanged.disconnect(obj, fun);
+</pre><a name="signal-to-named-member-function-connections"><h4>Signal to Named Member Function Connections</h4> <tt>connect(thisObject, functionName)</tt> <p>In this form of the <tt>connect()</tt> function, the first argument is the object that will be bound to the variable, <tt>this</tt>, when a function is invoked in response to the signal. The second argument specifies the name of a function that is connected to the signal, and this refers to a member function of the object passed as the first argument (<tt>thisObject</tt> in the above scheme). <p>Note that the function is resolved when the connection is made, not when the signal is emitted. <pre class="snippet">
+var obj = { x: 123, fun: function() { print(this.x); } };
+myQObject.somethingChanged.connect(obj, "fun");
+</pre> To disconnect from the signal, pass the same arguments to <tt>disconnect()</tt>: <pre class="snippet">
+myQObject.somethingChanged.disconnect(obj, "fun");
+</pre><a name="error-handling"><h4>Error Handling</h4> When <tt>connect()</tt> or <tt>disconnect()</tt> succeeds, the function will return <tt>undefined</tt>; otherwise, it will throw a script exception. You can obtain an error message from the resulting <tt>Error</tt> object. Example: <pre class="snippet">
+try {
+    myQObject.somethingChanged.connect(myQObject, "slotThatDoesntExist");
+} catch (e) {
+    print(e);
+}
+</pre><a name="emitting-signals-from-scripts"><h4>Emitting Signals from Scripts</h4> To emit a signal from script code, you simply invoke the signal function, passing the relevant arguments: <pre class="snippet">
+myQObject.somethingChanged("hello");
+</pre> It is currently not possible to define a new signal in a script; i.e., all signals must be defined by C++ classes.<a name="overloaded-signals-and-slots"><h4>Overloaded Signals and Slots</h4> When a signal or slot is overloaded, <a href="qtscript.html">QtScript</a> will attempt to pick the right overload based on the actual types of the QScriptValue arguments involved in the function invocation. For example, if your class has slots <tt>myOverloadedSlot(int)</tt> and <tt>myOverloadedSlot(QString)</tt>, the following script code will behave reasonably: <pre class="snippet">
+myQObject.myOverloadedSlot(10);   // will call the int overload
+myQObject.myOverloadedSlot("10"); // will call the QString overload
+</pre> You can specify a particular overload by using array-style property access with the normalized signature of the C++ function as the property name: <pre class="snippet">
+myQObject['myOverloadedSlot(int)']("10");   // call int overload; the argument is converted to an int
+myQObject['myOverloadedSlot(QString)'](10); // call QString overload; the argument is converted to a string
+</pre> If the overloads have different number of arguments, <a href="qtscript.html">QtScript</a> will pick the overload with the argument count that best matches the actual number of arguments passed to the slot. <p>For overloaded signals, Qt Script will throw an error if you try to connect to the signal by name; you have to refer to the signal with the full normalized signature of the particular overload you want to connect to.<a name="accessing-properties"><h3>Accessing Properties</h3> The properties of the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> are available as properties of the corresponding <a href="qtscript.html">QtScript</a> object. When you manipulate a property in script code, the C++ get/set method for that property will automatically be invoked. For example, if your C++ class has a property declared as follows: <pre class="snippet">
+Q_PROPERTY(bool enabled READ enabled WRITE setEnabled)
+</pre> then script code can do things like the following: <pre class="snippet">
+myQObject.enabled = true;
+
+...
+
+myQObject.enabled = !myQObject.enabled;
+</pre><a name="accessing-child-qobjects"><h3>Accessing Child QObjects</h3> Every named child of the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> (that is, for which <a href="../../../com/trolltech/qt/core/QObject.html#objectName()">QObject::objectName()</a> is not an empty string) is by default available as a property of the <a href="qtscript.html">QtScript</a> wrapper object. For example, if you have a <a href="../../../com/trolltech/qt/gui/QDialog.html">QDialog</a> with a child widget whose <tt>objectName</tt> property is <tt>"okButton"</tt>, you can access this object in script code through the expression <pre class="snippet">
+myDialog.okButton
+</pre> Since <tt>objectName</tt> is itself a Q_PROPERTY, you can manipulate the name in script code to, for example, rename an object: <pre class="snippet">
+myDialog.okButton.objectName = "cancelButton";
+// from now on, myDialog.cancelButton references the button
+</pre> You can also use the functions <tt>findChild()</tt> and <tt>findChildren()</tt> to find children. These two functions behave identically to <a href="../../../com/trolltech/qt/core/QObject.html#findChild()">QObject::findChild()</a> and <a href="../../../com/trolltech/qt/core/QObject.html#findChildren()">QObject::findChildren()</a>, respectively. <p>For example, we can use these functions to find objects using strings and regular expressions: <pre class="snippet">
+var okButton = myDialog.findChild("okButton");
+if (okButton != null) {
+   // do something with the OK button
+}
+
+var buttons = myDialog.findChildren(RegExp("button[0-9]+"));
+for (var i = 0; i &lt; buttons.length; ++i) {
+   // do something with buttons[i]
+}
+</pre> You typically want to use <tt>findChild()</tt> when manipulating a form that uses nested layouts; that way the script is isolated from the details about which particular layout a widget is located in.<a name="controlling-qobject-ownership"><h3>Controlling QObject Ownership</h3> Qt Script uses garbage collection to reclaim memory used by script objects when they are no longer needed; an object's memory can be automatically reclaimed when it is no longer referenced anywhere in the scripting environment. Qt Script lets you control what happens to the underlying C++ <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> when the wrapper object is reclaimed (i.e., whether the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> is deleted or not); you do this when you create an object by passing an ownership mode as the second argument to QScriptEngine::newQObject(). <p>Knowing how Qt Script deals with ownership is important, since it can help you avoid situations where a C++ object isn't deleted when it should be (causing memory leaks), or where a C++ object is deleted when it shouldn't be (typically causing a crash if C++ code later tries to access that object).<a name="qt-ownership"><h4>Qt Ownership</h4> By default, the script engine does not take ownership of the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> that is passed to QScriptEngine::newQObject(); the object is managed according to Qt's object ownership (see <a href="objecttrees.html">Object Trees and Object Ownership</a>). This mode is appropriate when, for example, you are wrapping C++ objects that are part of your application's core; that is, they should persist regardless of what happens in the scripting environment. Another way of stating this is that the C++ objects should outlive the script engine.<a name="script-ownership"><h4>Script Ownership</h4> Specifying QScriptEngine::ScriptOwnership as the ownership mode will cause the script engine to take full ownership of the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> and delete it when it determines that it is safe to do so (i.e., when there are no more references to it in script code). This ownership mode is appropriate if the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> does not have a parent object, and/or the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> is created in the context of the script engine and is not intended to outlive the script engine. <p>For example, a constructor function that constructs QObjects only to be used in the script environment is a good candidate: <pre class="snippet">
+QScriptValue myQObjectConstructor(QScriptContext *context, QScriptEngine *engine)
+{
+  // let the engine manage the new object's lifetime.
+  return engine-&gt;newQObject(new MyQObject(), QScriptEngine::ScriptOwnership);
+}
+</pre><a name="auto-ownership"><h4>Auto-Ownership</h4> With QScriptEngine::AutoOwnership the ownership is based on whether the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> has a parent or not. If the <a href="qtscript.html">QtScript</a> garbage collector finds that the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> is no longer referenced within the script environment, the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> will be deleted only if it does not have a parent.<a name="what-happens-when-someone-else-deletes-the-qobject"><h4>What Happens When Someone Else Deletes the QObject?</h4> It is possible that a wrapped <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> is deleted outside of Qt Script's control; i.e., without regard to the ownership mode specified. In this case, the wrapper object will still be an object (unlike the C++ pointer it wraps, the script object won't become null). Any attempt to access properties of the script object will, however, result in a script exception being thrown. <p>Note that QScriptValue::isQObject() will still return true for a deleted <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>, since it tests the type of the script object, not whether the internal pointer is non-null. In other words, if QScriptValue::isQObject() returns true but QScriptValue::toQObject() returns a null pointer, this indicates that the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> has been deleted outside of Qt Script (perhaps accidentally).<a name="customizing-access-to-the-qobject"><h3>Customizing Access to the QObject</h3> QScriptEngine::newQObject() can take a third argument which allows you to control various aspects of the access to the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> through the <a href="qtscript.html">QtScript</a> wrapper object it returns. <p>QScriptEngine::ExcludeChildObjects specifies that child objects of the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> should not appear as properties of the wrapper object. <p>QScriptEngine::ExcludeSuperClassProperties and QScriptEngine::ExcludeSuperClassMethods can be used to avoid exposing members that are inherited from the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>'s superclass. This is useful for defining a "pure" interface where inherited members don't make sense from a scripting perspective; e.g., you don't want script authors to be able to change the <tt>objectName</tt> property of the object or invoke the <tt>deleteLater()</tt> slot. <p>QScriptEngine::AutoCreateDynamicProperties specifies that properties that don't already exist in the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> should be created as dynamic properties of the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>, rather than as properties of the <a href="qtscript.html">QtScript</a> wrapper object. If you want new properties to truly become persistent properties of the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>, rather than properties that are destroyed along with the wrapper object (and that aren't shared if the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> is wrapped multiple times with QScriptEngine::newQObject()), you should use this option. <p>QScriptEngine::SkipMethodsInEnumeration specifies that signals and slots should be skipped when enumerating the properties of the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> wrapper in a for-in script statement. This is useful when defining prototype objects, since by convention function properties of prototypes should not be enumerable.<a name="making-a-qobject-based-class-new-able-from-a-script"><h3>Making a QObject-based Class New-able from a Script</h3> The QScriptEngine::newQObject() function is used to wrap an existing <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> instance, so that it can be made available to scripts. A different scenario is that you want scripts to be able to construct new objects, not just access existing ones. <p>The Qt meta-type system currently does not provide dynamic binding of constructors for <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>-based classes. If you want to make such a class new-able from scripts, Qt Script can generate a reasonable script constructor for you; see QScriptEngine::scriptValueFromQMetaObject(). <p>You can also use QScriptEngine::newFunction() to wrap your own factory function, and add it to the script environment; see QScriptEngine::newQMetaObject() for an example.<a name="enum-values"><h3>Enum Values</h3> Values for enums declared with Q_ENUMS are not available as properties of individual wrapper objects; rather, they are properties of the QMetaObject wrapper object that can be created with QScriptEngine::newQMetaObject().<a name="conversion-between-qtscript-and-c-types"><h2>Conversion Between QtScript and C++ Types</h2> <a href="qtscript.html">QtScript</a> will perform type conversion when a value needs to be converted from the script side to the C++ side or vice versa; for instance, when a C++ signal triggers a script function, when you access a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> property in script code, or when you call QScriptEngine::toScriptValue() or QScriptEngine::fromScriptValue() in C++. <a href="qtscript.html">QtScript</a> provides default conversion operations for many of the built-in Qt types. You can change the conversion operation for a type (including your custom C++ types) by registering your own conversion functions with qScriptRegisterMetaType().<a name="default-conversion-from-qt-script-to-c"><h3>Default Conversion from Qt Script to C++</h3> The following table describes the default conversion from a QScriptValue to a C++ type. <table align="center" border="0" cellpadding="2" cellspacing="1" width="80%"><thead><tr class="qt-style" valign="top"><th><center> C++ Type</center></th><th><center> Default Conversion</center></th></tr></thead><tr valign="top" class="even"><td> bool</td><td> QScriptValue::toBool()</td></tr><tr valign="top" class="odd"><td> int</td><td> QScriptValue::toInt32()</td></tr><tr valign="top" class="even"><td> uint</td><td> QScriptValue::toUInt32()</td></tr><tr valign="top" class="odd"><td> float</td><td> float(QScriptValue::toNumber())</td></tr><tr valign="top" class="even"><td> double</td><td> QScriptValue::toNumber()</td></tr><tr valign="top" class="odd"><td> short</td><td> short(QScriptValue::toInt32())</td></tr><tr valign="top" class="even"><td> ushort</td><td> QScriptValue::toUInt16()</td></tr><tr valign="top" class="odd"><td> char</td><td> char(QScriptValue::toInt32())</td></tr><tr valign="top" class="even"><td> uchar</td><td> unsigned char(QScriptValue::toInt32())</td></tr><tr valign="top" class="odd"><td> qlonglong</td><td> qlonglong(QScriptValue::toInteger())</td></tr><tr valign="top" class="even"><td> qulonglong</td><td> qulonglong(QScriptValue::toInteger())</td></tr><tr valign="top" class="odd"><td> QString</td><td> An empty string if the QScriptValue is null or undefined; QScriptValue::toString() otherwise.</td></tr><tr valign="top" class="even"><td> <a href="../../../com/trolltech/qt/core/QDateTime.html">QDateTime</a></td><td> QScriptValue::toDateTime()</td></tr><tr valign="top" class="odd"><td> <a href="../../../com/trolltech/qt/core/QDate.html">QDate</a></td><td> QScriptValue::toDateTime().date()</td></tr><tr valign="top" class="even"><td> <a href="../../../com/trolltech/qt/core/QRegExp.html">QRegExp</a></td><td> QScriptValue::toRegExp()</td></tr><tr valign="top" class="odd"><td> <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>*</td><td> QScriptValue::toQObject()</td></tr><tr valign="top" class="even"><td> <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>*</td><td> QScriptValue::toQObject()</td></tr><tr valign="top" class="odd"><td> <a href="../../../com/trolltech/qt/QVariant.html">QVariant</a></td><td> QScriptValue::toVariant()</td></tr><tr valign="top" class="even"><td> QChar</td><td> If the QScriptValue is a string, the result is the first character of the string, or a null QChar if the string is empty; otherwise, the result is a QChar constructed from the unicode obtained by converting the QScriptValue to a <tt>ushort</tt>.</td></tr><tr valign="top" class="odd"><td> QStringList</td><td> If the QScriptValue is an array, the result is a QStringList constructed from the result of QScriptValue::toString() for each array element; otherwise, the result is an empty QStringList.</td></tr><tr valign="top" class="even"><td> QVariantList</td><td> If the QScriptValue is an array, the result is a QVariantList constructed from the result of QScriptValue::toVariant() for each array element; otherwise, the result is an empty QVariantList.</td></tr><tr valign="top" class="odd"><td> QVariantMap</td><td> If the QScriptValue is an object, the result is a QVariantMap with a (key, value) pair of the form (propertyName, propertyValue.toVariant()) for each property, using QScriptValueIterator to iterate over the object's properties.</td></tr><tr valign="top" class="even"><td> QObjectList</td><td> If the QScriptValue is an array, the result is a QObjectList constructed from the result of QScriptValue::toQObject() for each array element; otherwise, the result is an empty QObjectList.</td></tr><tr valign="top" class="odd"><td> QList&lt;int&gt;</td><td> If the QScriptValue is an array, the result is a QList&lt;int&gt; constructed from the result of QScriptValue::toInt32() for each array element; otherwise, the result is an empty QList&lt;int&gt;.</td></tr></table> Additionally, <a href="qtscript.html">QtScript</a> will handle the following cases: <ul><li> If the QScriptValue is a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> and the target type name ends with <tt>*</tt> (i.e., it is a pointer), the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> pointer will be cast to the target type with qobject_cast().</li><li> If the QScriptValue is a <a href="../../../com/trolltech/qt/QVariant.html">QVariant</a> and the target type name ends with <tt>*</tt> (i.e., it is a pointer), and the userType() of the <a href="../../../com/trolltech/qt/QVariant.html">QVariant</a> is the type that the target type points to, the result is a pointer to the <a href="../../../com/trolltech/qt/QVariant.html">QVariant</a>'s data.</li><li> If the QScriptValue is a <a href="../../../com/trolltech/qt/QVariant.html">QVariant</a> and it can be converted to the target type (according to QVariant::canConvert()), the <a href="../../../com/trolltech/qt/QVariant.html">QVariant</a> will be cast to the target type with qvariant_cast().</li></ul><a name="default-conversion-from-c-to-qt-script"><h3>Default Conversion from C++ to Qt Script</h3> The following table describes the default behavior when a QScriptValue is constructed from a C++ type: <table align="center" border="0" cellpadding="2" cellspacing="1" width="80%"><thead><tr class="qt-style" valign="top"><th><center> C++ Type</center></th><th><center> Default Construction</center></th></tr></thead><tr valign="top" class="even"><td> void</td><td> QScriptEngine::undefinedValue()</td></tr><tr valign="top" class="odd"><td> bool</td><td> QScriptValue(engine, value)</td></tr><tr valign="top" class="even"><td> int</td><td> QScriptValue(engine, value)</td></tr><tr valign="top" class="odd"><td> uint</td><td> QScriptValue(engine, value)</td></tr><tr valign="top" class="even"><td> float</td><td> QScriptValue(engine, value)</td></tr><tr valign="top" class="odd"><td> double</td><td> QScriptValue(engine, value)</td></tr><tr valign="top" class="even"><td> short</td><td> QScriptValue(engine, value)</td></tr><tr valign="top" class="odd"><td> ushort</td><td> QScriptValue(engine, value)</td></tr><tr valign="top" class="even"><td> char</td><td> QScriptValue(engine, value)</td></tr><tr valign="top" class="odd"><td> uchar</td><td> QScriptValue(engine, value)</td></tr><tr valign="top" class="even"><td> QString</td><td> QScriptValue(engine, value)</td></tr><tr valign="top" class="odd"><td> qlonglong</td><td> QScriptValue(engine, qsreal(value)). Note that the conversion may lead to loss of precision, since not all 64-bit integers can be represented using the qsreal type.</td></tr><tr valign="top" class="even"><td> qulonglong</td><td> QScriptValue(engine, qsreal(value)). Note that the conversion may lead to loss of precision, since not all 64-bit unsigned integers can be represented using the qsreal type.</td></tr><tr valign="top" class="odd"><td> QChar</td><td> QScriptValue(this, value.unicode())</td></tr><tr valign="top" class="even"><td> <a href="../../../com/trolltech/qt/core/QDateTime.html">QDateTime</a></td><td> QScriptEngine::newDate(value)</td></tr><tr valign="top" class="odd"><td> <a href="../../../com/trolltech/qt/core/QDate.html">QDate</a></td><td> QScriptEngine::newDate(value)</td></tr><tr valign="top" class="even"><td> <a href="../../../com/trolltech/qt/core/QRegExp.html">QRegExp</a></td><td> QScriptEngine::newRegExp(value)</td></tr><tr valign="top" class="odd"><td> <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>*</td><td> QScriptEngine::newQObject(value)</td></tr><tr valign="top" class="even"><td> <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>*</td><td> QScriptEngine::newQObject(value)</td></tr><tr valign="top" class="odd"><td> <a href="../../../com/trolltech/qt/QVariant.html">QVariant</a></td><td> QScriptEngine::newVariant(value)</td></tr><tr valign="top" class="even"><td> QStringList</td><td> A new script array (created with QScriptEngine::newArray()), whose elements are created using the QScriptValue(QScriptEngine *, QString) constructor for each element of the list.</td></tr><tr valign="top" class="odd"><td> QVariantList</td><td> A new script array (created with QScriptEngine::newArray()), whose elements are created using QScriptEngine::newVariant() for each element of the list.</td></tr><tr valign="top" class="even"><td> QVariantMap</td><td> A new script object (created with QScriptEngine::newObject()), whose properties are initialized according to the (key, value) pairs of the map.</td></tr><tr valign="top" class="odd"><td> QObjectList</td><td> A new script array (created with QScriptEngine::newArray()), whose elements are created using QScriptEngine::newQObject() for each element of the list.</td></tr><tr valign="top" class="even"><td> QList&lt;int&gt;</td><td> A new script array (created with QScriptEngine::newArray()), whose elements are created using the QScriptValue(QScriptEngine *, int) constructor for each element of the list.</td></tr></table> Other types (including custom types) will be wrapped using QScriptEngine::newVariant(). For null pointers of any type, the result is QScriptEngine::nullValue().<a name="how-to-design-and-implement-application-objects"><h2>How to Design and Implement Application Objects</h2> This section explains how to implement application objects and provides the necessary technical background material.<a name="making-a-c-object-available-to-scripts-written-in-qtscript"><h3>Making a C++ object available to Scripts Written in QtScript</h3> Making C++ classes and objects available to a scripting language is not trivial because scripting languages tend to be more dynamic than C++, and it must be possible to introspect objects (query information such as function names, function signatures, properties, etc., at run-time). Standard C++ does not provide features for this. <p>We can achieve the functionality we want by extending C++, using C++'s own facilities so our code is still standard C++. The Qt meta-object system provides the necessary additional functionality. It allows us to write using an extended C++ syntax, but converts this into standard C++ using a small utility program called <a href="moc.html">moc</a> (Meta-Object Compiler). Classes that wish to take advantage of the meta-object facilities are either subclasses of <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>, or use the <tt>Q_OBJECT</tt> macro. Qt has used this approach for many years and it has proven to be solid and reliable. <a href="qtscript.html">QtScript</a> uses this meta-object technology to provide scripters with dynamic access to C++ classes and objects. <p>To completely understand how to make C++ objects available to Qt Script, some basic knowledge of the Qt meta-object system is very helpful. We recommend that you read the <a href="object.html">Qt Object Model</a>. The information in this document and the documents it links to are very useful for understanding how to implement application objects. <p>However, this knowledge is not essential in the simplest cases. To make an object available in <a href="qtscript.html">QtScript</a>, it must derive from <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>. All classes which derive from <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> can be introspected and can provide the information needed by the scripting engine at run-time; e.g., class name, functions, signatures. Because we obtain the information we need about classes dynamically at run-time, there is no need to write wrappers for <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> derived classes.<a name="making-c-class-member-functions-available-in-qtscript"><h3>Making C++ Class Member Functions Available in QtScript</h3> The meta-object system also makes information about signals and slots dynamically available at run-time. By default, for <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> subclasses, only the signals and slots are automatically made available to scripts. This is very convenient because, in practice, we normally only want to make specially chosen functions available to scripters. When you create a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> subclass, make sure that the functions you want to expose to <a href="qtscript.html">QtScript</a> are public slots. <p>For example, the following class definition enables scripting only for certain functions: <pre class="snippet">
+class MyObject : public QObject
+{
+    Q_OBJECT
+
+public:
+    MyObject( ... );
+
+    void aNonScriptableFunction();
+
+public slots: // these functions (slots) will be available in QtScript
+    void calculate( ... );
+    void setEnabled( bool enabled );
+    bool isEnabled() const;
+
+private:
+   ....
+
+};
+</pre> In the example above, aNonScriptableFunction() is not declared as a slot, so it will not be available in <a href="qtscript.html">QtScript</a>. The other three functions will automatically be made available in <a href="qtscript.html">QtScript</a> because they are declared in the <tt>public slots</tt> section of the class definition. <p>It is possible to make any function script-invokable by specifying the <tt>Q_INVOKABLE</tt> modifier when declaring the function: <pre class="snippet">
+class MyObject : public QObject
+{
+    Q_OBJECT
+
+    public:
+    Q_INVOKABLE void thisMethodIsInvokableInQtScript();
+    void thisMethodIsNotInvokableInQtScript();
+
+    ...
+};
+</pre> Once declared with <tt>Q_INVOKABLE</tt>, the method can be invoked from <a href="qtscript.html">QtScript</a> code just as if it were a slot. Although such a method is not a slot, you can still specify it as the target function in a call to <tt>connect()</tt> in script code; <tt>connect()</tt> accepts both native and non-native functions as targets.<a name="making-c-class-properties-available-in-qtscript"><h3>Making C++ Class Properties Available in QtScript</h3> In the previous example, if we wanted to get or set a property using <a href="qtscript.html">QtScript</a> we would have to write code like the following: <pre class="snippet">
+var obj = new MyObject;
+obj.setEnabled( true );
+print( "obj is enabled: " + obj.isEnabled() );
+</pre> Scripting languages often provide a property syntax to modify and retrieve properties (in our case the enabled state) of an object. Many script programmers would want to write the above code like this: <pre class="snippet">
+var obj = new MyObject;
+obj.enabled = true;
+print( "obj is enabled: " + obj.enabled );
+</pre> To make this possible, you must define properties in the C++ <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> subclass. For example, the following <tt>MyObject</tt> class declaration declares a boolean property called <tt>enabled</tt>, which uses the function <tt>setEnabled(bool)</tt> as its setter function and <tt>isEnabled()</tt> as its getter function: <pre class="snippet">
+class MyObject : public QObject
+{
+    Q_OBJECT
+    // define the enabled property
+    Q_PROPERTY( bool enabled WRITE setEnabled READ isEnabled )
+
+public:
+    MyObject( ... );
+
+    void aNonScriptableFunction();
+
+public slots: // these functions (slots) will be available in QtScript
+    void calculate( ... );
+    void setEnabled( bool enabled );
+    bool isEnabled() const;
+
+private:
+   ....
+
+};
+</pre> The only difference from the original code is the use of the macro <tt>Q_PROPERTY</tt>, which takes the type and name of the property, and the names of the setter and getter functions as arguments. <p>If you don't want a property of your class to be accessible in <a href="qtscript.html">QtScript</a>, you set the <tt>SCRIPTABLE</tt> attribute to <tt>false</tt> when declaring the property; by default, the <tt>SCRIPTABLE</tt> attribute is <tt>true</tt>. For example: <pre class="snippet">
+Q_PROPERTY(int nonScriptableProperty READ foo WRITE bar SCRIPTABLE false)
+</pre><a name="reacting-to-c-objects-signals-in-scripts"><h3>Reacting to C++ Objects Signals in Scripts</h3> In the Qt object model, signals are used as a notification mechanism between QObjects. This means one object can connect a signal to another object's slot and, every time the signal is emitted, the slot is called. This connection is established using the QObject::connect() function. <p>The signals and slots mechanism is also available to <a href="qtscript.html">QtScript</a> programmers. The code to declare a signal in C++ is the same, regardless of whether the signal will be connected to a slot in C++ or in <a href="qtscript.html">QtScript</a>. <pre class="snippet">
+class MyObject : public QObject
+{
+    Q_OBJECT
+    // define the enabled property
+    Q_PROPERTY( bool enabled WRITE setEnabled READ isEnabled )
+
+public:
+    MyObject( ... );
+
+    void aNonScriptableFunction();
+
+public slots: // these functions (slots) will be available in QtScript
+    void calculate( ... );
+    void setEnabled( bool enabled );
+    bool isEnabled() const;
+
+signals: // the signals
+    void enabledChanged( bool newState );
+
+private:
+   ....
+
+};
+</pre> The only change we have made to the code in the previous section is to declare a signals section with the relevant signal. Now, the script writer can define a function and connect to the object like this: <pre class="snippet">
+function enabledChangedHandler( b )
+{
+    print( "state changed to: " + b );
+}
+
+function init()
+{
+    var obj = new MyObject();
+    // connect a script function to the signal
+    obj["enabledChanged(bool)"].connect(enabledChangedHandler);
+    obj.enabled = true;
+    print( "obj is enabled: " + obj.enabled );
+}
+</pre><a name="design-of-application-objects"><h3>Design of Application Objects</h3> The previous section described how to implement C++ objects which can be used in <a href="qtscript.html">QtScript</a>. Application objects are the same kind of objects, and they make your application's functionality available to <a href="qtscript.html">QtScript</a> scripters. Since the C++ application is already written in Qt, many objects are already QObjects. The easiest approach would be to simply add all these QObjects as application objects to the scripting engine. For small applications this might be sufficient, but for larger applications this is probably not the right approach. The problem is that this method reveals too much of the internal API and gives script programmers access to application internals which should not be exposed. <p>Generally, the best way of making application functionality available to scripters is to code some QObjects which define the applications public API using signals, slots, and properties. This gives you complete control of the functionality made available by the application. The implementations of these objects simply call the functions in the application which do the real work. So, instead of making all your QObjects available to the scripting engine, just add the wrapper QObjects.<a name="returning-qobject-pointers"><h4>Returning QObject Pointers</h4> If you have a slot that returns a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> pointer, you should note that, by default, Qt Script only handles conversion of the types <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>* and <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>*. This means that if your slot is declared with a signature like "MyObject* getMyObject()", <a href="qtscript.html">QtScript</a> doesn't automatically know that MyObject* should be handled in the same way as <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>* and <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>*. The simplest way to solve this is to only use <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>* and <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>* in the method signatures of your scripting interface. <p>Alternatively, you can register conversion functions for your custom type with the qScriptRegisterMetaType() function. In this way, you can preserve the precise typing in your C++ declarations, while still allowing pointers to your custom objects to flow seamlessly between C++ and scripts. Example: <pre class="snippet">
+class MyObject : public QObject
+{
+    Q_OBJECT
+    ...
+};
+
+Q_DECLARE_METATYPE(MyObject*)
+
+QScriptValue myObjectToScriptValue(QScriptEngine *engine, MyObject* const &in)
+{ return engine-&gt;newQObject(in); }
+
+void myObjectFromScriptValue(const QScriptValue &object, MyObject* &out)
+{ out = qobject_cast&lt;MyObject*&gt;(object.toQObject()); }
+
+...
+
+qScriptRegisterMetaType(&engine, myObjectToScriptValue, myObjectFromScriptValue);
+</pre><a name="function-objects-and-native-functions"><h2>Function Objects and Native Functions</h2> In Qt Script, functions are first-class values; they are objects that can have properties of their own, just like any other type of object. They can be stored in variables and passed as arguments to other functions. Knowing how function calls in Qt Script behave is useful when you want to define and use your own script functions. This section discusses this matter, and also explains how you can implement native functions; that is, Qt Script functions written in C++, as opposed to functions written in the scripting language itself. Even if you will be relying mostly on the dynamic <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> binding that Qt Script provides, knowing about these powerful concepts and techniques is important to understand what's actually going on when script functions are executed.<a name="calling-a-qt-script-function-from-c"><h3>Calling a Qt Script Function from C++</h3> Calling a Qt Script function from C++ is achieved with the QScriptValue::call() function. A typical scenario is that you evaluate a script that defines a function, and at some point you want to call that function from C++, perhaps passing it some arguments, and then handle the result. The following script defines a Qt Script object that has a toKelvin() function: <pre class="snippet">
+({ unitName: "Celsius",
+   toKelvin: function(x) { return x + 273; }
+ })
+</pre> The toKelvin() function takes a temperature in Kelvin as argument, and returns the temperature converted to Celsius. The following snippet shows how the toKelvin() function might be obtained and called from C++: <pre class="snippet">
+QScriptValue object = engine.evaluate("({ unitName: 'Celsius', toKelvin: function(x) { return x + 273; } })");
+QScriptValue toKelvin = object.property("toKelvin");
+QScriptValue result = toKelvin.call(object, QScriptValueList() &lt;&lt; 100);
+qDebug() &lt;&lt; result.toNumber(); // 373
+</pre> If a script defines a global function, you can access the function as a property of QScriptEngine::globalObject(). For example, the following script defines a global function add(): <pre class="snippet">
+function add(a, b) {
+    return a + b;
+}
+</pre> C++ code might call the add() function as follows: <pre class="snippet">
+QScriptValue add = engine.globalObject().property("add");
+qDebug() &lt;&lt; add.call(QScriptValue(), QScriptValueList() &lt;&lt; 1 &lt;&lt; 2).toNumber(); // 3
+</pre> As already mentioned, functions are just values in Qt Script; a function by itself is not "tied to" a particular object. This is why you have to specify a <tt>this</tt> object (the first argument to QScriptValue::call()) that the function should be applied to. <p>If the function is supposed to act as a method (i.e. it can only be applied to a certain class of objects), it is up to the function itself to check that it is being called with a compatible <tt>this</tt> object. <p>Passing an invalid QScriptValue as the <tt>this</tt> argument to QScriptValue::call() indicates that the Global Object should be used as the <tt>this</tt> object; in other words, that the function should be invoked as a global function.<a name="the-object"><h3>The this Object</h3><tt>this</tt> When a Qt Script function is invoked from a script, the way in which it is invoked determines the <tt>this</tt> object when the function body is executed, as the following script example illustrates: <pre class="snippet">
+var getProperty = function(name) { return this[name]; };
+
+name = "Global Object"; // creates a global variable
+print(getProperty("name")); // "Global Object"
+
+var myObject = { name: 'My Object' };
+print(getProperty.call(myObject, "name")); // "My Object"
+
+myObject.getProperty = getProperty;
+print(myObject.getProperty("name")); // "My Object"
+
+getProperty.name = "The getProperty() function";
+getProperty.getProperty = getProperty;
+getProperty.getProperty("name"); // "The getProperty() function"
+</pre> An important thing to note is that in Qt Script, unlike C++ and Java, the <tt>this</tt> object is not part of the execution scope. This means that member functions (i.e., functions that operate on <tt>this</tt>) must always use the <tt>this</tt> keyword to access the object's properties. For example, the following script probably doesn't do what you want: <pre class="snippet">
+var o = { a: 1, b: 2, sum: function() { return a + b; } };
+print(o.sum()); // reference error, or sum of global variables a and b!!
+</pre> You will get a reference error saying that 'a is not defined' or, worse, two totally unrelated global variables <tt>a</tt> and <tt>b</tt> will be used to perform the computation, if they exist. Instead, the script should look like this: <pre class="snippet">
+var o = { a: 1, b: 2, sum: function() { return this.a + this.b; } };
+print(o.sum()); // 3
+</pre> Accidentally omitting the <tt>this</tt> keyword is a typical source of error for programmers who are used to the scoping rules of C++ and Java.<a name="wrapping-a-native-function"><h3>Wrapping a Native Function</h3> Qt Script provides QScriptEngine::newFunction() as a way of wrapping a C++ function pointer; this enables you to implement a function in C++ and add it to the script environment, so that scripts can invoke your function as if it were a "normal" script function. Here is how the previous <tt>getProperty()</tt> function can be written in C++: <pre class="snippet">
+QScriptValue getProperty(QScriptContext *ctx, QScriptEngine *eng)
+{
+    QString name = ctx-&gt;argument(0).toString();
+    return ctx-&gt;thisObject().property(name);
+}
+</pre> Call QScriptEngine::newFunction() to wrap the function. This will produce a special type of function object that carries a pointer to the C++ function internally. Once the resulting wrapper has been added to the scripting environment (e.g., by setting it as a property of the Global Object), scripts can call the function without having to know nor care that it is, in fact, a native function. <p>Note that the name of the C++ function doesn't matter in the scripting sense; the name by which the function is invoked by scripts depends only on what you call the script object property in which you store the function wrapper. <p>It is currently not possible to wrap member functions; i.e., methods of a C++ class that require a <tt>this</tt> object.<a name="the-qscriptcontext-object"><h3>The QScriptContext Object</h3> A QScriptContext holds all the state associated with a particular invocation of your function. Through the QScriptContext, you can: <ul><li> Get the arguments that were passed to the function.</li><li> Get the <tt>this</tt> object.</li><li> Find out whether the function was called with the <tt>new</tt> operator (the significance of this will be explained later).</li><li> Throw a script error.</li><li> Get the function object that's being invoked.</li><li> Get the activation object (the object used to hold local variables).</li></ul> The following sections explain how to make use of this functionality.<a name="processing-function-arguments"><h3>Processing Function Arguments</h3> Two things are worth noting about function arguments: <ol><li> Any script function &mdash; including native functions &mdash; can be invoked with any number of arguments. This means that it is up to the function itself to check the argument count if necessary, and act accordingly (e.g., throw an error if the number of arguments is too large, or prepare a default value if the number is too small).</li><li> A value of any type can be supplied as an argument to any function. This means that it is up to you to check the type of the arguments if necessary, and act accordingly (e.g., throw an error if an argument is not an object of a certain type).</li></ol> In summary: Qt Script does not automatically enforce any constraints on the number or type of arguments involved in a function call.<a name="formal-parameters-and-the-arguments-object"><h4>Formal Parameters and the Arguments Object</h4> A native Qt Script function is analogous to a script function that defines no formal parameters and only uses the built-in <tt>arguments</tt> variable to process its arguments. To see this, let's first consider how a script would normally define an <tt>add()</tt> function that takes two arguments, adds them together and returns the result: <pre class="snippet">
+function add(a, b) {
+    return a + b;
+}
+</pre> When a script function is defined with formal parameters, their names can be viewed as mere aliases of properties of the <tt>arguments</tt> object; for example, in the <tt>add(a, b)</tt> definition's function body, <tt>a</tt> and <tt>arguments[0]</tt> refer to the same variable. This means that the <tt>add()</tt> function can equivalently be written like this: <pre class="snippet">
+function add() {
+    return arguments[0] + arguments[1];
+}
+</pre> This latter form closely matches what a native implementation typically looks like: <pre class="snippet">
+QScriptValue add(QScriptContext *ctx, QScriptEngine *eng)
+{
+    double a = ctx-&gt;argument(0).toNumber();
+    double b = ctx-&gt;argument(1).toNumber();
+    return a + b;
+}
+</pre><a name="checking-the-number-of-arguments"><h4>Checking the Number of Arguments</h4> Again, remember that the presence (or lack) of formal parameter names in a function definition does not affect how the function may be invoked; <tt>add(1, 2, 3)</tt> is allowed by the engine, as is <tt>add(42)</tt>. In the case of the <tt>add()</tt> function, the function really needs two arguments in order to do something useful. This can be expressed by the script definition as follows: <pre class="snippet">
+function add() {
+    if (arguments.length != 2)
+        throw Error("add() takes exactly two arguments");
+    return arguments[0] + arguments[1];
+}
+</pre> This would result in an error being thrown if a script invokes <tt>add()</tt> with anything other than two arguments. The native function can be modified to perform the same check: <pre class="snippet">
+QScriptValue add(QScriptContext *ctx, QScriptEngine *eng)
+{
+    if (ctx-&gt;argumentCount() != 2)
+        return ctx-&gt;throwError("add() takes exactly two arguments");
+    double a = ctx-&gt;argument(0).toNumber();
+    double b = ctx-&gt;argument(1).toNumber();
+    return a + b;
+}
+</pre><a name="checking-the-types-of-arguments"><h4>Checking the Types of Arguments</h4> In addition to expecting a certain number of arguments, a function might expect that those arguments are of certain types (e.g., that the first argument is a number and that the second is a string). Such a function should explicitly check the type of arguments and/or perform a conversion, or throw an error if the type of an argument is incompatible. <p>As it is, the native implementation of <tt>add()</tt> shown above doesn't have the exact same semantics as the script counterpart; this is because the behavior of the Qt Script <tt>+</tt> operator depends on the types of its operands (for example, if one of the operands is a string, string concatenation is performed). To give the script function stricter semantics (namely, that it should only add numeric operands), the argument types can be tested: <pre class="snippet">
+function add() {
+    if (arguments.length != 2)
+        throw Error("add() takes exactly two arguments");
+    if (typeof arguments[0] != "number")
+        throw TypeError("add(): first argument is not a number");
+    if (typeof arguments[1] != "number")
+        throw TypeError("add(): second argument is not a number");
+    return arguments[0] + arguments[1];
+}
+</pre> Then an invocation like <tt>add("foo", new Array())</tt> will cause an error to be thrown. <p>The C++ version can call QScriptValue::isNumber() to perform similar tests: <pre class="snippet">
+QScriptValue add(QScriptContext *ctx, QScriptEngine *eng)
+{
+    if (ctx-&gt;argumentCount() != 2)
+        return ctx-&gt;throwError("add() takes exactly two arguments");
+    if (!ctx-&gt;argument(0).isNumber())
+        return ctx-&gt;throwError(QScriptContext::TypeError, "add(): first argument is not a number");
+    if (!ctx-&gt;argument(1).isNumber())
+        return ctx-&gt;throwError(QScriptContext::TypeError, "add(): second argument is not a number");
+    double a = ctx-&gt;argument(0).toNumber();
+    double b = ctx-&gt;argument(1).toNumber();
+    return a + b;
+}
+</pre> A less strict script implementation might settle for performing an explicit to-number conversion before applying the <tt>+</tt> operator: <pre class="snippet">
+function add() {
+    if (arguments.length != 2)
+        throw Error("add() takes exactly two arguments");
+    return Number(arguments[0]) + Number(arguments[1]);
+}
+</pre> In a native implementation, this is equivalent to calling QScriptValue::toNumber() without performing any type test first, since QScriptValue::toNumber() will automatically perform a type conversion if necessary. <p>To check if an argument is of a certain object type (class), scripts can use the <tt>instanceof</tt> operator (e.g., <tt>"arguments[0] instanceof Array"</tt> evaluates to true if the first argument is an Array object); native functions can call QScriptValue::instanceOf(). <p>To check if an argument is of a custom C++ type, you typically use qscriptvalue_cast() and check if the result is valid. For object types, this means casting to a pointer and checking if it is non-zero; for value types, the class should have an <tt>isNull()</tt>, <tt>isValid()</tt> or similar method. Alternatively, since most custom types are transported in <a href="../../../com/trolltech/qt/QVariant.html">QVariant</a>s, you can check if the script value is a <a href="../../../com/trolltech/qt/QVariant.html">QVariant</a> using QScriptValue::isVariant(), and then check if the <a href="../../../com/trolltech/qt/QVariant.html">QVariant</a> can be converted to your type using QVariant::canConvert().<a name="functions-with-variable-numbers-of-arguments"><h4>Functions with Variable Numbers of Arguments</h4> Because of the presence of the built-in <tt>arguments</tt> object, implementing functions that take a variable number of arguments is simple. In fact, as we have seen, in the technical sense all Qt Script functions can be seen as variable-argument functions). As an example, consider a concat() function that takes an arbitrary number of arguments, converts the arguments to their string representation and concatenates the results; for example, <tt>concat("Qt", " ", "Script ", 101)</tt> would return "Qt Script 101". A script definition of <tt>concat()</tt> might look like this: <pre class="snippet">
+function concat() {
+    var result = "";
+    for (var i = 0; i &lt; arguments.length; ++i)
+        result += String(arguments[i]);
+    return result;
+}
+</pre> Here is an equivalent native implementation: <pre class="snippet">
+QScriptValue concat(QScriptContext *ctx, QScriptEngine *eng)
+{
+    QString result = "";
+    for (int i = 0; i &lt; ctx-&gt;argumentCount(); ++i)
+        result += ctx-&gt;argument(i).toString();
+    return result;
+}
+</pre> A second use case for a variable number of arguments is to implement optional arguments. Here's how a script definition typically does it: <pre class="snippet">
+function sort(comparefn) {
+    if (comparefn == undefined)
+        comparefn =  the built-in comparison function ;
+    else if (typeof comparefn != "function")
+        throw TypeError("sort(): argument must be a function");
+    ...
+}
+</pre> And here's the native equivalent: <pre class="snippet">
+QScriptValue sort(QScriptContext *ctx, QScriptEngine *eng)
+{
+    QScriptValue comparefn = ctx-&gt;argument(0);
+    if (comparefn.isUndefined())
+        comparefn =  the built-in comparison function ;
+    else if (!comparefn.isFunction())
+        return ctx-&gt;throwError(QScriptContext::TypeError, "sort(): argument is not a function");
+    ...
+}
+</pre> A third use case for a variable number of arguments is to simulate C++ overloads. This involves checking the number of arguments and/or their type at the beginning of the function body (as already shown), and acting accordingly. It might be worth thinking twice before doing this, and instead favor unique function names; e.g., having separate <tt>processNumber(number)</tt> and <tt>processString(string)</tt> functions rather than a generic <tt>process(anything)</tt> function. On the caller side, this makes it harder for scripts to accidentally call the wrong overload (since they don't know or don't comprehend your custom sophisticated overloading resolution rules), and on the callee side, you avoid the need for potentially complex (read: error-prone) checks to resolve ambiguity.<a name="accessing-the-arguments-object"><h4>Accessing the Arguments Object</h4> Most native functions use the QScriptContext::argument() function to access function arguments. However, it is also possible to access the built-in <tt>arguments</tt> object itself (the one referred to by the <tt>arguments</tt> variable in script code), by calling the QScriptContext::argumentsObject() function. This has three principal applications: <ul><li> The <tt>arguments</tt> object can be used to easily forward a function call to another function. In script code, this is what it typically looks like: <pre class="snippet">
+function foo() {
+    // Let bar() take care of this.
+    print("calling bar() with " + arguments.length + "arguments");
+    var result = return bar.apply(this, arguments);
+    print("bar() returned" + result);
+    return result;
+}
+</pre> For example, <tt>foo(10, 20, 30)</tt> would result in the <tt>foo()</tt> function executing the equivalent of <tt>bar(10, 20, 30)</tt>. This is useful if you want to perform some special pre- or post-processing when calling a function (e.g., to log the call to <tt>bar()</tt> without having to modify the <tt>bar()</tt> function itself, like the above example), or if you want to call a "base implementation" from a prototype function that has the exact same "signature". In C++, the forwarding function might look like this: <pre class="snippet">
+QScriptValue foo(QScriptContext *ctx, QScriptEngine *eng)
+{
+    QScriptValue bar = eng-&gt;globalObject().property("bar");
+    QScriptValue arguments = ctx-&gt;argumentsObject();
+    qDebug() &lt;&lt; "calling bar() with" &lt;&lt; arguments.property("length").toInt32() &lt;&lt; "arguments";
+    QScriptValue result = bar.apply(ctx-&gt;thisObject(), arguments);
+    qDebug() &lt;&lt; "bar() returned" &lt;&lt; result.toString();
+    return result;
+}
+</li></pre><li> The arguments object can serve as input to a QScriptValueIterator, providing a generic way to iterate over the arguments. A debugger might use this to display the arguments object in a general purpose "Qt Script Object Explorer", for example.</li><li> The arguments object can be serialized (e.g., with JSON) and transferred to another entity (e.g., a script engine running in another thread), where the object can be deserialized and passed as argument to another script function.</li></ul><a name="constructor-functions"><h3>Constructor Functions</h3> Some script functions are constructors; they are expected to initialize new objects. The following snippet is a small example: <pre class="snippet">
+function Book(isbn) {
+    this.isbn = isbn;
+}
+
+var coolBook1 = new Book("978-0131872493");
+var coolBook2 = new Book("978-1593271473");
+</pre> There is nothing special about constructor functions. In fact, any script function can act as a constructor function (i.e., any function can serve as the operand to <tt>new</tt>). Some functions behave differently depending on whether they are called as part of a <tt>new</tt> expression or not; for example, the expression <tt>new Number(1)</tt> will create a Number object, whereas <tt>Number("123")</tt> will perform a type conversion. Other functions, like <tt>Array()</tt>, will always create and initialize a new object (e.g., <tt>new Array()</tt> and <tt>Array()</tt> have the same effect). <p>A native Qt Script function can call the QScriptContext::isCalledAsConstructor() function to determine if it is being called as a constructor or as a regular function. When a function is called as a constructor (i.e., it is the operand in a <tt>new</tt> expression), this has two important implications: <ul><li> The <tt>this</tt> object, QScriptContext::thisObject(), contains the new object to be initialized; the engine creates this new object automatically before invoking your function. This means that your native constructor function normally doesn't have to (and shouldn't) create a new object when it is called as a constructor, since the engine has already prepared a new object. Instead your function should operate on the supplied <tt>this</tt> object.</li><li> The constructor function should return an undefined value, QScriptEngine::undefinedValue(), to tell the engine that the <tt>this</tt> object should be the final result of the <tt>new</tt> operator. Alternatively, the function can return the <tt>this</tt> object itself.</li></ul> When QScriptContext::isCalledAsConstructor() returns false, how your constructor handles this case depends on what behavior you desire. If, like the built-in <tt>Number()</tt> function, a plain function call should perform a type conversion of its argument, then you perform the conversion and return the result. If, on the other hand, you want your constructor to behave as if it was called as a constructor (with <tt>new</tt>), you have to explicitly create a new object (that is, ignore the <tt>this</tt> object), initialize that object, and return it. <p>The following example implements a constructor function that always creates and initializes a new object: <pre class="snippet">
+QScriptValue Person_ctor(QScriptContext *ctx, QScriptEngine *eng)
+{
+    QScriptValue object;
+    if (ctx-&gt;isCalledAsConstructor()) {
+        object = ctx-&gt;thisObject();
+    } else {
+        object = eng-&gt;newObject();
+        object.setPrototype(ctx-&gt;callee().property("prototype"));
+    }
+    object.setProperty("name", ctx-&gt;argument(0));
+    return object;
+}
+</pre> Given this constructor, scripts would be able to use either the expression <tt>new Person("Bob")</tt> or <tt>Person("Bob")</tt> to create a new <tt>Person</tt> object; both behave in the same way. <p>There is no equivalent way for a function defined in script code to determine whether or not it was invoked as a constructor. <p>Note that, even though it is not considered good practice, there is nothing that stops you from choosing to ignore the default constructed (<tt>this</tt>) object when your function is called as a constructor and creating your own object anyway; simply have the constructor return that object. The object will "override" the default object that the engine constructed (i.e., the default object will simply be discarded internally).<a name="associating-data-with-a-function"><h3>Associating Data with a Function</h3> Even if a function is global &mdash; i.e., not associated with any particular (type of) object &mdash; you might still want to associate some data with it, so that it becomes self-contained; for example, the function could have a pointer to some C++ resource that it needs to access. If your application only uses a single script engine, or the same C++ resource can/should be shared among all script engines, you can simply use a static C++ variable and access it from within the native Qt Script function. <p>In the case where a static C++ variable or singleton class is not appropriate, you can call QScriptValue::setProperty() on the function object, but be aware that those properties will also be accessible to script code. The alternative is to use QScriptValue::setData(); this data is not script-accessible. The implementation can access this internal data through the QScriptContext::callee() function, which returns the function object being invoked. The following example shows how this might be used: <pre class="snippet">
+QScriptValue rectifier(QScriptContext *ctx, QScriptEngine *eng)
+{
+    QRectF magicRect = qscriptvalue_cast&lt;QRectF&gt;(ctx-&gt;callee().data());
+    QRectF sourceRect = qscriptvalue_cast&lt;QRectF&gt;(ctx-&gt;argument(0));
+    return eng-&gt;toScriptValue(sourceRect.intersected(magicRect));
+}
+
+...
+
+QScriptValue fun = eng.newFunction(rectifier);
+QRectF magicRect = QRectF(10, 20, 30, 40);
+fun.setData(eng.toScriptValue(magicRect));
+eng.globalObject().setProperty("rectifier", fun);
+</pre><a name="native-functions-as-arguments-to-functions"><h3>Native Functions as Arguments to Functions</h3> As previously mentioned, a function object can be passed as argument to another function; this is also true for native functions, naturally. As an example, here's a native comparison function that compares its two arguments numerically: <pre class="snippet">
+QScriptValue myCompare(QScriptContext *ctx, QScriptEngine *eng)
+{
+    double first = ctx-&gt;argument(0).toNumber();
+    double second = ctx-&gt;argument(1).toNumber();
+    int result;
+    if (first == second)
+        result = 0;
+    else if (first &lt; second)
+        result = -1;
+    else
+        result = 1;
+    return result;
+}
+</pre> The above function can be passed as argument to the standard <tt>Array.prototype.sort</tt> function to sort an array numerically, as the following C++ code illustrates: <pre class="snippet">
+QScriptEngine eng;
+QScriptValue comparefn = eng.newFunction(myCompare);
+QScriptValue array = eng.evaluate("new Array(10, 5, 20, 15, 30)");
+array.property("sort").call(array, QScriptValueList() &lt;&lt; comparefn);
+
+// prints "5,10,15,20,30"
+qDebug() &lt;&lt; array.toString();
+</pre> Note that, in this case, we are truly treating the native function object as a value &mdash; i.e., we don't store it as a property of the scripting environment &mdash; we simply pass it on as an "anonymous" argument to another script function and then forget about it.<a name="the-activation-object"><h3>The Activation Object</h3> Every Qt Script function invocation has an activation object associated with it; this object is accessible through the QScriptContext::activationObject() function. The activation object is a script object whose properties are the local variables associated with the invocation (including the arguments for which the script function has a corresponding formal parameter name). Thus, getting, modifying, creating and deleting local variables from C++ is done using the regular QScriptValue::property() and QScriptValue::setProperty() functions. The activation object itself is not directly accessible from script code (but it is implicitly accessed whenever a local variable is read from or written to). <p>For C++ code, there are two principal applications of the activation object: <ul><li> The activation object provides a standard way to traverse the variables associated with a function call, by using it as the input to QScriptValueIterator. This is useful for debugging purposes.</li><li> The activation object can be used to prepare local variables that should be available when a script is evaluated inline; this can be viewed as a way of passing arguments to the script itself. This technique is typically used in conjunction with QScriptEngine::pushContext(), as in the following example: <pre class="snippet">
+QScriptContext *ctx = eng.pushContext();
+QScriptValue act = ctx-&gt;activationObject();
+act.setProperty("digit", 7);
+
+qDebug() &lt;&lt; eng.evaluate("digit + 1").toNumber(); // 8
+
+eng.popContext();
+</pre> We create a temporary execution context, create a local variable for it, evaluate the script, and finally restore the old context.</li></ul><a name="nested-functions-and-the-scope-chain"><h3>Nested Functions and the Scope Chain</h3> This is an advanced topic; feel free to skip it. <p>A nested function can be used to "capture" the execution context in which a nested function object is created; this is typically referred to as creating a closure. When, at some later time, the nested function is invoked, it can access the variables that were created when the enclosing function was invoked. This can perhaps best be illustrated through a small example: <pre class="snippet">
+function counter() {
+    var count = 0;
+    return function() {
+        return count++;
+    }
+}
+</pre> The <tt>counter()</tt> function initializes a local variable to zero, and returns a nested function. The nested function increments the "outer" variable and returns its new value. The variable persists over function calls, as shown in the following example: <pre class="snippet">
+var c1 = counter(); // create a new counter function
+var c2 = counter(); // create a new counter function
+print(c1()); // 0
+print(c1()); // 1
+print(c2()); // 0
+print(c2()); // 1
+</pre> The <tt>counter()</tt> function can be implemented as a native function, too &mdash; or rather, as a pair of native functions: One for the outer and one for the inner. The definition of the outer function is as follows: <pre class="snippet">
+QScriptValue counter(QScriptContext *ctx, QScriptEngine *eng)
+{
+    QScriptValue act = ctx-&gt;activationObject();
+    act.setProperty("count", 0);
+    QScriptValue result = eng-&gt;newFunction(counter_inner);
+    result.setScope(act);
+    return result;
+}
+</pre> The function creates a local variable and initializes it to zero. Then it wraps the inner native function, and sets the scope of the resulting function object to be the activation object associated with this (the outer) function call. The inner function accesses the "outer" activation through the scope of the callee: <pre class="snippet">
+QScriptValue counter_inner(QScriptContext *ctx, QScriptEngine *eng)
+{
+    QScriptValue outerAct = ctx-&gt;callee().scope();
+    double count = outerAct.property("count").toNumber();
+    outerAct.setProperty("count", count+1);
+    return count;
+}
+</pre> It is also possible to have a hybrid approach, where the outer function is a native function and the inner function is defined by a script: <pre class="snippet">
+QScriptValue counter_hybrid(QScriptContext *ctx, QScriptEngine *eng)
+{
+    QScriptValue act = ctx-&gt;activationObject();
+    act.setProperty("count", 0);
+    return eng-&gt;evaluate("function() { return count++; }");
+}
+</pre><a name="property-getters-and-setters"><h3>Property Getters and Setters</h3> A script object property can be defined in terms of a getter/setter function, similar to how a Qt C++ property has read and write functions associated with it. This makes it possible for a script to use expressions like <tt>object.x</tt> instead of <tt>object.getX()</tt>; the getter/setter function for <tt>x</tt> will implicitly be invoked whenever the property is accessed. To scripts, the property looks and behaves just like a regular object property. <p>A single Qt Script function can act as both getter and setter for a property. When it is called as a getter, the argument count is 0. When it is called as a setter, the argument count is 1; the argument is the new value of the property. In the following example, we define a native combined getter/setter that transforms the value slightly: <pre class="snippet">
+QScriptValue getSet(QScriptContext *ctx, QScriptEngine *eng)
+{
+    QScriptValue obj = ctx-&gt;thisObject();
+    QScriptValue data = obj.data();
+    if (!data.isValid()) {
+        data = eng-&gt;newObject();
+        obj.setData(data);
+    }
+    QScriptValue result;
+    if (ctx-&gt;argumentCount() == 1) {
+        QString str = ctx-&gt;argument(0).toString();
+        str.replace("Roberta", "Ken");
+        result = str;
+        data.setProperty("x", result);
+    } else {
+        result = data.property("x");
+    }
+    return result;
+}
+</pre> The example uses the internal data of the object to store and retrieve the transformed value. Alternatively, the property could be stored in another, "hidden" property of the object itself (e.g., <tt>__x__</tt>). A native function is free to implement whatever storage scheme it wants, as long as the external behavior of the property itself is consistent (e.g., that scripts should not be able to distinguish it from a regular property). <p>The following C++ code shows how an object property can be defined in terms of the native getter/setter: <pre class="snippet">
+QScriptEngine eng;
+QScriptValue obj = eng.newObject();
+obj.setProperty("x", eng.newFunction(getSet),
+                QScriptValue::PropertyGetter|QScriptValue::PropertySetter);
+</pre> When the property is accessed, like in the following script, the getter/setter does its job behind the scenes: <pre class="snippet">
+obj.x = "Roberta sent me";
+print(obj.x); // "Ken sent me"
+obj.x = "I sent the bill to Roberta";
+print(obj.x); // "I sent the bill to Ken"
+</pre> <b>Note:</b> It is important that the setter function, not just the getter, returns the value of the property; i.e., the setter should not return QScriptValue::UndefinedValue. This is because the result of the property assignment is the value returned by the setter, and not the right-hand side expression. Also note that you normally should not attempt to read the same property that the getter modifies within the getter itself, since this will cause the getter to be called recursively. <p>You can remove a property getter/setter by calling QScriptValue::setProperty(), passing an invalid QScriptValue as the getter/setter. Remember to specify the QScriptValue::PropertyGetter/QScriptValue::PropertySetter flag(s), otherwise the only thing that will happen is that the setter will be invoked with an invalid QScriptValue as its argument! <p>Property getters and setters can be defined and installed by script code as well, as in the following example: <pre class="snippet">
+obj = {};
+obj.__defineGetter__("x", function() { return this._x; });
+obj.__defineSetter__("x", function(v) { print("setting x to", v); this._x = v; });
+obj.x = 123;
+</pre> Getters and setters can only be used to implement "a priori properties"; i.e., the technique can't be used to react to an access to a property that the object doesn't already have. To gain total control of property access in this way, you need to subclass QScriptClass.<a name="making-use-of-prototype-based-inheritance"><h2>Making Use of Prototype-Based Inheritance</h2> In ECMAScript, inheritance is based on the concept of shared prototype objects; this is quite different from the class-based inheritance familiar to C++ programmers. With <a href="qtscript.html">QtScript</a>, you can associate a custom prototype object with a C++ type using QScriptEngine::setDefaultPrototype(); this is the key to providing a script interface to that type. Since the <a href="qtscript.html">QtScript</a> module is built on top of Qt's meta-type system, this can be done for any C++ type. <p>You might be wondering when exactly you would need to use this functionality in your application; isn't the automatic binding provided by QScriptEngine::newQObject() enough? No, not under all circumstances. Firstly, not every C++ type is derived from <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>; types that are not QObjects cannot be introspected through Qt's meta-object system (they do not have properties, signals and slots). Secondly, even if a type is <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>-derived, the functionality you want to expose to scripts might not all be available, since it is unusual to define every function to be a slot (and it's not always possible/desirable to change the C++ API to make it so). <p>It is perfectly possible to solve this problem by using "conventional" C++ techniques. For instance, the <a href="../../../com/trolltech/qt/core/QRect.html">QRect</a> class could effectively be made scriptable by creating a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>-based C++ wrapper class with <tt>x</tt>, <tt>y</tt>, <tt>width</tt> properties and so on, which forwarded property access and function calls to the wrapped value. However, as we shall see, by taking advantage of the ECMAScript object model and combining it with Qt's meta-object system, we can arrive at a solution that is more elegant, consistent and lightweight, supported by a small API. <p>This section explains the underlying concepts of prototype-based inheritance. Once these concepts are understood, the associated practices can be applied throughout the <a href="qtscript.html">QtScript</a> API in order to create well-behaved, consistent bindings to C++ that will fit nicely into the ECMAScript universe. <p>When experimenting with <a href="qtscript.html">QtScript</a> objects and inheritance, it can be helpful to use the interactive interpreter included with the <a href="examples.html#qt-script">Qt Script examples</a>, located in <tt>examples/script/qscript</tt>.<a name="prototype-objects-and-shared-properties"><h3>Prototype Objects and Shared Properties</h3> The purpose of a <a href="qtscript.html">QtScript</a>prototype object is to define behavior that should be shared by a set of other <a href="qtscript.html">QtScript</a> objects. We say that objects which share the same prototype object belong to the same class (again, on the technical side this should not to be confused with the class constructs of languages like C++ and Java; ECMAScript has no such construct). <p>The basic prototype-based inheritance mechanism works as follows: Each <a href="qtscript.html">QtScript</a> object has an internal link to another object, its prototype. When a property is looked up in an object, and the object itself does not have the property, the property is looked up in the prototype object instead; if the prototype has the property, then that property is returned. Otherwise, the property is looked up in the prototype of the prototype object, and so on; this chain of objects constitutes a prototype chain. The chain of prototype objects is followed until the property is found or the end of the chain is reached. <p>For example, when you create a new object by the expression <tt>new Object()</tt>, the resulting object will have as its prototype the standard <tt>Object</tt> prototype, <tt>Object.prototype</tt>; through this prototype relation, the new object inherits a set of properties, including the <tt>hasOwnProperty()</tt> function and <tt>toString()</tt> function: <pre class="snippet">
+var o = new Object();
+o.foo = 123;
+print(o.hasOwnProperty('foo')); // true
+print(o.hasOwnProperty('bar')); // false
+print(o); // calls o.toString(), which returns "[object Object]"
+</pre> The <tt>toString()</tt> function itself is not defined in <tt>o</tt> (since we did not assign anything to <tt>o.toString</tt>), so instead the <tt>toString()</tt> function in the standard <tt>Object</tt> prototype is called, which returns a highly generic string representation of <tt>o</tt> ("[object Object]"). <p>Note that the properties of the prototype object are not copied to the new object; only a link from the new object to the prototype object is maintained. This means that changes done to the prototype object will immediately be reflected in the behavior of all objects that have the modified object as their prototype.<a name="defining-classes-in-a-prototype-based-universe"><h3>Defining Classes in a Prototype-Based Universe</h3> In <a href="qtscript.html">QtScript</a>, a class is not defined explicitly; there is no <tt>class</tt> keyword. Instead, you define a new class in two steps: <ol><li> Define a constructor function that will initialize new objects.</li><li> Set up a prototype object that defines the class interface, and assign this object to the public <tt>prototype</tt> property of the constructor function.</li></ol> With this arrangement, the constructor's public <tt>prototype</tt> property will automatically be set as the prototype of objects created by applying the <tt>new</tt> operator to your constructor function; e.g., the prototype of an object created by <tt>new Foo()</tt> will be the value of <tt>Foo.prototype</tt>. <p>Functions that don't operate on the <tt>this</tt> object ("static" methods) are typically stored as properties of the constructor function, not as properties of the prototype object. The same is true for constants, such as enum values. <p>The following code defines a simple constructor function for a class called <tt>Person</tt>: <pre class="snippet">
+function Person(name)
+{
+  this.name = name;
+}
+</pre> Next, you want to set up <tt>Person.prototype</tt> as your prototype object; i.e., define the interface that should be common to all <tt>Person</tt> objects. <a href="qtscript.html">QtScript</a> automatically creates a default prototype object (by the expression <tt>new Object()</tt>) for every script function; you can add properties to this object, or you can assign your own custom object. (Generally speaking, any <a href="qtscript.html">QtScript</a> object can act as prototype for any other object.) <p>Here's an example of how you might want to override the <tt>toString()</tt> function that <tt>Person.prototype</tt> inherits from <tt>Object.prototype</tt>, to give your <tt>Person</tt> objects a more appropriate string representation: <pre class="snippet">
+Person.prototype.toString = function() { return "Person(name: " + this.name + ")"; }
+</pre> This resembles the process of reimplementing a virtual function in C++. Henceforth, when the property named <tt>toString</tt> is looked up in a <tt>Person</tt> object, it will be resolved in <tt>Person.prototype</tt>, not in <tt>Object.prototype</tt> as before: <pre class="snippet">
+var p1 = new Person("John Doe");
+var p2 = new Person("G.I. Jane");
+print(p1); // "Person(name: John Doe)"
+print(p2); // "Person(name: G.I. Jane)"
+</pre> There are also some other interesting things we can learn about a <tt>Person</tt> object: <pre class="snippet">
+print(p1.hasOwnProperty('name')); // 'name' is an instance variable, so this returns true
+print(p1.hasOwnProperty('toString')); // returns false; inherited from prototype
+print(p1 instanceof Person); // true
+print(p1 instanceof Object); // true
+</pre> The <tt>hasOwnProperty()</tt> function is not inherited from <tt>Person.prototype</tt>, but rather from <tt>Object.prototype</tt>, which is the prototype of <tt>Person.prototype</tt> itself; i.e., the prototype chain of <tt>Person</tt> objects is <tt>Person.prototype</tt> followed by <tt>Object.prototype</tt>. This prototype chain establishes a class hierarchy, as demonstrated by applying the <tt>instanceof</tt> operator; <tt>instanceof</tt> checks if the value of the public <tt>prototype</tt> property of the constructor function on the right-hand side is reached by following the prototype chain of the object on the left-hand side. <p>When defining subclasses, there's a general pattern you can use. The following example shows how one can create a subclass of <tt>Person</tt> called <tt>Employee</tt>: <pre class="snippet">
+function Employee(name, salary)
+{
+  Person.call(this, name); // call base constructor
+
+  this.salary = salary;
+}
+
+// set the prototype to be an instance of the base class
+Employee.prototype = new Person();
+
+// initialize prototype
+Employee.prototype.toString = function() { ... }
+</pre> Again, you can use the <tt>instanceof</tt> to verify that the class relationship between <tt>Employee</tt> and <tt>Person</tt> has been correctly established: <pre class="snippet">
+var e = new Employee("Johnny Bravo", 5000000);
+print(e instanceof Employee); // true
+print(e instanceof Person);   // true
+print(e instanceof Object);   // true
+print(e instanceof Array);    // false
+</pre> This shows that the prototype chain of <tt>Employee</tt> objects is the same as that of <tt>Person</tt> objects, but with <tt>Employee.prototype</tt> added to the front of the chain.<a name="prototype-based-programming-with-the-qtscript-c-api"><h3>Prototype-Based Programming with the QtScript C++ API</h3> You can use QScriptEngine::newFunction() to wrap native functions. When implementing a constructor function, you also pass the prototype object as an argument to QScriptEngine::newFunction(). You can call QScriptValue::construct() to call a constructor function, and you can use QScriptValue::call() from within a native constructor function if you need to call a base class constructor. <p>The QScriptable class provides a convenient way to implement a prototype object in terms of C++ slots and properties. Take a look at the <a href="script-defaultprototypes.html">Default Prototypes Example</a> to see how this is done. Alternatively, the prototype functionality can be implemented in terms of standalone native functions that you wrap with QScriptEngine::newFunction() and set as properties of your prototype object by calling QScriptValue::setProperty(). <p>In the implementation of your prototype functions, you use QScriptable::thisObject() (or QScriptContext::thisObject()) to obtain a reference to the QScriptValue being operated upon; then you call qscriptvalue_cast() to cast it to your C++ type, and perform the relevant operations using the usual C++ API for the type. <p>You associate a prototype object with a C++ type by calling QScriptEngine::setDefaultPrototype(). Once this mapping is established, <a href="qtscript.html">QtScript</a> will automatically assign the correct prototype when a value of such a type is wrapped in a QScriptValue; either when you explicitly call QScriptEngine::toScriptValue(), or when a value of such a type is returned from a C++ slot and internally passed back to script code by the engine. This means you don't have to implement wrapper classes if you use this approach. <p>As an example, let's consider how the <tt>Person</tt> class from the preceding section can be implemented in terms of the Qt Script API. We begin with the native constructor function: <pre class="snippet">
+QScriptValue Person_ctor(QScriptContext *context, QScriptEngine *engine)
+{
+  QString name = context-&gt;argument(0).toString();
+  context-&gt;thisObject().setProperty("name", name);
+  return engine-&gt;undefinedValue();
+}
+</pre> Here's the native equivalent of the <tt>Person.prototype.toString</tt> function we saw before: <pre class="snippet">
+QScriptValue Person_prototype_toString(QScriptContext *context, QScriptEngine *engine)
+{
+  QString name = context-&gt;thisObject().property("name").toString();
+  QString result = QString::fromLatin1("Person(name: %0)").arg(name);
+  return result;
+}
+</pre> The <tt>Person</tt> class can then be initialized as follows: <pre class="snippet">
+QScriptEngine engine;
+QScriptValue ctor = engine.newFunction(Person_ctor);
+ctor.property("prototype").setProperty("toString", engine.newFunction(Person_prototype_toString));
+QScriptValue global = engine.globalObject();
+global.setProperty("Person", ctor);
+</pre> The implementation of the <tt>Employee</tt> subclass is similar. We use QScriptValue::call() to call the super-class (Person) constructor: <pre class="snippet">
+QScriptValue Employee_ctor(QScriptContext *context, QScriptEngine *engine)
+{
+  QScriptValue super = context-&gt;callee().property("prototype").property("constructor");
+  super.call(context-&gt;thisObject(), QScriptValueList() &lt;&lt; context-&gt;argument(0));
+  context-&gt;thisObject().setProperty("salary", context-&gt;argument(1));
+  return engine-&gt;undefinedValue();
+}
+</pre> The <tt>Employee</tt> class can then be initialized as follows: <pre class="snippet">
+QScriptValue empCtor = engine.newFunction(Employee_ctor);
+empCtor.setProperty("prototype", global.property("Person").construct());
+global.setProperty("Employee", empCtor);
+</pre> When implementing the prototype object of a class, you may want to use the QScriptable class, as it enables you to define the API of your script class in terms of Qt properties, signals and slots, and automatically handles value conversion between the Qt Script and C++ side.<a name="implementing-prototype-objects-for-value-based-types"><h3>Implementing Prototype Objects for Value-based Types</h3> When implementing a prototype object for a value-based type -- e.g. <a href="../../../com/trolltech/qt/core/QPointF.html">QPointF</a> -- the same general technique applies; you populate a prototype object with functionality that should be shared among instances. You then associate the prototype object with the type by calling QScriptEngine::setDefaultPrototype(). This ensures that when e.g. a value of the relevant type is returned from a slot back to the script, the prototype link of the script value will be initialized correctly. <p>When values of the custom type are stored in QVariants -- which Qt Script does by default --, qscriptvalue_cast() enables you to safely cast the script value to a pointer to the C++ type. This makes it easy to do type-checking, and, for prototype functions that should modify the underlying C++ value, lets you modify the actual value contained in the script value (and not a copy of it). <pre class="snippet">
+Q_DECLARE_METATYPE(QPointF)
+Q_DECLARE_METATYPE(QPointF*)
+
+QScriptValue QPointF_prototype_x(QScriptContext *context, QScriptEngine *engine)
+{
+  // Since the point is not to be modified, it's OK to cast to a value here
+    QPointF point = qscriptvalue_cast&lt;QPointF&gt;(context-&gt;thisObject());
+    return point.x();
+}
+
+QScriptValue QPointF_prototype_setX(QScriptContext *context, QScriptEngine *engine)
+{
+    // Cast to a pointer to be able to modify the underlying C++ value
+    QPointF *point = qscriptvalue_cast&lt;QPointF*&gt;(context-&gt;thisObject());
+    if (!point)
+        return context-&gt;throwError(QScriptContext::TypeError, "QPointF.prototype.setX: this object is not a QPointF");
+    point-&gt;setX(context-&gt;argument(0).toNumber());
+    return engine-&gt;undefinedValue();
+}
+</pre><a name="implementing-constructors-for-value-based-types"><h3>Implementing Constructors for Value-based Types</h3> You can implement a constructor function for a value-based type by wrapping a native factory function. For example, the following function implements a simple constructor for <a href="../../../com/trolltech/qt/core/QPoint.html">QPoint</a>: <pre class="snippet">
+QScriptValue QPoint_ctor(QScriptContext *context, QScriptEngine *engine)
+{
+    int x = context-&gt;argument(0).toInt32();
+    int y = context-&gt;argument(1).toInt32();
+    return engine-&gt;toScriptValue(QPoint(x, y));
+}
+
+...
+
+engine.globalObject().setProperty("QPoint", engine.newFunction(QPoint_ctor));
+</pre> In the above code we simplified things a bit, e.g. we didn't check the argument count to decide which <a href="../../../com/trolltech/qt/core/QPoint.html">QPoint</a> C++ constructor to use. In your own constructors you have to do this type of resolution yourself, i.e. by checking the number of arguments passed to the native function, and/or by checking the type of the arguments and converting the arguments to the desired type. If you detect a problem with the arguments you may want to signal this by throwing a script exception; see QScriptContext::throwError().<a name="managing-non-qobject-based-objects"><h3>Managing Non-QObject-based Objects</h3> For value-based types (e.g. <a href="../../../com/trolltech/qt/core/QPoint.html">QPoint</a>), the C++ object will be destroyed when the Qt Script object is garbage-collected, so managing the memory of the C++ object is not an issue. For QObjects, Qt Script provides several alternatives for managing the underlying C++ object's lifetime; see the <a href="qtscript.html#controlling-qobject-ownership">Controlling QObject Ownership</a> section. However, for polymorphic types that don't inherit from <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>, and when you can't (or won't) wrap the type in a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>, you have to manage the lifetime of the C++ object yourself. <p>A behavior that's often reasonable when a Qt Script object wraps a C++ object, is that the C++ object is deleted when the Qt Script object is garbage-collected; this is typically the case when the objects can be constructed by scripts, as opposed to the application providing the scripts with pre-made "environment" objects. A way of making the lifetime of the C++ object follow the lifetime of the Qt Script object is by using a shared pointer class, such as QSharedPointer, to hold a pointer to your object; when the Qt Script object containing the QSharedPointer is garbage-collected, the underlying C++ object will be deleted if there are no other references to the object. <p>The following snippet shows a constructor function that constructs <a href="../../../com/trolltech/qt/xml/QXmlStreamReader.html">QXmlStreamReader</a> objects that are stored using QSharedPointer: <pre class="snippet">
+typedef QSharedPointer&lt;QXmlStreamReader&gt; XmlStreamReaderPointer;
+
+Q_DECLARE_METATYPE(XmlStreamReaderPointer)
+
+QScriptValue constructXmlStreamReader(QScriptContext *context, QScriptEngine *engine)
+{
+    if (!context-&gt;isCalledAsConstructor())
+        return context-&gt;throwError(QScriptContext::SyntaxError, "please use the 'new' operator");
+
+    QIODevice *device = qobject_cast&lt;QIODevice*&gt;(context-&gt;argument(0).toQObject());
+    if (!device)
+        return context-&gt;throwError(QScriptContext::TypeError, "please supply a QIODevice as first argument");
+
+    // Create the C++ object
+    QXmlStreamReader *reader = new QXmlStreamReader(device);
+
+    XmlStreamReaderPointer pointer(reader);
+
+    // store the shared pointer in the script object that we are constructing
+    return engine-&gt;newVariant(context-&gt;thisObject(), qVariantFromValue(pointer));
+}
+</pre> Prototype functions can use qscriptvalue_cast() to cast the <tt>this</tt> object to the proper type: <pre class="snippet">
+QScriptValue xmlStreamReader_atEnd(QScriptContext *context, QScriptEngine *)
+{
+    XmlStreamReaderPointer reader = qscriptvalue_cast&lt;XmlStreamReaderPointer&gt;(context-&gt;thisObject());
+    if (!reader)
+        return context-&gt;throwError(QScriptContext::TypeError, "this object is not an XmlStreamReader");
+    return reader-&gt;atEnd();
+}
+</pre> The prototype and constructor objects are set up in the usual way: <pre class="snippet">
+    QScriptEngine engine;
+    QScriptValue xmlStreamReaderProto = engine.newObject();
+    xmlStreamReaderProto.setProperty("atEnd", engine.newFunction(xmlStreamReader_atEnd));
+
+    QScriptValue xmlStreamReaderCtor = engine.newFunction(constructXmlStreamReader, xmlStreamReaderProto);
+    engine.globalObject().setProperty("XmlStreamReader", xmlStreamReaderCtor);
+</pre> Scripts can now construct <a href="../../../com/trolltech/qt/xml/QXmlStreamReader.html">QXmlStreamReader</a> objects by calling the <tt>XmlStreamReader</tt> constructor, and when the Qt Script object is garbage-collected (or the script engine is destroyed), the <a href="../../../com/trolltech/qt/xml/QXmlStreamReader.html">QXmlStreamReader</a> object is destroyed as well.<a name="defining-custom-script-classes-with-qscriptclass"><h2>Defining Custom Script Classes with QScriptClass</h2> There are cases where neither the dynamic <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> binding provided by QScriptEngine::newQObject() or the manual binding provided by QScriptEngine::newFunction() is sufficient. For example, you might want to implement a dynamic script proxy to an underlying object; or you might want to implement an array-like class (i.e. that gives special treatment to properties that are valid array indexes, and to the property "length"). In such cases, you can subclass QScriptClass to achieve the desired behavior. <p>QScriptClass allows you to handle all property access for a (class of) script object through virtual get/set property functions. Iteration of custom properties is also supported through the QScriptClassPropertyIterator class; this means you can advertise properties to be reported by for-in script statements and QScriptValueIterator.<a name="error-handling-and-debugging-facilities"><h2>Error Handling and Debugging Facilities</h2> Syntax errors in scripts will be reported as soon as a script is evaluated; QScriptEngine::evaluate() will return a SyntaxError object that you can convert to a string to get a description of the error. <p>The QScriptEngine::uncaughtExceptionBacktrace() function gives you a human-readable backtrace of the last uncaught exception. In order to get useful filename information in backtraces, you should pass proper filenames to QScriptEngine::evaluate() when evaluating your scripts. <p>Often an exception doesn't happen at the time the script is evaluated, but at a later time when a function defined by the script is actually executed. For C++ signal handlers, this is tricky; consider the case where the clicked() signal of a button is connected to a script function, and that script function causes a script exception when it is handling the signal. Where is that script exception propagated to? <p>The solution is to connect to the QScriptEngine::signalHandlerException() signal; this will give you notification when a signal handler causes an exception, so that you can find out what happened and/or recover from it. <p>In Qt 4.4 the QScriptEngineAgent class was introduced. QScriptEngineAgent provides an interface for reporting low-level "events" in a script engine, such as when a function is entered or when a new script statement is reached. By subclassing QScriptEngineAgent you can be notified of these events and perform some action, if you want. QScriptEngineAgent itself doesn't provide any debugging-specific functionality (e.g. setting breakpoints), but it is the basis of tools that do. <p>The QScriptEngineDebugger class introduced in Qt 4.5 provides a Qt Script debugger that can be embedded into your application.<a name="redefining-print"><h3>Redefining print()</h3> Qt Script provides a built-in print() function that can be useful for simple debugging purposes. The built-in print() function writes to standard output. You can redefine the print() function (or add your own function, e.g. debug() or log()) that redirects the text to somewhere else. The following code shows a custom print() that adds text to a <a href="../../../com/trolltech/qt/gui/QPlainTextEdit.html">QPlainTextEdit</a>. <pre class="snippet">
+QScriptValue myPrintFunction(QScriptContext *context, QScriptEngine *engine)
+{
+    QString result;
+    for (int i = 0; i &lt; context-&gt;argumentCount(); ++i) {
+        if (i &gt; 0)
+            result.append(" ");
+        result.append(context-&gt;argument(i).toString());
+    }
+
+    QScriptValue calleeData = context-&gt;callee().data();
+    QPlainTextEdit *edit = qobject_cast&lt;QPlainTextEdit*&gt;(calleeData.toQObject());
+    edit-&gt;appendPlainText(result);
+
+    return engine-&gt;undefinedValue();
+}
+</pre> The following code shows how the custom print() function may be initialized and used. <pre class="snippet">
+int main(int argc, char **argv)
+{
+    QApplication app(argc, argv);
+
+    QScriptEngine eng;
+    QPlainTextEdit edit;
+
+    QScriptValue fun = eng.newFunction(myPrintFunction);
+    fun.setData(eng.newQObject(&edit));
+    eng.globalObject().setProperty("print", fun);
+
+    eng.evaluate("print('hello', 'world')");
+
+    edit.show();
+    return app.exec();
+}
+</pre> A pointer to the <a href="../../../com/trolltech/qt/gui/QPlainTextEdit.html">QPlainTextEdit</a> is stored as an internal property of the script function itself, so that it can be retrieved when the function is called.<a name="using-qtscript-extensions"><h2>Using QtScript Extensions</h2> The QScriptEngine::importExtension() function can be used to load plugins into a script engine. Plugins typically add some extra functionality to the engine; for example, a plugin might add full bindings for the Qt Arthur painting API, so that those classes may be used from Qt Script scripts. There are currently no script plugins shipped with Qt. <p>If you are implementing some Qt Script functionality that you want other Qt application developers to be able to use, developing an extension (e.g. by subclassing QScriptExtensionPlugin) is worth looking into.<a name="internationalization"><h2>Internationalization</h2> Since Qt 4.5, Qt Script supports internationalization of scripts by building on the C++ internationalization functionality (see <a href="qtjambi-i18n.html">Internationalization with Qt</a>).<a name="use-qstr-for-all-literal-text"><h3>Use qsTr() for All Literal Text</h3> Wherever your script uses "quoted text" for text that will be presented to the user, ensure that it is processed by the <a href="../../../com/trolltech/qt/core/QCoreApplication.html#translate(java.lang.String, java.lang.String, java.lang.String)">QCoreApplication::translate()</a> function. Essentially all that is necessary to achieve this is to use the qsTr() script function. Example: <pre class="snippet">
+myButton.text = qsTr("Hello world!");
+</pre> This accounts for 99% of the user-visible strings you're likely to write. <p>The qsTr() function uses the basename of the script's filename (see <a href="../../../com/trolltech/qt/core/QFileInfo.html#baseName()">QFileInfo::baseName()</a>) as the translation context; if the filename is not unique in your project, you should use the qsTranslate() function and pass a suitable context as the first argument. Example: <pre class="snippet">
+myButton.text = qsTranslate("MyAwesomeScript", "Hello world!");
+</pre> If you need to have translatable text completely outside a function, there are two functions to help: QT_TR_NOOP() and QT_TRANSLATE_NOOP(). They merely mark the text for extraction by the <tt>lupdate</tt> utility described below. At runtime, these functions simply return the text to translate unmodified. <p>Example of QT_TR_NOOP(): <pre class="snippet">
+FriendlyConversation.prototype.greeting = function(type)
+{
+    if (FriendlyConversation['greeting_strings'] == undefined) {
+        FriendlyConversation['greeting_strings'] = [
+            QT_TR_NOOP("Hello"),
+            QT_TR_NOOP("Goodbye")
+        ];
+    }
+    return qsTr(FriendlyConversation.greeting_strings[type]);
+}
+</pre> Example of QT_TRANSLATE_NOOP(): <pre class="snippet">
+FriendlyConversation.prototype.greeting = function(type)
+{
+    if (FriendlyConversation['greeting_strings'] == undefined) {
+        FriendlyConversation['greeting_strings'] = [
+            QT_TRANSLATE_NOOP("FriendlyConversation", "Hello"),
+            QT_TRANSLATE_NOOP("FriendlyConversation", "Goodbye")
+        ];
+    }
+    return qsTranslate("FriendlyConversation", FriendlyConversation.greeting_strings[type]);
+}
+</pre><a name="use-string-prototype-arg-for-dynamic-text"><h3>Use String.prototype.arg() for Dynamic Text</h3> The String.prototype.arg() function (which is modeled after QString::arg()) offers a simple means for substituting arguments: <pre class="snippet">
+FileCopier.prototype.showProgress = function(done, total, currentFileName)
+{
+    this.label.text = qsTr("%1 of %2 files copied.\nCopying: %3")
+                      .arg(done)
+                      .arg(total)
+                      .arg(currentFileName));
+}
+</pre><a name="produce-translations"><h3>Produce Translations</h3> Once you are using qsTr() and/or qsTranslate() throughout your scripts, you can start producing translations of the user-visible text in your program. <p>The <a href="qtjambi-linguist-manual.html">Qt Linguist manual</a> provides further information about Qt's translation tools, Qt Linguist, <tt>lupdate</tt> and <tt>lrelease</tt>. <p>Translation of Qt Script scripts is a three-step process: <ol><li> Run <tt>lupdate</tt> to extract translatable text from the script source code of the Qt application, resulting in a message file for translators (a <tt>.ts</tt> file). The utility recognizes qsTr(), qsTranslate() and the <tt>QT_TR*_NOOP()</tt> functions described above and produces <tt>.ts</tt> files (usually one per language).</li><li> Provide translations for the source texts in the <tt>.ts</tt> file, using Qt Linguist. Since <tt>.ts</tt> files are in XML format, you can also edit them by hand.</li><li> Run <tt>lrelease</tt> to obtain a light-weight message file (a <tt>.qm</tt> file) from the <tt>.ts</tt> file, suitable only for end use. Think of the <tt>.ts</tt> files as "source files", and <tt>.qm</tt> files as "object files". The translator edits the <tt>.ts</tt> files, but the users of your application only need the <tt>.qm</tt> files. Both kinds of files are platform and locale independent.</li></ol> Typically, you will repeat these steps for every release of your application. The <tt>lupdate</tt> utility does its best to reuse the translations from previous releases. <p>When running <tt>lupdate</tt>, you must specify the location of the script(s), and the name of the <tt>.ts</tt> file to produce. Examples: <pre class="snippet">
+lupdate myscript.qs -ts myscript_la.ts
+</pre> will extract translatable text from <tt>myscript.qs</tt> and create the translation file <tt>myscript_la.qs</tt>. <pre class="snippet">
+lupdate -extensions qs scripts/ -ts scripts_la.ts
+</pre> will extract translatable text from all files ending with <tt>.qs</tt> in the <tt>scripts</tt> folder and create the translation file <tt>scripts_la.qs</tt>. <p>Alternatively, you can create a separate qmake project file that sets up the <tt>SOURCES</tt> and <tt>TRANSLATIONS</tt> variables appropriately; then run <tt>lupdate</tt> with the project file as input. <pre class="snippet">
+lrelease myscript_la.ts
+</pre> When running <tt>lrelease</tt>, you must specify the name of the <tt>.ts</tt> input file; or, if you are using a qmake project file to manage script translations, you specify the name of that file. <tt>lrelease</tt> will create <tt>myscript_la.qm</tt>, the binary representation of the translation.<a name="apply-translations"><h3>Apply Translations</h3> In your application, you must use <a href="../../../com/trolltech/qt/core/QTranslator.html#load(java.lang.String, java.lang.String, java.lang.String)">QTranslator::load()</a> to load the translation files appropriate for the user's language, and install them using <a href="../../../com/trolltech/qt/core/QCoreApplication.html#installTranslator(com.trolltech.qt.core.QTranslator)">QCoreApplication::installTranslator()</a>. Finally, you must call QScriptEngine::installTranslatorFunctions() to make the script translation functions (qsTr(), qsTranslate() and <tt>QT_TR*_NOOP()</tt>) available to scripts that are subsequently evaluated by QScriptEngine::evaluate(). For scripts that are using the qsTr() function, the proper filename must be passed as second argument to QScriptEngine::evaluate(). <p><tt>linguist</tt>, <tt>lupdate</tt> and <tt>lrelease</tt> are installed in the <tt>bin</tt> subdirectory of the base directory Qt is installed into. Click Help|Manual in Qt Linguist to access the user's manual; it contains a tutorial to get you started. <p>See also the <a href="script-helloscript.html">Hello Script Example</a>.<a name="ecmascript-compatibility"><h2>ECMAScript Compatibility</h2> <a href="qtscript.html">QtScript</a> implements all the built-in classes and functions defined in ECMA-262. <p>The Date parsing and string conversion functions are implemented using <a href="../../../com/trolltech/qt/core/QDateTime.html#fromString(java.lang.String)">QDateTime::fromString()</a> and <a href="../../../com/trolltech/qt/core/QDateTime.html#toString()">QDateTime::toString()</a>, respectively. <p>The RegExp class is a wrapper around <a href="../../../com/trolltech/qt/core/QRegExp.html">QRegExp</a>. The <a href="../../../com/trolltech/qt/core/QRegExp.html">QRegExp</a> semantics do not precisely match the semantics for regular expressions defined in ECMA-262.<a name="qtscript-extensions-to-ecmascript"><h2>QtScript Extensions to ECMAScript</h2> <ul><li> <tt>__proto__</tt><br /> The prototype of an object (QScriptValue::prototype()) can be accessed through its <tt>__proto__</tt> property in script code. This property has the QScriptValue::Undeletable flag set. For example: <pre class="snippet">
+var o = new Object();
+(o.__proto__ === Object.prototype); // this evaluates to true
+</li></pre><li> <tt>Object.prototype.__defineGetter__</tt><br /> This function installs a getter function for a property of an object. The first argument is the property name, and the second is the function to call to get the value of that property. When the function is invoked, the <tt>this</tt> object will be the object whose property is accessed. For example: <pre class="snippet">
+var o = new Object();
+o.__defineGetter__("x", function() { return 123; });
+var y = o.x; // 123
+</li></pre><li> <tt>Object.prototype.__defineSetter__</tt><br /> This function installs a setter function for a property of an object. The first argument is the property name, and the second is the function to call to set the value of that property. When the function is invoked, the <tt>this</tt> object will be the object whose property is accessed. For example: <pre class="snippet">
+var o = new Object();
+o.__defineSetter__("x", function(v) { print("and the value is:", v); });
+o.x = 123; // will print "and the value is: 123"
+</li></pre><li> <tt>Function.prototype.connect</tt><br /> This function connects a signal to a slot. Usage of this function is described in the section <a href="qtscript.html#using-signals-and-slots">Using Signals and Slots</a>.</li><li> <tt>Function.prototype.disconnect</tt><br /> This function disconnects a signal from a slot. Usage of this function is described in the section <a href="qtscript.html#using-signals-and-slots">Using Signals and Slots</a>.</li><li> <tt>QObject.prototype.findChild</tt><br /> This function is semantically equivalent to <a href="../../../com/trolltech/qt/core/QObject.html#findChild()">QObject::findChild()</a>.</li><li> <tt>QObject.prototype.findChildren</tt><br /> This function is semantically equivalent to <a href="../../../com/trolltech/qt/core/QObject.html#findChildren()">QObject::findChildren()</a>.</li><li> <tt>QObject.prototype.toString</tt><br /> This function returns a default string representation of a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>.</li><li> <tt>gc</tt><br /> This function invokes the garbage collector.</li><li> <tt>Error.prototype.backtrace</tt><br /> This function returns a human-readable backtrace, in the form of an array of strings.</li><li> Error objects have the following additional properties: <ul><li> <tt>lineNumber</tt>: The line number where the error occurred.</li><li> <tt>fileName</tt>: The file name where the error occurred (if a file name was passed to QScriptEngine::evaluate()).</li><li> <tt>stack</tt>: An array of objects describing the stack. Each object has the following properties: <ul><li> <tt>functionName</tt>: The function name, if available.</li><li> <tt>fileName</tt>: The file name, if available.</li><li> <tt>lineNumber</tt>: The line number, if available.</li></ul></li></ul></li></ul><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
