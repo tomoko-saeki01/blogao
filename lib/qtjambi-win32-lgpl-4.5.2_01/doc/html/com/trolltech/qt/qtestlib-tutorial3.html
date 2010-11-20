@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Chapter 3: Simulating GUI Events</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Chapter 3: Simulating GUI Events</h1></center><p>[Previous: <a href="qtestlib-tutorial2.html">Chapter 2: Data Driven Testing</a>][<a href="qtestlib-tutorial.html">QTestLib Tutorial</a>][Next: <a href="qtestlib-tutorial4.html">Chapter 4: Replaying GUI Events</a>]<p> <a href="qtestlib-manual.html">QTestLib</a> features some mechanisms to test graphical user interfaces. Instead of simulating native window system events, <a href="qtestlib-manual.html">QTestLib</a> sends internal Qt events. That means there are no side-effects on the machine the tests are running on. <p>In this chapter we will se how to write a simple GUI test.<a name="writing-a-gui-test"><h2>Writing a GUI test</h2> This time, let's assume you want to test the behavior of our <a href="../../../com/trolltech/qt/gui/QLineEdit.html">QLineEdit</a> class. As before, you will need a class that contains your test function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+#include &lt;QtGui&gt;
+#include &lt;QtTest/QtTest&gt;
+
+class TestGui: public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testGui();
+
+};
+</pre> The only difference is that you need to include the <a href="qtgui.html">QtGui</a> class definitions in addition to the QTest namespace.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void TestGui::testGui()
+{
+    QLineEdit lineEdit;
+
+    QTest::keyClicks(&lineEdit, "hello world");
+
+    QCOMPARE(lineEdit.text(), QString("hello world"));
+}
+</pre> In the implementation of the test function we first create a <a href="../../../com/trolltech/qt/gui/QLineEdit.html">QLineEdit</a>. Then we simulate writing "hello world" in the line edit using the QTest::keyClicks() function. <p><b>Note:</b> The widget must also be shown in order to correctly test keyboard shortcuts. <p>QTest::keyClicks() simulates clicking a sequence of keys on a widget. Optionally, a keyboard modifier can be specified as well as a delay (in milliseconds) of the test after each key click. In a similar way, you can use the QTest::keyClick(), QTest::keyPress(), QTest::keyRelease(), QTest::mouseClick(), QTest::mouseDClick(), QTest::mouseMove(), QTest::mousePress() and QTest::mouseRelease() functions to simulate the associated GUI events. <p>Finally, we use the QCOMPARE() macro to check if the line edit's text is as expected. <p>As before, to make our test case a stand-alone executable, the following two lines are needed:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QTEST_MAIN(TestGui)
+#include "testgui.moc"
+</pre> The QTEST_MAIN() macro expands to a simple main() method that runs all the test functions, and since both the declaration and the implementation of our test class are in a .cpp file, we also need to include the generated moc file to make Qt's introspection work.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

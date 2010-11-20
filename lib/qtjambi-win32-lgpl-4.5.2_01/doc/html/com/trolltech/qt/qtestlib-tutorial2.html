@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Chapter 2: Data Driven Testing</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Chapter 2: Data Driven Testing</h1></center><p>[Previous: <a href="qtestlib-tutorial1.html">Chapter 1: Writing a Unit Test</a>][<a href="qtestlib-tutorial.html">QTestLib Tutorial</a>][Next: <a href="qtestlib-tutorial3.html">Chapter 3: Simulating GUI Events</a>]<p> In this chapter we will demonstrate how to execute a test multiple times with different test data. <p>So far, we have hard coded the data we wanted to test into our test function. If we add more test data, the function might look like this: <pre class="snippet">
+QCOMPARE(QString("hello").toUpper(), QString("HELLO"));
+QCOMPARE(QString("Hello").toUpper(), QString("HELLO"));
+QCOMPARE(QString("HellO").toUpper(), QString("HELLO"));
+QCOMPARE(QString("HELLO").toUpper(), QString("HELLO"));
+</pre> To prevent that the function ends up being cluttered by repetitive code, <a href="qtestlib-manual.html">QTestLib</a> supports adding test data to a test function. All we need is to add another private slot to our test class:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+class TestQString: public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void toUpper_data();
+    void toUpper();
+};
+</pre><a name="writing-the-data-function"><h2>Writing the Data Function</h2> A test function's associated data function carries the same name, appended by <tt>_data</tt>. Our data function looks like this:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void TestQString::toUpper_data()
+{
+    QTest::addColumn&lt;QString&gt;("string");
+    QTest::addColumn&lt;QString&gt;("result");
+
+    QTest::newRow("all lower") &lt;&lt; "hello" &lt;&lt; "HELLO";
+    QTest::newRow("mixed")     &lt;&lt; "Hello" &lt;&lt; "HELLO";
+    QTest::newRow("all upper") &lt;&lt; "HELLO" &lt;&lt; "HELLO";
+}
+</pre> First, we define the two elements of our test table using the QTest::addColumn() function: A test string, and the expected result of applying the QString::toUpper() function to that string. <p>Then we add some data to the table using the QTest::newRow() function. Each set of data will become a separate row in the test table. <p>QTest::newRow() takes one argument: A name that will be associated with the data set. If the test fails, the name will be used in the test log, referencing the failed data. Then we stream the data set into the new table row: First an arbitrary string, and then the expected result of applying the QString::toUpper() function to that string. <p>You can think of the test data as a two-dimensional table. In our case, it has two columns called <tt>string</tt> and <tt>result</tt> and three rows. In addition a name as well as an index is associated with each row: <table align="center" border="0" cellpadding="2" cellspacing="1"><thead><tr class="qt-style" valign="top"><th><center> index</center></th><th><center> name</center></th><th><center> string</center></th><th><center> result</center></th></tr></thead><tr valign="top" class="even"><td> 0</td><td> all lower</td><td> "hello"</td><td> HELLO</td></tr><tr valign="top" class="odd"><td> 1</td><td> mixed</td><td> "Hello"</td><td> HELLO</td></tr><tr valign="top" class="even"><td> 2</td><td> all upper</td><td> "HELLO"</td><td> HELLO</td></tr></table><a name="rewriting-the-test-function"><h2>Rewriting the Test Function</h2> Our test function can now be rewritten:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void TestQString::toUpper()
+{
+    QFETCH(QString, string);
+    QFETCH(QString, result);
+
+    QCOMPARE(string.toUpper(), result);
+}
+</pre> The TestQString::toUpper() function will be executed three times, once for each entry in the test table that we created in the associated TestQString::toUpper_data() function. <p>First, we fetch the two elements of the data set using the QFETCH() macro. QFETCH() takes two arguments: The data type of the element and the element name. Then we perform the test using the QCOMPARE() macro. <p>This approach makes it very easy to add new data to the test without modifying the test itself. <p>And again, to make our test case a stand-alone executable, the following two lines are needed:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QTEST_MAIN(TestQString)
+#include "testqstring.moc"
+</pre> As before, the QTEST_MAIN() macro expands to a simple main() method that runs all the test functions, and since both the declaration and the implementation of our test class are in a .cpp file, we also need to include the generated moc file to make Qt's introspection work.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
