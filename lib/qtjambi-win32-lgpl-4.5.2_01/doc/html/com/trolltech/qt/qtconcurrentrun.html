@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Asynchronous Run</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Asynchronous Run</h1></center><p>The &lt;QtConcurrentRun&gt; header provides a way to run a function in a separate thread. This function is a part of the <a href="threads.html#qtconcurrent-intro">Qt Concurrent</a> framework. <p>The QtConcurrent::run() function runs a function in a separate thread. The return value of the function is made available through the <a href="../../../com/trolltech/qt/core/QFuture.html">QFuture</a> API.<a name="running-a-function-in-a-separate-thread"><h2>Running a Function in a Separate Thread</h2> To run a function in another thread, use QtConcurrent::run():<br><br>The following code example is written in c++.<br> <pre class="snippet">
+extern void aFunction();
+QFuture&lt;void&gt; future = QtConcurrent::run(aFunction);
+</pre> This will run aFunction in a separate thread obtained from the default <a href="../../../com/trolltech/qt/core/QThreadPool.html">QThreadPool</a>. You can use the <a href="../../../com/trolltech/qt/core/QFuture.html">QFuture</a> and <a href="../../../com/trolltech/qt/core/QFutureWatcher.html">QFutureWatcher</a> classes to monitor the status of the function.<a name="passing-arguments-to-the-function"><h2>Passing Arguments to the Function</h2> Passing arguments to the function is done by adding them to the QtConcurrent::run() call immediately after the function name. For example:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+extern void aFunctionWithArguments(int arg1, double arg2, const QString &string);
+
+int integer = ...;
+double floatingPoint = ...;
+QString string = ...;
+
+QFuture&lt;void&gt; future = QtConcurrent::run(aFunctionWithArguments, integer, floatingPoint, string);
+</pre> A copy of each argument is made at the point where QtConcurrent::run() is called, and these values are passed to the thread when it begins executing the function. Changes made to the arguments after calling QtConcurrent::run() are not visible to the thread.<a name="returning-values-from-the-function"><h2>Returning Values from the Function</h2> Any return value from the function is available via <a href="../../../com/trolltech/qt/core/QFuture.html">QFuture</a>:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+extern QString functionReturningAString();
+QFuture&lt;QString&gt; future = QtConcurrent::run(functionReturningAString);
+...
+QString result = future.result();
+</pre> As documented above, passing arguments is done like this:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+extern QString someFunction(const QByteArray &input);
+
+QByteArray bytearray = ...;
+
+QFuture&lt;QString&gt; future = QtConcurrent::run(someFunction, bytearray);
+...
+QString result = future.result();
+</pre> Note that the <a href="../../../com/trolltech/qt/core/QFuture.html#result()">QFuture::result()</a> function blocks and waits for the result to become available. Use <a href="../../../com/trolltech/qt/core/QFutureWatcher.html">QFutureWatcher</a> to get notification when the function has finished execution and the result is available.<a name="additional-api-features"><h2>Additional API Features</h2><a name="using-member-functions"><h3>Using Member Functions</h3> QtConcurrent::run() also accepts pointers to member functions. The first argument must be either a const reference or a pointer to an instance of the class. Passing by const reference is useful when calling const member functions; passing by pointer is useful for calling non-const member functions that modify the instance. <p>For example, calling QString::split() (a const member function) in a separate thread is done like this:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+// call 'QStringList QString::split(const QString &sep, SplitBehavior behavior, Qt::CaseSensitivity cs) const' in a separate thread
+QString string = ...;
+QFuture&lt;QStringList&gt; future = QtConcurrent::run(string, &QString::split, QString(", "), QString::KeepEmptyParts, Qt::CaseSensitive);
+...
+QStringList result = future.result();
+</pre> Calling a non-const member function is done like this:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+// call 'void QImage::invertPixels(InvertMode mode)' in a separate thread
+QImage image = ...;
+QFuture&lt;void&gt; future = QtConcurrent::run(image, &QImage::invertPixels, QImage::InvertRgba);
+...
+future.waitForFinished();
+// At this point, the pixels in 'image' have been inverted
+</pre><a name="using-bound-function-arguments"><h3>Using Bound Function Arguments</h3> Note that Qt does not provide support for bound functions. This is provided by 3rd party libraries like Boost or C++ TR1 Library Extensions. <p>You can use boost::bind() or std::tr1::bind() to bind a number of arguments to a function when called. There are number of reasons for doing this: <ul><li> To call a function that takes more than 5 arguments.</li><li> To simplify calling a function with constant arguments.</li><li> Changing the order of arguments.</li></ul> See the documentation for the relevant functions for details on how to use the bind API. <p>Calling a bound function is done like this:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void someFunction(int arg1, double arg2);
+QFuture&lt;void&gt; future = QtConcurrent::run(boost::bind(someFunction, 1, 2.0));
+...
+</pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
