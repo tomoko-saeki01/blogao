@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Code for Spin Boxes Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Code for Spin Boxes Example</h1></center><p><pre class="snippet"><html style="white-space:pre-wrap;font-family:courier new"><font color=darkgreen><i>/****************************************************************************
+ **
+ ** Copyright (C) 1992-2009 Nokia Corporation and/or its subsidiary(-ies).
+** All rights reserved.
+ **
+ ** This file is part of Qt Jambi.
+ **
+ ** 
+** Commercial Usage
+** Licensees holding valid Qt Commercial licenses may use this file in
+** accordance with the Qt Commercial License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Nokia.
+** 
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 2.1 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU Lesser General Public License version 2.1 requirements
+** will be met: http:<font color=darkgreen><i>//www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+</i></font>** 
+** In addition, as a special exception, Nokia gives you certain
+** additional rights. These rights are described in the Nokia Qt LGPL
+** Exception version 1.0, included in the file LGPL_EXCEPTION.txt in this
+** package.
+** 
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 3.0 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU General Public License version 3.0 requirements will be
+** met: http:<font color=darkgreen><i>//www.gnu.org/copyleft/gpl.html.
+</i></font>** 
+** If you are unsure which license is appropriate for your use, please
+** contact the sales department at qt-sales@nokia.com.
+ **
+ ** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+ ** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ **
+ ****************************************************************************/</i></font>
+
+<font color=blue>package</font> com.trolltech.examples;
+
+<font color=blue>import</font> com.trolltech.qt.core.*;
+<font color=blue>import</font> com.trolltech.qt.gui.*;
+
+@<font color=darkmagenta><i>QtJambiExample</i></font>(name = <font color=darkgreen><i>"Spin Boxes"</i></font>)
+<font color=blue>public</font> <font color=blue>class</font> SpinBoxes <font color=blue>extends</font> <font color=darkmagenta><i>QWidget</i></font> {
+    <font color=blue>private</font> <font color=darkmagenta><i>QDateTimeEdit</i></font> meetingEdit;
+    <font color=blue>private</font> <font color=darkmagenta><i>QDoubleSpinBox</i></font> doubleSpinBox;
+    <font color=blue>private</font> <font color=darkmagenta><i>QDoubleSpinBox</i></font> priceSpinBox;
+    <font color=blue>private</font> <font color=darkmagenta><i>QDoubleSpinBox</i></font> scaleSpinBox;
+    <font color=blue>private</font> <font color=darkmagenta><i>QGroupBox</i></font> spinBoxesGroup;
+    <font color=blue>private</font> <font color=darkmagenta><i>QGroupBox</i></font> editsGroup;
+    <font color=blue>private</font> <font color=darkmagenta><i>QGroupBox</i></font> doubleSpinBoxesGroup;
+    <font color=blue>private</font> <font color=darkmagenta><i>QLabel</i></font> meetingLabel;
+
+
+    <font color=blue>public</font> SpinBoxes() {
+        <font color=blue>this</font>(null);
+    }
+
+    <font color=blue>public</font> SpinBoxes(<font color=darkmagenta><i>QWidget</i></font> parent) {
+        <font color=blue>super</font>(parent);
+        createSpinBoxes();
+        createDateTimeEdits();
+        createDoubleSpinBoxes();
+
+        <font color=darkmagenta><i>QHBoxLayout</i></font> layout = <font color=blue>new</font> <font color=darkmagenta><i>QHBoxLayout</i></font>();
+        layout.addWidget(spinBoxesGroup);
+        layout.addWidget(editsGroup);
+        layout.addWidget(doubleSpinBoxesGroup);
+        setLayout(layout);
+
+        setWindowTitle(tr(<font color=darkgreen><i>"Spin Boxes"</i></font>));
+
+        setWindowIcon(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(<font color=darkgreen><i>"classpath:com/trolltech/images/qt-logo.png"</i></font>));
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> createSpinBoxes() {
+        spinBoxesGroup = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(tr(<font color=darkgreen><i>"Spinboxes"</i></font>));
+
+        <font color=darkmagenta><i>QLabel</i></font> integerLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(String.format(tr(<font color=darkgreen><i>"Enter a value between %1$d and %2$d:"</i></font>), -20, 20));
+        <font color=darkmagenta><i>QSpinBox</i></font> integerSpinBox = <font color=blue>new</font> <font color=darkmagenta><i>QSpinBox</i></font>();
+        integerSpinBox.setRange(-20, 20);
+        integerSpinBox.setSingleStep(1);
+        integerSpinBox.setValue(0);
+
+        <font color=darkmagenta><i>QLabel</i></font> zoomLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(String.format(tr(<font color=darkgreen><i>"Enter a zoom value between %1$d and %2$d:"</i></font>), 0, 1000));
+        <font color=darkmagenta><i>QSpinBox</i></font> zoomSpinBox = <font color=blue>new</font> <font color=darkmagenta><i>QSpinBox</i></font>();
+        zoomSpinBox.setRange(0, 1000);
+        zoomSpinBox.setSingleStep(10);
+        zoomSpinBox.setSuffix(<font color=darkgreen><i>"%"</i></font>);
+        zoomSpinBox.setSpecialValueText(tr(<font color=darkgreen><i>"Automatic"</i></font>));
+        zoomSpinBox.setValue(100);
+
+        <font color=darkmagenta><i>QLabel</i></font> priceLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(String.format(tr(<font color=darkgreen><i>"Enter a price between %1$d and %2$d:"</i></font>), 0, 999));
+        <font color=darkmagenta><i>QSpinBox</i></font> priceSpinBox = <font color=blue>new</font> <font color=darkmagenta><i>QSpinBox</i></font>();
+        priceSpinBox.setRange(0, 999);
+        priceSpinBox.setSingleStep(1);
+        priceSpinBox.setPrefix(<font color=darkgreen><i>"$"</i></font>);
+        priceSpinBox.setValue(99);
+
+        <font color=darkmagenta><i>QVBoxLayout</i></font> spinBoxLayout = <font color=blue>new</font> <font color=darkmagenta><i>QVBoxLayout</i></font>();
+        spinBoxLayout.addWidget(integerLabel);
+        spinBoxLayout.addWidget(integerSpinBox);
+        spinBoxLayout.addWidget(zoomLabel);
+        spinBoxLayout.addWidget(zoomSpinBox);
+        spinBoxLayout.addWidget(priceLabel);
+        spinBoxLayout.addWidget(priceSpinBox);
+        spinBoxesGroup.setLayout(spinBoxLayout);
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> createDateTimeEdits() {
+        editsGroup = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(tr(<font color=darkgreen><i>"Date and time spin boxes"</i></font>));
+
+        <font color=darkmagenta><i>QLabel</i></font> dateLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>();
+        <font color=darkmagenta><i>QDateEdit</i></font> dateEdit = <font color=blue>new</font> <font color=darkmagenta><i>QDateEdit</i></font>(<font color=darkmagenta><i>QDate</i></font>.currentDate());
+        dateEdit.setDateRange(<font color=blue>new</font> <font color=darkmagenta><i>QDate</i></font>(2005, 1, 1), <font color=blue>new</font> <font color=darkmagenta><i>QDate</i></font>(2010, 12, 31));
+        dateLabel.setText(String.format(tr(<font color=darkgreen><i>"Appointment date (between %1$s and %2$s):"</i></font>),
+                                        dateEdit.minimumDate().toString(<font color=darkmagenta><i>Qt</i></font>.DateFormat.ISODate),
+                                        dateEdit.maximumDate().toString(<font color=darkmagenta><i>Qt</i></font>.DateFormat.ISODate)));
+
+        <font color=darkmagenta><i>QLabel</i></font> timeLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>();
+        <font color=darkmagenta><i>QTimeEdit</i></font> timeEdit = <font color=blue>new</font> <font color=darkmagenta><i>QTimeEdit</i></font>(<font color=darkmagenta><i>QTime</i></font>.currentTime());
+        timeEdit.setTimeRange(<font color=blue>new</font> <font color=darkmagenta><i>QTime</i></font>(9, 0, 0, 0), <font color=blue>new</font> <font color=darkmagenta><i>QTime</i></font>(16, 30, 0, 0));
+        timeLabel.setText(String.format(tr(<font color=darkgreen><i>"Appointment time (between %1$s and %2$s):"</i></font>),
+                                        timeEdit.minimumTime().toString(<font color=darkmagenta><i>Qt</i></font>.DateFormat.ISODate),
+                                        timeEdit.maximumTime().toString(<font color=darkmagenta><i>Qt</i></font>.DateFormat.ISODate)));
+
+        meetingLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>();
+        meetingEdit = <font color=blue>new</font> <font color=darkmagenta><i>QDateTimeEdit</i></font>(<font color=darkmagenta><i>QDateTime</i></font>.currentDateTime());
+
+        <font color=darkmagenta><i>QLabel</i></font> formatLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"Format string for the meeting date and time:"</i></font>));
+        <font color=darkmagenta><i>QComboBox</i></font> formatComboBox = <font color=blue>new</font> <font color=darkmagenta><i>QComboBox</i></font>();
+        formatComboBox.addItem(<font color=darkgreen><i>"yyyy-MM-dd hh:mm:ss (zzz 'ms')"</i></font>);
+        formatComboBox.addItem(<font color=darkgreen><i>"hh:mm:ss MM/dd/yyyy"</i></font>);
+        formatComboBox.addItem(<font color=darkgreen><i>"hh:mm:ss dd/MM/yyyy"</i></font>);
+        formatComboBox.addItem(<font color=darkgreen><i>"hh:mm:ss"</i></font>);
+        formatComboBox.addItem(<font color=darkgreen><i>"hh:mm ap"</i></font>);
+
+        formatComboBox.activated.connect(<font color=blue>this</font>, <font color=darkgreen><i>"setFormatString(String)"</i></font>);
+
+        setFormatString(formatComboBox.currentText());
+
+        <font color=darkmagenta><i>QVBoxLayout</i></font> editsLayout = <font color=blue>new</font> <font color=darkmagenta><i>QVBoxLayout</i></font>();
+        editsLayout.addWidget(dateLabel);
+        editsLayout.addWidget(dateEdit);
+        editsLayout.addWidget(timeLabel);
+        editsLayout.addWidget(timeEdit);
+        editsLayout.addWidget(meetingLabel);
+        editsLayout.addWidget(meetingEdit);
+        editsLayout.addWidget(formatLabel);
+        editsLayout.addWidget(formatComboBox);
+        editsGroup.setLayout(editsLayout);
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> setFormatString(String formatString) {
+        meetingEdit.setDisplayFormat(formatString);
+        <font color=blue>if</font> (meetingEdit.displayedSections().isSet(<font color=darkmagenta><i>QDateTimeEdit</i></font>.Section.DateSections_Mask)) {
+            meetingEdit.setDateRange(<font color=blue>new</font> <font color=darkmagenta><i>QDate</i></font>(2004, 11, 1), <font color=blue>new</font> <font color=darkmagenta><i>QDate</i></font>(2005, 11, 30));
+            meetingLabel.setText(String.format(tr(<font color=darkgreen><i>"Meeting date (between %1$s and %2$s):"</i></font>),
+                                               meetingEdit.minimumDate().toString(<font color=darkmagenta><i>Qt</i></font>.DateFormat.ISODate), meetingEdit.maximumDate().toString(<font color=darkmagenta><i>Qt</i></font>.DateFormat.ISODate)));
+        } <font color=blue>else</font> {
+            meetingEdit.setTimeRange(<font color=blue>new</font> <font color=darkmagenta><i>QTime</i></font>(0, 7, 20, 0), <font color=blue>new</font> <font color=darkmagenta><i>QTime</i></font>(21, 0, 0, 0));
+            meetingLabel.setText(String.format(tr(<font color=darkgreen><i>"Meeting time (between %1$s and %2$s):"</i></font>), meetingEdit.minimumTime().toString(<font color=darkmagenta><i>Qt</i></font>.DateFormat.ISODate), meetingEdit.maximumTime().toString(<font color=darkmagenta><i>Qt</i></font>.DateFormat.ISODate)));
+        }
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> createDoubleSpinBoxes() {
+        doubleSpinBoxesGroup = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(tr(<font color=darkgreen><i>"Double precision spinboxes"</i></font>));
+
+        <font color=darkmagenta><i>QLabel</i></font> precisionLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"Number of decimal places to show:"</i></font>));
+        <font color=darkmagenta><i>QSpinBox</i></font> precisionSpinBox = <font color=blue>new</font> <font color=darkmagenta><i>QSpinBox</i></font>();
+        precisionSpinBox.setRange(0, 13);
+        precisionSpinBox.setValue(2);
+
+        <font color=darkmagenta><i>QLabel</i></font> doubleLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(String.format(tr(<font color=darkgreen><i>"Enter a value between %1$d and %2$d:"</i></font>), -20, 20));
+        doubleSpinBox = <font color=blue>new</font> <font color=darkmagenta><i>QDoubleSpinBox</i></font>();
+        doubleSpinBox.setRange(-20.0, 20.0);
+        doubleSpinBox.setSingleStep(1.0);
+        doubleSpinBox.setValue(0.0);
+
+        <font color=darkmagenta><i>QLabel</i></font> scaleLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(String.format(tr(<font color=darkgreen><i>"Enter a scale factor between %1$d and %2$d:"</i></font>), 0, 1000));
+        scaleSpinBox = <font color=blue>new</font> <font color=darkmagenta><i>QDoubleSpinBox</i></font>();
+        scaleSpinBox.setRange(0.0, 1000.0);
+        scaleSpinBox.setSingleStep(10.0);
+        scaleSpinBox.setSuffix(<font color=darkgreen><i>"%"</i></font>);
+        scaleSpinBox.setSpecialValueText(tr(<font color=darkgreen><i>"No scaling"</i></font>));
+        scaleSpinBox.setValue(100.0);
+
+        <font color=darkmagenta><i>QLabel</i></font> priceLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(String.format(tr(<font color=darkgreen><i>"Enter a price between %1$d and %2$d:"</i></font>), 0, 1000));
+        priceSpinBox = <font color=blue>new</font> <font color=darkmagenta><i>QDoubleSpinBox</i></font>();
+        priceSpinBox.setRange(0.0, 1000.0);
+        priceSpinBox.setSingleStep(1.0);
+        priceSpinBox.setPrefix(<font color=darkgreen><i>"$"</i></font>);
+        priceSpinBox.setValue(99.99);
+
+        precisionSpinBox.valueChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"changePrecision(int)"</i></font>);
+
+        <font color=darkmagenta><i>QVBoxLayout</i></font> spinBoxLayout = <font color=blue>new</font> <font color=darkmagenta><i>QVBoxLayout</i></font>();
+        spinBoxLayout.addWidget(precisionLabel);
+        spinBoxLayout.addWidget(precisionSpinBox);
+        spinBoxLayout.addWidget(doubleLabel);
+        spinBoxLayout.addWidget(doubleSpinBox);
+        spinBoxLayout.addWidget(scaleLabel);
+        spinBoxLayout.addWidget(scaleSpinBox);
+        spinBoxLayout.addWidget(priceLabel);
+        spinBoxLayout.addWidget(priceSpinBox);
+        doubleSpinBoxesGroup.setLayout(spinBoxLayout);
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> changePrecision(<font color=blue>int</font> decimals) {
+        doubleSpinBox.setDecimals(decimals);
+        scaleSpinBox.setDecimals(decimals);
+        priceSpinBox.setDecimals(decimals);
+    }
+
+    <font color=blue>public</font> <font color=blue>static</font> <font color=blue>void</font> main(String args[]) {
+        <font color=darkmagenta><i>QApplication</i></font>.initialize(args);
+
+        SpinBoxes spinBoxes = <font color=blue>new</font> SpinBoxes();
+        spinBoxes.show();
+
+        <font color=darkmagenta><i>QApplication</i></font>.exec();
+    }
+}
+</html></pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>The Qt Jambi Resource System</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>The Qt Jambi Resource System</h1></center><p> Qt Jambi provides a convenient way to bundle resources with you Java application - such as icons, translation files, etc. With the resource system, Jambi can search for files and directories you specify in the current classpath.<a name="using-the-resource-system"><h2>Using the Resource System</h2> Using the resource system, you can specify resource file names relative to the classpath. This is done by prefixing the filename of the resource with "classpath:", for instance: <pre class="snippet">
+        QFile resourceFile = new QFile("classpath:images/star.png");
+</pre> Qt Jambi then goes through the classpath entries and appends <tt>images/star.png</tt> to each entry. Notice that this makes it easy to package resources in <tt>.jar</tt> files. <p>For instance if you have an image, <tt>star.png</tt>, located in the root directory of the <tt>.jar</tt> file, you can simply access it by "classpath:star.png". The <tt>.jar</tt> file must be in the classpath, of course. <p>It is also possible to search for a file in a specific (absolute) location in the classpath, using the syntax "classpath:&lt;absolute path&gt;#&lt;filename&gt;". The absolute path can be the full path to a directory or a <tt>.jar</tt> file, while the filename is the name of the resource. <p>In the following code snippet, Qt Jambi will pick the classpath entry <tt>images</tt>, and search for the <tt>star.png</tt> in that directory. <pre class="snippet">
+        QPixmap pixmap = new QPixmap("classpath:images#/star.png");
+</pre> Giving a specific location is mostly useful if you want to get an absolute path to a resource, i.e., a path to one specific file in the classpath. We give a code example below. <pre class="snippet">
+        QFile absoluteFilePath = new QFile("classpath:images#/star.png");
+        QFile relativeFilePath = new QFile("classpath:images/star.png");
+</pre> If your classpath contains <tt>resources.jar</tt> and the directory <tt>images</tt>, Qt Jambi will search for <tt>absoluteFilePath</tt> only in <tt>images</tt>, and search for <tt>relativeFilePath</tt> in <tt>images/images/</tt> and in <tt>images</tt> inside the resources <tt>.jar</tt> file. <p>You can list contents of a directory in the classpath, for instance, using a <a href="../../../com/trolltech/qt/core/QDir.html">QDir</a>. <pre class="snippet">
+        QDir dir = new QDir("classpath:images");
+        List&lt;QFileInfo&gt; images = dir.entryInfoList();
+</pre> The resource system is read-only, so it is not possible to create new directories, write resource files, etc.<a name="the-resource-system-implementation"><h2>The Resource System Implementation</h2> In Jambi it is possible to write custom file engines by extending <a href="../../../com/trolltech/qt/core/QAbstractFileEngine.html">QAbstractFileEngine</a>. A file engine knows how to resolve file names, read, and write files through a <a href="../../../com/trolltech/qt/core/QIODevice.html">QIODevice</a>. The <a href="../../../com/trolltech/qt/core/QDir.html">QDir</a>, <a href="../../../com/trolltech/qt/core/QFile.html">QFile</a>, and <a href="../../../com/trolltech/qt/core/QFileInfo.html">QFileInfo</a> classes all make use of a file file engine. The resource system is implemented in such a custom file engine. <p>Note that this makes the resource system specific to Qt Jambi, so, for instance, you cannot access resources using the <tt>java.io</tt> package. <p><DT><b>See also:</b><br><DD><a href="qtjambi-resourcesystem.html">Resource System Example</a>, and <a href="../../../com/trolltech/qt/core/QAbstractFileEngine.html">QAbstractFileEngine</a>. <br></DD></DT><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

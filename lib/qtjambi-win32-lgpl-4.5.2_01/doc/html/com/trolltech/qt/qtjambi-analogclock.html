@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Analog Clock Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Analog Clock Example</h1></center><p> <b>Code</b>: <ul><li> <a href="qtjambi-analogclock-code.html">AnalogClock.java</a></li></ul> The Analog Clock example shows how to draw the contents of a custom widget. <br><center><img src="images/analogclock-example.png"></center><br> This example also demonstrates how the transformation and scaling features of <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a> can be used to make drawing custom widgets easier.<a name="analogclock-class-implementation"><h2>AnalogClock Class Implementation</h2> The <tt>AnalogClock</tt> class provides a clock widget with hour and minute hands that is automatically updated every few seconds. <pre class="snippet">
+public class AnalogClock
+    extends QWidget
+{
+    static QPolygon hourHand = new QPolygon();
+    static QPolygon minuteHand = new QPolygon();
+    static {
+        hourHand.append(new QPoint(7, 8));
+        hourHand.append(new QPoint(-7, 8));
+        hourHand.append(new QPoint(0, -40));
+
+        minuteHand.append(new QPoint(7, 8));
+        minuteHand.append(new QPoint(-7, 8));
+        minuteHand.append(new QPoint(0, -70));
+    }
+
+    QTimer m_timer = new QTimer(this);
+</pre> We subclass <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> and define polygons to use for the hour and minute hands, as well as a timer that enables us to update the clock face. <p>In the constructor, we set up a one-second timer to keep track of the current time, and we connect it to the standard <a href="../../../com/trolltech/qt/gui/QWidget.html#update()">update()</a> slot so that the clock face is updated when the timer emits the timeout() signal: <pre class="snippet">
+    public AnalogClock() {
+        this(null);
+    }
+</pre> We also resize the widget so that it is displayed at a reasonable size. <p>The <tt>paintEvent()</tt> method is called whenever the widget's contents need to be updated. This happens when the widget is first shown, and when it is covered then exposed, but it is also executed when the widget's <a href="../../../com/trolltech/qt/gui/QWidget.html#update()">update()</a> slot is called. Since we connected the timer's timeout() signal to this slot, it will be called at least once every five seconds. <pre class="snippet">
+    protected void paintEvent(QPaintEvent e)
+    {
+        QColor hourColor = new QColor(127, 0, 127);
+        QColor minuteColor = new QColor(0, 127, 127, 191);
+
+        int side = width() &lt; height() ? width() : height();
+
+        QTime time = QTime.currentTime();
+</pre> Before we set up the painter and draw the clock, we first define two <a href="../../../com/trolltech/qt/gui/QColor.html">QColor</a>s that will be used for the hour and minute hands. The minute hand's color has an alpha component of 191, meaning that it's 75% opaque. <p>We also determine the length of the widget's shortest side so that we can fit the clock face inside the widget. It is also useful to determine the current time before we start drawing. <pre class="snippet">
+        QPainter painter = new QPainter(this);
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing);
+        painter.translate(width() / 2, height() / 2);
+        painter.scale(side / 200.0f, side / 200.0f);
+</pre> The contents of custom widgets are drawn with a <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a>. Painters can be used to draw on any <a href="../../../com/trolltech/qt/gui/QPaintDevice.html">QPaintDevice</a>, but they are usually used with widgets, so we pass the widget instance to the painter's constructor. <p>We call <a href="../../../com/trolltech/qt/gui/QPainter.html#setRenderHint(com.trolltech.qt.gui.QPainter.RenderHint)">QPainter.setRenderHint()</a> with <a href="../../../com/trolltech/qt/gui/QPainter.RenderHint.html">QPainter.Antialiasing</a> to turn on antialiasing. This makes drawing of diagonal lines much smoother. <p>The translation moves the origin to the center of the widget, and the scale operation ensures that the following drawing operations are scaled to fit within the widget. We use a scale factor that let's us use x and y coordinates between -100 and 100, and that ensures that these lie within the length of the widget's shortest side. <p>To make our code simpler, we will draw a fixed size clock face that will be positioned and scaled so that it lies in the center of the widget. <p>The painter takes care of all the transformations made during the paint event, and ensures that everything is drawn correctly. Letting the painter handle transformations is often easier than performing manual calculations just to draw the contents of a custom widget. <br><center><img src="images/analogclock-viewport.png"></center><br> We draw the hour hand first, using a formula that rotates the coordinate system counterclockwise by a number of degrees determined by the current hour and minute. This means that the hand will be shown rotated clockwise by the required amount. <pre class="snippet">
+        painter.setPen(QPen.NoPen);
+        painter.setBrush(hourColor);
+</pre> We set the pen to be <a href="../../../com/trolltech/qt/core/Qt.PenStyle.html">Qt::NoPen</a> because we don't want any outline, and we use a solid brush with the color appropriate for displaying hours. Brushes are used when filling in polygons and other geometric shapes. <pre class="snippet">
+        painter.save();
+        painter.rotate(30.0f * ((time.hour() + time.minute() / 60.0f)));
+        painter.drawConvexPolygon(hourHand);
+        painter.restore();
+</pre> We save and restore the transformation matrix before and after the rotation because we want to place the minute hand without having to take into account any previous rotations. <pre class="snippet">
+        painter.setPen(hourColor);
+
+        for (int i=0; i&lt;12; ++i) {
+            painter.drawLine(88, 0, 96, 0);
+            painter.rotate(30.0f);
+        }
+</pre> We draw markers around the edge of the clock for each hour. We draw each marker then rotate the coordinate system so that the painter is ready for the next one. <pre class="snippet">
+        painter.setPen(QPen.NoPen);
+        painter.setBrush(minuteColor);
+
+        painter.save();
+        painter.rotate(6.0f * (time.minute() + time.second() / 60.0f));
+        painter.drawConvexPolygon(minuteHand);
+        painter.restore();
+</pre> The minute hand is rotated in a similar way to the hour hand. <pre class="snippet">
+        painter.setPen(minuteColor);
+
+        for (int j=0; j&lt;60; ++j) {
+            if ((j % 5) != 0)
+                painter.drawLine(92, 0, 96, 0);
+            painter.rotate(6.0f);
+        }
+</pre> Again, we draw markers around the edge of the clock, but this time to indicate minutes. We skip multiples of 5 to avoid drawing minute markers on top of hour markers. <p>The rest of the class contains a <a href="../../../com/trolltech/qt/gui/QWidget.html#showEvent(com.trolltech.qt.gui.QShowEvent)">showEvent()</a> implementation that starts the timer when the window is shown, and a <a href="../../../com/trolltech/qt/gui/QWidget.html#hideEvent(com.trolltech.qt.gui.QHideEvent)">hideEvent()</a> implementation that stops it when the window is hidden. <pre class="snippet">
+    public void showEvent(QShowEvent e) {
+        m_timer.start(1000);
+    }
+
+    &#64;Override
+    public void hideEvent(QHideEvent e) {
+        m_timer.stop();
+
+    }
+</pre> These methods ensure that we don't do unnecessary work when the clock is not visible to the user. <p>Finally, we provide a <tt>main()</tt> method to create and show the analog clock when the example is run: <pre class="snippet">
+    static public void main(String args[])
+    {
+        QApplication.initialize(args);
+        AnalogClock w = new AnalogClock();
+
+        w.show();
+
+        QApplication.exec();
+    }
+}
+</pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

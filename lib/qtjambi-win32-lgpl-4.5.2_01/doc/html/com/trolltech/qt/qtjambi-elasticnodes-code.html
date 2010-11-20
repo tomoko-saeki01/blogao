@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Code for Elastic Nodes Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Code for Elastic Nodes Example</h1></center><p><pre class="snippet"><html style="white-space:pre-wrap;font-family:courier new"><font color=darkgreen><i>/****************************************************************************
+**
+**  (C) 1992-2009 Nokia Corporation and/or its subsidiary(-ies).
+** All rights reserved.
+**
+** This file is part of Qt Jambi.
+**
+** 
+** Commercial Usage
+** Licensees holding valid Qt Commercial licenses may use this file in
+** accordance with the Qt Commercial License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Nokia.
+** 
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 2.1 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU Lesser General Public License version 2.1 requirements
+** will be met: http:<font color=darkgreen><i>//www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+</i></font>** 
+** In addition, as a special exception, Nokia gives you certain
+** additional rights. These rights are described in the Nokia Qt LGPL
+** Exception version 1.0, included in the file LGPL_EXCEPTION.txt in this
+** package.
+** 
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 3.0 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU General Public License version 3.0 requirements will be
+** met: http:<font color=darkgreen><i>//www.gnu.org/copyleft/gpl.html.
+</i></font>** 
+** If you are unsure which license is appropriate for your use, please
+** contact the sales department at qt-sales@nokia.com.
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/</i></font>
+
+
+<font color=blue>package</font> com.trolltech.examples;
+
+<font color=blue>import</font> java.util.Vector;
+
+<font color=blue>import</font> com.trolltech.qt.core.*;
+<font color=blue>import</font> com.trolltech.qt.gui.*;
+
+@<font color=darkmagenta><i>QtJambiExample</i></font>(name = <font color=darkgreen><i>"Elastic Nodes"</i></font>)
+<font color=blue>public</font> <font color=blue>class</font> ElasticNodes <font color=blue>extends</font> <font color=darkmagenta><i>QGraphicsView</i></font> {
+
+    <font color=blue>public</font> <font color=blue>static</font> <font color=blue>void</font> main(String args[]) {
+        <font color=darkmagenta><i>QApplication</i></font>.initialize(args);
+        ElasticNodes elasticNodes = <font color=blue>new</font> ElasticNodes();
+        elasticNodes.show();
+        <font color=darkmagenta><i>QApplication</i></font>.exec();
+    }
+
+    <font color=blue>private</font> <font color=blue>int</font> timerId;
+    <font color=blue>private</font> Node centerNode;
+    <font color=blue>private</font> Vector&lt;Node&gt; nodes = <font color=blue>new</font> Vector&lt;Node&gt;();
+
+    <font color=blue>private</font> <font color=blue>static</font> <font color=blue>final</font> <font color=darkmagenta><i>QBrush</i></font> BRUSH_DARK_GRAY = <font color=blue>new</font> <font color=darkmagenta><i>QBrush</i></font>(<font color=darkmagenta><i>QColor</i></font>.darkGray);
+    <font color=blue>private</font> <font color=blue>static</font> <font color=blue>final</font> <font color=darkmagenta><i>QPen</i></font> QPEN_EDGE = <font color=blue>new</font> <font color=darkmagenta><i>QPen</i></font>(<font color=darkmagenta><i>QColor</i></font>.black, 1, <font color=darkmagenta><i>Qt</i></font>.PenStyle.SolidLine, <font color=darkmagenta><i>Qt</i></font>.PenCapStyle.RoundCap, <font color=darkmagenta><i>Qt</i></font>.PenJoinStyle.RoundJoin);
+    <font color=blue>private</font> <font color=blue>static</font> <font color=blue>final</font> <font color=darkmagenta><i>QPen</i></font> QPEN_BLACK = <font color=blue>new</font> <font color=darkmagenta><i>QPen</i></font>(<font color=darkmagenta><i>QColor</i></font>.black, 0);
+
+    <font color=blue>private</font> <font color=blue>static</font> <font color=darkmagenta><i>QRadialGradient</i></font> GRADIENT_SUNKEN;
+    <font color=blue>private</font> <font color=blue>static</font> <font color=darkmagenta><i>QRadialGradient</i></font> GRADIENT_NORMAL;
+
+    <font color=blue>private</font> <font color=blue>static</font> <font color=darkmagenta><i>QPainterPath</i></font> NODE_SHAPE;
+    <font color=blue>static</font>{
+        NODE_SHAPE = <font color=blue>new</font> <font color=darkmagenta><i>QPainterPath</i></font>();
+        NODE_SHAPE.addEllipse(-10, -10, 20, 20);
+
+        GRADIENT_SUNKEN = <font color=blue>new</font> <font color=darkmagenta><i>QRadialGradient</i></font>(-3, -3, 10);
+        GRADIENT_SUNKEN.setCenter(3, 3);
+        GRADIENT_SUNKEN.setFocalPoint(3, 3);
+        GRADIENT_SUNKEN.setColorAt(1, <font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(<font color=darkmagenta><i>QColor</i></font>.yellow).lighter(120));
+        GRADIENT_SUNKEN.setColorAt(0, <font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(<font color=darkmagenta><i>QColor</i></font>.darkYellow).lighter(120));
+
+        GRADIENT_NORMAL = <font color=blue>new</font> <font color=darkmagenta><i>QRadialGradient</i></font>(-3, -3, 10);
+        GRADIENT_NORMAL.setColorAt(0, <font color=darkmagenta><i>QColor</i></font>.yellow);
+        GRADIENT_NORMAL.setColorAt(1, <font color=darkmagenta><i>QColor</i></font>.darkYellow);
+    }
+
+
+    <font color=blue>public</font> ElasticNodes() {
+        <font color=darkmagenta><i>QGraphicsScene</i></font> scene = <font color=blue>new</font> <font color=darkmagenta><i>QGraphicsScene</i></font>(<font color=blue>this</font>);
+        scene.setItemIndexMethod(<font color=darkmagenta><i>QGraphicsScene</i></font>.ItemIndexMethod.NoIndex);
+        scene.setSceneRect(-200, -200, 400, 400);
+        setScene(scene);
+
+        setCacheMode(<font color=blue>new</font> <font color=darkmagenta><i>QGraphicsView</i></font>.CacheMode(<font color=darkmagenta><i>QGraphicsView</i></font>.CacheModeFlag.CacheBackground));
+
+        setRenderHint(<font color=darkmagenta><i>QPainter</i></font>.RenderHint.Antialiasing);
+        setTransformationAnchor(<font color=darkmagenta><i>QGraphicsView</i></font>.ViewportAnchor.AnchorUnderMouse);
+        setResizeAnchor(<font color=darkmagenta><i>QGraphicsView</i></font>.ViewportAnchor.AnchorViewCenter);
+
+        Node node1 = <font color=blue>new</font> Node(<font color=blue>this</font>);
+        Node node2 = <font color=blue>new</font> Node(<font color=blue>this</font>);
+        Node node3 = <font color=blue>new</font> Node(<font color=blue>this</font>);
+        Node node4 = <font color=blue>new</font> Node(<font color=blue>this</font>);
+        centerNode = <font color=blue>new</font> Node(<font color=blue>this</font>);
+        Node node6 = <font color=blue>new</font> Node(<font color=blue>this</font>);
+        Node node7 = <font color=blue>new</font> Node(<font color=blue>this</font>);
+        Node node8 = <font color=blue>new</font> Node(<font color=blue>this</font>);
+        Node node9 = <font color=blue>new</font> Node(<font color=blue>this</font>);
+        scene.addItem(node1);
+        scene.addItem(node2);
+        scene.addItem(node3);
+        scene.addItem(node4);
+        scene.addItem(centerNode);
+        scene.addItem(node6);
+        scene.addItem(node7);
+        scene.addItem(node8);
+        scene.addItem(node9);
+        scene.addItem(<font color=blue>new</font> Edge(node1, node2));
+        scene.addItem(<font color=blue>new</font> Edge(node2, node3));
+        scene.addItem(<font color=blue>new</font> Edge(node2, centerNode));
+        scene.addItem(<font color=blue>new</font> Edge(node3, node6));
+        scene.addItem(<font color=blue>new</font> Edge(node4, node1));
+        scene.addItem(<font color=blue>new</font> Edge(node4, centerNode));
+        scene.addItem(<font color=blue>new</font> Edge(centerNode, node6));
+        scene.addItem(<font color=blue>new</font> Edge(centerNode, node8));
+        scene.addItem(<font color=blue>new</font> Edge(node6, node9));
+        scene.addItem(<font color=blue>new</font> Edge(node7, node4));
+        scene.addItem(<font color=blue>new</font> Edge(node8, node7));
+        scene.addItem(<font color=blue>new</font> Edge(node9, node8));
+
+        node1.setPos(-50, -50);
+        node2.setPos(0, -50);
+        node3.setPos(50, -50);
+        node4.setPos(-50, 0);
+        centerNode.setPos(0, 0);
+        node6.setPos(50, 0);
+        node7.setPos(-50, 50);
+        node8.setPos(0, 50);
+        node9.setPos(50, 50);
+
+        scale(0.8, 0.8);
+
+
+
+        <font color=blue>for</font> (<font color=darkmagenta><i>QGraphicsItemInterface</i></font> item : scene().items()) {
+            <font color=blue>if</font> (item <font color=blue>instanceof</font> Node)
+                nodes.add((Node) item);
+        }
+
+
+        setMinimumSize(400, 400);
+        setWindowTitle(tr(<font color=darkgreen><i>"Elastic Nodes"</i></font>));
+        setWindowIcon(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(<font color=darkgreen><i>"classpath:com/trolltech/images/qt-logo.png"</i></font>));
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> itemMoved() {
+        <font color=blue>if</font> (timerId == 0)
+            timerId = startTimer(1000 / 25);
+    }
+
+    @Override
+    <font color=blue>protected</font> <font color=blue>void</font> keyPressEvent(<font color=darkmagenta><i>QKeyEvent</i></font> event) {
+        <font color=darkmagenta><i>Qt</i></font>.Key key = <font color=darkmagenta><i>Qt</i></font>.Key.resolve(event.key());
+        <font color=blue>switch</font> (key) {
+        <font color=blue>case</font> Key_Up:
+            centerNode.moveBy(0, -20);
+            <font color=blue>break</font>;
+        <font color=blue>case</font> Key_Down:
+            centerNode.moveBy(0, 20);
+            <font color=blue>break</font>;
+        <font color=blue>case</font> Key_Left:
+            centerNode.moveBy(-20, 0);
+            <font color=blue>break</font>;
+        <font color=blue>case</font> Key_Right:
+            centerNode.moveBy(20, 0);
+            <font color=blue>break</font>;
+        <font color=blue>case</font> Key_Plus:
+            scaleView(1.2);
+            <font color=blue>break</font>;
+        <font color=blue>case</font> Key_Minus:
+            scaleView(1 / 1.2);
+            <font color=blue>break</font>;
+        <font color=blue>case</font> Key_Space:
+        <font color=blue>case</font> Key_Enter:
+            <font color=blue>for</font> (<font color=darkmagenta><i>QGraphicsItemInterface</i></font> item : scene().items()) {
+                <font color=blue>if</font> (item <font color=blue>instanceof</font> Node)
+                    item.setPos(-150 + Math.random() * 300, -150 + Math.random() * 300);
+            }
+            <font color=blue>break</font>;
+        <font color=blue>default</font>:
+            <font color=blue>super</font>.keyPressEvent(event);
+        }
+    }
+
+    @Override
+    <font color=blue>protected</font> <font color=blue>void</font> timerEvent(<font color=darkmagenta><i>QTimerEvent</i></font> event) {
+       <font color=blue>for</font> (Node node : nodes)
+            node.calculateForces();
+
+        <font color=blue>boolean</font> itemsMoved = false;
+        <font color=blue>for</font> (Node node : nodes) {
+            <font color=blue>if</font> (node.advance())
+                itemsMoved = true;
+        }
+
+        <font color=blue>if</font> (!itemsMoved) {
+            killTimer(timerId);
+            timerId = 0;
+        }
+    }
+
+    @Override
+    <font color=blue>protected</font> <font color=blue>void</font> wheelEvent(<font color=darkmagenta><i>QWheelEvent</i></font> event) {
+        scaleView(Math.pow(2, -event.delta() / 240.0));
+    }
+
+    @Override
+    <font color=blue>protected</font> <font color=blue>void</font> drawBackground(<font color=darkmagenta><i>QPainter</i></font> painter, <font color=darkmagenta><i>QRectF</i></font> rect) {
+        <font color=darkgreen><i>// Shadow
+</i></font>        <font color=darkmagenta><i>QRectF</i></font> sceneRect = <font color=blue>this</font>.sceneRect();
+        <font color=darkmagenta><i>QRectF</i></font> rightShadow = <font color=blue>new</font> <font color=darkmagenta><i>QRectF</i></font>(sceneRect.right(), sceneRect.top() + 5, 5, sceneRect.height());
+        <font color=darkmagenta><i>QRectF</i></font> bottomShadow = <font color=blue>new</font> <font color=darkmagenta><i>QRectF</i></font>(sceneRect.left() + 5, sceneRect.bottom(), sceneRect.width(), 5);
+        <font color=blue>if</font> (rightShadow.intersects(rect) || rightShadow.contains(rect))
+            painter.fillRect(rightShadow, BRUSH_DARK_GRAY);
+        <font color=blue>if</font> (bottomShadow.intersects(rect) || bottomShadow.contains(rect))
+            painter.fillRect(bottomShadow, BRUSH_DARK_GRAY);
+
+        <font color=darkgreen><i>// Fill
+</i></font>        <font color=darkmagenta><i>QLinearGradient</i></font> gradient = <font color=blue>new</font> <font color=darkmagenta><i>QLinearGradient</i></font>(sceneRect.topLeft(), sceneRect.bottomRight());
+        gradient.setColorAt(0, <font color=darkmagenta><i>QColor</i></font>.white);
+        gradient.setColorAt(1, <font color=darkmagenta><i>QColor</i></font>.lightGray);
+        painter.fillRect(rect.intersected(sceneRect), <font color=blue>new</font> <font color=darkmagenta><i>QBrush</i></font>(gradient));
+        painter.setBrush(<font color=darkmagenta><i>QBrush</i></font>.NoBrush);
+        painter.drawRect(sceneRect);
+
+        <font color=darkgreen><i>// Text
+</i></font>        <font color=darkmagenta><i>QRectF</i></font> textRect = <font color=blue>new</font> <font color=darkmagenta><i>QRectF</i></font>(sceneRect.left() + 4, sceneRect.top() + 4, sceneRect.width() - 4, sceneRect.height() - 4);
+        String message = tr(<font color=darkgreen><i>"Click and drag the nodes around, and zoom with the mouse wheel or the '+' and '-' keys"</i></font>);
+
+        <font color=darkmagenta><i>QFont</i></font> font = painter.font();
+        font.setBold(true);
+        font.setPointSize(14);
+        painter.setFont(font);
+        painter.setPen(<font color=darkmagenta><i>QColor</i></font>.lightGray);
+        painter.drawText(textRect.translated(2, 2), message);
+        painter.setPen(<font color=darkmagenta><i>QColor</i></font>.black);
+        painter.drawText(textRect, message);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> scaleView(<font color=blue>double</font> scaleFactor) {
+        <font color=darkmagenta><i>QMatrix</i></font> m = matrix();
+        m.scale(scaleFactor, scaleFactor);
+        <font color=blue>double</font> factor = m.mapRect(<font color=blue>new</font> <font color=darkmagenta><i>QRectF</i></font>(0, 0, 1, 1)).width();
+        <font color=blue>if</font> (factor &lt; 0.07 || factor &gt; 100)
+            <font color=blue>return</font>;
+
+        scale(scaleFactor, scaleFactor);
+    }
+
+    <font color=blue>public</font> <font color=blue>class</font> Node <font color=blue>extends</font> <font color=darkmagenta><i>QGraphicsItem</i></font> {
+
+        <font color=blue>private</font> Vector&lt;Edge&gt; edgeList = <font color=blue>new</font> Vector&lt;Edge&gt;();
+        <font color=blue>private</font> <font color=darkmagenta><i>QPointF</i></font> newPos;
+        <font color=blue>private</font> ElasticNodes graph;
+        <font color=blue>private</font> <font color=blue>double</font> adjust = 2;
+        <font color=blue>private</font> <font color=darkmagenta><i>QRectF</i></font> boundingRect = <font color=blue>new</font> <font color=darkmagenta><i>QRectF</i></font>(-10 - adjust, -10 - adjust, 23 + adjust, 23 + adjust);
+
+        Node(ElasticNodes graphWidget) {
+            graph = graphWidget;
+            setFlag(<font color=darkmagenta><i>QGraphicsItem</i></font>.GraphicsItemFlag.ItemIsMovable);
+            setZValue(1);
+            newPos = pos();
+        }
+
+        <font color=blue>private</font> <font color=blue>void</font> addEdge(Edge edge) {
+            edgeList.add(edge);
+            edge.adjust();
+        }
+
+        <font color=blue>private</font> <font color=blue>void</font> calculateForces() {
+            <font color=blue>if</font> (scene() == null || scene().mouseGrabberItem() == <font color=blue>this</font>) {
+                newPos = pos();
+                <font color=blue>return</font>;
+            }
+            <font color=darkgreen><i>// Sum up all forces pushing <font color=blue>this</font> item away
+</i></font>            <font color=blue>double</font> xvel = 0;
+            <font color=blue>double</font> yvel = 0;
+            <font color=blue>for</font> (Node node : nodes) {
+                <font color=darkmagenta><i>QPointF</i></font> deltaPoint = mapFromItem(node, 0, 0);
+                <font color=blue>double</font> dx = -deltaPoint.x();
+                <font color=blue>double</font> dy = -deltaPoint.y();
+                <font color=blue>double</font> l = 2.0 * (dx * dx + dy * dy);
+                <font color=blue>if</font> (l &gt; 0) {
+                    xvel += (dx * 150.0) / l;
+                    yvel += (dy * 150.0) / l;
+                }
+            }
+
+            <font color=darkgreen><i>// Now subtract all forces pulling items together
+</i></font>            <font color=blue>double</font> weight = (edgeList.size() + 1) * 10;
+            <font color=blue>for</font> (Edge edge : edgeList) {
+                <font color=darkmagenta><i>QPointF</i></font> pos;
+                <font color=blue>if</font> (edge.sourceNode() == <font color=blue>this</font>)
+                    pos = mapFromItem(edge.destNode(), 0, 0);
+                <font color=blue>else</font>
+                    pos = mapFromItem(edge.sourceNode(), 0, 0);
+                xvel += pos.x() / weight;
+                yvel += pos.y() / weight;
+            }
+
+            <font color=blue>if</font> (Math.abs(xvel) &lt; 0.1 && Math.abs(yvel) &lt; 0.1)
+                xvel = yvel = 0;
+
+            <font color=darkmagenta><i>QRectF</i></font> sceneRect = scene().sceneRect();
+            newPos.setX(Math.min(Math.max(newPos.x() + xvel, sceneRect.left() + 10), sceneRect.right() - 10));
+            newPos.setY(Math.min(Math.max(newPos.y() + yvel, sceneRect.top() + 10), sceneRect.bottom() - 10));
+        }
+
+        <font color=blue>private</font> <font color=blue>boolean</font> advance() {
+            <font color=blue>if</font> (newPos == pos())
+                <font color=blue>return</font> false;
+
+            setPos(newPos);
+            <font color=blue>return</font> true;
+        }
+
+        @Override
+        <font color=blue>public</font> <font color=darkmagenta><i>QRectF</i></font> boundingRect() {
+            <font color=blue>return</font> boundingRect;
+        }
+
+        @Override
+        <font color=blue>public</font> <font color=darkmagenta><i>QPainterPath</i></font> shape() {
+            <font color=blue>return</font> NODE_SHAPE;
+        }
+
+        @Override
+        <font color=blue>public</font> <font color=blue>void</font> paint(<font color=darkmagenta><i>QPainter</i></font> painter, <font color=darkmagenta><i>QStyleOptionGraphicsItem</i></font> option, <font color=darkmagenta><i>QWidget</i></font> widget) {
+            painter.setPen(<font color=darkmagenta><i>Qt</i></font>.PenStyle.NoPen);
+            painter.setBrush(<font color=darkmagenta><i>QColor</i></font>.fromRgba(<font color=darkmagenta><i>QColor</i></font>.black.rgb() & 0x7fffffff));
+            painter.drawEllipse(-7, -7, 20, 20);
+
+            <font color=blue>if</font> ((option.state().isSet(<font color=darkmagenta><i>QStyle</i></font>.StateFlag.State_Sunken))) {
+                painter.setBrush(GRADIENT_SUNKEN);
+            } <font color=blue>else</font> {
+                painter.setBrush(GRADIENT_NORMAL);
+            }
+
+            painter.setPen(QPEN_BLACK);
+            painter.drawEllipse(-10, -10, 20, 20);
+        }
+
+        @Override
+        <font color=blue>public</font> Object itemChange(GraphicsItemChange change, Object value) {
+            <font color=blue>switch</font> (change) {
+            <font color=blue>case</font> ItemPositionChange:
+                <font color=blue>for</font> (Edge edge : edgeList)
+                    edge.adjust();
+                graph.itemMoved();
+                <font color=blue>break</font>;
+            <font color=blue>default</font>:
+                <font color=blue>break</font>;
+            }
+
+            <font color=blue>return</font> <font color=blue>super</font>.itemChange(change, value);
+        }
+
+        @Override
+        <font color=blue>public</font> <font color=blue>void</font> mousePressEvent(<font color=darkmagenta><i>QGraphicsSceneMouseEvent</i></font> event) {
+            update();
+            <font color=blue>super</font>.mousePressEvent(event);
+        }
+
+        @Override
+        <font color=blue>public</font> <font color=blue>void</font> mouseReleaseEvent(<font color=darkmagenta><i>QGraphicsSceneMouseEvent</i></font> event) {
+            update();
+            <font color=blue>super</font>.mouseReleaseEvent(event);
+        }
+    }
+
+    <font color=blue>public</font> <font color=blue>class</font> Edge <font color=blue>extends</font> <font color=darkmagenta><i>QGraphicsItem</i></font> {
+        <font color=blue>private</font> Node source;
+        <font color=blue>private</font> Node dest;
+
+        <font color=blue>private</font> <font color=darkmagenta><i>QPointF</i></font> sourcePoint = <font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>();
+        <font color=blue>private</font> <font color=darkmagenta><i>QPointF</i></font> destPoint = <font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>();
+        <font color=blue>private</font> <font color=blue>double</font> arrowSize = 10;
+        <font color=blue>private</font> <font color=blue>double</font> penWidth = 1;
+        <font color=blue>private</font> <font color=blue>double</font> extra = (penWidth + arrowSize) / 2.0;
+
+        <font color=blue>private</font> <font color=darkmagenta><i>QRectF</i></font> boundingRect = <font color=blue>new</font> <font color=darkmagenta><i>QRectF</i></font>();
+
+
+        <font color=darkmagenta><i>QPointF</i></font> sourceArrowP1 = <font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>();
+        <font color=darkmagenta><i>QPointF</i></font> sourceArrowP2 = <font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>();
+        <font color=darkmagenta><i>QPointF</i></font> destArrowP1 = <font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>();
+        <font color=darkmagenta><i>QPointF</i></font> destArrowP2 = <font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>();
+
+        <font color=darkmagenta><i>QPolygonF</i></font> pol1 = <font color=blue>new</font> <font color=darkmagenta><i>QPolygonF</i></font>();
+        <font color=darkmagenta><i>QPolygonF</i></font> pol2 = <font color=blue>new</font> <font color=darkmagenta><i>QPolygonF</i></font>();
+
+        <font color=blue>public</font> Edge(Node sourceNode, Node destNode) {
+            <font color=darkgreen><i>// setAcceptedMouseButtons(LeftButton);
+</i></font>            source = sourceNode;
+            dest = destNode;
+            source.addEdge(<font color=blue>this</font>);
+            dest.addEdge(<font color=blue>this</font>);
+            adjust();
+        }
+
+        <font color=blue>private</font> Node sourceNode() {
+            <font color=blue>return</font> source;
+        }
+
+        <font color=blue>private</font> Node destNode() {
+            <font color=blue>return</font> dest;
+        }
+
+        <font color=blue>private</font> <font color=blue>void</font> adjust() {
+            <font color=blue>double</font> dx = source.pos().x()-dest.pos().x();
+            <font color=blue>double</font> dy = source.pos().y()-dest.pos().y();
+
+            <font color=blue>double</font> length = Math.sqrt(dx*dx+dy*dy);
+            <font color=blue>if</font> (length == 0.0) <font color=blue>return</font>;
+
+            <font color=blue>double</font> paddingX = dx/length*10;
+            <font color=blue>double</font> paddingY = dy/length*10;
+
+            prepareGeometryChange();
+            sourcePoint.setX(source.pos().x() - paddingX);
+            sourcePoint.setY(source.pos().y() - paddingY);
+
+            destPoint.setX(dest.pos().x() + paddingX);
+            destPoint.setY(dest.pos().y() + paddingY);
+
+            boundingRect.setBottomLeft(source.pos());
+            boundingRect.setTopRight(dest.pos());
+
+            boundingRect = boundingRect.normalized();
+
+            boundingRect.adjust(-extra, -extra, extra, extra);
+        }
+
+        @Override
+        <font color=blue>public</font> <font color=darkmagenta><i>QRectF</i></font> boundingRect() {
+            <font color=blue>return</font> boundingRect;
+        }
+
+        @Override
+        <font color=blue>public</font> <font color=blue>void</font> paint(<font color=darkmagenta><i>QPainter</i></font> painter, <font color=darkmagenta><i>QStyleOptionGraphicsItem</i></font> option, <font color=darkmagenta><i>QWidget</i></font> widget) {
+
+            <font color=blue>if</font> (source == null || dest == null)
+                <font color=blue>return</font>;
+
+            <font color=darkgreen><i>// Draw the line itself
+</i></font>            <font color=darkmagenta><i>QLineF</i></font> line = <font color=blue>new</font> <font color=darkmagenta><i>QLineF</i></font>(sourcePoint, destPoint);
+
+            painter.setPen(QPEN_EDGE);
+            painter.drawLine(line);
+
+            <font color=darkgreen><i>// Draw the arrows <font color=blue>if</font> there's enough room
+</i></font>            <font color=blue>double</font> angle;
+            <font color=blue>if</font> (line.length() &gt; 0)
+                angle = Math.acos(line.dx() / line.length());
+            <font color=blue>else</font>
+                angle = 0;
+
+            <font color=blue>if</font> (line.dy() &gt;= 0)
+                angle = (Math.PI * 2) - angle;
+
+            sourceArrowP1.setX(sourcePoint.x() + Math.sin(angle + Math.PI / 3) * arrowSize);
+            sourceArrowP1.setY(sourcePoint.y() + Math.cos(angle + Math.PI / 3) * arrowSize);
+
+            sourceArrowP2.setX(sourcePoint.x() + Math.sin(angle + Math.PI - Math.PI / 3) * arrowSize);
+            sourceArrowP2.setY(sourcePoint.y() + Math.cos(angle + Math.PI - Math.PI / 3) * arrowSize);
+
+            destArrowP1.setX(destPoint.x() + Math.sin(angle - Math.PI / 3) * arrowSize);
+            destArrowP1.setY(destPoint.y() + Math.cos(angle - Math.PI / 3) * arrowSize);
+
+            destArrowP2.setX(destPoint.x() + Math.sin(angle - Math.PI + Math.PI / 3) * arrowSize);
+            destArrowP2.setY(destPoint.y() + Math.cos(angle - Math.PI + Math.PI / 3) * arrowSize);
+
+            pol1.clear();
+            pol2.clear();
+
+            pol1.append(line.p1());
+            pol1.append(sourceArrowP1);
+            pol1.append(sourceArrowP2);
+
+            pol2.append(line.p2());
+            pol2.append(destArrowP1);
+            pol2.append(destArrowP2);
+
+            painter.setBrush(<font color=darkmagenta><i>QColor</i></font>.black);
+            painter.drawPolygon(pol1);
+            painter.drawPolygon(pol2);
+        }
+    }
+}
+</html></pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Code for Line Edits Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Code for Line Edits Example</h1></center><p><pre class="snippet"><html style="white-space:pre-wrap;font-family:courier new"><font color=darkgreen><i>/****************************************************************************
+ **
+ ** Copyright (C) 1992-2009 Nokia Corporation and/or its subsidiary(-ies).
+** All rights reserved.
+ **
+ ** This file is part of Qt Jambi.
+ **
+ ** 
+** Commercial Usage
+** Licensees holding valid Qt Commercial licenses may use this file in
+** accordance with the Qt Commercial License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Nokia.
+** 
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 2.1 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU Lesser General Public License version 2.1 requirements
+** will be met: http:<font color=darkgreen><i>//www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+</i></font>** 
+** In addition, as a special exception, Nokia gives you certain
+** additional rights. These rights are described in the Nokia Qt LGPL
+** Exception version 1.0, included in the file LGPL_EXCEPTION.txt in this
+** package.
+** 
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 3.0 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU General Public License version 3.0 requirements will be
+** met: http:<font color=darkgreen><i>//www.gnu.org/copyleft/gpl.html.
+</i></font>** 
+** If you are unsure which license is appropriate for your use, please
+** contact the sales department at qt-sales@nokia.com.
+ **
+ ** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+ ** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ **
+ ****************************************************************************/</i></font>
+
+<font color=blue>package</font> com.trolltech.examples;
+
+<font color=blue>import</font> com.trolltech.qt.core.*;
+<font color=blue>import</font> com.trolltech.qt.gui.*;
+
+@<font color=darkmagenta><i>QtJambiExample</i></font>(name = <font color=darkgreen><i>"Line Edits"</i></font>)
+<font color=blue>public</font> <font color=blue>class</font> LineEdits <font color=blue>extends</font> <font color=darkmagenta><i>QWidget</i></font> {
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QLineEdit</i></font> echoLineEdit;
+    <font color=blue>private</font> <font color=darkmagenta><i>QLineEdit</i></font> validatorLineEdit;
+    <font color=blue>private</font> <font color=darkmagenta><i>QLineEdit</i></font> alignmentLineEdit;
+    <font color=blue>private</font> <font color=darkmagenta><i>QLineEdit</i></font> inputMaskLineEdit;
+    <font color=blue>private</font> <font color=darkmagenta><i>QLineEdit</i></font> accessLineEdit;
+
+    <font color=blue>public</font> <font color=blue>static</font> <font color=blue>void</font> main(String args[]) {
+        <font color=darkmagenta><i>QApplication</i></font>.initialize(args);
+
+        LineEdits lineedits = <font color=blue>new</font> LineEdits();
+        lineedits.show();
+
+        <font color=darkmagenta><i>QApplication</i></font>.exec();
+    }
+
+    <font color=blue>public</font> LineEdits() {
+        <font color=blue>this</font>(null);
+    }
+
+    <font color=blue>public</font> LineEdits(<font color=darkmagenta><i>QWidget</i></font> parent) {
+        <font color=blue>super</font>(parent);
+        <font color=darkmagenta><i>QGroupBox</i></font> echoGroup = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(tr(<font color=darkgreen><i>"Echo"</i></font>));
+
+        <font color=darkmagenta><i>QLabel</i></font> echoLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"Mode:"</i></font>));
+        <font color=darkmagenta><i>QComboBox</i></font> echoComboBox = <font color=blue>new</font> <font color=darkmagenta><i>QComboBox</i></font>();
+        echoComboBox.addItem(tr(<font color=darkgreen><i>"Normal"</i></font>));
+        echoComboBox.addItem(tr(<font color=darkgreen><i>"Password"</i></font>));
+        echoComboBox.addItem(tr(<font color=darkgreen><i>"No Echo"</i></font>));
+
+        setWindowIcon(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(<font color=darkgreen><i>"classpath:com/trolltech/images/qt-logo.png"</i></font>));
+
+        echoLineEdit = <font color=blue>new</font> <font color=darkmagenta><i>QLineEdit</i></font>();
+        echoLineEdit.setFocus();
+
+        <font color=darkmagenta><i>QGroupBox</i></font> validatorGroup = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(tr(<font color=darkgreen><i>"Validator"</i></font>));
+
+        <font color=darkmagenta><i>QLabel</i></font> validatorLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"Type:"</i></font>));
+        <font color=darkmagenta><i>QComboBox</i></font> validatorComboBox = <font color=blue>new</font> <font color=darkmagenta><i>QComboBox</i></font>();
+        validatorComboBox.addItem(tr(<font color=darkgreen><i>"No validator"</i></font>));
+        validatorComboBox.addItem(tr(<font color=darkgreen><i>"Integer validator"</i></font>));
+        validatorComboBox.addItem(tr(<font color=darkgreen><i>"Double validator"</i></font>));
+
+        validatorLineEdit = <font color=blue>new</font> <font color=darkmagenta><i>QLineEdit</i></font>();
+
+        <font color=darkmagenta><i>QGroupBox</i></font> alignmentGroup = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(tr(<font color=darkgreen><i>"Alignment"</i></font>));
+
+        <font color=darkmagenta><i>QLabel</i></font> alignmentLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"Type:"</i></font>));
+        <font color=darkmagenta><i>QComboBox</i></font> alignmentComboBox = <font color=blue>new</font> <font color=darkmagenta><i>QComboBox</i></font>();
+        alignmentComboBox.addItem(tr(<font color=darkgreen><i>"Left"</i></font>));
+        alignmentComboBox.addItem(tr(<font color=darkgreen><i>"Centered"</i></font>));
+        alignmentComboBox.addItem(tr(<font color=darkgreen><i>"Right"</i></font>));
+
+        alignmentLineEdit = <font color=blue>new</font> <font color=darkmagenta><i>QLineEdit</i></font>();
+
+        <font color=darkmagenta><i>QGroupBox</i></font> inputMaskGroup = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(tr(<font color=darkgreen><i>"Input mask"</i></font>));
+
+        <font color=darkmagenta><i>QLabel</i></font> inputMaskLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"Type:"</i></font>));
+        <font color=darkmagenta><i>QComboBox</i></font> inputMaskComboBox = <font color=blue>new</font> <font color=darkmagenta><i>QComboBox</i></font>();
+        inputMaskComboBox.addItem(tr(<font color=darkgreen><i>"No mask"</i></font>));
+        inputMaskComboBox.addItem(tr(<font color=darkgreen><i>"Phone number"</i></font>));
+        inputMaskComboBox.addItem(tr(<font color=darkgreen><i>"ISO date"</i></font>));
+        inputMaskComboBox.addItem(tr(<font color=darkgreen><i>"License key"</i></font>));
+
+        inputMaskLineEdit = <font color=blue>new</font> <font color=darkmagenta><i>QLineEdit</i></font>();
+
+        <font color=darkmagenta><i>QGroupBox</i></font> accessGroup = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(tr(<font color=darkgreen><i>"Access"</i></font>));
+
+        <font color=darkmagenta><i>QLabel</i></font> accessLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"Read-only:"</i></font>));
+        <font color=darkmagenta><i>QComboBox</i></font> accessComboBox = <font color=blue>new</font> <font color=darkmagenta><i>QComboBox</i></font>();
+        accessComboBox.addItem(tr(<font color=darkgreen><i>"False"</i></font>));
+        accessComboBox.addItem(tr(<font color=darkgreen><i>"True"</i></font>));
+
+        accessLineEdit = <font color=blue>new</font> <font color=darkmagenta><i>QLineEdit</i></font>();
+
+        echoComboBox.activatedIndex.connect(<font color=blue>this</font>, <font color=darkgreen><i>"echoChanged(int)"</i></font>);
+        validatorComboBox.activatedIndex.connect(<font color=blue>this</font>, <font color=darkgreen><i>"validatorChanged(int)"</i></font>);
+        alignmentComboBox.activatedIndex.connect(<font color=blue>this</font>, <font color=darkgreen><i>"alignmentChanged(int)"</i></font>);
+        inputMaskComboBox.activatedIndex.connect(<font color=blue>this</font>, <font color=darkgreen><i>"inputMaskChanged(int)"</i></font>);
+        accessComboBox.activatedIndex.connect(<font color=blue>this</font>, <font color=darkgreen><i>"accessChanged(int)"</i></font>);
+
+        <font color=darkmagenta><i>QGridLayout</i></font> echoLayout = <font color=blue>new</font> <font color=darkmagenta><i>QGridLayout</i></font>();
+        echoLayout.addWidget(echoLabel, 0, 0);
+        echoLayout.addWidget(echoComboBox, 0, 1);
+        echoLayout.addWidget(echoLineEdit, 1, 0, 1, 2);
+        echoGroup.setLayout(echoLayout);
+
+        <font color=darkmagenta><i>QGridLayout</i></font> validatorLayout = <font color=blue>new</font> <font color=darkmagenta><i>QGridLayout</i></font>();
+        validatorLayout.addWidget(validatorLabel, 0, 0);
+        validatorLayout.addWidget(validatorComboBox, 0, 1);
+        validatorLayout.addWidget(validatorLineEdit, 1, 0, 1, 2);
+        validatorGroup.setLayout(validatorLayout);
+
+        <font color=darkmagenta><i>QGridLayout</i></font> alignmentLayout = <font color=blue>new</font> <font color=darkmagenta><i>QGridLayout</i></font>();
+        alignmentLayout.addWidget(alignmentLabel, 0, 0);
+        alignmentLayout.addWidget(alignmentComboBox, 0, 1);
+        alignmentLayout.addWidget(alignmentLineEdit, 1, 0, 1, 2);
+        alignmentGroup.setLayout(alignmentLayout);
+
+        <font color=darkmagenta><i>QGridLayout</i></font> inputMaskLayout = <font color=blue>new</font> <font color=darkmagenta><i>QGridLayout</i></font>();
+        inputMaskLayout.addWidget(inputMaskLabel, 0, 0);
+        inputMaskLayout.addWidget(inputMaskComboBox, 0, 1);
+        inputMaskLayout.addWidget(inputMaskLineEdit, 1, 0, 1, 2);
+        inputMaskGroup.setLayout(inputMaskLayout);
+
+        <font color=darkmagenta><i>QGridLayout</i></font> accessLayout = <font color=blue>new</font> <font color=darkmagenta><i>QGridLayout</i></font>();
+        accessLayout.addWidget(accessLabel, 0, 0);
+        accessLayout.addWidget(accessComboBox, 0, 1);
+        accessLayout.addWidget(accessLineEdit, 1, 0, 1, 2);
+        accessGroup.setLayout(accessLayout);
+
+        <font color=darkmagenta><i>QGridLayout</i></font> layout = <font color=blue>new</font> <font color=darkmagenta><i>QGridLayout</i></font>();
+        layout.addWidget(echoGroup, 0, 0);
+        layout.addWidget(validatorGroup, 1, 0);
+        layout.addWidget(alignmentGroup, 2, 0);
+        layout.addWidget(inputMaskGroup, 0, 1);
+        layout.addWidget(accessGroup, 1, 1);
+        setLayout(layout);
+
+        setWindowTitle(tr(<font color=darkgreen><i>"Line Edits"</i></font>));
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> echoChanged(<font color=blue>int</font> index) {
+        <font color=blue>switch</font> (index) {
+        <font color=blue>case</font> 0:
+            echoLineEdit.setEchoMode(<font color=darkmagenta><i>QLineEdit</i></font>.EchoMode.Normal);
+            <font color=blue>break</font>;
+        <font color=blue>case</font> 1:
+            echoLineEdit.setEchoMode(<font color=darkmagenta><i>QLineEdit</i></font>.EchoMode.Password);
+            <font color=blue>break</font>;
+        <font color=blue>case</font> 2:
+            echoLineEdit.setEchoMode(<font color=darkmagenta><i>QLineEdit</i></font>.EchoMode.NoEcho);
+        }
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> validatorChanged(<font color=blue>int</font> index) {
+        <font color=blue>switch</font> (index) {
+        <font color=blue>case</font> 0:
+            validatorLineEdit.setValidator(null);
+            <font color=blue>break</font>;
+        <font color=blue>case</font> 1:
+            validatorLineEdit.setValidator(<font color=blue>new</font> <font color=darkmagenta><i>QIntValidator</i></font>(validatorLineEdit));
+            <font color=blue>break</font>;
+        <font color=blue>case</font> 2:
+            validatorLineEdit.setValidator(<font color=blue>new</font> <font color=darkmagenta><i>QDoubleValidator</i></font>(-999.0, 999.0, 2, validatorLineEdit));
+        }
+
+        validatorLineEdit.setText(<font color=darkgreen><i>""</i></font>);
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> alignmentChanged(<font color=blue>int</font> index) {
+        <font color=blue>switch</font> (index) {
+        <font color=blue>case</font> 0:
+            alignmentLineEdit.setAlignment(<font color=blue>new</font> <font color=darkmagenta><i>Qt</i></font>.Alignment(<font color=darkmagenta><i>Qt</i></font>.AlignmentFlag.AlignLeft));
+            <font color=blue>break</font>;
+        <font color=blue>case</font> 1:
+            alignmentLineEdit.setAlignment(<font color=blue>new</font> <font color=darkmagenta><i>Qt</i></font>.Alignment(<font color=darkmagenta><i>Qt</i></font>.AlignmentFlag.AlignCenter));
+            <font color=blue>break</font>;
+        <font color=blue>case</font> 2:
+            alignmentLineEdit.setAlignment(<font color=blue>new</font> <font color=darkmagenta><i>Qt</i></font>.Alignment(<font color=darkmagenta><i>Qt</i></font>.AlignmentFlag.AlignRight));
+        }
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> inputMaskChanged(<font color=blue>int</font> index) {
+        <font color=blue>switch</font> (index) {
+        <font color=blue>case</font> 0:
+            inputMaskLineEdit.setInputMask(<font color=darkgreen><i>""</i></font>);
+            <font color=blue>break</font>;
+        <font color=blue>case</font> 1:
+            inputMaskLineEdit.setInputMask(<font color=darkgreen><i>"+99 99 99 99 99;_"</i></font>);
+            <font color=blue>break</font>;
+        <font color=blue>case</font> 2:
+            inputMaskLineEdit.setInputMask(<font color=darkgreen><i>"0000-00-00"</i></font>);
+            inputMaskLineEdit.setText(<font color=darkgreen><i>"00000000"</i></font>);
+            inputMaskLineEdit.setCursorPosition(0);
+            <font color=blue>break</font>;
+        <font color=blue>case</font> 3:
+            inputMaskLineEdit.setInputMask(<font color=darkgreen><i>"&gt;AAAAA-AAAAA-AAAAA-AAAAA-AAAAA;#"</i></font>);
+        }
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> accessChanged(<font color=blue>int</font> index) {
+        <font color=blue>switch</font> (index) {
+        <font color=blue>case</font> 0:
+            accessLineEdit.setReadOnly(false);
+            <font color=blue>break</font>;
+        <font color=blue>case</font> 1:
+            accessLineEdit.setReadOnly(true);
+        }
+    }
+}
+</html></pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

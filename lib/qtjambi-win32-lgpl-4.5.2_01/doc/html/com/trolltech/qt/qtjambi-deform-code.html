@@ -1,0 +1,552 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Code for Vector Deformation</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Code for Vector Deformation</h1></center><p><pre class="snippet"><html style="white-space:pre-wrap;font-family:courier new"><font color=darkgreen><i>/****************************************************************************
+**
+** Copyright (C) 1992-2009 Nokia Corporation and/or its subsidiary(-ies).
+** All rights reserved.
+**
+** This file is part of Qt Jambi.
+**
+** 
+** Commercial Usage
+** Licensees holding valid Qt Commercial licenses may use this file in
+** accordance with the Qt Commercial License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Nokia.
+** 
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 2.1 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU Lesser General Public License version 2.1 requirements
+** will be met: http:<font color=darkgreen><i>//www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+</i></font>** 
+** In addition, as a special exception, Nokia gives you certain
+** additional rights. These rights are described in the Nokia Qt LGPL
+** Exception version 1.0, included in the file LGPL_EXCEPTION.txt in this
+** package.
+** 
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 3.0 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU General Public License version 3.0 requirements will be
+** met: http:<font color=darkgreen><i>//www.gnu.org/copyleft/gpl.html.
+</i></font>** 
+** If you are unsure which license is appropriate for your use, please
+** contact the sales department at qt-sales@nokia.com.
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/</i></font>
+
+<font color=blue>package</font> com.trolltech.demos;
+
+<font color=blue>import</font> com.trolltech.examples.<font color=darkmagenta><i>QtJambiExample</i></font>;
+<font color=blue>import</font> com.trolltech.qt.core.*;
+<font color=blue>import</font> com.trolltech.qt.gui.*;
+
+<font color=blue>import</font> java.util.*;
+
+<font color=blue>class</font> PainterPathElements
+{
+    <font color=blue>public</font> <font color=darkmagenta><i>QPainterPath</i></font> path;
+    <font color=blue>public</font> QPainterPath_Element elements[];
+}
+
+<font color=blue>class</font> PathDeformRenderer <font color=blue>extends</font> ArthurFrame
+{
+    <font color=darkmagenta><i>QBasicTimer</i></font> m_repaintTimer = <font color=blue>new</font> <font color=darkmagenta><i>QBasicTimer</i></font>();
+    <font color=darkmagenta><i>QTime</i></font> m_repaintTracker = <font color=blue>new</font> <font color=darkmagenta><i>QTime</i></font>();
+    List&lt;PainterPathElements&gt; m_paths = <font color=blue>new</font> LinkedList&lt;PainterPathElements&gt;();
+    List&lt;<font color=darkmagenta><i>QPointF</i></font>&gt; m_advances = <font color=blue>new</font> LinkedList&lt;<font color=darkmagenta><i>QPointF</i></font>&gt;();
+    <font color=darkmagenta><i>QRectF</i></font> m_pathBounds = <font color=blue>new</font> <font color=darkmagenta><i>QRectF</i></font>();
+    String m_text = <font color=darkgreen><i>""</i></font>;
+    <font color=darkmagenta><i>QPixmap</i></font> m_lens_pixmap = <font color=blue>new</font> <font color=darkmagenta><i>QPixmap</i></font>();
+    <font color=darkmagenta><i>QImage</i></font> m_lens_image = <font color=blue>new</font> <font color=darkmagenta><i>QImage</i></font>();
+    <font color=blue>int</font> m_fontSize = 0;
+    <font color=blue>boolean</font> m_animated = false;
+    <font color=blue>double</font> m_intensity = 0.0;
+    <font color=blue>double</font> m_radius = 0.0;
+    <font color=darkmagenta><i>QPointF</i></font> m_pos = <font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>();
+    <font color=darkmagenta><i>QPointF</i></font> m_offset = <font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>();
+    <font color=darkmagenta><i>QPointF</i></font> m_direction = <font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>();
+    <font color=blue>boolean</font> m_textDirty = true;
+
+    <font color=blue>public</font> PathDeformRenderer(<font color=darkmagenta><i>QWidget</i></font> parent)
+    {
+        <font color=blue>super</font>(parent);
+
+        m_radius = 100;
+        m_pos = <font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(m_radius, m_radius);
+        m_direction = <font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(1, 1);
+        m_fontSize = 24;
+        m_animated = true;
+        m_repaintTimer.start(25, <font color=blue>this</font>);
+        m_repaintTracker.start();
+        m_intensity = 1;
+
+        generateLensPixmap();
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> setFontSize(<font color=blue>int</font> fontSize) { m_fontSize = fontSize; setText(m_text); }
+    @Override
+    <font color=blue>public</font> <font color=darkmagenta><i>QSize</i></font> sizeHint() { <font color=blue>return</font> <font color=blue>new</font> <font color=darkmagenta><i>QSize</i></font>(600, 500); }
+    <font color=blue>public</font> <font color=blue>boolean</font> animated() { <font color=blue>return</font> m_animated; }
+    <font color=blue>public</font> <font color=blue>int</font> radius() { <font color=blue>return</font> (<font color=blue>int</font>)m_radius; }
+    <font color=blue>public</font> <font color=blue>int</font> fontSize() { <font color=blue>return</font> m_fontSize; }
+    <font color=blue>public</font> <font color=blue>int</font> intensity() { <font color=blue>return</font> (<font color=blue>int</font>)m_intensity; }
+    <font color=blue>public</font> String text() { <font color=blue>return</font> m_text; }
+
+    <font color=blue>public</font> <font color=blue>void</font> setText(String text)
+    {
+        m_text = text;
+        m_textDirty = true;
+        update();
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> makeTextPaths()
+    {
+        <font color=darkmagenta><i>QFont</i></font> f = <font color=blue>new</font> <font color=darkmagenta><i>QFont</i></font>(<font color=darkgreen><i>"times new roman,utopia"</i></font>);
+        f.setStyleStrategy(<font color=darkmagenta><i>QFont</i></font>.StyleStrategy.ForceOutline);
+        f.setPointSize(m_fontSize);
+        f.setStyleHint(<font color=darkmagenta><i>QFont</i></font>.StyleHint.Times);
+
+        <font color=darkmagenta><i>QFontMetrics</i></font> fm = <font color=blue>new</font> <font color=darkmagenta><i>QFontMetrics</i></font>(f);
+        m_paths.clear();
+        m_pathBounds = <font color=blue>new</font> <font color=darkmagenta><i>QRectF</i></font>();
+
+        <font color=darkmagenta><i>QPointF</i></font> advance = <font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(0, 0);
+
+        List&lt;<font color=darkmagenta><i>QPainterPath</i></font>&gt; paths = <font color=blue>new</font> LinkedList&lt;<font color=darkmagenta><i>QPainterPath</i></font>&gt;();
+
+        <font color=blue>boolean</font> do_quick = true;
+        <font color=blue>for</font> (<font color=blue>int</font> i=0; i&lt;m_text.length(); ++i) {
+            <font color=blue>if</font> (m_text.charAt(i) &gt;= 0x4ff && m_text.charAt(i) &lt;= 0x1e00) {
+                do_quick = false;
+                <font color=blue>break</font>;
+            }
+        }
+
+        <font color=blue>if</font> (do_quick) {
+            <font color=blue>for</font> (<font color=blue>int</font> i=0; i&lt;m_text.length(); ++i) {
+                <font color=darkmagenta><i>QPainterPath</i></font> path = <font color=blue>new</font> <font color=darkmagenta><i>QPainterPath</i></font>();
+                path.addText(advance, f, m_text.substring(i, i + 1));
+                m_pathBounds = m_pathBounds.united(path.boundingRect());
+                paths.add(path);
+                advance.add(<font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(fm.width(m_text.substring(i, i + 1)), 0));
+            }
+        } <font color=blue>else</font> {
+            <font color=darkmagenta><i>QPainterPath</i></font> path = <font color=blue>new</font> <font color=darkmagenta><i>QPainterPath</i></font>();
+            path.addText(advance, f, m_text);
+            m_pathBounds = m_pathBounds.united(path.boundingRect());
+            paths.add(path);
+        }
+
+        <font color=darkmagenta><i>QMatrix</i></font> m = <font color=blue>new</font> <font color=darkmagenta><i>QMatrix</i></font>(1, 0, 0, 1, -m_pathBounds.x(), -m_pathBounds.y());
+        <font color=blue>for</font> (<font color=blue>int</font> i=0; i&lt;paths.size(); ++i)
+            addPath(m.map(paths.get(i)));
+
+        m_textDirty = false;
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> addPath(<font color=darkmagenta><i>QPainterPath</i></font> path)
+    {
+        PainterPathElements p = <font color=blue>new</font> PainterPathElements();
+        p.path = path;
+
+        p.elements = <font color=blue>new</font> QPainterPath_Element[path.elementCount()];
+        <font color=blue>for</font> (<font color=blue>int</font> i=0; i&lt;path.elementCount(); ++i) {
+            p.elements[i] = path.elementAt(i);
+        }
+
+        m_paths.add(p);
+    }
+
+    <font color=blue>static</font> <font color=darkmagenta><i>QRect</i></font> circle_bounds(<font color=darkmagenta><i>QPointF</i></font> center, <font color=blue>double</font> radius, <font color=blue>double</font> compensation)
+    {
+        <font color=blue>return</font> <font color=blue>new</font> <font color=darkmagenta><i>QRect</i></font>((<font color=blue>int</font>)Math.round(center.x() - radius - compensation),
+                         (<font color=blue>int</font>)Math.round(center.y() - radius - compensation),
+                         (<font color=blue>int</font>)Math.round((radius + compensation) * 2),
+                         (<font color=blue>int</font>)Math.round((radius + compensation) * 2));
+    }
+
+
+    <font color=blue>final</font> <font color=blue>int</font> LENS_EXTENT = 10;
+    <font color=blue>void</font> generateLensPixmap()
+    {
+        <font color=blue>double</font> rad = m_radius + LENS_EXTENT;
+
+        <font color=darkmagenta><i>QRect</i></font> bounds = circle_bounds(<font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(), rad, 0);
+
+        <font color=darkmagenta><i>QPainter</i></font> painter = <font color=blue>new</font> <font color=darkmagenta><i>QPainter</i></font>();
+        <font color=blue>if</font> (preferImage()) {
+            m_lens_image = <font color=blue>new</font> <font color=darkmagenta><i>QImage</i></font>(bounds.size(), <font color=darkmagenta><i>QImage</i></font>.Format.Format_ARGB32_Premultiplied);
+            m_lens_image.fill(0);
+            painter.begin(m_lens_image);
+        } <font color=blue>else</font> {
+            m_lens_pixmap = <font color=blue>new</font> <font color=darkmagenta><i>QPixmap</i></font>(bounds.size());
+            m_lens_pixmap.fill(<font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(0, 0, 0, 0));
+            painter.begin(m_lens_pixmap);
+        }
+
+        <font color=darkmagenta><i>QRadialGradient</i></font> gr = <font color=blue>new</font> <font color=darkmagenta><i>QRadialGradient</i></font>(rad, rad, rad, 3 * rad / 5, 3 * rad / 5);
+        gr.setColorAt(0.0, <font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(255, 255, 255, 191));
+        gr.setColorAt(0.2, <font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(255, 255, 127, 191));
+        gr.setColorAt(0.9, <font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(150, 150, 200, 63));
+        gr.setColorAt(0.95, <font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(0, 0, 0, 127));
+        gr.setColorAt(1, <font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(0, 0, 0, 0));
+
+        painter.setRenderHint(<font color=darkmagenta><i>QPainter</i></font>.RenderHint.Antialiasing);
+        painter.setBrush(<font color=blue>new</font> <font color=darkmagenta><i>QBrush</i></font>(gr));
+        painter.setPen(<font color=darkmagenta><i>QPen</i></font>.NoPen);
+        painter.drawEllipse(0, 0, bounds.width(), bounds.height());
+        painter.end();
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> setAnimated(<font color=blue>boolean</font> animated)
+    {
+        m_animated = animated;
+
+        <font color=blue>if</font> (m_animated) {
+            m_repaintTimer.start(25, <font color=blue>this</font>);
+            m_repaintTracker.start();
+        } <font color=blue>else</font> {
+            m_repaintTimer.stop();
+        }
+    }
+
+    @Override
+    <font color=blue>protected</font> <font color=blue>void</font> paintEvent(<font color=darkmagenta><i>QPaintEvent</i></font> e)
+    {
+        <font color=blue>if</font> (m_textDirty)
+            makeTextPaths();
+        <font color=blue>super</font>.paintEvent(e);
+    }
+
+    @Override
+    <font color=blue>protected</font> <font color=blue>void</font> timerEvent(<font color=darkmagenta><i>QTimerEvent</i></font> e)
+    {
+        <font color=blue>if</font> (e.timerId() == m_repaintTimer.timerId()) {
+            <font color=blue>if</font> ((<font color=blue>new</font> <font color=darkmagenta><i>QLineF</i></font>(<font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(0,0), m_direction)).length() &gt; 1)
+                m_direction.multiply(0.995);
+
+            <font color=blue>double</font> time = m_repaintTracker.restart();
+
+            <font color=darkmagenta><i>QRect</i></font> rectBefore = circle_bounds(m_pos, m_radius, m_fontSize);
+
+            <font color=blue>double</font> dx = m_direction.x();
+            <font color=blue>double</font> dy = m_direction.y();
+
+            <font color=blue>if</font> (time &gt; 0) {
+                dx = dx * time * 0.1;
+                dy = dy * time * 0.1;
+            }
+
+            m_pos.add(<font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(dx, dy));
+
+            <font color=blue>if</font> (m_pos.x() - m_radius &lt; 0) {
+                m_direction.setX(-m_direction.x());
+                m_pos.setX(m_radius);
+            } <font color=blue>else</font> <font color=blue>if</font> (m_pos.x() + m_radius &gt; width()) {
+                m_direction.setX(-m_direction.x());
+                m_pos.setX(width() - m_radius);
+            }
+
+            <font color=blue>if</font> (m_pos.y() - m_radius &lt; 0) {
+                m_direction.setY(-m_direction.y());
+                m_pos.setY(m_radius);
+            } <font color=blue>else</font> <font color=blue>if</font> (m_pos.y() + m_radius &gt; height()) {
+                m_direction.setY(-m_direction.y());
+                m_pos.setY(height() - m_radius);
+            }
+
+            <font color=darkmagenta><i>QRect</i></font> rectAfter = circle_bounds(m_pos, m_radius, m_fontSize);
+            update(rectBefore.united(rectAfter));
+            <font color=darkmagenta><i>QApplication</i></font>.syncX();
+        }
+    }
+
+    @Override
+    <font color=blue>protected</font> <font color=blue>void</font> mousePressEvent(<font color=darkmagenta><i>QMouseEvent</i></font> e)
+    {
+        setDescriptionEnabled(false);
+
+        m_repaintTimer.stop();
+        m_offset = <font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>();
+
+        <font color=blue>if</font> ((<font color=blue>new</font> <font color=darkmagenta><i>QLineF</i></font>(m_pos, <font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(e.pos()))).length() &lt;= m_radius) {
+            m_offset = <font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(m_pos.x(), m_pos.y());
+            m_offset.subtract(<font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(e.pos()));
+        }
+
+        mouseMoveEvent(e);
+    }
+
+    @Override
+    <font color=blue>protected</font> <font color=blue>void</font> mouseReleaseEvent(<font color=darkmagenta><i>QMouseEvent</i></font> e)
+    {
+        <font color=blue>if</font> (e.buttons().isSet(<font color=darkmagenta><i>Qt</i></font>.MouseButton.NoButton) && m_animated) {
+            m_repaintTimer.start(25, <font color=blue>this</font>);
+            m_repaintTracker.start();
+        }
+    }
+
+    @Override
+    <font color=blue>protected</font> <font color=blue>void</font> mouseMoveEvent(<font color=darkmagenta><i>QMouseEvent</i></font> e)
+    {
+        <font color=darkmagenta><i>QRect</i></font> rectBefore = circle_bounds(m_pos, m_radius, m_fontSize);
+        <font color=blue>if</font> (e.type() == <font color=darkmagenta><i>QEvent</i></font>.Type.MouseMove) {
+            <font color=darkmagenta><i>QPointF</i></font> epos = <font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(e.pos());
+            epos.add(m_offset);
+            <font color=darkmagenta><i>QLineF</i></font> line = <font color=blue>new</font> <font color=darkmagenta><i>QLineF</i></font>(m_pos, epos);
+            line.setLength(line.length() * .1);
+            <font color=darkmagenta><i>QPointF</i></font> dir = <font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(line.dx(), line.dy());
+            m_direction.add(dir);
+            m_direction.multiply(0.5);
+        }
+
+        m_pos = <font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(e.pos());
+        m_pos.add(m_offset);
+        <font color=darkmagenta><i>QRect</i></font> rectAfter = circle_bounds(m_pos, m_radius, m_fontSize);
+
+        update(rectBefore.united(rectAfter));
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> deformElement(QPainterPath_Element e, <font color=darkmagenta><i>QPointF</i></font> offset, <font color=blue>double</font> pts[])
+    {
+        <font color=blue>double</font> flip = m_intensity;
+
+        <font color=blue>double</font> x = e.x() + offset.x();
+        <font color=blue>double</font> y = e.y() + offset.y();
+
+        <font color=blue>double</font> dx = x - m_pos.x();
+        <font color=blue>double</font> dy = y - m_pos.y();
+        <font color=blue>double</font> len = m_radius - Math.sqrt(dx * dx + dy * dy);
+
+        <font color=blue>if</font> (len &gt; 0) {
+            x = x + flip * dx * len / m_radius;
+            y = y + flip * dy * len / m_radius;
+        }
+
+        pts[0] = x;
+        pts[1] = y;
+    }
+
+    <font color=blue>protected</font> <font color=darkmagenta><i>QPainterPath</i></font> lensDeform(PainterPathElements source, <font color=darkmagenta><i>QPointF</i></font> offset)
+    {
+        <font color=darkmagenta><i>QPainterPath</i></font> path = <font color=blue>new</font> <font color=darkmagenta><i>QPainterPath</i></font>();
+        <font color=blue>double</font> pts[] = <font color=blue>new</font> <font color=blue>double</font>[2];
+
+        <font color=blue>for</font> (<font color=blue>int</font> i=0; i&lt;source.elements.length;) {
+            QPainterPath_Element e = source.elements[i++];
+
+            <font color=blue>if</font> (e.isLineTo()) {
+                deformElement(e, offset, pts);
+                path.lineTo(pts[0], pts[1]);
+            } <font color=blue>else</font> <font color=blue>if</font> (e.isMoveTo()) {
+                deformElement(e, offset, pts);
+                path.moveTo(pts[0], pts[1]);
+            } <font color=blue>else</font> <font color=blue>if</font> (e.isCurveTo()) {
+                deformElement(e, offset, pts);
+                <font color=blue>double</font> c1x = pts[0], c1y = pts[1];
+
+                e = source.elements[i++];
+                deformElement(e, offset, pts);
+                <font color=blue>double</font> c2x = pts[0], c2y = pts[1];
+
+                e = source.elements[i++];
+                deformElement(e, offset, pts);
+                <font color=blue>double</font> ex = pts[0], ey = pts[1];
+
+                path.cubicTo(c1x, c1y, c2x, c2y, ex, ey);
+            }
+        }
+
+        <font color=blue>return</font> path;
+    }
+
+    @Override
+    <font color=blue>public</font> <font color=blue>void</font> paint(<font color=darkmagenta><i>QPainter</i></font> painter)
+    {
+        <font color=blue>int</font> pad_x = 5;
+        <font color=blue>int</font> pad_y = 5;
+
+        <font color=blue>int</font> skip_x = (<font color=blue>int</font>)Math.round(m_pathBounds.width() + pad_x + m_fontSize / 2);
+        <font color=blue>int</font> skip_y = (<font color=blue>int</font>)Math.round(m_pathBounds.height() + pad_y);
+
+        painter.setPen(<font color=darkmagenta><i>QPen</i></font>.NoPen);
+        painter.setBrush(<font color=blue>new</font> <font color=darkmagenta><i>QBrush</i></font>(<font color=darkmagenta><i>QColor</i></font>.black));
+
+        <font color=darkmagenta><i>QRectF</i></font> clip = painter.clipPath().boundingRect();
+        <font color=blue>int</font> overlap = pad_x / 2;
+
+        <font color=blue>for</font> (<font color=blue>int</font> start_y=0; start_y&lt;height(); start_y += skip_y) {
+            <font color=blue>if</font> (start_y &gt; clip.bottom())
+                <font color=blue>break</font>;
+
+            <font color=blue>int</font> start_x = -overlap;
+            <font color=blue>for</font> (;start_x &lt; width(); start_x += skip_x) {
+                <font color=blue>if</font> (start_y + skip_y &gt;= clip.top()
+                 && start_x + skip_x &gt;= clip.left()
+                 && start_x &lt;= clip.right()) {
+                    <font color=blue>for</font> (<font color=blue>int</font> i=0; i&lt;m_paths.size(); ++i) {
+                        <font color=darkmagenta><i>QPainterPath</i></font> path = lensDeform(m_paths.get(i), <font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(start_x, start_y));
+                        painter.drawPath(path);
+                    }
+                }
+
+            }
+            overlap = skip_x - (start_x - width());
+        }
+        <font color=blue>if</font> (preferImage()) {
+            painter.drawImage((<font color=blue>int</font>)(m_pos.x() - m_radius - LENS_EXTENT), (<font color=blue>int</font>)(m_pos.y() - m_radius - LENS_EXTENT), m_lens_image);
+        } <font color=blue>else</font> {
+            painter.drawPixmap((<font color=blue>int</font>)(m_pos.x() - m_radius - LENS_EXTENT), (<font color=blue>int</font>)(m_pos.y() - m_radius - LENS_EXTENT), m_lens_pixmap);
+        }
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> setRadius(<font color=blue>int</font> radius)
+    {
+        <font color=blue>double</font> max = Math.max(m_radius, radius);
+        m_radius = radius;
+
+        generateLensPixmap();
+        <font color=blue>if</font> (!m_animated || m_radius &lt; max)
+            update(circle_bounds(m_pos, max, m_fontSize));
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> setIntensity(<font color=blue>int</font> intensity)
+    {
+        m_intensity = intensity / 100.0;
+        <font color=blue>if</font> (!m_animated)
+            update(circle_bounds(m_pos, m_radius, m_fontSize));
+    }
+}
+
+@<font color=darkmagenta><i>QtJambiExample</i></font>(name = <font color=darkgreen><i>"Deform"</i></font>)
+<font color=blue>public</font> <font color=blue>class</font> Deform <font color=blue>extends</font> <font color=darkmagenta><i>QWidget</i></font>
+{
+    <font color=blue>private</font> PathDeformRenderer m_renderer;
+
+    <font color=blue>public</font> Deform(<font color=darkmagenta><i>QWidget</i></font> parent)
+    {
+        <font color=blue>super</font>(parent);
+
+        setWindowTitle(<font color=darkgreen><i>"Vector deformation"</i></font>);
+        setWindowIcon(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(<font color=darkgreen><i>"classpath:com/trolltech/images/qt-logo.png"</i></font>));
+
+        m_renderer = <font color=blue>new</font> PathDeformRenderer(<font color=blue>this</font>);
+        m_renderer.setSizePolicy(<font color=darkmagenta><i>QSizePolicy</i></font>.Policy.Expanding, <font color=darkmagenta><i>QSizePolicy</i></font>.Policy.Expanding);
+
+        <font color=darkmagenta><i>QGroupBox</i></font> mainGroup = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(<font color=blue>this</font>);
+        mainGroup.setTitle(<font color=darkgreen><i>"Vector Deformation"</i></font>);
+
+        <font color=darkmagenta><i>QGroupBox</i></font> radiusGroup = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(mainGroup);
+        radiusGroup.setTitle(<font color=darkgreen><i>"Lens radius"</i></font>);
+        <font color=darkmagenta><i>QSlider</i></font> radiusSlider = <font color=blue>new</font> <font color=darkmagenta><i>QSlider</i></font>(<font color=darkmagenta><i>Qt</i></font>.Orientation.Horizontal, radiusGroup);
+        radiusSlider.setRange(50, 150);
+        radiusSlider.setSizePolicy(<font color=darkmagenta><i>QSizePolicy</i></font>.Policy.Preferred, <font color=darkmagenta><i>QSizePolicy</i></font>.Policy.Fixed);
+
+        <font color=darkmagenta><i>QGroupBox</i></font> deformGroup = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(mainGroup);
+        deformGroup.setTitle(<font color=darkgreen><i>"Deformation"</i></font>);
+        <font color=darkmagenta><i>QSlider</i></font> deformSlider = <font color=blue>new</font> <font color=darkmagenta><i>QSlider</i></font>(<font color=darkmagenta><i>Qt</i></font>.Orientation.Horizontal, deformGroup);
+        deformSlider.setRange(-100, 100);
+        deformSlider.setSizePolicy(<font color=darkmagenta><i>QSizePolicy</i></font>.Policy.Preferred, <font color=darkmagenta><i>QSizePolicy</i></font>.Policy.Fixed);
+
+        <font color=darkmagenta><i>QGroupBox</i></font> fontSizeGroup = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(mainGroup);
+        fontSizeGroup.setTitle(<font color=darkgreen><i>"Font Size"</i></font>);
+        <font color=darkmagenta><i>QSlider</i></font> fontSizeSlider = <font color=blue>new</font> <font color=darkmagenta><i>QSlider</i></font>(<font color=darkmagenta><i>Qt</i></font>.Orientation.Horizontal, fontSizeGroup);
+        fontSizeSlider.setRange(16, 200);
+        fontSizeSlider.setSizePolicy(<font color=darkmagenta><i>QSizePolicy</i></font>.Policy.Preferred, <font color=darkmagenta><i>QSizePolicy</i></font>.Policy.Fixed);
+
+        <font color=darkmagenta><i>QGroupBox</i></font> textGroup = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(mainGroup);
+        textGroup.setTitle(<font color=darkgreen><i>"Text"</i></font>);
+
+        <font color=darkmagenta><i>QLineEdit</i></font> textInput = <font color=blue>new</font> <font color=darkmagenta><i>QLineEdit</i></font>(textGroup);
+
+        <font color=darkmagenta><i>QPushButton</i></font> animateButton = <font color=blue>new</font> <font color=darkmagenta><i>QPushButton</i></font>(mainGroup);
+        animateButton.setText(<font color=darkgreen><i>"Animated"</i></font>);
+        animateButton.setCheckable(true);
+
+        <font color=darkmagenta><i>QPushButton</i></font> showSourceButton = <font color=blue>new</font> <font color=darkmagenta><i>QPushButton</i></font>(mainGroup);
+        showSourceButton.setText(<font color=darkgreen><i>"Show Source"</i></font>);
+
+        <font color=darkmagenta><i>QPushButton</i></font> whatsThisButton = <font color=blue>new</font> <font color=darkmagenta><i>QPushButton</i></font>(mainGroup);
+        whatsThisButton.setText(<font color=darkgreen><i>"What's This?"</i></font>);
+        whatsThisButton.setCheckable(true);
+
+        <font color=darkmagenta><i>QHBoxLayout</i></font> mainLayout = <font color=blue>new</font> <font color=darkmagenta><i>QHBoxLayout</i></font>(<font color=blue>this</font>);
+        mainLayout.addWidget(m_renderer);
+        mainLayout.addWidget(mainGroup);
+        mainGroup.setFixedWidth(180);
+
+        <font color=darkmagenta><i>QVBoxLayout</i></font> mainGroupLayout = <font color=blue>new</font> <font color=darkmagenta><i>QVBoxLayout</i></font>(mainGroup);
+        mainGroupLayout.addWidget(radiusGroup);
+        mainGroupLayout.addWidget(deformGroup);
+        mainGroupLayout.addWidget(fontSizeGroup);
+        mainGroupLayout.addWidget(textGroup);
+        mainGroupLayout.addWidget(animateButton);
+        mainGroupLayout.addStretch(1);
+        mainGroupLayout.addWidget(showSourceButton);
+        mainGroupLayout.addWidget(whatsThisButton);
+
+        <font color=darkmagenta><i>QVBoxLayout</i></font> radiusGroupLayout = <font color=blue>new</font> <font color=darkmagenta><i>QVBoxLayout</i></font>(radiusGroup);
+        radiusGroupLayout.addWidget(radiusSlider);
+
+        <font color=darkmagenta><i>QVBoxLayout</i></font> deformGroupLayout = <font color=blue>new</font> <font color=darkmagenta><i>QVBoxLayout</i></font>(deformGroup);
+        deformGroupLayout.addWidget(deformSlider);
+
+        <font color=darkmagenta><i>QVBoxLayout</i></font> fontSizeGroupLayout = <font color=blue>new</font> <font color=darkmagenta><i>QVBoxLayout</i></font>(fontSizeGroup);
+        fontSizeGroupLayout.addWidget(fontSizeSlider);
+
+        <font color=darkmagenta><i>QVBoxLayout</i></font> textGroupLayout = <font color=blue>new</font> <font color=darkmagenta><i>QVBoxLayout</i></font>(textGroup);
+        textGroupLayout.addWidget(textInput);
+
+        textInput.textChanged.connect(m_renderer, <font color=darkgreen><i>"setText(String)"</i></font>);
+        radiusSlider.valueChanged.connect(m_renderer, <font color=darkgreen><i>"setRadius(int)"</i></font>);
+        deformSlider.valueChanged.connect(m_renderer, <font color=darkgreen><i>"setIntensity(int)"</i></font>);
+        fontSizeSlider.valueChanged.connect(m_renderer, <font color=darkgreen><i>"setFontSize(int)"</i></font>);
+        animateButton.clicked.connect(m_renderer, <font color=darkgreen><i>"setAnimated(boolean)"</i></font>);
+        whatsThisButton.clicked.connect(m_renderer, <font color=darkgreen><i>"setDescriptionEnabled(boolean)"</i></font>);
+        showSourceButton.clicked.connect(m_renderer, <font color=darkgreen><i>"showSource()"</i></font>);
+        m_renderer.descriptionEnabledChanged.connect(whatsThisButton, <font color=darkgreen><i>"setChecked(boolean)"</i></font>);
+
+        animateButton.animateClick();
+        deformSlider.setValue(80);
+        radiusSlider.setValue(100);
+        fontSizeSlider.setValue(100);
+        textInput.setText(<font color=darkgreen><i>"Qt Jambi"</i></font>);
+
+        m_renderer.loadSourceFile(<font color=darkgreen><i>"classpath:com/trolltech/demos/Deform.java"</i></font>);
+        m_renderer.loadDescription(<font color=darkgreen><i>"classpath:com/trolltech/demos/Deform.html"</i></font>);
+        m_renderer.setDescriptionEnabled(false);
+    }
+
+    <font color=blue>public</font> <font color=blue>static</font> <font color=blue>void</font> main(String args[])
+    {
+        <font color=darkmagenta><i>QApplication</i></font>.initialize(args);
+
+        Deform w = <font color=blue>new</font> Deform(null);
+        w.show();
+
+        <font color=darkmagenta><i>QApplication</i></font>.exec();
+    }
+}
+
+</html></pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

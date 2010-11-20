@@ -1,0 +1,664 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Code for Custom Widget Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Code for Custom Widget Example</h1></center><p><pre class="snippet"><html style="white-space:pre-wrap;font-family:courier new"><font color=darkgreen><i>/****************************************************************************
+**
+** Copyright (C) 1992-2009 Nokia Corporation and/or its subsidiary(-ies).
+** All rights reserved.
+**
+** This file is part of Qt Jambi.
+**
+** 
+** Commercial Usage
+** Licensees holding valid Qt Commercial licenses may use this file in
+** accordance with the Qt Commercial License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Nokia.
+** 
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 2.1 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU Lesser General Public License version 2.1 requirements
+** will be met: http:<font color=darkgreen><i>//www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+</i></font>** 
+** In addition, as a special exception, Nokia gives you certain
+** additional rights. These rights are described in the Nokia Qt LGPL
+** Exception version 1.0, included in the file LGPL_EXCEPTION.txt in this
+** package.
+** 
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 3.0 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU General Public License version 3.0 requirements will be
+** met: http:<font color=darkgreen><i>//www.gnu.org/copyleft/gpl.html.
+</i></font>** 
+** If you are unsure which license is appropriate for your use, please
+** contact the sales department at qt-sales@nokia.com.
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/</i></font>
+
+<font color=blue>package</font> com.trolltech.examples;
+
+<font color=blue>import</font> com.trolltech.qt.*;
+<font color=blue>import</font> com.trolltech.qt.gui.*;
+<font color=blue>import</font> com.trolltech.qt.core.*;
+
+<font color=blue>public</font> <font color=blue>class</font> CustomWidget <font color=blue>extends</font> <font color=darkmagenta><i>QWidget</i></font> {
+
+    <font color=blue>public</font> <font color=blue>enum</font> SpeedUnit {
+        MilesPerHour(<font color=darkgreen><i>"mph"</i></font>),
+        KilometersPerHour(<font color=darkgreen><i>"km/h"</i></font>);
+
+        <font color=blue>private</font> String title;
+        <font color=blue>private</font> SpeedUnit(String title) {
+            <font color=blue>this</font>.title = title;
+        }
+
+        <font color=blue>public</font> String title() { <font color=blue>return</font> title; }
+    }
+
+    <font color=darkgreen><i>//
+</i></font>    <font color=darkgreen><i>// Constructors
+</i></font>    <font color=darkgreen><i>//
+</i></font>    <font color=blue>public</font> CustomWidget() { <font color=blue>this</font>(null); }
+    <font color=blue>public</font> CustomWidget(<font color=darkmagenta><i>QWidget</i></font> parent) { <font color=blue>super</font>(parent); }
+
+    <font color=darkgreen><i>//
+</i></font>    <font color=darkgreen><i>// Caches <font color=blue>for</font> commonly used stuff
+</i></font>    <font color=darkgreen><i>//
+</i></font>    <font color=blue>private</font> <font color=blue>int</font> x = rect().x();
+    <font color=blue>private</font> <font color=blue>int</font> y = rect().y();
+    <font color=blue>private</font> <font color=blue>int</font> w = rect().width();
+    <font color=blue>private</font> <font color=blue>int</font> h = rect().height();
+    <font color=blue>private</font> <font color=darkmagenta><i>QRect</i></font> rect = rect();
+    <font color=blue>private</font> <font color=darkmagenta><i>QBrush</i></font> gradient = null;
+    <font color=blue>private</font> <font color=darkmagenta><i>QRectF</i></font> innerCircle = null;
+    <font color=blue>private</font> <font color=darkmagenta><i>QRectF</i></font> outerCircle = null;
+    <font color=blue>private</font> <font color=darkmagenta><i>QPainterPath</i></font> innerCirclePath = null;
+    <font color=blue>private</font> <font color=darkmagenta><i>QPainterPath</i></font> needlePath = null;
+    <font color=blue>private</font> <font color=darkmagenta><i>QBrush</i></font> radialGradient = null;
+    <font color=blue>private</font> <font color=darkmagenta><i>QPainterPath</i></font> framePath = null;
+    <font color=blue>private</font> <font color=darkmagenta><i>QPen</i></font> speedBarPen = <font color=blue>new</font> <font color=darkmagenta><i>QPen</i></font>(<font color=darkmagenta><i>QColor</i></font>.black, 4);
+    <font color=blue>private</font> <font color=darkmagenta><i>QTimeLine</i></font> timeLine = <font color=blue>new</font> <font color=darkmagenta><i>QTimeLine</i></font>(1, <font color=blue>this</font>); {
+        timeLine.valueChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"animateSpeed(double)"</i></font>);
+        timeLine.finished.connect(<font color=blue>this</font>, <font color=darkgreen><i>"noLongerAnimating()"</i></font>);
+    }
+
+    <font color=darkgreen><i>//
+</i></font>    <font color=darkgreen><i>// Signals
+</i></font>    <font color=darkgreen><i>//
+</i></font>    <font color=blue>public</font> Signal0 propertyChanged = <font color=blue>new</font> Signal0(); {
+        propertyChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"update()"</i></font>);
+    }
+
+    <font color=blue>public</font> Signal1&lt;Integer&gt; speedChanged = <font color=blue>new</font> Signal1&lt;Integer&gt;();
+
+
+    <font color=darkgreen><i>/**
+     * Calculates the size of the frame.
+     * @return The width of the frame.
+     */</i></font>
+    <font color=blue>private</font> <font color=blue>static</font> <font color=blue>final</font> <font color=blue>double</font> FRAMING_SIZE = 0.01f;
+    <font color=blue>private</font> <font color=blue>double</font> framingSize() {
+        <font color=blue>return</font> FRAMING_SIZE * (<font color=blue>double</font>)outerCircle().width();
+    }
+
+    <font color=darkgreen><i>//
+</i></font>    <font color=darkgreen><i>// topSpeed property
+</i></font>    <font color=darkgreen><i>//
+</i></font>    <font color=blue>private</font> <font color=blue>static</font> <font color=blue>final</font> <font color=blue>int</font> MAX_SPEED = 260;
+    <font color=blue>private</font> <font color=blue>int</font> maxSpeed = MAX_SPEED;
+
+    @<font color=darkmagenta><i>QtPropertyReader</i></font>(name=<font color=darkgreen><i>"topSpeed"</i></font>)
+    @<font color=darkmagenta><i>QtBlockedSlot</i></font> <font color=blue>public</font> <font color=blue>final</font> <font color=blue>int</font> maxSpeed() {
+        <font color=blue>return</font> maxSpeed;
+    }
+
+    @<font color=darkmagenta><i>QtPropertyWriter</i></font>(name=<font color=darkgreen><i>"topSpeed"</i></font>)
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> setMaxSpeed(<font color=blue>int</font> maxSpeed) {
+        <font color=blue>this</font>.maxSpeed = maxSpeed; propertyChanged.emit();
+    }
+
+    @<font color=darkmagenta><i>QtPropertyResetter</i></font>(name=<font color=darkgreen><i>"topSpeed"</i></font>)
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> resetMaxSpeed() {
+        setMaxSpeed(MAX_SPEED);
+    }
+
+    <font color=darkgreen><i>//
+</i></font>    <font color=darkgreen><i>// animationSpeed property
+</i></font>    <font color=darkgreen><i>//
+</i></font>    <font color=blue>private</font> <font color=blue>static</font> <font color=blue>final</font> <font color=blue>double</font> ANIMATION_SPEED = 10.0f;
+    <font color=blue>private</font> <font color=blue>double</font> animationSpeed = ANIMATION_SPEED;
+
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>double</font> animationSpeed() { <font color=blue>return</font> animationSpeed; }
+
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> setAnimationSpeed(<font color=blue>double</font> animationSpeed) {
+        <font color=blue>this</font>.animationSpeed = animationSpeed;
+        propertyChanged.emit();
+    }
+
+    @<font color=darkmagenta><i>QtPropertyResetter</i></font>(name=<font color=darkgreen><i>"animationSpeed"</i></font>)
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> resetAnimationSpeed() {
+        setAnimationSpeed(ANIMATION_SPEED);
+    }
+
+    <font color=blue>private</font> <font color=blue>int</font> tail[] = <font color=blue>new</font> <font color=blue>int</font>[TAIL_LENGTH];
+    <font color=blue>private</font> <font color=blue>void</font> resetTail() {
+        <font color=blue>int</font> newTail[] = <font color=blue>new</font> <font color=blue>int</font>[tailLength()];
+        <font color=blue>for</font> (<font color=blue>int</font> i=0; i&lt;(tail.length &gt; newTail.length ? newTail.length : tail.length); ++i)
+            newTail[i] = tail[i];
+        tail = newTail;
+    }
+
+    <font color=darkgreen><i>//
+</i></font>    <font color=darkgreen><i>// tailLength property
+</i></font>    <font color=darkgreen><i>//
+</i></font>    <font color=blue>private</font> <font color=blue>static</font> <font color=blue>final</font> <font color=blue>int</font> TAIL_LENGTH = 10;
+    <font color=blue>private</font> <font color=blue>int</font> tailLength = TAIL_LENGTH;
+
+    @<font color=darkmagenta><i>QtBlockedSlot</i></font> <font color=blue>public</font> <font color=blue>final</font> <font color=blue>int</font> tailLength() { <font color=blue>return</font> tailLength; }
+
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> setTailLength(<font color=blue>int</font> tailLength) {
+        <font color=blue>if</font> (tailLength &lt; 0)
+            <font color=blue>return</font> ;
+
+        <font color=blue>this</font>.tailLength = tailLength;
+        resetTail();
+        propertyChanged.emit();
+    }
+
+    @<font color=darkmagenta><i>QtPropertyResetter</i></font>(name=<font color=darkgreen><i>"tailLength"</i></font>)
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> resetTailLength() { setTailLength(TAIL_LENGTH); }
+
+    <font color=darkgreen><i>//
+</i></font>    <font color=darkgreen><i>// currentSpeed property
+</i></font>    <font color=darkgreen><i>//
+</i></font>    <font color=blue>private</font> <font color=blue>boolean</font> isAnimating = false;
+    <font color=blue>private</font> <font color=blue>int</font> startTail;
+    <font color=blue>private</font> <font color=blue>int</font> endTail;
+    <font color=blue>private</font> <font color=blue>int</font> oldSpeed;
+    <font color=blue>private</font> <font color=blue>int</font> diff = 0;
+    <font color=blue>private</font> <font color=blue>int</font> requestedSpeed = 0;
+    <font color=blue>private</font> <font color=blue>int</font> currentSpeed = 0;
+
+    @<font color=darkmagenta><i>QtPropertyDesignable</i></font>(value=<font color=darkgreen><i>"false"</i></font>)
+    @<font color=darkmagenta><i>QtBlockedSlot</i></font> <font color=blue>public</font> <font color=blue>int</font> currentSpeed() { <font color=blue>return</font> currentSpeed; }
+
+    <font color=blue>public</font> <font color=blue>void</font> setCurrentSpeed(<font color=blue>int</font> currentSpeed) {
+        oldSpeed = <font color=blue>this</font>.currentSpeed;
+        requestedSpeed = currentSpeed;
+        diff = requestedSpeed - oldSpeed;
+
+        startTail = 0;
+        endTail = 0;
+        isAnimating = true;
+
+        <font color=blue>if</font> (timeLine.state() == <font color=darkmagenta><i>QTimeLine</i></font>.State.Running)
+            timeLine.stop();
+
+        timeLine.setDuration((<font color=blue>int</font>)(Math.abs(diff) * animationSpeed()) + 1);
+        timeLine.start();
+    }
+
+    <font color=darkgreen><i>//
+</i></font>    <font color=darkgreen><i>// skip property
+</i></font>    <font color=darkgreen><i>//
+</i></font>    <font color=blue>private</font> <font color=blue>static</font> <font color=blue>final</font> <font color=blue>int</font> SKIP = 20;
+    <font color=blue>private</font> <font color=blue>int</font> skip = SKIP;
+
+    @<font color=darkmagenta><i>QtBlockedSlot</i></font> <font color=blue>public</font> <font color=blue>final</font> <font color=blue>int</font> skip() {
+        <font color=blue>return</font> skip;
+    }
+
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> setSkip(<font color=blue>int</font> skip) { <font color=blue>this</font>.skip = skip; propertyChanged.emit(); }
+
+    @<font color=darkmagenta><i>QtPropertyResetter</i></font>(name=<font color=darkgreen><i>"skip"</i></font>)
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> resetSkip() { setSkip(SKIP); }
+
+    <font color=darkgreen><i>//
+</i></font>    <font color=darkgreen><i>// unit property
+</i></font>    <font color=darkgreen><i>//
+</i></font>    <font color=blue>private</font> SpeedUnit unit = SpeedUnit.KilometersPerHour;
+
+    @<font color=darkmagenta><i>QtBlockedSlot</i></font> <font color=blue>public</font> SpeedUnit unit() { <font color=blue>return</font> unit; }
+
+    <font color=blue>public</font> <font color=blue>void</font> setUnit(SpeedUnit unit) { <font color=blue>this</font>.unit = unit; propertyChanged.emit(); }
+
+    <font color=darkgreen><i>//
+</i></font>    <font color=darkgreen><i>// startAngle property
+</i></font>    <font color=darkgreen><i>//
+</i></font>    <font color=blue>private</font> <font color=blue>static</font> <font color=blue>final</font> <font color=blue>double</font> START_ANGLE = -30.0f;
+    <font color=blue>private</font> <font color=blue>double</font> startAngle = START_ANGLE;
+
+    @<font color=darkmagenta><i>QtBlockedSlot</i></font> <font color=blue>public</font> <font color=blue>final</font> <font color=blue>double</font> startAngle() { <font color=blue>return</font> startAngle; }
+
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> setStartAngle(<font color=blue>double</font> startAngle) { <font color=blue>this</font>.startAngle = startAngle; propertyChanged.emit(); }
+
+    @<font color=darkmagenta><i>QtPropertyResetter</i></font>(name=<font color=darkgreen><i>"startAngle"</i></font>)
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> resetStartAngle() { setStartAngle(START_ANGLE); }
+
+    <font color=darkgreen><i>//
+</i></font>    <font color=darkgreen><i>// endAngle property
+</i></font>    <font color=darkgreen><i>//
+</i></font>    <font color=blue>private</font> <font color=blue>static</font> <font color=blue>final</font> <font color=blue>double</font> END_ANGLE = 210.0f;
+    <font color=blue>private</font> <font color=blue>double</font> endAngle = END_ANGLE;
+
+    @<font color=darkmagenta><i>QtBlockedSlot</i></font> <font color=blue>public</font> <font color=blue>final</font> <font color=blue>double</font> endAngle() { <font color=blue>return</font> endAngle; }
+
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> setEndAngle(<font color=blue>double</font> endAngle) { <font color=blue>this</font>.endAngle = endAngle; propertyChanged.emit(); }
+
+    @<font color=darkmagenta><i>QtPropertyResetter</i></font>(name=<font color=darkgreen><i>"endAngle"</i></font>)
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> resetEndAngle() { setEndAngle(endAngle); }
+
+    <font color=darkgreen><i>//
+</i></font>    <font color=darkgreen><i>// font property
+</i></font>    <font color=darkgreen><i>//
+</i></font>    <font color=blue>private</font> <font color=darkmagenta><i>QFont</i></font> font = font();
+    @<font color=darkmagenta><i>QtBlockedSlot</i></font> <font color=blue>public</font> <font color=blue>final</font> <font color=darkmagenta><i>QFont</i></font> speedFont() { <font color=blue>return</font> font; }
+
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> setSpeedFont(<font color=darkmagenta><i>QFont</i></font> font) { <font color=blue>this</font>.font = font; propertyChanged.emit(); }
+
+    @<font color=darkmagenta><i>QtPropertyResetter</i></font>(name=<font color=darkgreen><i>"speedFont"</i></font>)
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> resetSpeedFont() { setSpeedFont(font()); }
+
+    <font color=darkgreen><i>//
+</i></font>    <font color=darkgreen><i>// highlightLight property
+</i></font>    <font color=darkgreen><i>//
+</i></font>    <font color=blue>private</font> <font color=blue>static</font> <font color=blue>final</font> <font color=darkmagenta><i>QColor</i></font> HIGHLIGHT_LIGHT = <font color=darkmagenta><i>QColor</i></font>.fromRgba(0xffffffff);
+    <font color=blue>private</font> <font color=darkmagenta><i>QColor</i></font> highlightLight = HIGHLIGHT_LIGHT;
+
+    @<font color=darkmagenta><i>QtBlockedSlot</i></font> <font color=blue>public</font> <font color=blue>final</font> <font color=darkmagenta><i>QColor</i></font> highlightLight() { <font color=blue>return</font> highlightLight; }
+
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> setHighlightLight(<font color=darkmagenta><i>QColor</i></font> color) { highlightLight = color; propertyChanged.emit(); }
+
+    @<font color=darkmagenta><i>QtPropertyResetter</i></font>(name=<font color=darkgreen><i>"highlightLight"</i></font>)
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> resetHighlightLight() { setHighlightLight(HIGHLIGHT_LIGHT); }
+
+    <font color=darkgreen><i>//
+</i></font>    <font color=darkgreen><i>// highlightDark property
+</i></font>    <font color=darkgreen><i>//
+</i></font>    <font color=blue>private</font> <font color=blue>static</font> <font color=blue>final</font> <font color=darkmagenta><i>QColor</i></font> HIGHLIGHT_DARK = <font color=darkmagenta><i>QColor</i></font>.fromRgba(0x00ffffff);
+    <font color=blue>private</font> <font color=darkmagenta><i>QColor</i></font> highlightDark = HIGHLIGHT_DARK;
+
+    @<font color=darkmagenta><i>QtBlockedSlot</i></font> <font color=blue>public</font> <font color=blue>final</font> <font color=darkmagenta><i>QColor</i></font> highlightDark() { <font color=blue>return</font> highlightDark; }
+
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> setHighlightDark(<font color=darkmagenta><i>QColor</i></font> color) { highlightDark = color; propertyChanged.emit(); }
+
+    @<font color=darkmagenta><i>QtPropertyResetter</i></font>(name=<font color=darkgreen><i>"highlightDark"</i></font>)
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> resetHighlightDark() { setHighlightDark(HIGHLIGHT_DARK); }
+
+    <font color=darkgreen><i>//
+</i></font>    <font color=darkgreen><i>// needleColor property
+</i></font>    <font color=darkgreen><i>//
+</i></font>    <font color=blue>private</font> <font color=blue>static</font> <font color=blue>final</font> <font color=darkmagenta><i>QColor</i></font> NEEDLE_COLOR = <font color=darkmagenta><i>QColor</i></font>.red;
+    <font color=blue>private</font> <font color=darkmagenta><i>QColor</i></font> needleColor = NEEDLE_COLOR;
+
+    @<font color=darkmagenta><i>QtBlockedSlot</i></font> <font color=blue>public</font> <font color=blue>final</font> <font color=darkmagenta><i>QColor</i></font> needleColor() { <font color=blue>return</font> needleColor; }
+
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> setNeedleColor(<font color=darkmagenta><i>QColor</i></font> needleColor) { <font color=blue>this</font>.needleColor = needleColor; propertyChanged.emit(); }
+
+    @<font color=darkmagenta><i>QtPropertyResetter</i></font>(name=<font color=darkgreen><i>"needleColor"</i></font>)
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> resetNeedleColor() { setNeedleColor(NEEDLE_COLOR); }
+
+    <font color=darkgreen><i>//
+</i></font>    <font color=darkgreen><i>// backgroundColor property
+</i></font>    <font color=darkgreen><i>//
+</i></font>    <font color=blue>private</font> <font color=blue>static</font> <font color=blue>final</font> <font color=darkmagenta><i>QColor</i></font> BACKGROUND_COLOR = <font color=darkmagenta><i>QColor</i></font>.white;
+    <font color=blue>private</font> <font color=darkmagenta><i>QColor</i></font> backgroundColor = BACKGROUND_COLOR;
+
+    @<font color=darkmagenta><i>QtBlockedSlot</i></font> <font color=blue>public</font> <font color=blue>final</font> <font color=darkmagenta><i>QColor</i></font> backgroundColor() { <font color=blue>return</font> backgroundColor; }
+
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> setBackgroundColor(<font color=darkmagenta><i>QColor</i></font> backgroundColor) {
+        <font color=blue>this</font>.backgroundColor = backgroundColor;
+        propertyChanged.emit();
+    }
+
+    @<font color=darkmagenta><i>QtPropertyResetter</i></font>(name=<font color=darkgreen><i>"backgroundColor"</i></font>)
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> resetBackgroundColor() { setBackgroundColor(BACKGROUND_COLOR); }
+
+    <font color=darkgreen><i>//
+</i></font>    <font color=darkgreen><i>// needleFrameColor property
+</i></font>    <font color=darkgreen><i>//
+</i></font>    <font color=blue>private</font> <font color=blue>static</font> <font color=blue>final</font> <font color=darkmagenta><i>QColor</i></font> NEEDLE_FRAME_COLOR = <font color=darkmagenta><i>QColor</i></font>.black;
+    <font color=blue>private</font> <font color=darkmagenta><i>QColor</i></font> needleFrameColor = NEEDLE_FRAME_COLOR;
+
+    @<font color=darkmagenta><i>QtBlockedSlot</i></font> <font color=blue>public</font> <font color=blue>final</font> <font color=darkmagenta><i>QColor</i></font> needleFrameColor() { <font color=blue>return</font> needleFrameColor; }
+
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> setNeedleFrameColor(<font color=darkmagenta><i>QColor</i></font> needleFrameColor) { <font color=blue>this</font>.needleFrameColor = needleFrameColor; propertyChanged.emit(); }
+
+    @<font color=darkmagenta><i>QtPropertyResetter</i></font>(name=<font color=darkgreen><i>"needleFrameColor"</i></font>)
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> resetNeedleFrameColor() { setNeedleFrameColor(NEEDLE_FRAME_COLOR); }
+
+    <font color=darkgreen><i>//
+</i></font>    <font color=darkgreen><i>// frameColorDark property
+</i></font>    <font color=darkgreen><i>//
+</i></font>    <font color=blue>private</font> <font color=blue>static</font> <font color=blue>final</font> <font color=darkmagenta><i>QColor</i></font> FRAME_COLOR_DARK = <font color=darkmagenta><i>QColor</i></font>.fromRgb(0x00514f48);
+    <font color=blue>private</font> <font color=darkmagenta><i>QColor</i></font> frameColorDark = FRAME_COLOR_DARK;
+
+    @<font color=darkmagenta><i>QtBlockedSlot</i></font> <font color=blue>public</font> <font color=blue>final</font> <font color=darkmagenta><i>QColor</i></font> frameColorDark() { <font color=blue>return</font> frameColorDark; }
+
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> setFrameColorDark(<font color=darkmagenta><i>QColor</i></font> frameColorDark) { <font color=blue>this</font>.frameColorDark = frameColorDark; propertyChanged.emit(); }
+
+    @<font color=darkmagenta><i>QtPropertyResetter</i></font>(name=<font color=darkgreen><i>"frameColorDark"</i></font>)
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> resetFrameColorDark() { setFrameColorDark(FRAME_COLOR_DARK); }
+
+    <font color=darkgreen><i>//
+</i></font>    <font color=darkgreen><i>// frameColorLight property
+</i></font>    <font color=darkgreen><i>//
+</i></font>    <font color=blue>private</font> <font color=blue>static</font> <font color=blue>final</font> <font color=darkmagenta><i>QColor</i></font> FRAME_COLOR_LIGHT = <font color=darkmagenta><i>QColor</i></font>.fromRgb(0x00a49a92);
+    <font color=blue>private</font> <font color=darkmagenta><i>QColor</i></font> frameColorLight = FRAME_COLOR_LIGHT;
+
+    @<font color=darkmagenta><i>QtBlockedSlot</i></font> <font color=blue>public</font> <font color=blue>final</font> <font color=darkmagenta><i>QColor</i></font> frameColorLight() { <font color=blue>return</font> frameColorLight; }
+
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> setFrameColorLight(<font color=darkmagenta><i>QColor</i></font> frameColorLight) { <font color=blue>this</font>.frameColorLight = frameColorLight; propertyChanged.emit(); }
+
+    @<font color=darkmagenta><i>QtPropertyResetter</i></font>(name=<font color=darkgreen><i>"frameColorLight"</i></font>)
+    <font color=blue>public</font> <font color=blue>final</font> <font color=blue>void</font> resetFrameColorLight() { setFrameColorLight(FRAME_COLOR_LIGHT); }
+
+    @Override
+    <font color=blue>protected</font> <font color=blue>void</font> resizeEvent(<font color=darkmagenta><i>QResizeEvent</i></font> e) {
+        <font color=blue>this</font>.rect = rect();
+        x = rect.x();
+        y = rect.y();
+        w = rect.width();
+        h = rect.height();
+
+        resetAll();
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> resetAll() {
+        resetLinearGradient();
+        resetInnerCircle();
+        resetOuterCircle();
+        resetFramePath();
+        resetRadialGradient();
+        resetNeedlePath();
+    }
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QSize</i></font> sizeHint = <font color=blue>new</font> <font color=darkmagenta><i>QSize</i></font>(200, 200);
+    @Override
+    <font color=blue>public</font> <font color=darkmagenta><i>QSize</i></font> sizeHint() {
+        <font color=blue>return</font> sizeHint;
+    }
+
+    @Override
+    <font color=blue>protected</font> <font color=blue>void</font> paintEvent(<font color=darkmagenta><i>QPaintEvent</i></font> e) {
+        <font color=darkmagenta><i>QPainter</i></font> p = <font color=blue>new</font> <font color=darkmagenta><i>QPainter</i></font>();
+
+        p.begin(<font color=blue>this</font>); {
+            p.setRenderHint(<font color=darkmagenta><i>QPainter</i></font>.RenderHint.Antialiasing, true);
+
+            drawFrame(p);
+            drawPlate(p);
+
+            p.end();
+        }
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> resetLinearGradient() {
+        gradient = null;
+    }
+    <font color=blue>private</font> <font color=darkmagenta><i>QBrush</i></font> linearGradient() {
+        <font color=blue>if</font> (gradient == null) {
+            <font color=darkmagenta><i>QRectF</i></font> rect = outerCircle();
+            <font color=darkmagenta><i>QLinearGradient</i></font> g = <font color=blue>new</font> <font color=darkmagenta><i>QLinearGradient</i></font>(<font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(rect.x() + rect.width() / 2.0, rect.top()),
+                                                    <font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(rect.x() + rect.width() / 2.0, rect.top() + framingSize() / 2.0));
+            g.setColorAt(0.0, highlightLight());
+            g.setColorAt(1.0, highlightDark());
+            gradient = <font color=blue>new</font> <font color=darkmagenta><i>QBrush</i></font>(g);
+        }
+        <font color=blue>return</font> gradient;
+    }
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QRectF</i></font> outerCircle() {
+        <font color=blue>if</font> (outerCircle == null) {
+            <font color=blue>if</font> (w &gt; h)
+                outerCircle = <font color=blue>new</font> <font color=darkmagenta><i>QRectF</i></font>(x + w/2 - h/2, y, h, h);
+            <font color=blue>else</font>
+                outerCircle = <font color=blue>new</font> <font color=darkmagenta><i>QRectF</i></font>(x, y + h/2 - w/2, w, w);
+            <font color=darkgreen><i>// Compensate <font color=blue>for</font> the antialiased edges of the drawing by shrinking the rect by 1 pixel
+</i></font>            outerCircle = outerCircle.adjusted(1, 1, -1, -1);
+        }
+        <font color=blue>return</font> outerCircle;
+    }
+    <font color=blue>private</font> <font color=blue>void</font> resetOuterCircle() {
+        outerCircle = null;
+    }
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QRectF</i></font> innerCircle() {
+        <font color=blue>if</font> (innerCircle == null) {
+            <font color=darkmagenta><i>QRectF</i></font> outerCircle = outerCircle();
+            innerCircle = <font color=blue>new</font> <font color=darkmagenta><i>QRectF</i></font>(outerCircle.x() + framingSize(), outerCircle.y() + framingSize(),
+                                     outerCircle.width() - framingSize()*2,
+                                     outerCircle.height() - framingSize()*2);
+        }
+
+        <font color=blue>return</font> innerCircle;
+    }
+    <font color=blue>private</font> <font color=darkmagenta><i>QPainterPath</i></font> innerCirclePath() {
+        <font color=blue>if</font> (innerCirclePath == null) {
+            innerCirclePath = <font color=blue>new</font> <font color=darkmagenta><i>QPainterPath</i></font>();
+            innerCirclePath.addEllipse(innerCircle());
+        }
+
+        <font color=blue>return</font> innerCirclePath;
+    }
+    <font color=blue>private</font> <font color=blue>void</font> resetInnerCircle() {
+        innerCircle = null;
+        innerCirclePath = null;
+    }
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QPainterPath</i></font> needlePath() {
+        <font color=blue>if</font> (needlePath == null) {
+            <font color=darkmagenta><i>QRectF</i></font> innerCircle = innerCircle();
+            needlePath = <font color=blue>new</font> <font color=darkmagenta><i>QPainterPath</i></font>();
+            needlePath.moveTo(0.0, 0.0);
+
+            <font color=blue>double</font> tipLength = (<font color=blue>double</font>)innerCircle.width() / 50.0f;
+            needlePath.lineTo(-innerCircle.width() / 2.0 + tipLength, -tipLength);
+            needlePath.lineTo(-innerCircle.width() / 2.0, 0.0);
+            needlePath.lineTo(-innerCircle.width() / 2.0 + tipLength, tipLength);
+            needlePath.lineTo(0.0, 0.0);
+        }
+
+        <font color=blue>return</font> needlePath;
+    }
+    <font color=blue>private</font> <font color=blue>void</font> resetNeedlePath() {
+        needlePath = null;
+    }
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QRectF</i></font> cachedTextRect = <font color=blue>new</font> <font color=darkmagenta><i>QRectF</i></font>();
+    <font color=blue>private</font> <font color=blue>void</font> drawPlate(<font color=darkmagenta><i>QPainter</i></font> p) {
+        p.save();
+
+        <font color=darkmagenta><i>QPainterPath</i></font> path = innerCirclePath();
+        p.fillPath(path, <font color=blue>new</font> <font color=darkmagenta><i>QBrush</i></font>(backgroundColor()));
+        p.setClipPath(path);
+
+        <font color=darkmagenta><i>QRectF</i></font> innerCircle = innerCircle();
+        <font color=blue>double</font> x = (<font color=blue>double</font>)innerCircle.x() + (<font color=blue>double</font>)innerCircle.width() / 2.0f;
+        <font color=blue>double</font> y = (<font color=blue>double</font>)innerCircle.y() + (<font color=blue>double</font>)innerCircle.height() / 2.0f;
+
+        <font color=darkgreen><i>// Draw the speed bars
+</i></font>        <font color=blue>int</font> skip = skip();
+        <font color=blue>double</font> step = ((<font color=blue>double</font>)skip / (<font color=blue>double</font>)maxSpeed()) * (endAngle() - startAngle());
+        <font color=darkmagenta><i>QFont</i></font> font = speedFont();
+        p.setFont(font);
+
+        <font color=darkmagenta><i>QFontMetrics</i></font> fm = <font color=blue>new</font> <font color=darkmagenta><i>QFontMetrics</i></font>(font);
+        {
+            <font color=blue>if</font> (step &gt; 0.0) {
+                p.save();
+                p.translate(x,y);
+
+                speedBarPen.setWidthF(innerCircle.width() / 100.0f);
+                p.setPen(speedBarPen);
+
+                <font color=blue>double</font> angle;
+                <font color=blue>int</font> speed = 0;
+                p.rotate(startAngle());
+                <font color=blue>for</font> (angle=startAngle(); angle&lt;=endAngle(); angle += step) {
+                    p.drawLine((<font color=blue>int</font>)(-innerCircle.width() / 2.0f) + (<font color=blue>int</font>)(innerCircle.width() / 30.0f), 0, (<font color=blue>int</font>)(-innerCircle.width() / 2.0f) + (<font color=blue>int</font>)(innerCircle.width() / 14.0f), 0);
+
+                    String speedString = <font color=darkgreen><i>""</i></font> + speed;
+                    <font color=darkmagenta><i>QSize</i></font> size = fm.size(0, speedString);
+                    <font color=blue>int</font> x1 = (<font color=blue>int</font>)(-innerCircle.width() / 2.0f) + (<font color=blue>int</font>)(innerCircle.width() / 14.0f);
+                    cachedTextRect.setCoords(x1, 0, x1 + size.width(), size.height());
+
+                    p.drawText(cachedTextRect, <font color=darkgreen><i>""</i></font> + speed);
+
+                    speed += skip;
+                    p.rotate(step);
+                }
+                p.restore();
+            }
+        }
+
+
+        p.translate(x, y);
+        p.setFont(font);
+        <font color=darkmagenta><i>QSize</i></font> size = fm.size(0, unit().title());
+        cachedTextRect.setCoords(-size.width() / 2.0, 0, size.width() / 2.0, size.height());
+        p.drawText(cachedTextRect, unit().title());
+
+        p.restore();
+
+        p.setPen(<font color=darkmagenta><i>QPen</i></font>.NoPen);
+        p.setBrush(<font color=blue>new</font> <font color=darkmagenta><i>QBrush</i></font>(needleColor()));
+
+        <font color=blue>int</font> i=startTail;
+        <font color=blue>while</font> (i != endTail) {
+            p.save();
+
+            matrix.reset();
+            matrix.translate(x, y);
+            matrix.rotate(angleOfSpeed(tail[i]));
+
+            <font color=blue>int</font> len = i &gt;= startTail ? i - startTail : i + tail.length - startTail;
+            p.setOpacity((needleColor().alphaF() / (tail.length+1)) * len);
+            <font color=darkmagenta><i>QPainterPath</i></font> temporaryPath = matrix.map(needlePath());
+            p.drawPath(temporaryPath);
+
+            <font color=blue>if</font> ((++i) &gt;= tail.length)
+                i = 0;
+            p.restore();
+        }
+
+        <font color=blue>if</font> (!isAnimating && startTail != endTail) {
+            <font color=blue>if</font> ((++startTail) &gt;= tail.length) {
+                startTail = 0;
+            }
+            update();
+        }
+
+        matrix.reset();
+        matrix.translate(x, y);
+        matrix.rotate(angleOfSpeed(currentSpeed));
+
+        p.setPen(needleFrameColor());
+        <font color=darkmagenta><i>QPainterPath</i></font> temporaryPath = matrix.map(needlePath());
+        p.drawPath(temporaryPath);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> drawHighlights(<font color=darkmagenta><i>QPainter</i></font> p) {
+        p.setPen(<font color=darkmagenta><i>QPen</i></font>.NoPen);
+        p.setBrush(linearGradient());
+        p.setClipPath(framePath());
+        p.drawEllipse(outerCircle());
+    }
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QPainterPath</i></font> framePath() {
+        <font color=blue>if</font> (framePath == null) {
+            framePath = <font color=blue>new</font> <font color=darkmagenta><i>QPainterPath</i></font>();
+            framePath.addEllipse(outerCircle());
+            {
+                <font color=darkmagenta><i>QPainterPath</i></font> innerEllipse = <font color=blue>new</font> <font color=darkmagenta><i>QPainterPath</i></font>();
+                innerEllipse.addEllipse(innerCircle());
+                framePath = framePath.subtracted(innerEllipse);
+            }
+        }
+
+        <font color=blue>return</font> framePath;
+    }
+    <font color=blue>private</font> <font color=blue>void</font> resetFramePath() {
+        framePath = null;
+    }
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QBrush</i></font> radialGradient() {
+        <font color=blue>if</font> (radialGradient == null) {
+            <font color=darkmagenta><i>QRadialGradient</i></font> g = <font color=blue>new</font> <font color=darkmagenta><i>QRadialGradient</i></font>(<font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(rect.center()), rect.width() / 2.0);
+            g.setColorAt(0.0, frameColorDark());
+            g.setColorAt(1.0, frameColorLight());
+            g.setCoordinateMode(<font color=darkmagenta><i>QGradient</i></font>.CoordinateMode.ObjectBoundingMode);
+            radialGradient = <font color=blue>new</font> <font color=darkmagenta><i>QBrush</i></font>(g);
+        }
+
+        <font color=blue>return</font> radialGradient;
+    }
+    <font color=blue>private</font> <font color=blue>void</font> resetRadialGradient() {
+        radialGradient = null;
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> drawFrame(<font color=darkmagenta><i>QPainter</i></font> p) {
+        p.save();
+
+        p.setPen(<font color=blue>new</font> <font color=darkmagenta><i>QPen</i></font>(<font color=darkmagenta><i>QColor</i></font>.black, 2));
+        p.setBrush(radialGradient());
+        p.drawPath(framePath());
+
+        drawHighlights(p);
+        p.restore();
+    }
+
+    <font color=blue>private</font> <font color=blue>double</font> angleOfSpeed(<font color=blue>int</font> speed) {
+        <font color=blue>int</font> skip = skip();
+        <font color=blue>double</font> step = ((<font color=blue>double</font>)skip / (<font color=blue>double</font>)maxSpeed()) * (endAngle() - startAngle());
+        <font color=blue>return</font> startAngle() + step * ((<font color=blue>double</font>)speed / (<font color=blue>double</font>)skip);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> noLongerAnimating() {
+        isAnimating = false;
+    }
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QMatrix</i></font> matrix = <font color=blue>new</font> <font color=darkmagenta><i>QMatrix</i></font>();
+
+    <font color=blue>private</font> <font color=blue>void</font> animateSpeed(<font color=blue>double</font> value) {
+        <font color=blue>if</font> (tail.length &gt; 0) {
+            tail[endTail++] = currentSpeed;
+            <font color=blue>if</font> (endTail &gt;= tail.length)
+                endTail = 0;
+
+            <font color=blue>if</font> (endTail &lt;= startTail) {
+                startTail = endTail + 1;
+                <font color=blue>if</font> (startTail &gt;= tail.length)
+                    startTail = 0;
+            }
+        }
+
+        currentSpeed = (<font color=blue>int</font>)(oldSpeed + diff * value);
+
+        propertyChanged.emit();
+        speedChanged.emit(currentSpeed);
+    }
+
+
+}
+</html></pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

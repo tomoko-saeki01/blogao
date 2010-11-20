@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Qt Jambi Tutorial 4 - Let There Be Widgets</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Qt Jambi Tutorial 4 - Let There Be Widgets</h1></center><p>[Previous: <a href="qtjambi-tutorial3.html">Qt Jambi Tutorial 3 - Family Values</a>][<a href="qtjambi-tutorial.html">Qt Jambi Tutorial</a>][Next: <a href="qtjambi-tutorial5.html">Qt Jambi Tutorial 5 - Building Blocks</a>]<p> <b>Code</b>: <ul><li> <a href="qtjambi-tutorial4-code.html">Widgets.java</a></li></ul> <br><center><img src="images/tutorial4-example.png"></center><br> This example shows how to create your own widget, and describes how to control the minimum and maximum sizes of a widget. <pre class="snippet">
+public class Widgets extends QWidget
+{
+ 
+    public Widgets()
+    {
+ 
+        setFixedSize(200, 120);
+ 
+
+        QPushButton quit = new QPushButton(tr("Quit"), this);
+        quit.setGeometry(62, 40, 75, 30);
+        quit.setFont(new QFont("Times", 18, QFont.Weight.Bold.value()));
+
+
+        quit.clicked.connect(QApplication.instance(), "quit()");
+
+        setWindowTitle(tr("Let There Be Widgets"));
+    }
+
+
+    public static void main(String args[])
+    {
+        QApplication.initialize(args);
+
+        Widgets widget = new Widgets();
+        widget.show();
+
+        QApplication.exec();
+    }
+
+}
+</pre><a name="line-by-line-walkthrough"><h2>Line by Line Walkthrough</h2> <pre class="snippet"> 
+public class Widgets extends QWidget
+{
+</pre> Here we create a new class. Because this class inherits from <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>, the new class is a widget and may be a top-level window or a child widget (like the <a href="../../../com/trolltech/qt/gui/QPushButton.html">QPushButton</a> in the previous chapter). <pre class="snippet">
+    public Widgets()
+    {
+</pre> This class has only one member, a constructor (in addition to the members it inherits from <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>). This widget is created without a parent. Parentless widgets are top-level windows in Qt Jambi, i.e., they are shown in separate windows on the screen. You can set a parent in the constructor of <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> or with the <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>.setParent() method. A widget's parent is also set to the widget to which it is added. <pre class="snippet">
+        setFixedSize(200, 120);
+</pre> Because this widget doesn't know how to handle resizing, we fix its size. In the next chapter, we will show how a widget can respond to resize event from the user. <pre class="snippet">
+
+        QPushButton quit = new QPushButton(tr("Quit"), this);
+        quit.setGeometry(62, 40, 75, 30);
+        quit.setFont(new QFont("Times", 18, QFont.Weight.Bold.value()));
+</pre> Here we create and set up a child widget of this widget (the new widget's parent is <tt>this</tt>, i.e. the <tt>Widgets</tt> instance). <p>The tr() method call around the string literal "Quit" marks the string for translation, making it possible to change it at run-time based on the contents of a translation file. It is a good habit to use tr() around all user-visible strings, in case you decide later to translate your application to other languages. <p>The <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>.setGeometry() call sets both the widget's screen position and the size. It is equivalent to calling <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>.move() followed by <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>.resize(). If we didn't set the widgets geometry, the parent widget will position it using the buttons <a href="porting4.html">sizeHint()</a> method - all widgets are able to calculate their preferred size. <pre class="snippet">
+    public static void main(String args[])
+    {
+        QApplication.initialize(args);
+
+        Widgets widget = new Widgets();
+        widget.show();
+
+        QApplication.exec();
+    }
+</pre> Here we instantiate a Widgets, show it, and execute the application.<a name="running-the-application"><h2>Running the Application</h2> This program is very similar in behavior to the previous one. The difference lies in the way we have implemented it. It does behave slightly differently, however. Just try to resize it to see.<a name="exercises"><h2>Exercises</h2> Try to create another <tt>Widgets</tt> object in <tt>main()</tt>. What happens? <p>Try to add more buttons or put in other widgets than <a href="../../../com/trolltech/qt/gui/QPushButton.html">QPushButton</a>.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

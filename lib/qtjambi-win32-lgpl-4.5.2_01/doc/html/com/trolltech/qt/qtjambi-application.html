@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Application Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Application Example</h1></center><p> <b>Code</b>: <ul><li> <a href="qtjambi-application-code.html">Application.java</a></li></ul> The Application example shows how to implement a standard GUI application with menus, toolbars, and a status bar. The example itself is a simple text editor program built around <a href="../../../com/trolltech/qt/gui/QTextEdit.html">QTextEdit</a>. <br><center><img src="images/application.png"></center><br> Nearly all of the code for the Application example is in the <tt>MainWindow</tt> class, which inherits <a href="../../../com/trolltech/qt/gui/QMainWindow.html">QMainWindow</a>. <a href="../../../com/trolltech/qt/gui/QMainWindow.html">QMainWindow</a> provides the framework for windows that have menus, toolbars, dock windows, and a status bar. The application provides <b>File</b>, <b>Edit</b>, and <b>Help</b> entries in the menu bar, with the following popup menus: <br><center><img src="images/application-menus.png"></center><br> The status bar at the bottom of the main window shows a description of the menu item or toolbar button under the cursor. <p>To keep the example simple, recently opened files aren't shown in the <b>File</b> menu, even though this feature is desired in 90% of applications. The <a href="mainwindows-recentfiles.html">Recent Files</a> example shows how to implement this. Furthermore, this example can only load one file at a time. The <a href="mainwindows-sdi.html">SDI</a> and <a href="qtjambi-mdi.html">MDI</a> examples shows how to lift these restrictions.<a name="importing-the-qt-classes"><h2>Importing the Qt Classes</h2> <pre class="snippet">
+import com.trolltech.qt.QVariant;
+import com.trolltech.qt.core.*;
+import com.trolltech.qt.gui.*;
+</pre> We start by importing all the classes in the <a href="qtcore.html">QtCore</a> and <a href="qtgui.html">QtGui</a> modules. This saves us from the trouble of having to import every class we use individually.<a name="application-class-implementation"><h2>Application Class Implementation</h2> The entire example is implemented in a single subclass of <a href="../../../com/trolltech/qt/gui/QMainWindow.html">QMainWindow</a>: <pre class="snippet">
+public class Application extends QMainWindow {
+
+    private String curFile;
+    private QTextEdit textEdit;
+    private QMenu fileMenu;
+    private QMenu editMenu;
+    private QMenu helpMenu;
+
+    private QToolBar fileToolBar;
+    private QToolBar editToolBar;
+
+    private QAction newAct;
+    private QAction openAct;
+    private QAction saveAct;
+    private QAction saveAsAct;
+    private QAction exitAct;
+    private QAction cutAct;
+    private QAction copyAct;
+    private QAction pasteAct;
+    private QAction aboutAct;
+    private QAction aboutQtJambiAct;
+    private QAction aboutQtAct;
+
+    private String rsrcPath = "classpath:com/trolltech/images";
+</pre> We declare various variables for widgets, menus, toolbars, and actions that will be explained later. <p>In the constructor, we start by creating a menu bar and setting it as the menu bar for the main window: <pre class="snippet">
+    public Application()
+    {
+        QMenuBar menuBar = new QMenuBar();
+        setMenuBar(menuBar);
+</pre> We also create a <a href="../../../com/trolltech/qt/gui/QTextEdit.html">QTextEdit</a> widget, and call <a href="../../../com/trolltech/qt/gui/QMainWindow.html#setCentralWidget(com.trolltech.qt.gui.QWidget)">setCentralWidget()</a> to make it occupy the central area of the main window, between the toolbars and the status bar. <p><a href="../../../com/trolltech/qt/gui/QAction.html">Actions</a> are usually reused in menus and toolbars to provide a consistent user interface. The actions used in the main window are set up before any of the standard menus, toolbars or other window elements. <pre class="snippet">
+        try {
+            createActions();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        createMenus();
+        createToolBars();
+        createStatusBar();
+</pre> We call <tt>createActions()</tt>, <tt>createMenus()</tt>, <tt>createToolBars()</tt>, and <tt>createStatusBar()</tt>, four private methods that set up the user interface. <pre class="snippet">
+        textEdit.document().contentsChanged.connect(this, "documentWasModified()");
+
+        setCurrentFile("");
+    }
+</pre> We establish a signal-slot connection between the <a href="../../../com/trolltech/qt/gui/QTextEdit.html">QTextEdit</a>'s document object and our <tt>documentWasModified()</tt> slot. Whenever the user modifies the text in the <a href="../../../com/trolltech/qt/gui/QTextEdit.html">QTextEdit</a>, we want to update the title bar to show that the file was modified. <p>We reimplement <a href="../../../com/trolltech/qt/gui/QWidget.html#closeEvent(com.trolltech.qt.gui.QCloseEvent)">QWidget::closeEvent()</a> to detect when the user attempts to close the window, and warn the user about unsaved changes:<a name="close-event-handler"> <pre class="snippet">
+    public void closeEvent(QCloseEvent event)
+    {
+        if (maybeSave()) {
+            writeSettings();
+            event.accept();
+        } else {
+            event.ignore();
+
+        }
+
+    }
+</pre> When the user attempts to close the window, we call the private method <tt>maybeSave()</tt> to give the user the possibility to save pending changes. The method returns true if the user wants the application to close; otherwise, it returns false. In the first case, we save the user's preferences to disk and accept the close event; in the second case, we ignore the close event, meaning that the application will stay up and running as if nothing happened. <pre class="snippet">
+    public void newFile()
+    {
+        if (maybeSave()) {
+            textEdit.clear();
+            setCurrentFile("");
+        }
+
+    }
+</pre> The <tt>newFile()</tt> slot is invoked when the user selects <b>File|New</b> from the menu. We call <tt>maybeSave()</tt> to save any pending changes and if the user accepts to go on, we clear the <a href="../../../com/trolltech/qt/gui/QTextEdit.html">QTextEdit</a> and call the private method <tt>setCurrentFile()</tt> to update the window title and clear the windowModified flag. <pre class="snippet">
+    public void open()
+    {
+        if (maybeSave()) {
+            String fileName = QFileDialog.getOpenFileName(this);
+            if (fileName.length() != 0)
+                loadFile(fileName);
+        }
+
+    }
+</pre> The <tt>open()</tt> slot is invoked when the user clicks <b>File|Open</b>. We pop up a <a href="../../../com/trolltech/qt/gui/QFileDialog.html">QFileDialog</a> asking the user to choose a file. If the user chooses a file (i.e., <tt>fileName</tt> is not an empty string), we call the private method <tt>loadFile()</tt> to actually load the file. <pre class="snippet">
+    public boolean save()
+    {
+        if (curFile.length() == 0) {
+            return saveAs();
+        } else {
+            return saveFile(curFile);
+
+        }
+
+    }
+</pre> The <tt>save()</tt> slot is invoked when the user clicks <b>File|Save</b>. If the user hasn't provided a name for the file yet, we call <tt>saveAs()</tt>; otherwise, we call the private method <tt>saveFile()</tt> to actually save the file. <pre class="snippet">
+    public boolean saveAs()
+    {
+        String fileName = QFileDialog.getSaveFileName(this);
+        if (fileName.length() == 0)
+            return false;
+
+        return saveFile(fileName);
+    }
+</pre> In <tt>saveAs()</tt>, we start by popping up a <a href="../../../com/trolltech/qt/gui/QFileDialog.html">QFileDialog</a> asking the user to provide a name. If the user clicks <b>Cancel</b>, the returned file name is empty, and we do nothing. <pre class="snippet">
+    public void about()
+    {
+        QMessageBox.about(this,
+                         tr("About Application"),
+                         tr("The &lt;b&gt;Application&lt;/b&gt; example demonstrates how to " +
+                            "write modern GUI applications using Qt, with a menu bar, " +
+                            "toolbars, and a status bar."));
+    }
+</pre> The application's About box is done using one statement, using the <a href="../../../com/trolltech/qt/gui/QMessageBox.html#about(com.trolltech.qt.gui.QWidget, java.lang.String, java.lang.String)">about()</a> static method and relying on its support for an HTML subset. <p>The tr() call around the literal string marks the string for translation. It is a good habit to call tr() on all user-visible strings, in case you later decide to translate your application to other languages. The <a href="qtjambi-i18n.html">Internationalization with Qt</a> overview convers tr() in more detail. <pre class="snippet">
+    public void documentWasModified()
+    {
+        setWindowModified(textEdit.document().isModified());
+    }
+</pre> The <tt>documentWasModified()</tt> slot is invoked each time the text in the <a href="../../../com/trolltech/qt/gui/QTextEdit.html">QTextEdit</a> changes because of user edits. We call <a href="../../../com/trolltech/qt/gui/QWidget.html#setWindowModified(boolean)">QWidget.setWindowModified()</a> to make the title bar show that the file was modified. How this is done varies on each platform. <pre class="snippet">
+    private void createActions()
+    {
+        newAct = new QAction(new QIcon(rsrcPath + "/new.png"), tr("&New"), this);
+        newAct.setShortcut(new QKeySequence(tr("Ctrl+N")));
+        newAct.setStatusTip(tr("Create a new file"));
+        newAct.triggered.connect(this, "newFile()");
+
+        openAct = new QAction(new QIcon(rsrcPath + "/open.png"), tr("&Open..."), this);
+        openAct.setShortcut(tr("Ctrl+O"));
+        openAct.setStatusTip(tr("Open an existing file"));
+        openAct.triggered.connect(this, "open()");
+...
+        aboutQtAct = new QAction(tr("About Q&t"), this);
+        aboutQtAct.setStatusTip(tr("Show the Qt library's About box"));
+        aboutQtAct.triggered.connect(QApplication.instance(), "aboutQt()");
+</pre> The <tt>createActions()</tt> private method, which is called from the <tt>MainWindow</tt> constructor, creates <a href="../../../com/trolltech/qt/gui/QAction.html">QAction</a>s. The code is very repetitive, so we show only the actions corresponding to <b>File|New</b>, <b>File|Open</b>, and <b>Help|About Qt</b>. <p>A <a href="../../../com/trolltech/qt/gui/QAction.html">QAction</a> is an object that represents one user action, such as saving a file or invoking a dialog. An action can be put in a <a href="../../../com/trolltech/qt/gui/QMenu.html">QMenu</a> or a <a href="../../../com/trolltech/qt/gui/QToolBar.html">QToolBar</a>, or both, or in any other widget that reimplements <a href="../../../com/trolltech/qt/gui/QWidget.html#actionEvent(com.trolltech.qt.gui.QActionEvent)">QWidget::actionEvent()</a>. <p>An action has a text that is shown in the menu, an icon, a shortcut key, a tooltip, a status tip (shown in the status bar), a "What's This?" text, and more. It emits a QAction.triggered() signal whenever the user invokes the action (e.g., by clicking the associated menu item or toolbar button). We connect this signal to a slot that performs the actual action. <p>The code above contains one more idiom that must be explained. For some of the actions, we specify an icon as a <a href="../../../com/trolltech/qt/gui/QIcon.html">QIcon</a> to the <a href="../../../com/trolltech/qt/gui/QAction.html">QAction</a> constructor. The <a href="../../../com/trolltech/qt/gui/QIcon.html">QIcon</a> constructor takes the file name of an image that it tries to load. Here, the file name starts with <tt>:</tt>. Such file names aren't ordinary file names, but rather path in the executable's stored resources. We'll come back to this when we review the <tt>application.qrc</tt> file that's part of the project. <pre class="snippet">
+        cutAct.setEnabled(false);
+        copyAct.setEnabled(false);
+        textEdit.copyAvailable.connect(cutAct, "setEnabled(boolean)");
+        textEdit.copyAvailable.connect(copyAct, "setEnabled(boolean)");
+    }
+</pre> The <b>Edit|Cut</b> and <b>Edit|Copy</b> actions must be available only when the <a href="../../../com/trolltech/qt/gui/QTextEdit.html">QTextEdit</a> contains selected text. We disable them by default and connect the QTextEdit.copyAvailable() signal to the action's <a href="../../../com/trolltech/qt/gui/QAction.html#setEnabled(boolean)">setEnabled()</a> slot, ensuring that the actions are disabled when the text editor has no selection. <pre class="snippet">
+    private void createMenus()
+    {
+        fileMenu = menuBar().addMenu(tr("&File"));
+        fileMenu.addAction(newAct);
+        fileMenu.addAction(openAct);
+        fileMenu.addAction(saveAct);
+        fileMenu.addAction(saveAsAct);
+        fileMenu.addSeparator();
+        fileMenu.addAction(exitAct);
+
+        editMenu = menuBar().addMenu(tr("&Edit"));
+        editMenu.addAction(cutAct);
+        editMenu.addAction(copyAct);
+        editMenu.addAction(pasteAct);
+
+        menuBar().addSeparator();
+
+        helpMenu = menuBar().addMenu(tr("&Help"));
+        helpMenu.addAction(aboutAct);
+        helpMenu.addSeparator();
+        helpMenu.addAction(aboutQtJambiAct);
+        helpMenu.addAction(aboutQtAct);
+    }
+</pre> Creating actions isn't sufficient to make them available to the user; we must also add them to the menu system. This is what <tt>createMenus()</tt> does. We create a <b>File</b>, an <b>Edit</b>, and a <b>Help</b> menu. <a href="../../../com/trolltech/qt/gui/QMainWindow.html#menuBar()">QMainWindow.menuBar()</a> lets us access the window's menu bar widget. We don't have to worry about creating the menu bar ourselves; the first time we call this method, the <a href="../../../com/trolltech/qt/gui/QMenuBar.html">QMenuBar</a> is created. <p>Just before we create the <b>Help</b> menu, we call <a href="../../../com/trolltech/qt/gui/QMenuBar.html#addSeparator()">QMenuBar.addSeparator()</a>. This has no effect for most widget styles (e.g., Windows and Mac OS X styles), but for Motif-based styles this makes sure that <b>Help</b> is pushed to the right side of the menu bar. Try running the application with various styles and see the results:<pre>application -style=windows
+application -style=motif
+application -style=cde</pre> Let's now review the toolbars: <pre class="snippet">
+    private void createToolBars()
+    {
+        fileToolBar = addToolBar(tr("File"));
+        fileToolBar.addAction(newAct);
+        fileToolBar.addAction(openAct);
+        fileToolBar.addAction(saveAct);
+
+        editToolBar = addToolBar(tr("Edit"));
+        editToolBar.addAction(cutAct);
+        editToolBar.addAction(copyAct);
+        editToolBar.addAction(pasteAct);
+    }
+</pre> Creating toolbars is very similar to creating menus. The same actions that we put in the menus can be reused in the toolbars. <pre class="snippet">
+    private void createStatusBar()
+    {
+        statusBar().showMessage(tr("Ready"));
+    }
+</pre> <a href="../../../com/trolltech/qt/gui/QMainWindow.html#statusBar()">QMainWindow::statusBar()</a> returns a pointer to the main window's <a href="../../../com/trolltech/qt/gui/QStatusBar.html">QStatusBar</a> widget. Like with <a href="../../../com/trolltech/qt/gui/QMainWindow.html#menuBar()">QMainWindow::menuBar()</a>, the widget is automatically created the first time the method is called. <pre class="snippet">
+    private boolean maybeSave()
+    {
+        if (textEdit.document().isModified()) {
+            QMessageBox.StandardButton ret = QMessageBox.warning(this, tr("Application"),
+                                                                 tr("The document has been modified.\n" +
+                                                                    "Save your changes?"),
+                                                                 new QMessageBox.StandardButtons(QMessageBox.StandardButton.Ok,
+                                                                                                 QMessageBox.StandardButton.Discard,
+                                                                                                 QMessageBox.StandardButton.Cancel));
+            if (ret == QMessageBox.StandardButton.Ok) {
+                return save();
+            } else if (ret == QMessageBox.StandardButton.Cancel) {
+                return false;
+            }
+        }
+        return true;
+
+    }
+</pre> The <tt>maybeSave()</tt> method is called to save pending changes. If there are pending changes, it pops up a <a href="../../../com/trolltech/qt/gui/QMessageBox.html">QMessageBox</a> giving the user to save the document. The options are <a href="../../../com/trolltech/qt/gui/QMessageBox.StandardButton.html">QMessageBox.Yes</a>, <a href="../../../com/trolltech/qt/gui/QMessageBox.StandardButton.html">QMessageBox.No</a>, and <a href="../../../com/trolltech/qt/gui/QMessageBox.StandardButton.html">QMessageBox.Cancel</a>. The <b>Yes</b> button is made the default button (the button that is invoked when the user presses <b>Return</b>) using the <a href="../../../com/trolltech/qt/gui/QMessageBox.StandardButton.html">QMessageBox.Default</a> flag; the <b>Cancel</b> button is made the escape button (the button that is invoked when the user presses <b>Esc</b>) using the <a href="../../../com/trolltech/qt/gui/QMessageBox.StandardButton.html">QMessageBox.Escape</a> flag. <p>The <tt>maybeSave()</tt> method returns <tt>true</tt> in all cases, except when the user clicks <b>Cancel</b>. The caller must check the return value and stop whatever it was doing if the return value is <tt>false</tt>. <pre class="snippet">
+    public void loadFile(String fileName)
+    {
+        QFile file = new QFile(fileName);
+        if (!file.open(new QFile.OpenMode(QFile.OpenModeFlag.ReadOnly, QFile.OpenModeFlag.Text))) {
+            QMessageBox.warning(this, tr("Application"), String.format(tr("Cannot read file %1$s:\n%2$s."), fileName, file.errorString()));
+            return;
+        }
+
+
+        QTextStream in = new QTextStream(file);
+        QApplication.setOverrideCursor(new QCursor(Qt.CursorShape.WaitCursor));
+        textEdit.setPlainText(in.readAll());
+        QApplication.restoreOverrideCursor();
+
+        setCurrentFile(fileName);
+        statusBar().showMessage(tr("File loaded"), 2000);
+    }
+</pre> In <tt>loadFile()</tt>, we use <a href="../../../com/trolltech/qt/core/QFile.html">QFile</a> and <a href="../../../com/trolltech/qt/core/QTextStream.html">QTextStream</a> to read in the data. The <a href="../../../com/trolltech/qt/core/QFile.html">QFile</a> object provides access to the bytes stored in a file. <p>We start by opening the file in read-only mode. The <a href="../../../com/trolltech/qt/core/QFile.OpenModeFlag.html">QFile::Text</a> flag indicates that the file is a text file, not a binary file. On Unix and Mac OS X, this makes no difference, but on Windows, it ensures that the "\r\n" end-of-line sequence is converted to "\n" when reading. <p>If we successfully opened the file, we use a <a href="../../../com/trolltech/qt/core/QTextStream.html">QTextStream</a> object to read in the data. <a href="../../../com/trolltech/qt/core/QTextStream.html">QTextStream</a> automatically converts the 8-bit data into a Unicode QString and supports various encodings. If no encoding is specified, <a href="../../../com/trolltech/qt/core/QTextStream.html">QTextStream</a> assumes the file is written using the system's default 8-bit encoding (for example, Latin-1; see <a href="../../../com/trolltech/qt/core/QTextCodec.html#codecForLocale()">QTextCodec.codecForLocale()</a> for details). <p>Since the call to <a href="../../../com/trolltech/qt/core/QTextStream.html#readAll()">QTextStream.readAll()</a> might take some time, we set the cursor to be <a href="../../../com/trolltech/qt/core/Qt.CursorShape.html">Qt.WaitCursor</a> for the entire application while it goes on. <p>At the end, we call the private <tt>setCurrentFile()</tt> method, which we'll cover in a moment, and we display the string "File loaded" in the status bar for 2 seconds (2000 milliseconds). <pre class="snippet">
+    public boolean saveFile(String fileName)
+    {
+        QFile file = new QFile(fileName);
+        if (!file.open(new QFile.OpenMode(QFile.OpenModeFlag.WriteOnly, QFile.OpenModeFlag.Text))) {
+            QMessageBox.warning(this, tr("Application"), String.format(tr("Cannot write file %1$s:\n%2$s."), fileName, file.errorString()));
+            return false;
+        }
+
+        QTextStream out = new QTextStream(file);
+        QApplication.setOverrideCursor(new QCursor(Qt.CursorShape.WaitCursor));
+        out.writeString(textEdit.toPlainText());
+        QApplication.restoreOverrideCursor();
+
+        setCurrentFile(fileName);
+        statusBar().showMessage(tr("File saved"), 2000);
+        file.close();
+        return true;
+
+    }
+</pre> Saving a file is very similar to loading one. Here, the <a href="../../../com/trolltech/qt/core/QFile.OpenModeFlag.html">QFile.Text</a> flag ensures that on Windows, "\n" is converted into "\r\n" to conform to the Windows convension. <pre class="snippet">
+    public void setCurrentFile(String fileName)
+    {
+        curFile = fileName;
+        textEdit.document().setModified(false);
+        setWindowModified(false);
+
+        String shownName;
+        if (curFile.length() == 0)
+            shownName = "untitled.txt";
+        else
+            shownName = strippedName(curFile);
+
+        setWindowTitle(String.format(tr("%1$s[*] - %2$s"), shownName, tr("Application")));
+    }
+</pre> The <tt>setCurrentFile()</tt> method is called to reset the state of a few variables when a file is loaded or saved, or when the user starts editing a new file (in which case <tt>fileName</tt> is empty). We update the <tt>curFile</tt> variable, clear the QTextDocument.modified flag and the associated <tt>QWidget.windowModified</tt> flag, and update the window title to contain the new file name (or <tt>untitled.txt</tt>). <p>The <tt>strippedName()</tt> method call around <tt>curFile</tt> in the <a href="../../../com/trolltech/qt/gui/QWidget.html#setWindowTitle(java.lang.String)">setWindowTitle()</a> call shortens the file name to exclude the path. Here's the method: <pre class="snippet">
+    private static String strippedName(String fullFileName)
+    {
+        return new QFileInfo(fullFileName).fileName();
+    }
+</pre><a name="the-main-function"><h2>The main() Function</h2> The <tt>main()</tt> method for this application is typical of applications that contain one main window: <pre class="snippet">
+    public static void main(String[] args) {
+        QApplication.initialize(args);
+
+        Application application = new Application();
+        application.show();
+
+        QApplication.exec();
+    }
+</pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
