@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Colliding Mice Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Colliding Mice Example</h1></center><p> The Colliding Mice example shows how to use the Graphics View framework to implement animated items and detect collision between items. <br><center><img src="images/collidingmice-example.png"></center><br> Graphics View provides the <a href="../../../com/trolltech/qt/gui/QGraphicsScene.html">QGraphicsScene</a> class for managing and interacting with a large number of custom-made 2D graphical items derived from the <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html">QGraphicsItem</a> class, and a <a href="../../../com/trolltech/qt/gui/QGraphicsView.html">QGraphicsView</a> widget for visualizing the items, with support for zooming and rotation. <p>The example consists of an item class and a main function: the <tt>Mouse</tt> class represents the individual mice extending <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html">QGraphicsItem</a>, and the <tt>main()</tt> function provides the main application window. <p>We will first review the <tt>Mouse</tt> class to see how to animate items and detect item collision, and then we will review the <tt>main()</tt> function to see how to put the items into a scene and how to implement the corresponding view.<a name="mouse-class-definition"><h2>Mouse Class Definition</h2> The <tt>mouse</tt> class inherits both <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> and <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html">QGraphicsItem</a>. The <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html">QGraphicsItem</a> class is the base class for all graphical items in the Graphics View framework, and provides a light-weight foundation for writing your own custom items. <pre class="snippet">
+class Mouse : public QObject, public QGraphicsItem
+{
+    Q_OBJECT
+
+public:
+    Mouse();
+
+    QRectF boundingRect() const;
+    QPainterPath shape() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+               QWidget *widget);
+
+protected:
+    void timerEvent(QTimerEvent *event);
+
+private:
+    qreal angle;
+    qreal speed;
+    qreal mouseEyeDirection;
+    QColor color;
+};
+</pre> When writing a custom graphics item, you must implement <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html">QGraphicsItem</a>'s two pure virtual public functions: <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html#boundingRect()">boundingRect()</a>, which returns an estimate of the area painted by the item, and <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html#paint(com.trolltech.qt.gui.QPainter, com.trolltech.qt.gui.QStyleOptionGraphicsItem)">paint()</a>, which implements the actual painting. In addition, we reimplement the <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html#shape()">shape()</a> function to return an accurate shape of our mouse item; the default implementation simply returns the item's bounding rectangle. <p>The rationale for deriving from <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> in addition to <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html">QGraphicsItem</a> is to be able to animate our items by reimplementing <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>'s <a href="../../../com/trolltech/qt/core/QObject.html#timerEvent(com.trolltech.qt.core.QTimerEvent)">timerEvent()</a> function and use <a href="../../../com/trolltech/qt/core/QObject.html#startTimer(int)">QObject::startTimer()</a> to generate timer events.<a name="mouse-class-definition"><h2>Mouse Class Definition</h2> When constructing a mouse item, we first ensure that all the item's private variables are properly initialized:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+Mouse::Mouse()
+    : angle(0), speed(0), mouseEyeDirection(0),
+      color(qrand() % 256, qrand() % 256, qrand() % 256)
+{
+    rotate(qrand() % (360 * 16));
+    startTimer(1000 / 33);
+}
+</pre> To calculate the various components of the mouse's color, we use the global qrand() function which is a thread-safe version of the standard C++ rand() function. <p>Then we call the <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html#rotate(double)">rotate()</a> function inherited from <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html">QGraphicsItem</a>. Items live in their own local coordinate system. Their coordinates are usually centered around (0, 0), and this is also the center for all transformations. By calling the item's <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html#rotate(double)">rotate()</a> function we alter the direction in which the mouse will start moving. <p>In the end we call <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>'s <a href="../../../com/trolltech/qt/core/QObject.html#startTimer(int)">startTimer()</a> function, emitting a timer event every 1000/33 millisecond. This enables us to animate our mouse item using our reimplementation of the <a href="../../../com/trolltech/qt/core/QObject.html#timerEvent(com.trolltech.qt.core.QTimerEvent)">timerEvent()</a> function; whenever a mouse receives a timer event it will trigger <a href="../../../com/trolltech/qt/core/QObject.html#timerEvent(com.trolltech.qt.core.QTimerEvent)">timerEvent()</a>:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void Mouse::timerEvent(QTimerEvent *)
+{
+
+    QLineF lineToCenter(QPointF(0, 0), mapFromScene(0, 0));
+    if (lineToCenter.length() &gt; 150) {
+        qreal angleToCenter = ::acos(lineToCenter.dx() / lineToCenter.length());
+        if (lineToCenter.dy() &lt; 0)
+            angleToCenter = TwoPi - angleToCenter;
+        angleToCenter = normalizeAngle((Pi - angleToCenter) + Pi / 2);
+
+        if (angleToCenter &lt; Pi && angleToCenter &gt; Pi / 4) {
+            // Rotate left
+            angle += (angle &lt; -Pi / 2) ? 0.25 : -0.25;
+        } else if (angleToCenter &gt;= Pi && angleToCenter &lt; (Pi + Pi / 2 + Pi / 4)) {
+            // Rotate right
+            angle += (angle &lt; Pi / 2) ? 0.25 : -0.25;
+        }
+    } else if (::sin(angle) &lt; 0) {
+        angle += 0.25;
+    } else if (::sin(angle) &gt; 0) {
+        angle -= 0.25;
+
+    }
+</pre> First we ensure that the mice stays within a circle with a radius of 150 pixels. <p>Note the <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html#mapFromScene(com.trolltech.qt.gui.QPainterPath)">mapFromScene()</a> function provided by <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html">QGraphicsItem</a>. This function maps a position given in scene coordinates, to the item's coordinate system.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QList&lt;QGraphicsItem *&gt; dangerMice = scene()-&gt;items(QPolygonF()
+                                                       &lt;&lt; mapToScene(0, 0)
+                                                       &lt;&lt; mapToScene(-30, -50)
+                                                       &lt;&lt; mapToScene(30, -50));
+    foreach (QGraphicsItem *item, dangerMice) {
+        if (item == this)
+            continue;
+        
+        QLineF lineToMouse(QPointF(0, 0), mapFromItem(item, 0, 0));
+        qreal angleToMouse = ::acos(lineToMouse.dx() / lineToMouse.length());
+        if (lineToMouse.dy() &lt; 0)
+            angleToMouse = TwoPi - angleToMouse;
+        angleToMouse = normalizeAngle((Pi - angleToMouse) + Pi / 2);
+
+        if (angleToMouse &gt;= 0 && angleToMouse &lt; Pi / 2) {
+            // Rotate right
+            angle += 0.5;
+        } else if (angleToMouse &lt;= TwoPi && angleToMouse &gt; (TwoPi - Pi / 2)) {
+            // Rotate left
+            angle -= 0.5;
+
+        }
+
+    }
+<br>
+    if (dangerMice.size() &gt; 1 && (qrand() % 10) == 0) {
+        if (qrand() % 1)
+            angle += (qrand() % 100) / 500.0;
+        else
+            angle -= (qrand() % 100) / 500.0;
+    }
+</pre> Then we try to avoid colliding with other mice.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    speed += (-50 + qrand() % 100) / 100.0;
+
+    qreal dx = ::sin(angle) * 10;
+    mouseEyeDirection = (qAbs(dx / 5) &lt; 1) ? 0 : dx / 5;
+
+    rotate(dx);
+    setPos(mapToParent(0, -(3 + sin(speed) * 3)));
+}
+</pre> Finally, we calculate the mouse's speed and its eye direction (for use when painting the mouse), and set its new position. <p>The position of an item describes its origin (local coordinate (0, 0)) in the parent coordinates. The <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html#setPos(com.trolltech.qt.core.QPointF)">QGraphicsItem::setPos()</a> function sets the position of the item to the given position in the parent's coordinate system. For items with no parent, the given position is interpreted as scene coordinates. <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html">QGraphicsItem</a> also provides a <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html#mapToParent(com.trolltech.qt.gui.QPainterPath)">mapToParent()</a> function to map a position given in item coordinates, to the parent's coordinate system. If the item has no parent, the position will be mapped to the scene's coordinate system instead. <p>Then it is time to provide an implementation for the pure virtual functions inherited from <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html">QGraphicsItem</a>. Let's first take a look at the <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html#boundingRect()">boundingRect()</a> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QRectF Mouse::boundingRect() const
+{
+    qreal adjust = 0.5;
+    return QRectF(-18 - adjust, -22 - adjust,
+                  36 + adjust, 60 + adjust);
+}
+</pre> The <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html#boundingRect()">boundingRect()</a> function defines the outer bounds of the item as a rectangle. Note that the Graphics View framework uses the bounding rectangle to determine whether the item requires redrawing, so all painting must be restricted inside this rectangle.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void Mouse::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+{
+    // Body
+    painter-&gt;setBrush(color);
+    painter-&gt;drawEllipse(-10, -20, 20, 40);
+
+    // Eyes
+    painter-&gt;setBrush(Qt::white);
+    painter-&gt;drawEllipse(-10, -17, 8, 8);
+    painter-&gt;drawEllipse(2, -17, 8, 8);
+
+    // Nose
+    painter-&gt;setBrush(Qt::black);
+    painter-&gt;drawEllipse(QRectF(-2, -22, 4, 4));
+
+    // Pupils
+    painter-&gt;drawEllipse(QRectF(-8.0 + mouseEyeDirection, -17, 4, 4));
+    painter-&gt;drawEllipse(QRectF(4.0 + mouseEyeDirection, -17, 4, 4));
+
+    // Ears
+    painter-&gt;setBrush(scene()-&gt;collidingItems(this).isEmpty() ? Qt::darkYellow : Qt::red);
+    painter-&gt;drawEllipse(-17, -12, 16, 16);
+    painter-&gt;drawEllipse(1, -12, 16, 16);
+
+    // Tail
+    QPainterPath path(QPointF(0, 20));
+    path.cubicTo(-5, 22, -5, 22, 0, 25);
+    path.cubicTo(5, 27, 5, 32, 0, 30);
+    path.cubicTo(-5, 32, -5, 42, 0, 35);
+    painter-&gt;setBrush(Qt::NoBrush);
+    painter-&gt;drawPath(path);
+}
+</pre> The Graphics View framework calls the <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html#paint(com.trolltech.qt.gui.QPainter, com.trolltech.qt.gui.QStyleOptionGraphicsItem)">paint()</a> function to paint the contents of the item; the function paints the item in local coordinates. <p>Note the painting of the ears: Whenever a mouse item collides with other mice items its ears are filled with red; otherwise they are filled with dark yellow. We use the <a href="../../../com/trolltech/qt/gui/QGraphicsScene.html#collidingItems(com.trolltech.qt.gui.QGraphicsItemInterface)">QGraphicsScene::collidingItems()</a> function to check if there are any colliding mice. The actual collision detection is handled by the Graphics View framework using shape-shape intersection. All we have to do is to ensure that the <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html#shape()">QGraphicsItem::shape()</a> function returns an accurate shape for our item:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QPainterPath Mouse::shape() const
+{
+    QPainterPath path;
+    path.addRect(-10, -20, 20, 40);
+    return path;
+}
+</pre> Because the complexity of arbitrary shape-shape intersection grows with an order of magnitude when the shapes are complex, this operation can be noticably time consuming. An alternative approach is to reimplement the <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html#collidesWithItem(com.trolltech.qt.gui.QGraphicsItemInterface)">collidesWithItem()</a> function to provide your own custom item and shape collision algorithm. <p>This completes the <tt>Mouse</tt> class implementation, it is now ready for use. Let's take a look at the <tt>main()</tt> function to see how to implement a scene for the mice and a view for displaying the contents of the scene.<a name="the-main-function"><h2>The Main() Function</h2> In this example we have chosen to let the <tt>main()</tt> function provide the main application window, creating the items and the scene, putting the items into the scene and creating a corresponding view.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+int main(int argc, char **argv)
+{
+    QApplication app(argc, argv);
+    qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
+</pre> First, we create an application object and call the global qsrand() function to specify the seed used to generate a new random number sequence of pseudo random integers with the previously mentioned qrand() function. <p>Then it is time to create the scene:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QGraphicsScene scene;
+    scene.setSceneRect(-300, -300, 600, 600);
+</pre> The <a href="../../../com/trolltech/qt/gui/QGraphicsScene.html">QGraphicsScene</a> class serves as a container for QGraphicsItems. It also provides functionality that lets you efficiently determine the location of items as well as determining which items that are visible within an arbitrary area on the scene. <p>When creating a scene it is recommended to set the scene's rectangle, i.e., the rectangle that defines the extent of the scene. It is primarily used by <a href="../../../com/trolltech/qt/gui/QGraphicsView.html">QGraphicsView</a> to determine the view's default scrollable area, and by <a href="../../../com/trolltech/qt/gui/QGraphicsScene.html">QGraphicsScene</a> to manage item indexing. If not explicitly set, the scene's default rectangle will be the largest bounding rectangle of all the items on the scene since the scene was created (i.e., the rectangle will grow when items are added or moved in the scene, but it will never shrink).<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    scene.setItemIndexMethod(QGraphicsScene::NoIndex);
+</pre> The item index function is used to speed up item discovery. <a href="../../../com/trolltech/qt/gui/QGraphicsScene.ItemIndexMethod.html">NoIndex</a> implies that item location is of linear complexity, as all items on the scene are searched. Adding, moving and removing items, however, is done in constant time. This approach is ideal for dynamic scenes, where many items are added, moved or removed continuously. The alternative is <a href="../../../com/trolltech/qt/gui/QGraphicsScene.ItemIndexMethod.html">BspTreeIndex</a> which makes use of binary search resulting in item location algorithms that are of an order closer to logarithmic complexity.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    for (int i = 0; i &lt; MouseCount; ++i) {
+        Mouse *mouse = new Mouse;
+        mouse-&gt;setPos(::sin((i * 6.28) / MouseCount) * 200,
+                      ::cos((i * 6.28) / MouseCount) * 200);
+        scene.addItem(mouse);
+    }
+</pre> Then we add the mice to the scene.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QGraphicsView view(&scene);
+    view.setRenderHint(QPainter::Antialiasing);
+    view.setBackgroundBrush(QPixmap(":/images/cheese.jpg"));
+</pre> To be able to view the scene we must also create a <a href="../../../com/trolltech/qt/gui/QGraphicsView.html">QGraphicsView</a> widget. The <a href="../../../com/trolltech/qt/gui/QGraphicsView.html">QGraphicsView</a> class visualizes the contents of a scene in a scrollable viewport. We also ensure that the contents is rendered using antialiasing, and we create the cheese background by setting the view's background brush. <p>The image used for the background is stored as a binary file in the application's executable using Qt's <a href="resources.html">resource system</a>. The <a href="../../../com/trolltech/qt/gui/QPixmap.html">QPixmap</a> constructor accepts both file names that refer to actual files on disk and file names that refer to the application's embedded resources.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    view.setCacheMode(QGraphicsView::CacheBackground);
+    view.setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
+    view.setDragMode(QGraphicsView::ScrollHandDrag);
+</pre> Then we set the cache mode; <a href="../../../com/trolltech/qt/gui/QGraphicsView.html">QGraphicsView</a> can cache pre-rendered content in a pixmap, which is then drawn onto the viewport. The purpose of such caching is to speed up the total rendering time for areas that are slow to render, e.g., texture, gradient and alpha blended backgrounds. The CacheMode property holds which parts of the view that are cached, and the <a href="../../../com/trolltech/qt/gui/QGraphicsView.CacheModeFlag.html">CacheBackground</a> flag enables caching of the view's background. <p>By setting the <a href="../../../QGraphicsView.html#dragMode()">dragMode</a> property we define what should happen when the user clicks on the scene background and drags the mouse. The <a href="../../../com/trolltech/qt/gui/QGraphicsView.DragMode.html">ScrollHandDrag</a> flag makes the cursor change into a pointing hand, and dragging the mouse around will scroll the scrollbars.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    view.setWindowTitle(QT_TRANSLATE_NOOP(QGraphicsView, "Colliding Mice"));
+    view.resize(400, 300);
+    view.show();
+
+    return app.exec();
+}
+</pre> In the end, we set the application window's title and size before we enter the main event loop using the <a href="../../../com/trolltech/qt/gui/QApplication.html#exec()">QApplication::exec()</a> function.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
