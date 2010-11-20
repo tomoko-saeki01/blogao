@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>QObject XML Model Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>QObject XML Model Example</h1></center><p> This example shows how to use <a href="qtxmlpatterns.html">QtXmlPatterns</a> to query <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> trees using XQuery by modeling the non-XML data structure of a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> tree to look like XML. <p><b>Note:</b> This page is not complete. Watch this space. <ul><li> <a href="#introduction">Introduction</a></li> <ul><li> <a href="#the-user-interface">The User Interface</a></li></ul><li> <a href="#code-walk-through">Code Walk-Through</a></li> <ul><li> <a href="#the-custom-node-model-class-qobjextxmlmodel">The Custom Node Model Class: QObjextXmlModel</a></li> <ul><li> <a href="#accessing-the-node-model">Accessing The Node Model</a></li><li> <a href="#traversing-the-node-model">Traversing The Node Model</a></li></ul><li> <a href="#the-ui-class-mainwindow">The UI Class: MainWindow</a></li><li> <a href="#including-the-qmetaobject-tree">Including The QMetaObject Tree</a></li></ul></ul><a name="introduction"><h2>Introduction</h2> This example illustrates two important aspects of modeling non-XML data to look like XML. The first is to illustrate that a custom node model class doesn't always have to actually build a node model. Sometimes the node model can be an already existing data structure in memory, like the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> tree used in this example. The second important aspect is to explain what is really required to make non-XML data look like XML. <p>In this example, we want to model a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> tree to look like XML. That is easy to do because <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> tree structures map simply to XML tree structures. Each <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> node is modeled as an XML element node. But when we try to include the QMetaObject tree in the model, we are adding a second tree to the mode, the QMetaObject tree, which exists behind the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> tree, thus changing the two dimensional data structure into a three dimensional one. <p>By adding the QMetaObject tree to the node model and thereby making the model three dimensional, the query engine can no longer traverse it as if it were an XML document, because an XML document is always a two dimensional tree. This means if we want to include the QMetaObject tree in the node model, we have to somehow flatten it into the the same plane as the two dimensional <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> tree. This requires that our node model class must actually build an auxiliary component of the node model. How we do this and how this auxiliary structure is traversed is explained in <a href="xmlpatterns-qobjectxmlmodel.html#including-the-qmetaobject-tree">Including The QMetaObject Tree</a>.<a name="the-user-interface"><h3>The User Interface</h3> The UI for this example was created using Qt Designer: <br><center><img src="images/qobjectxmlmodel-example.png"></center><br><a name="code-walk-through"><h2>Code Walk-Through</h2> The strategy for this example is different from the strategy for the <a href="xmlpatterns-filetree.html">file system example</a>. In the file system example, the node model class had to actually build a node model, because the non-XML data to be traversed was the computer's file system, a structure stored on disk in a form that the query engine couldn't use. The node model class had to build an analog of the computer's file system in memory, and that in-memory structure was the node model. <p>For this example, the data structure to be traversed already exists in memory in a usable form. It is the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> tree of the example application itself. All we need is the pointer to the root of the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> tree. <p><b>Note:</b> When we add the QMetaObject tree to the node model, the node model class will have to build an auxiliary data structure to move the QMetaObject tree into the same plane as the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> tree. This is explained later in <a href="xmlpatterns-qobjectxmlmodel.html#including-the-qmetaobject-tree">Including The QMetaObject Tree</a>.<a name="the-custom-node-model-class-qobjextxmlmodel"><h3>The Custom Node Model Class: QObjextXmlModel</h3> The node model class for this example is QObjextXmlModel, which is derived from <a href="../../../com/trolltech/qt/xmlpatterns/QSimpleXmlNodeModel.html">QSimpleXmlNodeModel</a>. QObjextXmlModel implements the callback interface functions that don't have implementations in <a href="../../../com/trolltech/qt/xmlpatterns/QSimpleXmlNodeModel.html">QSimpleXmlNodeModel</a>: <pre class="snippet">
+    virtual QXmlNodeModelIndex::DocumentOrder compareOrder(const QXmlNodeModelIndex &n1, const QXmlNodeModelIndex &n2) const;
+    virtual QXmlName name(const QXmlNodeModelIndex &n) const;
+    virtual QUrl documentUri(const QXmlNodeModelIndex &n) const;
+    virtual QXmlNodeModelIndex::NodeKind kind(const QXmlNodeModelIndex &n) const;
+    virtual QXmlNodeModelIndex root(const QXmlNodeModelIndex &n) const;
+    virtual QVariant typedValue(const QXmlNodeModelIndex &n) const;
+    virtual QVector&lt;QXmlNodeModelIndex&gt; attributes(const QXmlNodeModelIndex&) const;
+    virtual QXmlNodeModelIndex nextFromSimpleAxis(SimpleAxis, const QXmlNodeModelIndex&) const;
+</pre> The node model class declares three data members: <pre class="snippet">
+    const QUrl              m_baseURI;
+    QObject *const          m_root;
+
+    const AllMetaObjects    m_allMetaObjects;
+
+</pre> <tt>m_baseURI</tt> is returned by <a href="../../../com/trolltech/qt/xmlpatterns/QAbstractXmlNodeModel.html#documentUri(com.trolltech.qt.xmlpatterns.QXmlNodeModelIndex)">documentUri()</a>. <tt>m_root</tt> is the pointer to our node model, the already existing <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> tree for the example application itself. <tt>m_allMetaObjects</tt> will contain the auxiliary component of the node model required for including the QMetaObject tree in the node model. This is discussed in <a href="xmlpatterns-qobjectxmlmodel.html#including-the-qmetaobject-tree">Including The QMetaObject Tree</a>.<a name="accessing-the-node-model"><h4>Accessing The Node Model</h4> Since the node model is stored outside the query engine in the <tt>QObjectXmlModel</tt> class, the query engine knows nothing about it and can only access it by calling functions in the callback interface. When the query engine calls any callback function to access data in the node model, it passes a <a href="../../../com/trolltech/qt/xmlpatterns/QXmlNodeModelIndex.html">QXmlNodeModelIndex</a> to identify the node in the node model that it wants to access. Hence all the virtual functions in the callback interface use a <a href="../../../com/trolltech/qt/xmlpatterns/QXmlNodeModelIndex.html">QXmlNodeModelIndex</a> to uniquely identify a node in the model. <p>Since the node model is a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> tree, we use a pointer to a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> to uniquely identify a node in the node model. To get the <a href="../../../com/trolltech/qt/xmlpatterns/QXmlNodeModelIndex.html">QXmlNodeModelIndex</a> for a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>, we pass a pointer to the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> to <a href="../../../com/trolltech/qt/xmlpatterns/QAbstractXmlNodeModel.html#createIndex(long)">createIndex()</a>, as in the <tt>root()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QXmlNodeModelIndex QObjectXmlModel::root() const
+{
+    return createIndex(m_root);
+}
+</pre> An overloading of <tt>root()</tt> allows finding the root node given the <a href="../../../com/trolltech/qt/xmlpatterns/QXmlNodeModelIndex.html">QXmlNodeModelIndex</a> of any <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> in the node model:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QObjectXmlModel::QObjectNodeType QObjectXmlModel::toNodeType(const QXmlNodeModelIndex &n)
+{
+    return QObjectNodeType(n.additionalData() & (15 &lt;&lt; 26));
+}
+</pre><a name="traversing-the-node-model"><h4>Traversing The Node Model</h4> The query engine traverses the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> tree by calling back to the node model class's implementation of <a href="../../../com/trolltech/qt/xmlpatterns/QAbstractXmlNodeModel.html#nextFromSimpleAxis(com.trolltech.qt.xmlpatterns.QAbstractXmlNodeModel.SimpleAxis, com.trolltech.qt.xmlpatterns.QXmlNodeModelIndex)">nextFromSimpleAxis()</a>.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QXmlNodeModelIndex QObjectXmlModel::nextFromSimpleAxis(SimpleAxis axis, const QXmlNodeModelIndex &n) const
+{
+    switch (toNodeType(n))
+    {
+        case IsQObject:
+        {
+            switch (axis)
+            {
+                case Parent:
+                    return createIndex(asQObject(n)-&gt;parent());
+
+                case FirstChild:
+                {
+                    if (!asQObject(n) || asQObject(n)-&gt;children().isEmpty())
+                        return QXmlNodeModelIndex();
+                    else
+                        return createIndex(asQObject(n)-&gt;children().first());
+                }
+                
+                case NextSibling:
+                    return qObjectSibling(1, n);
+
+                    
+                case PreviousSibling:
+                {
+                    if (asQObject(n) == m_root)
+                        return createIndex(qint64(0), MetaObjects);
+                    else
+                        return qObjectSibling(-1, n);
+                }
+                    
+            }
+            Q_ASSERT(false);
+        }
+
+
+        case QObjectClassName:
+        case QObjectProperty:
+        {
+            Q_ASSERT(axis == Parent);
+            return createIndex(asQObject(n));
+        }
+
+
+    }
+
+    Q_ASSERT(false);
+    return QXmlNodeModelIndex();
+}
+</pre><a name="the-ui-class-mainwindow"><h3>The UI Class: MainWindow</h3> The example's UI is a conventional Qt GUI application inheriting <a href="../../../com/trolltech/qt/gui/QMainWindow.html">QMainWindow</a> and the class generated by Qt Designer: <pre class="snippet">
+class MainWindow : public QMainWindow,
+                   private Ui_MainWindow
+{
+    Q_OBJECT
+
+  public:
+    MainWindow();
+
+  private slots:
+    void on_actionAbout_triggered();
+};
+</pre><a name="including-the-qmetaobject-tree"><h3>Including The QMetaObject Tree</h3><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
