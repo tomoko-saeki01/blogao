@@ -1,0 +1,12 @@
+com.trolltech.qt
+com.trolltech.qt.core
+com.trolltech.qt.designer
+com.trolltech.qt.gui
+com.trolltech.qt.network
+com.trolltech.qt.opengl
+com.trolltech.qt.phonon
+com.trolltech.qt.sql
+com.trolltech.qt.svg
+com.trolltech.qt.webkit
+com.trolltech.qt.xml
+com.trolltech.qt.xmlpatterns
