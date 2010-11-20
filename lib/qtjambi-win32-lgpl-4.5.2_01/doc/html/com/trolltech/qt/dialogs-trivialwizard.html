@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Trivial Wizard Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Trivial Wizard Example</h1></center><p> The Trivial Wizard example illustrates how to create a linear three-page registration wizard using three instances of <a href="../../../com/trolltech/qt/gui/QWizardPage.html">QWizardPage</a> and one instance of <a href="../../../com/trolltech/qt/gui/QWizard.html">QWizard</a>. <br><center><img src="images/trivialwizard-example-flow.png"></center><br><a name="introduction-page"><h2>Introduction Page</h2> <br><center><img src="images/trivialwizard-example-introduction.png"></center><br> The introduction page is created with the <tt>createIntroPage()</tt> function where a <a href="../../../com/trolltech/qt/gui/QWizardPage.html">QWizardPage</a> is created and its title is set to "Introduction". A <a href="../../../com/trolltech/qt/gui/QLabel.html">QLabel</a> is used to hold the description of <tt>page</tt>. A <a href="../../../com/trolltech/qt/gui/QVBoxLayout.html">QVBoxLayout</a> is used to hold the <tt>label</tt>. This <tt>page</tt> is returned when the <tt>createIntroPage()</tt> function is called.<br><br>The following code example is written in c++.<br> <pre class="snippet"> 
+QWizardPage *createIntroPage()
+{
+    QWizardPage *page = new QWizardPage;
+    page-&gt;setTitle("Introduction");
+
+    QLabel *label = new QLabel("This wizard will help you register your copy "
+                               "of Super Product Two.");
+    label-&gt;setWordWrap(true);
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout-&gt;addWidget(label);
+    page-&gt;setLayout(layout);
+
+    return page;
+}
+</pre><a name="registration-page"><h2>Registration Page</h2> <br><center><img src="images/trivialwizard-example-registration.png"></center><br> The registration page is created with the <tt>createRegistrationPage()</tt> function. <a href="../../../com/trolltech/qt/gui/QLineEdit.html">QLineEdit</a> objects are used to allow the user to input a name and an e-mail address. A <a href="../../../com/trolltech/qt/gui/QGridLayout.html">QGridLayout</a> is used to hold the <a href="../../../com/trolltech/qt/gui/QLabel.html">QLabel</a> and <a href="../../../com/trolltech/qt/gui/QLineEdit.html">QLineEdit</a> objects.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QWizardPage *createRegistrationPage()
+ 
+{
+
+    QWizardPage *page = new QWizardPage;
+    page-&gt;setTitle("Registration");
+    page-&gt;setSubTitle("Please fill both fields.");
+
+    QLabel *nameLabel = new QLabel("Name:");
+    QLineEdit *nameLineEdit = new QLineEdit;
+
+    QLabel *emailLabel = new QLabel("Email address:");
+    QLineEdit *emailLineEdit = new QLineEdit;
+
+    QGridLayout *layout = new QGridLayout;
+    layout-&gt;addWidget(nameLabel, 0, 0);
+    layout-&gt;addWidget(nameLineEdit, 0, 1);
+    layout-&gt;addWidget(emailLabel, 1, 0);
+    layout-&gt;addWidget(emailLineEdit, 1, 1);
+    page-&gt;setLayout(layout);
+
+    return page;
+
+}
+</pre><a name="conclusion-page"><h2>Conclusion Page</h2> <br><center><img src="images/trivialwizard-example-conclusion.png"></center><br> The conclusion page is created in the <tt>createConclusionPage()</tt> function. This function's content is similar to <tt>createIntroPage()</tt>. A <a href="../../../com/trolltech/qt/gui/QLabel.html">QLabel</a> is used to inform the user that the registration process has completed successfully.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QWizardPage *createConclusionPage()
+ 
+{
+
+    QWizardPage *page = new QWizardPage;
+    page-&gt;setTitle("Conclusion");
+
+    QLabel *label = new QLabel("You are now successfully registered. Have a "
+                               "nice day!");
+    label-&gt;setWordWrap(true);
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout-&gt;addWidget(label);
+    page-&gt;setLayout(layout);
+
+    return page;
+
+}
+</pre><a name="function"><h2>main() Function</h2><tt>main()</tt> The <tt>main()</tt> function instantiates a <a href="../../../com/trolltech/qt/gui/QWizard.html">QWizard</a> object, <tt>wizard</tt>, and adds all three <a href="../../../com/trolltech/qt/gui/QWizardPage.html">QWizardPage</a> objects to it. The <tt>wizard</tt> window title is set to "Trivial Wizard" and its <tt>show()</tt> function is invoked to display it.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+int main(int argc, char *argv[])
+ 
+{
+    QApplication app(argc, argv);
+
+    QString translatorFileName = QLatin1String("qt_");
+    translatorFileName += QLocale::system().name();
+    QTranslator *translator = new QTranslator(&app);
+    if (translator-&gt;load(translatorFileName, QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
+        app.installTranslator(translator);
+
+
+    QWizard wizard;
+    wizard.addPage(createIntroPage());
+    wizard.addPage(createRegistrationPage());
+    wizard.addPage(createConclusionPage());
+
+    wizard.setWindowTitle("Trivial Wizard");
+    wizard.show();
+
+    return app.exec();
+}
+</pre> <p><DT><b>See also:</b><br><DD><a href="../../../com/trolltech/qt/gui/QWizard.html">QWizard</a>, <a href="dialogs-classwizard.html">Class Wizard Example</a>, and <a href="dialogs-licensewizard.html">License Wizard Example</a>. <br></DD></DT><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
