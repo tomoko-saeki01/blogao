@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Generic Algorithms</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Generic Algorithms</h1></center><p>The &lt;QtAlgorithms&gt; header provides generic template-based algorithms. Qt provides a number of global template functions in <tt>&lt;QtAlgorithms&gt;</tt> that work on containers and perform well-know algorithms. You can use these algorithms with any <a href="containers.html">container class</a> that provides STL-style iterators, including Qt's QList, QLinkedList, QVector, QMap, and QHash classes. <p>These functions have taken their inspiration from similar functions available in the STL <tt>&lt;algorithm&gt;</tt> header. Most of them have a direct STL equivalent; for example, qCopyBackward() is the same as STL's copy_backward() algorithm. <p>If STL is available on all your target platforms, you can use the STL algorithms instead of their Qt counterparts. One reason why you might want to use the the STL algorithms is that STL provides dozens and dozens of algorithms, whereas Qt only provides the most important ones, making no attempt to duplicate functionality that is already provided by the C++ standard. <p>Most algorithms take <a href="containers.html">STL-style iterators</a> as parameters. The algorithms are generic in the sense that they aren't bound to a specific iterator class; you can use them with any iterators that meet a certain set of requirements. <p>Let's take the qFill() algorithm as an example. Unlike QVector, QList has no fill() function that can be used to fill a list with a particular value. If you need that functionality, you can use qFill(): <pre class="snippet">
+QStringList list;
+list &lt;&lt; "one" &lt;&lt; "two" &lt;&lt; "three";
+
+qFill(list.begin(), list.end(), "eleven");
+// list: [ "eleven", "eleven", "eleven" ]
+</pre> qFill() takes a begin iterator, an end iterator, and a value. In the example above, we pass <tt>list.begin()</tt> and <tt>list.end()</tt> as the begin and end iterators, but this doesn't have to be the case: <pre class="snippet">
+qFill(list.begin() + 1, list.end(), "six");
+// list: [ "eleven", "six", "six" ]
+</pre> Different algorithms can have different requirements for the iterators they accept. For example, qFill() accepts two <a href="qtalgorithms.html#forward-iterators">forward iterators</a>. The iterator types required are specified for each algorithm. If an iterator of the wrong type is passed (for example, if QList::ConstIterator is passed as an <a href="qtalgorithms.html#output-iterator">output iterator</a>), you will always get a compiler error, although not necessarily a very informative one. <p>Some algorithms have special requirements on the value type stored in the containers. For example, qEqual() requires that the value type supports operator==(), which it uses to compare items. Similarly, qDeleteAll() requires that the value type is a non-const pointer type (for example, <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> *). The value type requirements are specified for each algorithm, and the compiler will produce an error if a requirement isn't met.<a name="binaryfind-example"> The generic algorithms can be used on other container classes than those provided by Qt and STL. The syntax of STL-style iterators is modeled after C++ pointers, so it's possible to use plain arrays as containers and plain pointers as iterators. A common idiom is to use qBinaryFind() together with two static arrays: one that contains a list of keys, and another that contains a list of associated values. For example, the following code will look up an HTML entity (e.g., <tt>&amp</tt>;) in the <tt>name_table</tt> array and return the corresponding Unicode value from the <tt>value_table</tt> if the entity is recognized: <pre class="snippet">
+QChar resolveEntity(const QString &entity)
+{
+    static const QLatin1String name_table[] = {
+        "AElig", "Aacute", ..., "zwnj"
+    };
+    static const ushort value_table[] = {
+        0x0061, 0x00c1, ..., 0x200c
+    };
+    int N = sizeof(name_table) / sizeof(name_table[0]);
+
+    const QLatin1String *name = qBinaryFind(name_table, name_table + N,
+                                            entity);
+    int index = name - name_table;
+    if (index == N)
+        return QChar();
+
+    return QChar(value_table[index]);
+}
+</pre> This kind of code is for advanced users only; for most applications, a QMap- or QHash-based approach would work just as well: <pre class="snippet">
+QChar resolveEntity(const QString &entity)
+{
+    static QMap&lt;QString, int&gt; entityMap;
+
+    if (!entityMap) {
+        entityMap.insert("AElig", 0x0061);
+        entityMap.insert("Aacute", 0x00c1);
+        ...
+        entityMap.insert("zwnj", 0x200c);
+    }
+    return QChar(entityMap.value(entity));
+}
+</pre><a name="types-of-iterators"><h2>Types of Iterators</h2> The algorithms have certain requirements on the iterator types they accept, and these are specified individually for each function. The compiler will produce an error if a requirement isn't met.<a name="input-iterators"><h3>Input Iterators</h3> An input iterator is an iterator that can be used for reading data sequentially from a container. It must provide the following operators: <tt>==</tt> and <tt>!=</tt> for comparing two iterators, unary <tt>*</tt> for retrieving the value stored in the item, and prefix <tt>++</tt> for advancing to the next item. <p>The Qt containers' iterator types (const and non-const) are all input iterators.<a name="output-iterators"><h3>Output Iterators</h3> An output iterator is an iterator that can be used for writing data sequentially to a container or to some output stream. It must provide the following operators: unary <tt>*</tt> for writing a value (i.e., <tt>*it = val</tt>) and prefix <tt>++</tt> for advancing to the next item. <p>The Qt containers' non-const iterator types are all output iterators.<a name="forward-iterators"><h3>Forward Iterators</h3> A forward iterator is an iterator that meets the requirements of both input iterators and output iterators. <p>The Qt containers' non-const iterator types are all forward iterators.<a name="bidirectional-iterators"><h3>Bidirectional Iterators</h3> A bidirectional iterator is an iterator that meets the requirements of forward iterators but that in addition supports prefix <tt>--</tt> for iterating backward. <p>The Qt containers' non-const iterator types are all bidirectional iterators.<a name="random-access-iterators"><h3>Random Access Iterators</h3> The last category, random access iterators, is the most powerful type of iterator. It supports all the requirements of a bidirectional iterator, and supports the following operations: <table align="center" border="0" cellpadding="2" cellspacing="1"><tr valign="top" class="even"><td> <tt>i += n</tt></td><td> advances iterator <tt>i</tt> by <tt>n</tt> positions</td></tr><tr valign="top" class="odd"><td> <tt>i -= n</tt></td><td> moves iterator <tt>i</tt> back by <tt>n</tt> positions</td></tr><tr valign="top" class="even"><td> <tt>i + n</tt> or <tt>n + i</tt></td><td> returns the iterator for the item <tt>n</tt> positions ahead of iterator <tt>i</tt></td></tr><tr valign="top" class="odd"><td> <tt>i - n</tt></td><td> returns the iterator for the item <tt>n</tt> positions behind of iterator <tt>i</tt></td></tr><tr valign="top" class="even"><td> <tt>i - j</tt></td><td> returns the number of items between iterators <tt>i</tt> and <tt>j</tt></td></tr><tr valign="top" class="odd"><td> <tt>i[n]</tt></td><td> same as <tt>*(i + n)</tt></td></tr><tr valign="top" class="even"><td> <tt>i &lt; j</tt></td><td> returns true if iterator <tt>j</tt> comes after iterator <tt>i</tt></td></tr></table> QList and QVector's non-const iterator types are random access iterators. <p><DT><b>See also:</b><br><DD><a href="containers.html">container classes</a>, and <a href="qtglobal.html"><QtGlobal></a>. <br></DD></DT><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
