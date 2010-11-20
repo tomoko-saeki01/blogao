@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Address Book 3 - Navigating between Entries</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Address Book 3 - Navigating between Entries</h1></center><p>[Previous: <a href="tutorials-addressbook-part2.html">Address Book 2 - Adding Addresses</a>][<a href="tutorials-addressbook.html">Address Book Tutorial</a>][Next: <a href="tutorials-addressbook-part4.html">Address Book 4 - Editing and Removing Addresses</a>]<p> The address book application is now half complete. We need to add some functions to navigate between contacts. But first, we have to decide what sort of a data structure we would like to use to hold these contacts. <p>In Chapter 2, we used a QMap of key-value pairs with the contact's name as the key, and the contact's address as the value. This works well for our case. However, in order to navigate and display each entry, a little bit of enhancement is needed. <p>We enhance the QMap by making it replicate a data structure similar to a circularly-linked list, where all elements are connected, including the first element and the last element. The figure below illustrates this data structure. <br><center><img src="images/addressbook-tutorial-part3-linkedlist.png"></center><br><a name="defining-the-addressbook-class"><h2>Defining the AddressBook Class</h2> In order to add navigation functions to the address book application, we need to add two more slots to our <tt>AddressBook</tt> class: <tt>next()</tt> and <tt>previous()</tt>. These are added to our <tt>addressbook.h</tt> file: <pre class="snippet">
+    void next();
+    void previous();
+</pre> We also require another two <a href="../../../com/trolltech/qt/gui/QPushButton.html">QPushButton</a> objects, so we declare <tt>nextButton</tt> and <tt>previousButton</tt> as private variables: <pre class="snippet">    
+    QPushButton *nextButton;
+    QPushButton *previousButton;
+</pre><a name="implementing-the-addressbook-class"><h2>Implementing the AddressBook Class</h2> In the <tt>AddressBook</tt> constructor in <tt>addressbook.cpp</tt>, we instantiate <tt>nextButton</tt> and <tt>previousButton</tt> and disable them by default. This is because navigation is only enabled when there is more than one contact in the address book.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    nextButton = new QPushButton(tr("&Next"));
+    nextButton-&gt;setEnabled(false);
+    previousButton = new QPushButton(tr("&Previous"));
+    previousButton-&gt;setEnabled(false);
+</pre> We then connect these push buttons to their respective slots:<br><br>The following code example is written in c++.<br> <pre class="snippet">    
+    connect(nextButton, SIGNAL(clicked()), this, SLOT(next()));
+    connect(previousButton, SIGNAL(clicked()), this, SLOT(previous()));
+</pre> The image below is our expected graphical user interface. Notice that it is getting closer to our expected final output. <br><center><img src="images/addressbook-tutorial-part3-screenshot.png"></center><br> We follow basic conventions for <tt>next()</tt> and <tt>previous()</tt> functions by placing the <tt>nextButton</tt> on the right and the <tt>previousButton</tt> on the left. In order to achieve this intuitive layout, we use <a href="../../../com/trolltech/qt/gui/QHBoxLayout.html">QHBoxLayout</a> to place the widgets side-by-side:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QHBoxLayout *buttonLayout2 = new QHBoxLayout;
+    buttonLayout2-&gt;addWidget(previousButton);
+    buttonLayout2-&gt;addWidget(nextButton);
+</pre> The <a href="../../../com/trolltech/qt/gui/QHBoxLayout.html">QHBoxLayout</a> object, <tt>buttonLayout2</tt>, is then added to <tt>mainLayout</tt>.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    mainLayout-&gt;addLayout(buttonLayout2, 3, 1);
+</pre> The figure below shows the coordinates of the widgets in <tt>mainLayout</tt>. <br><center><img src="images/addressbook-tutorial-part3-labeled-layout.png"></center><br> Within our <tt>addContact()</tt> function, we have to disable these buttons so that the user does not attempt to navigate while adding a contact.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    nextButton-&gt;setEnabled(false);
+    previousButton-&gt;setEnabled(false);
+</pre> Also, in our <tt>submitContact()</tt> function, we enable the navigation buttons, <tt>nextButton</tt> and <tt>previousButton</tt>, depending on the size of <tt>contacts</tt>. As mentioned earlier, navigation is only enabled when there is more than one contact in the address book. The following lines of code demonstrates how to do this:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    int number = contacts.size();
+    nextButton-&gt;setEnabled(number &gt; 1);
+    previousButton-&gt;setEnabled(number &gt; 1);
+</pre> We also include these lines of code in the <tt>cancel()</tt> function. <p>Recall that we intend to emulate a circularly-linked list with our QMap object, <tt>contacts</tt>. So, in the <tt>next()</tt> function, we obtain an iterator for <tt>contacts</tt> and then: <ul><li> If the iterator is not at the end of <tt>contacts</tt>, we increment it by one.</li><li> If the iterator is at the end of <tt>contacts</tt>, we move it to the beginning of <tt>contacts</tt>. This gives us the illusion that our QMap is working like a circularly-linked list.</li></ul>Error parsing snippet.</pre> Once we have iterated to the correct object in <tt>contacts</tt>, we display its contents on <tt>nameLine</tt> and <tt>addressText</tt>. <p>Similarly, for the <tt>previous()</tt> function, we obtain an iterator for <tt>contacts</tt> and then: <ul><li> If the iterator is at the end of <tt>contacts</tt>, we clear the display and return.</li><li> If the iterator is the beginning of <tt>contacts</tt>, we move it to the end.</li><li> We then decrement the iterator by one.</li></ul>Error parsing snippet.</pre> Again, we display the contents of the current object in <tt>contacts</tt>.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
