@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Calculator Builder Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Calculator Builder Example</h1></center><p> The Calculator Builder example shows how to create a user interface from a Qt Designer form at run-time, using the QUiLoader class. <br><center><img src="images/calculatorbuilder-example.png"></center><br> We use the form created in the <a href="designer-calculatorform.html">Calculator Form</a> example to show that the same user interface can be generated when the application is executed or defined when the application is built.<a name="preparation"><h2>Preparation</h2> The <a href="designer-calculatorform.html">Calculator Form</a> example defines a user interface that we can use without modification. In this example, we use a <a href="resources.html">resource file</a> to contain the <tt>calculatorform.ui</tt> file created in the previous example, but it could be stored on disk instead. <p>To generate a form at run time, we need to link the example against the <tt>QtUiTools</tt> module library. The project file we use contains all the necessary information to do this:Error parsing snippet.</pre> All the other necessary files are declared as usual.<a name="calculatorform-class-definition"><h2>CalculatorForm Class Definition</h2> The <tt>CalculatorForm</tt> class defines the widget used to host the form's user interface: <pre class="snippet">
+class CalculatorForm : public QWidget
+{
+    Q_OBJECT
+
+public:
+    CalculatorForm(QWidget *parent = 0);
+
+private slots:
+    void on_inputSpinBox1_valueChanged(int value);
+    void on_inputSpinBox2_valueChanged(int value);
+
+private:
+    QSpinBox *ui_inputSpinBox1;
+    QSpinBox *ui_inputSpinBox2;
+    QLabel *ui_outputWidget;
+};
+</pre> Note that we do not need to include a header file to describe the user interface. We only define two public slots, using the auto-connection naming convention required by <tt>uic</tt>, and declare private variables that we will use to access widgets provided by the form after they are constructed.<a name="calculatorform-class-implementation"><h2>CalculatorForm Class Implementation</h2> We will need to use the QUiLoader class that is provided by the <tt>libQtUiTools</tt> library, so we first ensure that we include the header file for the module:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+#include &lt;QtUiTools&gt;
+</pre> The constructor uses a form loader object to construct the user interface that we retrieve, via a <a href="../../../com/trolltech/qt/core/QFile.html">QFile</a> object, from the example's resources:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+CalculatorForm::CalculatorForm(QWidget *parent)
+    : QWidget(parent)
+{
+    QUiLoader loader;
+
+    QFile file(":/forms/calculatorform.ui");
+    file.open(QFile::ReadOnly);
+    QWidget *formWidget = loader.load(&file, this);
+    file.close();
+</pre> By including the user interface in the example's resources, we ensure that it will be present when the example is run. The <tt>loader.load()</tt> function takes the user interface description contained in the file and constructs the form widget as a child widget of the <tt>CalculatorForm</tt>. <p>We are interested in three widgets in the generated user interface: two spin boxes and a label. For convenience, we retrieve pointers to these widgets from the widget that was constructed by the <tt>FormBuilder</tt>, and we record them for later use. The <tt>qFindChild()</tt> template function allows us to query widgets in order to find named child widgets.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    ui_inputSpinBox1 = qFindChild&lt;QSpinBox*&gt;(this, "inputSpinBox1");
+    ui_inputSpinBox2 = qFindChild&lt;QSpinBox*&gt;(this, "inputSpinBox2");
+    ui_outputWidget = qFindChild&lt;QLabel*&gt;(this, "outputWidget");
+</pre> The widgets created by the form loader need to be connected to the specially-named slots in the <tt>CalculatorForm</tt> object. We use Qt's meta-object system to enable these connections:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QMetaObject::connectSlotsByName(this);
+</pre> The form widget is added to a layout, and the window title is set:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout-&gt;addWidget(formWidget);
+    setLayout(layout);
+
+    setWindowTitle(tr("Calculator Builder"));
+}
+</pre> The two slots that modify widgets provided by the form are defined in a similar way to those in the <a href="designer-calculatorform.html">Calculator Form</a> example, except that we read the values from the spin boxes and write the result to the output widget via the pointers we recorded in the constructor:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void CalculatorForm::on_inputSpinBox1_valueChanged(int value)
+{
+    ui_outputWidget-&gt;setText(QString::number(value + ui_inputSpinBox2-&gt;value()));
+}
+<br>
+void CalculatorForm::on_inputSpinBox2_valueChanged(int value)
+{
+    ui_outputWidget-&gt;setText(QString::number(value + ui_inputSpinBox1-&gt;value()));
+}
+</pre> The advantage of this approach is that we can replace the form when the application is run, but we can still manipulate the widgets it contains as long as they are given appropriate names.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
