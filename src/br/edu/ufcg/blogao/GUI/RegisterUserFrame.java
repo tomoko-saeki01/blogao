@@ -11,10 +11,10 @@ import com.trolltech.qt.gui.QWidget;
 public class RegisterUserFrame extends QWidget {
 
 	private QPushButton register;
-	private QLabel loginLabel, passwordLabel, nameLabel, addressLabel,
+	private QLabel /*loginLabel, passwordLabel,*/ nameLabel, addressLabel,
 			emailLabel, interestsLabel, whoIAmLabel, dateBirthdayLabel,
 			sexLabel, musicsLabel, moviesLabel, booksLabel;
-	private QLineEdit loginField, passwordField, nameField, addressField,
+	private QLineEdit /*loginField, passwordField,*/ nameField, addressField,
 			emailField, interestsField, whoIAmField, musicsField, moviesField,
 			booksField;
 	private QComboBox comboMonth, comboDay, comboYear;
@@ -30,15 +30,16 @@ public class RegisterUserFrame extends QWidget {
 	private void initUI() {
 		InitNameFields();
 		InitAddressFields();
-		InitBooksFields();
 		InitEmailsFields();
-		InitMoviesFields();
 		InitInteretsFields();
-		InitMusicsFields();
-		InitSexFields();
-		InitDateBirthdayFields();
 		InitWhoIAmFields();
-
+		InitDateBirthdayFields();
+		InitSexFields();
+		InitMoviesFields();
+		InitBooksFields();		
+		InitMusicsFields();
+	
+		//comboMonth.currentStringChanged.connect(this, "OnActivatedMonth(String)");
 		/*
 		 * String loginText = "Login"; loginLabel = new QLabel(loginText, this);
 		 * loginLabel.setFont(new QFont("Tempus Sans ITC", 11));
@@ -53,6 +54,7 @@ public class RegisterUserFrame extends QWidget {
 	private void createComboDay() {
 		comboDay = createComboBox();
 		comboDay.addItem("Dia");
+
 		// TODO
 	}
 
@@ -118,12 +120,17 @@ public class RegisterUserFrame extends QWidget {
 		createComboYear();
 
 		month = createLabel("");
-		comboMonth.currentStringChanged.connect(this,
-				"OnActivatedMonth(String)");
+		
 
 		comboDay.move(460, 300);
 		comboMonth.move(505, 300);
 		comboYear.move(584, 300);
+
+		/*
+		 * String textoDoCombo = comboMonth.currentText();
+		 * System.out.println(textoDoCombo);
+		 */
+
 	}
 
 	private void InitEmailsFields() {

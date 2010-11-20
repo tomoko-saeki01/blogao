@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Resource Compiler (rcc)</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Resource Compiler (rcc)</h1></center><p><a name="rcc"> The <tt>rcc</tt> tool is used to embed resources into a Qt application during the build process. It works by generating a C++ source file containing data specified in a Qt resource (.qrc) file. <p>Usage: <pre class="snippet">
+rcc [options] &lt;inputs&gt;
+</pre> RCC accepts the following command line options: <table align="center" border="0" cellpadding="2" cellspacing="1"><thead><tr class="qt-style" valign="top"><th><center> Option</center></th><th><center> Argument</center></th><th><center> Description</center></th></tr></thead><tr valign="top" class="even"><td> <tt>-o</tt></td><td></td><td> Writes output to file rather than stdout.</td></tr><tr valign="top" class="odd"><td> <tt>-name</tt></td><td> <tt>name</tt></td><td> Creates an external initialization function with name.</td></tr><tr valign="top" class="even"><td> <tt>-threshold</tt></td><td> <tt>level</tt></td><td> Specifies a threshold (in bytes) to use when compressing files. If the file is smaller than the threshold, it will not be compressed, independent of what the compression level is.</td></tr><tr valign="top" class="odd"><td> <tt>-compress</tt></td><td> <tt>level</tt></td><td> Compresses input files with the given level. Level is an integer from 1 to 9 - 1 being the fastest, producing the least compression; 9 being the slowest, producing the most compression.</td></tr><tr valign="top" class="even"><td> <tt>-root</tt></td><td> <tt>path</tt></td><td> Prefixes the resource access path with root path.</td></tr><tr valign="top" class="odd"><td> <tt>-no-compress</tt></td><td></td><td> Disables all compression.</td></tr><tr valign="top" class="even"><td> <tt>-binary</tt></td><td></td><td> Outputs a binary file for use as a dynamic resource.</td></tr><tr valign="top" class="odd"><td> <tt>-version</tt></td><td></td><td> Displays version information.</td></tr><tr valign="top" class="even"><td> <tt>-help</tt></td><td></td><td> Displays usage information.</td></tr></table> See also <a href="resources.html">The Qt Resource System</a> for more information about embedding resources in Qt applications.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

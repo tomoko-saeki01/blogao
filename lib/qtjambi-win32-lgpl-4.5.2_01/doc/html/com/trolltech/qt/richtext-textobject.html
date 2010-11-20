@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Text Object Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Text Object Example</h1></center><p> The Text Object example shows how to insert an SVG file into a <a href="../../../com/trolltech/qt/gui/QTextDocument.html">QTextDocument</a>. <br><center><img src="images/textobject-example.png"></center><br> A <a href="../../../com/trolltech/qt/gui/QTextDocument.html">QTextDocument</a> consists of a hierarchy of elements, such as text blocks and frames. A text object describes the structure or format of one or more of these elements. For instance, images imported from HTML are implemented using text objects. Text objects are used by the document's <a href="../../../com/trolltech/qt/gui/QAbstractTextDocumentLayout.html">layout</a> to lay out and render (paint) the document. Each object knows how to paint the elements they govern, and calculates their size. <p>To be able to insert an SVG image into a text document, we create a text object, and implement painting for that object. This object can then be <a href="../../../com/trolltech/qt/gui/QTextFormat.html#setObjectType(int)">set</a> on a <a href="../../../com/trolltech/qt/gui/QTextCharFormat.html">QTextCharFormat</a>. We also register the text object with the layout of the document, enabling it to draw <a href="../../../com/trolltech/qt/gui/QTextCharFormat.html">QTextCharFormat</a>s governed by our text object. We can summarize the procedure with the following steps: <ul><li> Implement the text object.</li><li> Register the text object with the layout of the text document.</li><li> Set the text object on a <a href="../../../com/trolltech/qt/gui/QTextCharFormat.html">QTextCharFormat</a>.</li><li> Insert a QChar::ObjectReplacementCharacter with that text char format into the document.</li></ul> The example consists of the following classes: <ul><li> <tt>SvgTextObject</tt> implements the text object.</li><li> <tt>Window</tt> shows a <a href="../../../com/trolltech/qt/gui/QTextEdit.html">QTextEdit</a> into which SVG images can be inserted.</li></ul><a name="svgtextobject-class-definition"><h2>SvgTextObject Class Definition</h2> Let's take a look at the header file of <tt>SvgTextObject</tt>: <pre class="snippet"> 
+class SvgTextObject : public QObject, public QTextObjectInterface
+{
+    Q_OBJECT
+    Q_INTERFACES(QTextObjectInterface)
+
+
+public:        
+    QSizeF intrinsicSize(QTextDocument *doc, int posInDocument,
+                         const QTextFormat &format);
+    void drawObject(QPainter *painter, const QRectF &rect, QTextDocument *doc,
+                    int posInDocument, const QTextFormat &format);
+};
+</pre> A text object is a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> that implements <a href="../../../com/trolltech/qt/gui/QTextObjectInterface.html">QTextObjectInterface</a>. Note that the first class inherited must be <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>, and that you must use Q_INTERFACES to let Qt know that your class implements <a href="../../../com/trolltech/qt/gui/QTextObjectInterface.html">QTextObjectInterface</a>. <p>The document layout keeps a collection of text objects stored as <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>s, each of which has an associated object type. The layout casts the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> for the associated object type into the <a href="../../../com/trolltech/qt/gui/QTextObjectInterface.html">QTextObjectInterface</a>. <p>The <a href="../../../com/trolltech/qt/gui/QTextObjectInterface.html#intrinsicSize(com.trolltech.qt.gui.QTextDocument, int, com.trolltech.qt.gui.QTextFormat)">intrinsicSize()</a> and <a href="../../../com/trolltech/qt/gui/QTextObjectInterface.html#drawObject(com.trolltech.qt.gui.QPainter, com.trolltech.qt.core.QRectF, com.trolltech.qt.gui.QTextDocument, int, com.trolltech.qt.gui.QTextFormat)">drawObject()</a> functions are then used to calculate the size of the text object and draw it.<a name="svgtextobject-class-implementation"><h2>SvgTextObject Class Implementation</h2> We start of by taking a look at the <a href="../../../com/trolltech/qt/gui/QTextObjectInterface.html#intrinsicSize(com.trolltech.qt.gui.QTextDocument, int, com.trolltech.qt.gui.QTextFormat)">intrinsicSize()</a> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QSizeF SvgTextObject::intrinsicSize(QTextDocument *doc, int posInDocument,
+                                    const QTextFormat &format)
+{
+    QSvgRenderer renderer(format.property(Window::SvgData).toByteArray());
+    QSize size = renderer.defaultSize();
+    
+    if (size.height() &gt; 25)
+        size *= 25.0 / (double) size.height();
+
+    return QSizeF(size);
+}
+</pre> <tt>intrinsicSize()</tt> is called by the layout to calculate the size of the text object.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void SvgTextObject::drawObject(QPainter *painter, const QRectF &rect,
+                               QTextDocument *doc, int posInDocument,
+                               const QTextFormat &format)
+{
+    QSvgRenderer renderer(format.property(Window::SvgData).toByteArray());
+    renderer.render(painter, rect);
+}
+</pre> In <tt>drawObject()</tt>, we paint the SVG image using the <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a> provided by the layout.<a name="window-class-definition"><h2>Window Class Definition</h2> The <tt>Window</tt> class is a self-contained window that has a <a href="../../../com/trolltech/qt/gui/QTextEdit.html">QTextEdit</a> in which SVG images can be inserted. <pre class="snippet">
+class Window : public QWidget
+{
+    Q_OBJECT
+
+public:
+    enum { SvgTextFormat = QTextFormat::UserObject + 1 };
+    enum SvgProperties { SvgData = 1 };
+
+    Window();
+
+private slots:
+    void insertTextObject();
+
+private:
+    void setupTextObject();
+    void setupGui();
+
+private:
+    QTextEdit *textEdit;
+    QLabel *fileNameLabel;
+    QLineEdit *fileNameLineEdit;
+    QPushButton *insertTextObjectButton;
+};
+</pre> The <tt>insertTextObject()</tt> slot inserts an SVG image at the current cursor position, while <tt>setupTextObject()</tt> creates and registers the SvgTextObject with the layout of the text edit's document. <p>The constructor simply calls <tt>setupTextObject()</tt> and <tt>setupGui()</tt>, which creates and lays out the widgets of the <tt>Window</tt>.<a name="window-class-implementation"><h2>Window Class Implementation</h2> We will now take a closer look at the functions that are relevant to our text object, starting with the <tt>setupTextObject()</tt> function.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void Window::setupTextObject()
+{
+    QObject *svgInterface = new SvgTextObject;
+    textEdit-&gt;document()-&gt;documentLayout()-&gt;registerHandler(SvgTextFormat, svgInterface);
+}
+</pre> <tt>SvgTextFormat</tt>'s value is the number of our object type. It is used to identify object types by the document layout. <p>Note that we only create one SvgTextObject instance; it will be used for all <a href="../../../com/trolltech/qt/gui/QTextCharFormat.html">QTextCharFormat</a>'s with the <tt>SvgTextFormat</tt> object type. <p>Let's move on to the <tt>insertTextObject()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void Window::insertTextObject()
+{
+    QString fileName = fileNameLineEdit-&gt;text();
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly)) {
+        QMessageBox::warning(this, tr("Error Opening File"),
+                             tr("Could not open '%1'").arg(fileName));
+    }
+
+    QByteArray svgData = file.readAll();
+</pre> First, the <tt>.svg</tt> file is opened and its contents are read into the <tt>svgData</tt> array.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QTextCharFormat svgCharFormat;
+    svgCharFormat.setObjectType(SvgTextFormat);
+    svgCharFormat.setProperty(SvgData, svgData);
+
+    QTextCursor cursor = textEdit-&gt;textCursor();
+    cursor.insertText(QString(QChar::ObjectReplacementCharacter), svgCharFormat);
+    textEdit-&gt;setTextCursor(cursor);
+}
+</pre> We use <a href="../../../com/trolltech/qt/gui/QTextFormat.html#setProperty(int, java.lang.Object)">setProperty()</a> to store the <tt>.svg</tt> file data in the in the <a href="../../../com/trolltech/qt/gui/QTextCharFormat.html">QTextCharFormat</a>. We can retrieve it later with <a href="../../../com/trolltech/qt/gui/QTextFormat.html#property(int)">property()</a>. <p>We insert the char format in the standard way - using a <a href="../../../com/trolltech/qt/gui/QTextCursor.html">QTextCursor</a>. Notice that we use the special QCharObjectReplacementCharacter.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
