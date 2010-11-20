@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Echo Plugin Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Echo Plugin Example</h1></center><p> This example shows how to create a Qt plugin. <br><center><img src="images/echopluginexample.png"></center><br> There are two kinds of plugins in Qt: plugins that extend Qt itself and plugins that extend applications written in Qt. In this example, we show the procedure of implementing plugins that extend applications. When you create a plugin you declare an interface, which is a class with only pure virtual functions. This interface is inherited by the class that implements the plugin. The class is stored in a shared library and can therefore be loaded by applications at run-time. When loaded, the plugin is dynamically cast to the interface using Qt's <a href="metaobjects.html">meta-object system</a>. The plugin <a href="plugins-howto.html">overview document</a> gives a high-level introduction to plugins. <p>We have implemented a plugin, the <tt>EchoPlugin</tt>, which implements the <tt>EchoInterface</tt>. The interface consists of <tt>echo()</tt>, which takes a QString as argument. The <tt>EchoPlugin</tt> returns the string unaltered (i.e., it works as the familiar echo command found in both Unix and Windows). <p>We test the plugin in <tt>EchoWindow</tt>: when you push the <a href="../../../com/trolltech/qt/gui/QPushButton.html">QPushButton</a> (as seen in the image above), the application sends the text in the <a href="../../../com/trolltech/qt/gui/QLineEdit.html">QLineEdit</a> to the plugin, which echoes it back to the application. The answer from the plugin is displayed in the <a href="../../../com/trolltech/qt/gui/QLabel.html">QLabel</a>.<a name="echowindow-class-definition"><h2>EchoWindow Class Definition</h2> The <tt>EchoWindow</tt> class lets us test the <tt>EchoPlugin</tt> through a GUI. <pre class="snippet">
+class EchoWindow : public QWidget
+{
+    Q_OBJECT
+
+public:
+    EchoWindow();
+
+private slots:
+    void sendEcho();
+
+private:
+    void createGUI();
+    bool loadPlugin();
+
+    EchoInterface *echoInterface;
+    QLineEdit *lineEdit;
+    QLabel *label;
+    QPushButton *button;
+    QGridLayout *layout;
+};
+</pre> We load the plugin in <tt>loadPlugin()</tt> and cast it to <tt>EchoInterface</tt>. When the user clicks the <tt>button</tt> we take the text in <tt>lineEdit</tt> and call the interface's <tt>echo()</tt> with it.<a name="echowindow-class-implementation"><h2>EchoWindow Class Implementation</h2> We start with a look at the constructor:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+EchoWindow::EchoWindow()
+{
+    createGUI();
+    setLayout(layout);
+    setWindowTitle("Echo Plugin Example");
+
+    if (!loadPlugin()) {
+        QMessageBox::information(this, "Error", "Could not load the plugin");
+        lineEdit-&gt;setEnabled(false);
+        button-&gt;setEnabled(false);
+    }
+}
+</pre> We create the widgets and set a title for the window. We then load the plugin. <tt>loadPlugin()</tt> returns false if the plugin could not be loaded, in which case we disable the widgets. If you wish a more detailed error message, you can use errorString(); we will look more closely at QPluginLoader later. <p>Here is the implementation of <tt>sendEcho()</tt>:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void EchoWindow::sendEcho()
+{
+    QString text = echoInterface-&gt;echo(lineEdit-&gt;text());
+    label-&gt;setText(text);
+}
+</pre> This slot is called when the user pushes <tt>button</tt> or presses enter in <tt>lineEdit</tt>. We call <tt>echo()</tt> of the echo interface. In our example this is the <tt>EchoPlugin</tt>, but it could be any plugin that inherit the <tt>EchoInterface</tt>. We take the QString returned from <tt>echo()</tt> and display it in the <tt>label</tt>. <p>Here is the implementation of <tt>createGUI()</tt>:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void EchoWindow::createGUI()
+{
+    lineEdit = new QLineEdit;
+    label = new QLabel;
+    label-&gt;setFrameStyle(QFrame::Box | QFrame::Plain);
+    button = new QPushButton(tr("Send Message"));
+
+    connect(lineEdit, SIGNAL(editingFinished()),
+            this, SLOT(sendEcho()));
+    connect(button, SIGNAL(clicked()),
+            this, SLOT(sendEcho()));
+
+    layout = new QGridLayout;
+    layout-&gt;addWidget(new QLabel(tr("Message:")), 0, 0);
+    layout-&gt;addWidget(lineEdit, 0, 1);
+    layout-&gt;addWidget(new QLabel(tr("Answer:")), 1, 0);
+    layout-&gt;addWidget(label, 1, 1);
+    layout-&gt;addWidget(button, 2, 1, Qt::AlignRight);
+    layout-&gt;setSizeConstraint(QLayout::SetFixedSize);
+}
+</pre> We create the widgets and lay them out in a grid layout. We connect the label and line edit to our <tt>sendEcho()</tt> slot. <p>Here is the <tt>loadPlugin()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+bool EchoWindow::loadPlugin()
+{
+    QDir pluginsDir(qApp-&gt;applicationDirPath());
+#if defined(Q_OS_WIN)
+    if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
+        pluginsDir.cdUp();
+#elif defined(Q_OS_MAC)
+    if (pluginsDir.dirName() == "MacOS") {
+        pluginsDir.cdUp();
+        pluginsDir.cdUp();
+        pluginsDir.cdUp();
+    }
+#endif
+    pluginsDir.cd("plugins");
+    foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
+        QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
+        QObject *plugin = pluginLoader.instance();
+        if (plugin) {
+            echoInterface = qobject_cast&lt;EchoInterface *&gt;(plugin);
+            if (echoInterface)
+                return true;
+        }
+    }
+
+    return false;
+}
+</pre> Access to plugins at run-time is provided by QPluginLoader. You supply it with the filename of the shared library the plugin is stored in and call instance(), which loads and returns the root component of the plugin (i.e., it resolves the type of the plugin and creates a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> instance of it). If the plugin was not successfully loaded, it will be null, so we return false. If it was loaded correctly, we can cast the plugin to our <tt>EchoInterface</tt> and return true. In the case that the plugin loaded does not implement the <tt>EchoInterface</tt>, <tt>instance()</tt> will return null, but this cannot happen in our example. Notice that the location of the plugin is not the same for all platforms.<a name="echointerface-class-definition"><h2>EchoInterface Class Definition</h2> The <tt>EchoInterface</tt> defines the functions that the plugin will provide. An interface is a class that only consists of pure virtual functions. If non virtual functions were present in the class you would get misleading compile errors in the moc files. <pre class="snippet">
+class EchoInterface
+{
+public:
+    virtual ~EchoInterface() {}
+    virtual QString echo(const QString &message) = 0;
+};
+
+
+QT_BEGIN_NAMESPACE
+Q_DECLARE_INTERFACE(EchoInterface,
+                    "com.trolltech.Plugin.EchoInterface/1.0");
+QT_END_NAMESPACE
+
+</pre> We declare <tt>echo()</tt>. In our <tt>EchoPlugin</tt> we use this method to return, or echo, <tt>message</tt>. <p>We use the Q_DECLARE_INTERFACE macro to let <a href="metaobjects.html">Qt's meta object system</a> aware of the interface. We do this so that it will be possible to identify plugins that implements the interface at run-time. The second argument is a string that must identify the interface in a unique way.<a name="echoplugin-class-definition"><h2>EchoPlugin Class Definition</h2> We inherit both <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> and <tt>EchoInterface</tt> to make this class a plugin. The Q_INTERFACES macro tells Qt which interfaces the class implements. In our case we only implement the <tt>EchoInterface</tt>. If a class implements more than one interface, they are given as a comma separated list. <pre class="snippet">
+class EchoPlugin : public QObject, EchoInterface
+{
+    Q_OBJECT
+    Q_INTERFACES(EchoInterface)
+
+public:
+    QString echo(const QString &message);
+};
+</pre><a name="echoplugin-class-implementation"><h2>EchoPlugin Class Implementation</h2> Here is the implementation of <tt>echo()</tt>:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QString EchoPlugin::echo(const QString &message)
+{
+    return message;
+}
+</pre> We simply return the functions parameter.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+Q_EXPORT_PLUGIN2(echoplugin, EchoPlugin);
+</pre> We use the Q_EXPORT_PLUGIN2 macro to let Qt know that the <tt>EchoPlugin</tt> class is a plugin. The first parameter is the name of the plugin; it is usual to give the plugin and the library file it is stored in the same name.<a name="the-function"><h2>The main() function</h2><tt>main()</tt><br><br>The following code example is written in c++.<br> <pre class="snippet">
+int main(int argv, char *args[])
+{
+    QApplication app(argv, args);
+
+    EchoWindow window;
+    window.show();
+
+    return app.exec();
+}
+</pre> We create an <tt>EchoWindow</tt> and display it as a top-level window.<a name="the-profiles"><h2>The Profiles</h2> When creating plugins the profiles need to be adjusted. We show here what changes need to be done. <p>The profile in the echoplugin directory uses the <tt>subdirs</tt> template and simply includes includes to directories in which the echo window and echo plugin lives:Error parsing snippet.</pre> The profile for the echo window does not need any plugin specific settings. We move on to the plugin profile:Error parsing snippet.</pre> We need to set the TEMPLATE as we now want to make a library instead of an executable. We also need to tell qmake that we are creating a plugin. The <tt>EchoInterface</tt> that the plugin implements lives in the <tt>echowindow</tt> directory, so we need to add that directory to the include path. We set the TARGET of the project, which is the name of the library file in which the plugin will be stored; qmake appends the appropriate file extension depending on the platform. By convention the target should have the same name as the plugin (set with Q_EXPORT_PLUGIN2)<a name="further-reading-and-examples"><h2>Further reading and examples</h2> You can find an overview of the macros needed to create plugins <a href="qtplugin.html">here</a>. <p>We give an example of a plugin that extend Qt in the <a href="tools-styleplugin.html">style plugin</a> example. The <a href="tools-plugandpaint.html">plug and paint</a> example shows how to create static plugins.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
