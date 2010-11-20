@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Default Prototypes Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Default Prototypes Example</h1></center><p> This Qt Script example shows how to use default prototypes to make a non-<a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>-based type scriptable. <br><center><img src="images/defaultprototypes-example.png"></center><br> With QScriptEngine::setDefaultPrototype() you can specify a <a href="qtscript.html">QtScript</a> object that defines a scripting interface for a C++ type; Qt Script operations on values of such types will then be delegated to your prototype object. In this example, a simple scripting interface for <a href="../../../com/trolltech/qt/gui/QListWidgetItem.html">QListWidgetItem</a> is defined, so that the text of items can easily be accessed from script code. <p>To define a scripting API for <a href="../../../com/trolltech/qt/gui/QListWidgetItem.html">QListWidgetItem</a> in terms of Qt properties and slots, we subclass <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> and QScriptable. <pre class="snippet">
+class ListWidgetItemPrototype : public QObject, public QScriptable
+{
+    Q_OBJECT
+    Q_PROPERTY(QString text READ text WRITE setText)
+public:
+    ListWidgetItemPrototype(QObject *parent = 0);
+
+    QString text() const;
+    void setText(const QString &text);
+
+public slots:
+    QString toString() const;
+};
+</pre> A single property, <tt>text</tt>, is defined, along with a slot, <tt>toString</tt>.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+ListWidgetItemPrototype::ListWidgetItemPrototype(QObject *parent)
+    : QObject(parent)
+{
+}
+
+QString ListWidgetItemPrototype::text() const
+{
+    QListWidgetItem *item = qscriptvalue_cast&lt;QListWidgetItem*&gt;(thisObject());
+    if (item)
+        return item-&gt;text();
+    return QString();
+}
+
+void ListWidgetItemPrototype::setText(const QString &text)
+{
+    QListWidgetItem *item = qscriptvalue_cast&lt;QListWidgetItem*&gt;(thisObject());
+    if (item)
+        item-&gt;setText(text);
+}
+
+QString ListWidgetItemPrototype::toString() const
+{
+    return QString("ListWidgetItem(text = %0)").arg(text());
+}
+</pre> The implementation of the property accessors use the qscriptvalue_cast() function to cast the script object to a <a href="../../../com/trolltech/qt/gui/QListWidgetItem.html">QListWidgetItem</a> pointer. The normal C++ <a href="../../../com/trolltech/qt/gui/QListWidgetItem.html">QListWidgetItem</a> API is then used to implement the desired functionality. <p>Although not shown here, it is possible to throw a script exception from a prototype function; for example, you could throw a TypeError exception if the qscriptvalue_cast() fails. <p>QListWidgetItems are usually added to a <a href="../../../com/trolltech/qt/gui/QListWidget.html">QListWidget</a>. While <a href="../../../com/trolltech/qt/gui/QListWidget.html">QListWidget</a> is a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>-based class, not all the functionality needed for this example are present. We can solve this by creating a default prototype for the <a href="../../../com/trolltech/qt/gui/QListWidget.html">QListWidget</a> class as well. The prototype will augment the functionality already provided by the Qt Script <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> integration; i.e. if a property or slot is not found in the <a href="../../../com/trolltech/qt/gui/QListWidget.html">QListWidget</a> object itself, the prototype will be used as a fallback. <pre class="snippet">
+class ListWidgetPrototype : public QObject, public QScriptable
+{
+    Q_OBJECT
+public:
+    ListWidgetPrototype(QObject *parent = 0);
+
+public slots:
+    void addItem(const QString &text);
+    void addItems(const QStringList &texts);
+    void setBackgroundColor(const QString &colorName);
+};
+</pre> The additional slots will make it possible to add items to a <a href="../../../com/trolltech/qt/gui/QListWidget.html">QListWidget</a> from script code, and to set the background color of the widget from a string.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+ListWidgetPrototype::ListWidgetPrototype(QObject *parent)
+    : QObject(parent)
+{
+}
+
+void ListWidgetPrototype::addItem(const QString &text)
+{
+    QListWidget *widget = qscriptvalue_cast&lt;QListWidget*&gt;(thisObject());
+    if (widget)
+        widget-&gt;addItem(text);
+}
+
+void ListWidgetPrototype::addItems(const QStringList &texts)
+{
+    QListWidget *widget = qscriptvalue_cast&lt;QListWidget*&gt;(thisObject());
+    if (widget)
+        widget-&gt;addItems(texts);
+}
+
+void ListWidgetPrototype::setBackgroundColor(const QString &colorName)
+{
+    QListWidget *widget = qscriptvalue_cast&lt;QListWidget*&gt;(thisObject());
+    if (widget) {
+        QPalette palette = widget-&gt;palette();
+        QColor color(colorName);
+        palette.setBrush(QPalette::Base, color);
+        widget-&gt;setPalette(palette);
+    }
+}
+</pre> Again, we use qscriptvalue_cast() to cast the script object to the relevant C++ type, in this case a <a href="../../../com/trolltech/qt/gui/QListWidget.html">QListWidget</a> pointer. The addItem() and addItems() functions simply forward their arguments to the corresponding functions in the <a href="../../../com/trolltech/qt/gui/QListWidget.html">QListWidget</a> class. setBackgroundColor() gets the widget's palette, creates a <a href="../../../com/trolltech/qt/gui/QColor.html">QColor</a> from the given string argument and changes the palette accordingly.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+Q_DECLARE_METATYPE(QListWidgetItem*)
+Q_DECLARE_METATYPE(QListWidget*)
+</pre> The relevant C++ types must be made known to Qt's meta type system.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QScriptEngine engine;
+
+    ListWidgetItemPrototype lwiProto;
+    engine.setDefaultPrototype(qMetaTypeId&lt;QListWidgetItem*&gt;(),
+                               engine.newQObject(&lwiProto));
+
+    ListWidgetPrototype lwProto;
+    engine.setDefaultPrototype(qMetaTypeId&lt;QListWidget*&gt;(),
+                               engine.newQObject(&lwProto));
+</pre> For each type that we want to associate a prototype object with, we create an instance of the prototype class, pass it to QScriptEngine::newQObject(), and then create the link between the C++ type and the resulting script object by calling QScriptEngine::setDefaultPrototype().<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QListWidget listWidget;
+    engine.globalObject().setProperty("listWidget",
+                                      engine.newQObject(&listWidget));
+</pre> In this example, a single <a href="../../../com/trolltech/qt/gui/QListWidget.html">QListWidget</a> object is added as a global script variable, called <tt>listWidget</tt>. Script code can add items to this widget by calling addItem() or addItems(). <pre class="snippet">
+listWidget.addItem("Red");
+listWidget.addItem("Blue");
+listWidget.addItem("Green");
+listWidget.addItem("Cyan");
+listWidget.addItem("Yellow");
+listWidget.addItem("Purple");
+listWidget.addItems(["Orange", "Gray"]);
+</pre> Script code can connect to signals of the <a href="../../../com/trolltech/qt/gui/QListWidget.html">QListWidget</a> object; signal handlers can use the interface defined in the <a href="../../../com/trolltech/qt/gui/QListWidgetItem.html">QListWidgetItem</a> prototype to manipulate item arguments. <pre class="snippet">
+listWidget.currentItemChanged.connect(
+    function(item)
+    {
+        listWidget.setBackgroundColor(item.text);
+    }
+);
+</pre> Not shown in this example is how to make <a href="../../../com/trolltech/qt/gui/QListWidgetItem.html">QListWidgetItem</a> constructible from Qt Script code, i.e. to be able to write "new QListWidgetItem()" in a script. In order to do this, you have to define your own script constructor for the type. The constructor would just be a factory function that constructs a new C++ <a href="../../../com/trolltech/qt/gui/QListWidgetItem.html">QListWidgetItem</a> and returns it back to the script. See QScriptEngine::newFunction() for more information.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
