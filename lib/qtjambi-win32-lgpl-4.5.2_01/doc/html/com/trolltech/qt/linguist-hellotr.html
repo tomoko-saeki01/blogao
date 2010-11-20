@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Hello tr() Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Hello tr() Example</h1></center><p> This example is a small Hello World program with a Latin translation. The screenshot below shows the English version. <br><center><img src="images/linguist-hellotr_en.png"></center><br> See the <a href="qtjambi-linguist-manual.html">Qt Linguist manual</a> for more information about translating Qt application.<a name="line-by-line-walkthrough"><h2>Line by Line Walkthrough</h2><br><br>The following code example is written in c++.<br> <pre class="snippet">
+#include &lt;QTranslator&gt;
+</pre> This line includes the definition of the <a href="../../../com/trolltech/qt/core/QTranslator.html">QTranslator</a> class. Objects of this class provide translations for user-visible text.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QTranslator translator;
+</pre> Creates a <a href="../../../com/trolltech/qt/core/QTranslator.html">QTranslator</a> object without a parent.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    translator.load("hellotr_la");
+</pre> Tries to load a file called <tt>hellotr_la.qm</tt> (the <tt>.qm</tt> file extension is implicit) that contains Latin translations for the source texts used in the program. No error will occur if the file is not found.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    app.installTranslator(&translator);
+ </pre> Adds the translations from <tt>hellotr_la.qm</tt> to the pool of translations used by the program.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QPushButton hello(QPushButton::tr("Hello world!"));
+</pre> Creates a push button that displays "Hello world!". If <tt>hellotr_la.qm</tt> was found and contains a translation for "Hello world!", the translation appears; if not, the source text appears. <p>All classes that inherit <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> have a <tt>tr()</tt> function. Inside a member function of a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> class, we simply write <tt>tr("Hello world!")</tt> instead of <tt>QPushButton::tr("Hello world!")</tt> or <tt>QObject::tr("Hello world!")</tt>.<a name="running-the-application-in-english"><h2>Running the Application in English</h2> Since we haven't made the translation file <tt>hellotr_la.qm</tt>, the source text is shown when we run the application: <br><center><img src="images/linguist-hellotr_en.png"></center><br><a name="creating-a-latin-message-file"><h2>Creating a Latin Message File</h2> The first step is to create a project file, <tt>hellotr.pro</tt>, that lists all the source files for the project. The project file can be a qmake project file, or even an ordinary makefile. Any file that containsError parsing snippet.Error parsing snippet.</pre> will work. <tt>TRANSLATIONS</tt> specifies the message files we want to maintain. In this example, we just maintain one set of translations, namely Latin. <p>Note that the file extension is <tt>.ts</tt>, not <tt>.qm</tt>. The <tt>.ts</tt> translation source format is designed for use during the application's development. Programmers or release managers run the <tt>lupdate</tt> program to generate and update <tt>.ts</tt> files with the source text that is extracted from the source code. Translators read and update the <tt>.ts</tt> files using Qt Linguist adding and editing their translations. <p>The <tt>.ts</tt> format is human-readable XML that can be emailed directly and is easy to put under version control. If you edit this file manually, be aware that the default encoding for XML is UTF-8, not Latin1 (ISO 8859-1). One way to type in a Latin1 character such as '&oslash;' (Norwegian o with slash) is to use an XML entity: "&#xf8;". This will work for any Unicode 4.0 character. <p>Once the translations are complete the <tt>lrelease</tt> program is used to convert the <tt>.ts</tt> files into the <tt>.qm</tt> Qt message file format. The <tt>.qm</tt> format is a compact binary format designed to deliver very fast lookup performance. Both <tt>lupdate</tt> and <tt>lrelease</tt> read all the project's source and header files (as specified in the HEADERS and SOURCES lines of the project file) and extract the strings that appear in <tt>tr()</tt> function calls. <p><tt>lupdate</tt> is used to create and update the message files (<tt>hellotr_la.ts</tt> in this case) to keep them in sync with the source code. It is safe to run <tt>lupdate</tt> at any time, as <tt>lupdate</tt> does not remove any information. For example, you can put it in the makefile, so the <tt>.ts</tt> files are updated whenever the source changes. <p>Try running <tt>lupdate</tt> right now, like this: <pre class="snippet">
+lupdate -verbose hellotr.pro
+</pre> (The <tt>-verbose</tt> option instructs <tt>lupdate</tt> to display messages that explain what it is doing.) You should now have a file <tt>hellotr_la.ts</tt> in the current directory, containing this: <pre class="snippet">
+&lt;!DOCTYPE TS&gt;&lt;TS&gt;
+&lt;context&gt;
+    &lt;name&gt;QPushButton&lt;/name&gt;
+    &lt;message&gt;
+        &lt;source&gt;Hello world!&lt;/source&gt;
+        &lt;translation type="unfinished"&gt;&lt;/translation&gt;
+    &lt;/message&gt;
+&lt;/context&gt;
+&lt;/TS&gt;
+</pre> You don't need to understand the file format since it is read and updated using tools (<tt>lupdate</tt>, Qt Linguist, <tt>lrelease</tt>).<a name="translating-to-latin-with-qt-linguist"><h2>Translating to Latin with Qt Linguist</h2> We will use Qt Linguist to provide the translation, although you can use any XML or plain text editor to enter a translation into a <tt>.ts</tt> file. <p>To start Qt Linguist, type <pre class="snippet">
+linguist hellotr_la.ts
+</pre> You should now see the text "<a href="../../../com/trolltech/qt/gui/QPushButton.html">QPushButton</a>" in the top left pane. Double-click it, then click on "Hello world!" and enter "Orbis, te saluto!" in the <b>Translation</b> pane (the middle right of the window). Don't forget the exclamation mark! <p>Click the <b>Done</b> checkbox and choose <b>File|Save</b> from the menu bar. The <tt>.ts</tt> file will no longer contain <pre class="snippet">
+&lt;translation type='unfinished'&gt;&lt;/translation&gt;
+</pre> but instead will have <pre class="snippet">
+&lt;translation&gt;Orbis, te saluto!&lt;/translation&gt;
+</pre><a name="running-the-application-in-latin"><h2>Running the Application in Latin</h2> To see the application running in Latin, we have to generate a <tt>.qm</tt> file from the <tt>.ts</tt> file. Generating a <tt>.qm</tt> file can be achieved either from within Qt Linguist (for a single <tt>.ts</tt> file), or by using the command line program <tt>lrelease</tt> which will produce one <tt>.qm</tt> file for each of the <tt>.ts</tt> files listed in the project file. Generate <tt>hellotr_la.qm</tt> from <tt>hellotr_la.ts</tt> by choosing <b>File|Release</b> from Qt Linguist's menu bar and pressing <b>Save</b> in the file save dialog that pops up. Now run the <tt>hellotr</tt> program again. This time the button will be labelled "Orbis, te saluto!". <br><center><img src="images/linguist-hellotr_la.png"></center><br><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
