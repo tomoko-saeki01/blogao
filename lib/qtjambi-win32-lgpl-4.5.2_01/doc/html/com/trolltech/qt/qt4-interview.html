@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>The Interview Framework</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>The Interview Framework</h1></center><p>[Previous: <a href="qt4-tulip.html">The Tulip Container Classes</a>][<a href="qt4-intro.html">What's New in Qt 4</a>][Next: <a href="qt4-arthur.html">The Arthur Paint System</a>]<p> The Interview classes provide a model/view framework for Qt applications based on the well known Model-View-Controller design pattern. In this document, we will describe Qt's model/view architecture, provide some examples, and show the improvements offered over Qt 3's item view classes. <ul><li> <a href="#overview-of-the-model-view-architecture">Overview of The Model/View Architecture</a></li><li> <a href="#model-view-classes">Model/View Classes</a></li><li> <a href="#example-code">Example Code</a></li> <ul><li> <a href="#sharing-a-model-between-views">Sharing a Model Between Views</a></li><li> <a href="#creating-a-custom-model">Creating a Custom Model</a></li></ul><li> <a href="#what-s-changed-since-qt-3">What's Changed Since Qt 3?</a></li></ul><a name="overview-of-the-model-view-architecture"><h2>Overview of The Model/View Architecture</h2> The model/view architecture is a variation of the Model-View-Controller (MVC) design pattern, originating from Smalltalk, that is often used when building user interfaces. <p>In the model/view architecture, the view and the controller objects are combined. This still separates the way that data is stored from the way that it is presented to the user, but provides a simpler framework based on the same principles. This separation makes it possible to display the same data in several different views, and to implement new types of views, without changing the underlying data structures. <p>User input is handled by delegates. The advantage of this approach is that it allows rendering and editing of individual items of data to be customized to suit each data type in use. <table align="center" border="0" cellpadding="2" cellspacing="1"><tr valign="top" class="even"><td>  <br><center><img src="images/modelview-overview.png"></center><br></td><td> <b>The model/view architecture</b> <p>The model communicates with a source of data, providing an interface for the other components in the architecture. The nature of the communication depends on the type of data source, and the way the model is implemented. <p>The view obtains model indexes from the model; these are references to items of data. By supplying model indexes to the model, the view can retrieve items of data from the data source. <p>In standard views, a delegate renders the items of data. When an item is edited, the delegate communicates with the model directly using model indexes.</td></tr></table><a name="model-view-classes"><h2>Model/View Classes</h2> On a fundamental level, the Interview classes define the interfaces and common functionality for models, views, and delegates. All implemented components subclass <a href="../../../com/trolltech/qt/core/QAbstractItemModel.html">QAbstractItemModel</a>, <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html">QAbstractItemView</a>, or <a href="../../../com/trolltech/qt/gui/QAbstractItemDelegate.html">QAbstractItemDelegate</a>. The use of a common API ensures a level of interoperability between the components. <br><center><img src="images/standard-views.png"></center><br> Interview provides ready-to-use implementations of views for table, tree, and list widgets: <a href="../../../com/trolltech/qt/gui/QTableView.html">QTableView</a>, <a href="../../../com/trolltech/qt/gui/QTreeView.html">QTreeView</a>, and <a href="../../../com/trolltech/qt/gui/QListView.html">QListView</a>. These standard views are suitable for displaying the most common types of data structures used in applications, and can be used with the ready-made models supplied with Qt: <ul><li> <a href="../../../com/trolltech/qt/gui/QStandardItemModel.html">QStandardItemModel</a> is a minimal convenience model that developers can use to manage items of data.</li><li> <a href="../../../com/trolltech/qt/gui/QDirModel.html">QDirModel</a> provides directory information for use with <a href="../../../com/trolltech/qt/gui/QListView.html">QListView</a> and <a href="../../../com/trolltech/qt/gui/QTreeView.html">QTreeView</a>.</li><li> <a href="../../../com/trolltech/qt/gui/QStringListModel.html">QStringListModel</a> is a convenience model that can be used to hold strings for views such as <a href="../../../com/trolltech/qt/gui/QListView.html">QListView</a> and <a href="../../../com/trolltech/qt/gui/QComboBox.html">QComboBox</a>.</li></ul> Two specialized abstract models are provided that can be subclassed and extended (see the <a href="model-view-programming.html#related-examples">Model/View Programming</a> examples): <ul><li> <a href="../../../com/trolltech/qt/gui/QAbstractTableModel.html">QAbstractTableModel</a> is a useful starting point for providing a custom model that can be used with <a href="../../../com/trolltech/qt/gui/QTableView.html">QTableView</a>.</li><li> <a href="../../../com/trolltech/qt/core/QAbstractListModel.html">QAbstractListModel</a> can be subclassed to produce a list-based model for use with <a href="../../../com/trolltech/qt/gui/QListView.html">QListView</a>.</li></ul> Operations on items, such as filtering and sorting, are handled by proxy models that allow views to display processed data without having to copy or modify data obtained from a source model. Interview provides the <a href="../../../com/trolltech/qt/gui/QSortFilterProxyModel.html">QSortFilterProxyModel</a> class to allow items of data from a source model to be sorted and filtered before they are supplied to views. <p>Developers who are familiar with the conventional list, tree, and table widgets may find <a href="../../../com/trolltech/qt/gui/QListWidget.html">QListWidget</a>, <a href="../../../com/trolltech/qt/gui/QTreeWidget.html">QTreeWidget</a>, and <a href="../../../com/trolltech/qt/gui/QTableWidget.html">QTableWidget</a> useful. These present a simplified interface to the views that does not require a knowledge of the underlying model/view architecture. <p>For details about how to use the model/view classes, see the <a href="model-view-programming.html">Model/View Programming</a> document. <p>See also the <a href="qt4-sql.html">Database GUI Layer</a> document for information about Qt 4's database models.<a name="example-code"><h2>Example Code</h2> To illustrate how the Interview classes are used, we present two examples that show different aspects of the model/view architecture.<a name="sharing-a-model-between-views"><h3>Sharing a Model Between Views</h3> In this example, we display the contents of a model using two different views, and share the user's selection between them. We will use the <a href="../../../com/trolltech/qt/gui/QDirModel.html">QDirModel</a> supplied with Qt because it requires very little configuration, and provides existing data to the views. <p>The main() function for this example demonstrates all the principles involved in setting up a model and two views. We also share the selection between the two views: <pre class="snippet">
+public static void main(String args[])
+{
+    QApplication.initialize(args);
+
+    QSplitter splitter = new QSplitter();
+
+ 
+    QDirModel model = new QDirModel();
+   
+    QTreeView tree = new QTreeView(splitter);
+ 
+    tree.setModel(model);
+  
+    tree.setRootIndex(model.index(QDir.currentPath()));
+
+
+    QListView list = new QListView(splitter);
+    list.setModel(model);
+    list.setRootIndex(model.index(QDir.currentPath()));
+
+
+    QItemSelectionModel selection = new QItemSelectionModel(model);
+    tree.setSelectionModel(selection);
+    list.setSelectionModel(selection);
+
+
+    splitter.setWindowTitle("Two views onto the same directory model");
+    splitter.show();
+
+    QApplication.exec();
+}
+</pre> In the above function, we construct a directory model to display the contents of a default directory. The two views are constructed and given the same model to work with. By default, each view will maintain and display its own selection of items from the model, so we explicitly create a new selection that is shared between the tree view and the list view. As a result, changes to the selection in either of these views will automatically cause the selection in the other to change. <br><center><img src="images/interview-shareddirmodel.png"></center><br> The model/view architecture allows us to replace the <a href="../../../com/trolltech/qt/gui/QDirModel.html">QDirModel</a> in this example with a completely different model, one that will perhaps obtain data from a remote server, or from a database.<a name="creating-a-custom-model"><h3>Creating a Custom Model</h3> In this example, we display items of data obtained from a custom list model using a standard view. The custom model is a subclass of <a href="../../../com/trolltech/qt/core/QAbstractListModel.html">QAbstractListModel</a> and provides implementations of a core set of functions. <p>The complete declaration of our model is as follows: <pre class="snippet">
+class StringListModel : public QAbstractListModel
+{
+    Q_OBJECT
+
+public:
+    StringListModel(const QStringList &strings, QObject *parent = 0)
+        : QAbstractListModel(parent), stringList(strings) {}
+
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    QVariant headerData(int section, Qt::Orientation orientation,
+
+                        int role = Qt::DisplayRole) const;
+<br>
+private:
+    QStringList stringList;
+};
+</pre> The model takes a list of strings when constructed, and supplies these to views as required. Since this is only a simple read-only model, we only need to implement a few functions. <p>The underlying data structure used to hold the strings is a QStringList. Since the model maps each item in the list to a row in the model, the rowCount() function is quite simple:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+int StringListModel::rowCount(const QModelIndex &parent) const
+{
+    return stringList.count();
+}
+</pre> The data() function returns an item of data for each model index supplied by a view:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QVariant StringListModel::data(const QModelIndex &index, int role) const
+{
+    if (!index.isValid())
+        return QVariant();
+
+    if (index.row() &gt;= stringList.size())
+        return QVariant();
+
+    if (role == Qt::DisplayRole)
+        return stringList.at(index.row());
+    else
+        return QVariant();
+}
+</pre> The data() function returns a <a href="../../../com/trolltech/qt/QVariant.html">QVariant</a> containing the information referred to by the model index. Items of data are returned to the view, but only if a number of checks are satisfied; for example, if the view specifies an invalid model index, the model indicates this by returning an invalid <a href="../../../com/trolltech/qt/QVariant.html">QVariant</a>. <p>Vertical and horizontal headers are supplied by the headerData() function. In this model, the value returned for these items is the row or column number, depending on the header:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QVariant StringListModel::headerData(int section, Qt::Orientation orientation,
+                                     int role) const
+{
+    if (role != Qt::DisplayRole)
+        return QVariant();
+
+    if (orientation == Qt::Horizontal)
+        return QString("Column %1").arg(section);
+    else
+        return QString("Row %1").arg(section);
+}
+</pre> We only include an excerpt from the main() function for this short example:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QStringList numbers;
+numbers &lt;&lt; "One" &lt;&lt; "Two" &lt;&lt; "Three" &lt;&lt; "Four" &lt;&lt; "Five";
+
+QAbstractItemModel *model = new StringListModel(numbers);
+ ...
+QListView *view = new QListView;
+
+view-&gt;setWindowTitle("View onto a string list model");
+
+view-&gt;setModel(model);
+</pre> We create a string list to use with the model, and we supply it to the model when it is constructed. The information in the string list is made available to the view via the model. <br><center><img src="images/stringlistmodel.png"></center><br> This example shows that it can be easy to populate views with data from a simple model. The standard models and views planned for Qt 4 will make the process even easier, and the convenience widgets supplied provide support for the classic item-based approach.<a name="what-s-changed-since-qt-3"><h2>What's Changed Since Qt 3?</h2> The table and item view classes in Qt 3 implemented widgets that both stored data and presented it to the user. These classes were designed to be easy-to-use and consistent, but were sometimes difficult to customize and extend. <p>The equivalent classes in Qt 4 are designed to be extensible while remaining easy-to-use; the introduction of the model/view architecture ensures that they will be more consistent than their predecessors. The view classes provided can be summarized in the following way: <ul><li> <a href="../../../com/trolltech/qt/gui/QListView.html">QListView</a> class provides a view widget that looks similar to Qt 3's <a href="porting4.html">QListBox</a> widget, but displays data provided by a model. It can also be used to display icons in a similar way to Qt 3's <a href="porting4.html">QIconView</a>.</li><li> The <a href="../../../com/trolltech/qt/gui/QTableView.html">QTableView</a> class is a view widget that displays tabular data like Qt 3's <a href="porting4.html">QTable</a> widget, but uses data provided by a model.</li><li> The <a href="../../../com/trolltech/qt/gui/QTreeView.html">QTreeView</a> class provides a view widget that behaves like Qt 3's <a href="../../../com/trolltech/qt/gui/QListView.html">QListView</a> widget, except that it displays data provided by a model.</li></ul> Since the model takes responsibility for supplying items of data, and the view takes care of their presentation to the user, we do not require item classes to represent individual items. Delegates handle the painting and editing of data obtained from the model. <p>Qt continues to provide a number of classic item view widgets with familiar item-based interfaces that are not based on compatibility classes: <ul><li> The <a href="../../../com/trolltech/qt/gui/QListWidget.html">QListWidget</a> class provides a widget to display a list of items, as found in Qt 3's <a href="porting4.html">QListBox</a> class.</li><li> The <a href="../../../com/trolltech/qt/gui/QTreeWidget.html">QTreeWidget</a> class implements the equivalent of Qt 3's <a href="../../../com/trolltech/qt/gui/QListView.html">QListView</a> class.</li><li> The <a href="../../../com/trolltech/qt/gui/QTableWidget.html">QTableWidget</a> class provides comparable functionality to Qt 3's <a href="porting4.html">QTable</a> class.</li></ul> Each of the convenience classes have a corresponding item class: <a href="../../../com/trolltech/qt/gui/QListWidgetItem.html">QListWidgetItem</a>, <a href="../../../com/trolltech/qt/gui/QTreeWidgetItem.html">QTreeWidgetItem</a>, and <a href="../../../com/trolltech/qt/gui/QTableWidgetItem.html">QTableWidgetItem</a> are the Qt 4 equivalents of Qt 3's QListBoxItem, QListViewItem, and QTableItem respectively. <p>The move towards a model/view architecture presents both challenges and opportunities for developers. Although the approach may appear to be rather powerful for simple applications, it encourages greater reuse of components within applications.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
