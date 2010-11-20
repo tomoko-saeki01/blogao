@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Painter Paths Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Painter Paths Example</h1></center><p> The Painter Paths example shows how painter paths can be used to build complex shapes for rendering. <br><center><img src="images/painterpaths-example.png"></center><br> The <a href="../../../com/trolltech/qt/gui/QPainterPath.html">QPainterPath</a> class provides a container for painting operations, enabling graphical shapes to be constructed and reused. <p>A painter path is an object composed of a number of graphical building blocks (such as rectangles, ellipses, lines, and curves), and can be used for filling, outlining, and clipping. The main advantage of painter paths over normal drawing operations is that complex shapes only need to be created once, but they can be drawn many times using only calls to <a href="../../../com/trolltech/qt/gui/QPainter.html#drawPath(com.trolltech.qt.gui.QPainterPath)">QPainter::drawPath()</a>. <p>The example consists of two classes: <ul><li> The <tt>RenderArea</tt> class which is a custom widget displaying a single painter path.</li><li> The <tt>Window</tt> class which is the applications main window displaying several <tt>RenderArea</tt> widgets, and allowing the user to manipulate the painter paths' filling, pen, color and rotation angle.</li></ul> First we will review the <tt>Window</tt> class, then we will take a look at the <tt>RenderArea</tt> class.<a name="window-class-definition"><h2>Window Class Definition</h2> The <tt>Window</tt> class inherits <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>, and is the applications main window displaying several <tt>RenderArea</tt> widgets, and allowing the user to manipulate the painter paths' filling, pen, color and rotation angle. <pre class="snippet">
+class Window : public QWidget
+{
+    Q_OBJECT
+
+public:
+    Window();
+
+private slots:
+    void fillRuleChanged();
+    void fillGradientChanged();
+    void penColorChanged();
+</pre> We declare three private slots to respond to user input regarding filling and color: <tt>fillRuleChanged()</tt>, <tt>fillGradientChanged()</tt> and <tt>penColorChanged()</tt>. <p>When the user changes the pen width and the rotation angle, the new value is passed directly on to the <tt>RenderArea</tt> widgets using the QSpinBox::valueChanged() signal. The reason why we must implement slots to update the filling and color, is that <a href="../../../com/trolltech/qt/gui/QComboBox.html">QComboBox</a> doesn't provide a similar signal passing the new value as argument; so we need to retrieve the new value, or values, before we can update the <tt>RenderArea</tt> widgets. <pre class="snippet">
+private:
+    void populateWithColors(QComboBox *comboBox);
+    QVariant currentItemData(QComboBox *comboBox);
+</pre> We also declare a couple of private convenience functions: <tt>populateWithColors()</tt> populates a given <a href="../../../com/trolltech/qt/gui/QComboBox.html">QComboBox</a> with items corresponding to the color names Qt knows about, and <tt>currentItemData()</tt> returns the current item for a given <a href="../../../com/trolltech/qt/gui/QComboBox.html">QComboBox</a>. <pre class="snippet">
+    enum { NumRenderAreas = 9 };
+
+    RenderArea *renderAreas[NumRenderAreas];
+    QLabel *fillRuleLabel;
+    QLabel *fillGradientLabel;
+    QLabel *fillToLabel;
+    QLabel *penWidthLabel;
+    QLabel *penColorLabel;
+    QLabel *rotationAngleLabel;
+    QComboBox *fillRuleComboBox;
+    QComboBox *fillColor1ComboBox;
+    QComboBox *fillColor2ComboBox;
+    QSpinBox *penWidthSpinBox;
+    QComboBox *penColorComboBox;
+    QSpinBox *rotationAngleSpinBox;
+};
+</pre> Then we declare the various components of the main window widget. We also declare a convenience constant specifying the number of <tt>RenderArea</tt> widgets.<a name="window-class-implementation"><h2>Window Class Implementation</h2> In the implementation of the <tt>Window</tt> class we first declare the constant <tt>Pi</tt> with six significant figures:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+const float Pi = 3.14159f;
+</pre> In the constructor, we then define the various painter paths and create corresponding <tt>RenderArea</tt> widgets which will render the graphical shapes:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+Window::Window()
+{
+    QPainterPath rectPath;
+    rectPath.moveTo(20.0, 30.0);
+    rectPath.lineTo(80.0, 30.0);
+    rectPath.lineTo(80.0, 70.0);
+    rectPath.lineTo(20.0, 70.0);
+    rectPath.closeSubpath();
+</pre> We construct a rectangle with sharp corners using the <a href="../../../com/trolltech/qt/gui/QPainterPath.html#moveTo(com.trolltech.qt.core.QPointF)">QPainterPath::moveTo()</a> and <a href="../../../com/trolltech/qt/gui/QPainterPath.html#lineTo(com.trolltech.qt.core.QPointF)">QPainterPath::lineTo()</a> functions. <p><a href="../../../com/trolltech/qt/gui/QPainterPath.html#moveTo(com.trolltech.qt.core.QPointF)">QPainterPath::moveTo()</a> moves the current point to the point passed as argument. A painter path is an object composed of a number of graphical building blocks, i.e. subpaths. Moving the current point will also start a new subpath (implicitly closing the previously current path when the new one is started). The <a href="../../../com/trolltech/qt/gui/QPainterPath.html#lineTo(com.trolltech.qt.core.QPointF)">QPainterPath::lineTo()</a> function adds a straight line from the current point to the given end point. After the line is drawn, the current point is updated to be at the end point of the line. <p>We first move the current point starting a new subpath, and we draw three of the rectangle's sides. Then we call the <a href="../../../com/trolltech/qt/gui/QPainterPath.html#closeSubpath()">QPainterPath::closeSubpath()</a> function which draws a line to the beginning of the current subpath. A new subpath is automatically begun when the current subpath is closed. The current point of the new path is (0, 0). We could also have called <a href="../../../com/trolltech/qt/gui/QPainterPath.html#lineTo(com.trolltech.qt.core.QPointF)">QPainterPath::lineTo()</a> to draw the last line as well, and then explicitly start a new subpath using the <a href="../../../com/trolltech/qt/gui/QPainterPath.html#moveTo(com.trolltech.qt.core.QPointF)">QPainterPath::moveTo()</a> function. <p><a href="../../../com/trolltech/qt/gui/QPainterPath.html">QPainterPath</a> also provide the <a href="../../../com/trolltech/qt/gui/QPainterPath.html#addRect(com.trolltech.qt.core.QRectF)">QPainterPath::addRect()</a> convenience function, which adds a given rectangle to the path as a closed subpath. The rectangle is added as a clockwise set of lines. The painter path's current position after the rect has been added is at the top-left corner of the rectangle.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QPainterPath roundRectPath;
+    roundRectPath.moveTo(80.0, 35.0);
+    roundRectPath.arcTo(70.0, 30.0, 10.0, 10.0, 0.0, 90.0);
+    roundRectPath.lineTo(25.0, 30.0);
+    roundRectPath.arcTo(20.0, 30.0, 10.0, 10.0, 90.0, 90.0);
+    roundRectPath.lineTo(20.0, 65.0);
+    roundRectPath.arcTo(20.0, 60.0, 10.0, 10.0, 180.0, 90.0);
+    roundRectPath.lineTo(75.0, 70.0);
+    roundRectPath.arcTo(70.0, 60.0, 10.0, 10.0, 270.0, 90.0);
+    roundRectPath.closeSubpath();
+</pre> Then we construct a rectangle with rounded corners. As before, we use the <a href="../../../com/trolltech/qt/gui/QPainterPath.html#moveTo(com.trolltech.qt.core.QPointF)">QPainterPath::moveTo()</a> and <a href="../../../com/trolltech/qt/gui/QPainterPath.html#lineTo(com.trolltech.qt.core.QPointF)">QPainterPath::lineTo()</a> functions to draw the rectangle's sides. To create the rounded corners we use the <a href="../../../com/trolltech/qt/gui/QPainterPath.html#arcTo(com.trolltech.qt.core.QRectF, double, double)">QPainterPath::arcTo()</a> function. <p><a href="../../../com/trolltech/qt/gui/QPainterPath.html#arcTo(com.trolltech.qt.core.QRectF, double, double)">QPainterPath::arcTo()</a> creates an arc that occupies the given rectangle (specified by a <a href="../../../com/trolltech/qt/core/QRect.html">QRect</a> or the rectangle's coordinates), beginning at the given start angle and extending the given degrees counter-clockwise. Angles are specified in degrees. Clockwise arcs can be specified using negative angles. The function connects the current point to the starting point of the arc if they are not already connected.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QPainterPath ellipsePath;
+    ellipsePath.moveTo(80.0, 50.0);
+    ellipsePath.arcTo(20.0, 30.0, 60.0, 40.0, 0.0, 360.0);
+</pre> We also use the <a href="../../../com/trolltech/qt/gui/QPainterPath.html#arcTo(com.trolltech.qt.core.QRectF, double, double)">QPainterPath::arcTo()</a> function to construct the ellipse path. First we move the current point starting a new path. Then we call <a href="../../../com/trolltech/qt/gui/QPainterPath.html#arcTo(com.trolltech.qt.core.QRectF, double, double)">QPainterPath::arcTo()</a> with starting angle 0.0 and 360.0 degrees as the last argument, creating an ellipse. <p>Again, <a href="../../../com/trolltech/qt/gui/QPainterPath.html">QPainterPath</a> provides a convenience function ( <a href="../../../com/trolltech/qt/gui/QPainterPath.html#addEllipse(com.trolltech.qt.core.QPointF, double, double)">QPainterPath::addEllipse()</a>) which creates an ellipse within a given bounding rectangle and adds it to the painter path. If the current subpath is closed, a new subpath is started. The ellipse is composed of a clockwise curve, starting and finishing at zero degrees (the 3 o'clock position).<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QPainterPath piePath;
+    piePath.moveTo(50.0, 50.0);
+    piePath.arcTo(20.0, 30.0, 60.0, 40.0, 60.0, 240.0);
+    piePath.closeSubpath();
+</pre> When constructing the pie chart path we continue to use a combination of the mentioned functions: First we move the current point, starting a new subpath. Then we create a line from the center of the chart to the arc, and the arc itself. When we close the subpath, we implicitly construct the last line back to the center of the chart.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QPainterPath polygonPath;
+    polygonPath.moveTo(10.0, 80.0);
+    polygonPath.lineTo(20.0, 10.0);
+    polygonPath.lineTo(80.0, 30.0);
+    polygonPath.lineTo(90.0, 70.0);
+    polygonPath.closeSubpath();
+</pre> Constructing a polygon is equivalent to constructing a rectangle. <p><a href="../../../com/trolltech/qt/gui/QPainterPath.html">QPainterPath</a> also provide the <a href="../../../com/trolltech/qt/gui/QPainterPath.html#addPolygon(com.trolltech.qt.gui.QPolygonF)">QPainterPath::addPolygon()</a> convenience function which adds the given polygon to the path as a new subpath. Current position after the polygon has been added is the last point in polygon.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QPainterPath groupPath;
+    groupPath.moveTo(60.0, 40.0);
+    groupPath.arcTo(20.0, 20.0, 40.0, 40.0, 0.0, 360.0);
+    groupPath.moveTo(40.0, 40.0);
+    groupPath.lineTo(40.0, 80.0);
+    groupPath.lineTo(80.0, 80.0);
+    groupPath.lineTo(80.0, 40.0);
+    groupPath.closeSubpath();
+</pre> Then we create a path consisting of a group of subpaths: First we move the current point, and create a circle using the <a href="../../../com/trolltech/qt/gui/QPainterPath.html#arcTo(com.trolltech.qt.core.QRectF, double, double)">QPainterPath::arcTo()</a> function with starting angle 0.0, and 360 degrees as the last argument, as we did when we created the ellipse path. Then we move the current point again, starting a new subpath, and construct three sides of a square using the <a href="../../../com/trolltech/qt/gui/QPainterPath.html#lineTo(com.trolltech.qt.core.QPointF)">QPainterPath::lineTo()</a> function. <p>Now, when we call the <a href="../../../com/trolltech/qt/gui/QPainterPath.html#closeSubpath()">QPainterPath::closeSubpath()</a> fucntion the last side is created. Remember that the <a href="../../../com/trolltech/qt/gui/QPainterPath.html#closeSubpath()">QPainterPath::closeSubpath()</a> function draws a line to the beginning of the current subpath, i.e the square. <p><a href="../../../com/trolltech/qt/gui/QPainterPath.html">QPainterPath</a> provide a convenience function, <a href="../../../com/trolltech/qt/gui/QPainterPath.html#addPath(com.trolltech.qt.gui.QPainterPath)">QPainterPath::addPath()</a> which adds a given path to the path that calls the function.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QPainterPath textPath;
+    QFont timesFont("Times", 50);
+    timesFont.setStyleStrategy(QFont::ForceOutline);
+    textPath.addText(10, 70, timesFont, tr("Qt"));
+</pre> When creating the text path, we first create the font. Then we set the font's style strategy which tells the font matching algorithm what type of fonts should be used to find an appropriate default family. <a href="../../../com/trolltech/qt/gui/QFont.StyleStrategy.html">QFont::ForceOutline</a> forces the use of outline fonts. <p>To construct the text, we use the <a href="../../../com/trolltech/qt/gui/QPainterPath.html#addText(com.trolltech.qt.core.QPointF, com.trolltech.qt.gui.QFont, java.lang.String)">QPainterPath::addText()</a> function which adds the given text to the path as a set of closed subpaths created from the supplied font. The subpaths are positioned so that the left end of the text's baseline lies at the specified point.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QPainterPath bezierPath;
+    bezierPath.moveTo(20, 30);
+    bezierPath.cubicTo(80, 0, 50, 50, 80, 80);
+</pre> To create the Bezier path, we use the <a href="../../../com/trolltech/qt/gui/QPainterPath.html#cubicTo(com.trolltech.qt.core.QPointF, com.trolltech.qt.core.QPointF, com.trolltech.qt.core.QPointF)">QPainterPath::cubicTo()</a> function which adds a Bezier curve between the current point and the given end point with the given control point. After the curve is added, the current point is updated to be at the end point of the curve. <p>In this case we omit to close the subpath so that we only have a simple curve. But there is still a logical line from the curve's endpoint back to the beginning of the subpath; it becomes visible when filling the path as can be seen in the applications main window.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QPainterPath starPath;
+    starPath.moveTo(90, 50);
+    for (int i = 1; i &lt; 5; ++i) {
+        starPath.lineTo(50 + 40 * cos(0.8 * i * Pi),
+                        50 + 40 * sin(0.8 * i * Pi));
+    }
+    starPath.closeSubpath();
+</pre> The final path that we construct shows that you can use <a href="../../../com/trolltech/qt/gui/QPainterPath.html">QPainterPath</a> to construct rather complex shapes using only the previous mentioned <a href="../../../com/trolltech/qt/gui/QPainterPath.html#moveTo(com.trolltech.qt.core.QPointF)">QPainterPath::moveTo()</a>, <a href="../../../com/trolltech/qt/gui/QPainterPath.html#lineTo(com.trolltech.qt.core.QPointF)">QPainterPath::lineTo()</a> and <a href="../../../com/trolltech/qt/gui/QPainterPath.html#closeSubpath()">QPainterPath::closeSubpath()</a> functions.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    renderAreas[0] = new RenderArea(rectPath);
+    renderAreas[1] = new RenderArea(roundRectPath);
+    renderAreas[2] = new RenderArea(ellipsePath);
+    renderAreas[3] = new RenderArea(piePath);
+    renderAreas[4] = new RenderArea(polygonPath);
+    renderAreas[5] = new RenderArea(groupPath);
+    renderAreas[6] = new RenderArea(textPath);
+    renderAreas[7] = new RenderArea(bezierPath);
+    renderAreas[8] = new RenderArea(starPath);
+    Q_ASSERT(NumRenderAreas == 9);
+</pre> Now that we have created all the painter paths that we need, we create a corresponding <tt>RenderArea</tt> widget for each. In the end, we make sure that the number of render areas is correct using the Q_ASSERT() macro.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    fillRuleComboBox = new QComboBox;
+    fillRuleComboBox-&gt;addItem(tr("Odd Even"), Qt::OddEvenFill);
+    fillRuleComboBox-&gt;addItem(tr("Winding"), Qt::WindingFill);
+
+    fillRuleLabel = new QLabel(tr("Fill &Rule:"));
+    fillRuleLabel-&gt;setBuddy(fillRuleComboBox);
+</pre> Then we create the widgets associated with the painter paths' fill rule. <p>There are two available fill rules in Qt: The <a href="../../../com/trolltech/qt/core/Qt.FillRule.html">Qt::OddEvenFill</a> rule determine whether a point is inside the shape by drawing a horizontal line from the point to a location outside the shape, and count the number of intersections. If the number of intersections is an odd number, the point is inside the shape. This rule is the default. <p>The <a href="../../../com/trolltech/qt/core/Qt.FillRule.html">Qt::WindingFill</a> rule determine whether a point is inside the shape by drawing a horizontal line from the point to a location outside the shape. Then it determines whether the direction of the line at each intersection point is up or down. The winding number is determined by summing the direction of each intersection. If the number is non zero, the point is inside the shape. <p>The <a href="../../../com/trolltech/qt/core/Qt.FillRule.html">Qt::WindingFill</a> rule can in most cases be considered as the intersection of closed shapes.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    fillColor1ComboBox = new QComboBox;
+    populateWithColors(fillColor1ComboBox);
+    fillColor1ComboBox-&gt;setCurrentIndex(
+            fillColor1ComboBox-&gt;findText("mediumslateblue"));
+
+    fillColor2ComboBox = new QComboBox;
+    populateWithColors(fillColor2ComboBox);
+    fillColor2ComboBox-&gt;setCurrentIndex(
+            fillColor2ComboBox-&gt;findText("cornsilk"));
+
+    fillGradientLabel = new QLabel(tr("&Fill Gradient:"));
+    fillGradientLabel-&gt;setBuddy(fillColor1ComboBox);
+
+    fillToLabel = new QLabel(tr("to"));
+    fillToLabel-&gt;setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+    penWidthSpinBox = new QSpinBox;
+    penWidthSpinBox-&gt;setRange(0, 20);
+
+    penWidthLabel = new QLabel(tr("&Pen Width:"));
+    penWidthLabel-&gt;setBuddy(penWidthSpinBox);
+
+    penColorComboBox = new QComboBox;
+    populateWithColors(penColorComboBox);
+    penColorComboBox-&gt;setCurrentIndex(
+            penColorComboBox-&gt;findText("darkslateblue"));
+
+    penColorLabel = new QLabel(tr("Pen &Color:"));
+    penColorLabel-&gt;setBuddy(penColorComboBox);
+
+    rotationAngleSpinBox = new QSpinBox;
+    rotationAngleSpinBox-&gt;setRange(0, 359);
+    rotationAngleSpinBox-&gt;setWrapping(true);
+    rotationAngleSpinBox-&gt;setSuffix("\xB0");
+
+    rotationAngleLabel = new QLabel(tr("&Rotation Angle:"));
+    rotationAngleLabel-&gt;setBuddy(rotationAngleSpinBox);
+</pre> We also create the other widgets associated with the filling, the pen and the rotation angle.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    connect(fillRuleComboBox, SIGNAL(activated(int)),
+            this, SLOT(fillRuleChanged()));
+    connect(fillColor1ComboBox, SIGNAL(activated(int)),
+            this, SLOT(fillGradientChanged()));
+    connect(fillColor2ComboBox, SIGNAL(activated(int)),
+            this, SLOT(fillGradientChanged()));
+    connect(penColorComboBox, SIGNAL(activated(int)),
+            this, SLOT(penColorChanged()));
+
+    for (int i = 0; i &lt; NumRenderAreas; ++i) {
+        connect(penWidthSpinBox, SIGNAL(valueChanged(int)),
+                renderAreas[i], SLOT(setPenWidth(int)));
+        connect(rotationAngleSpinBox, SIGNAL(valueChanged(int)),
+                renderAreas[i], SLOT(setRotationAngle(int)));
+    }
+
+</pre> We connect the comboboxes activated() signals to the associated slots in the <tt>Window</tt> class, while we connect the spin boxes valueChanged() signal directly to the <tt>RenderArea</tt> widget's respective slots.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QGridLayout *topLayout = new QGridLayout;
+    for (int i = 0; i &lt; NumRenderAreas; ++i)
+        topLayout-&gt;addWidget(renderAreas[i], i / 3, i % 3);
+
+    QGridLayout *mainLayout = new QGridLayout;
+    mainLayout-&gt;addLayout(topLayout, 0, 0, 1, 4);
+    mainLayout-&gt;addWidget(fillRuleLabel, 1, 0);
+    mainLayout-&gt;addWidget(fillRuleComboBox, 1, 1, 1, 3);
+    mainLayout-&gt;addWidget(fillGradientLabel, 2, 0);
+    mainLayout-&gt;addWidget(fillColor1ComboBox, 2, 1);
+    mainLayout-&gt;addWidget(fillToLabel, 2, 2);
+    mainLayout-&gt;addWidget(fillColor2ComboBox, 2, 3);
+    mainLayout-&gt;addWidget(penWidthLabel, 3, 0);
+    mainLayout-&gt;addWidget(penWidthSpinBox, 3, 1, 1, 3);
+    mainLayout-&gt;addWidget(penColorLabel, 4, 0);
+    mainLayout-&gt;addWidget(penColorComboBox, 4, 1, 1, 3);
+    mainLayout-&gt;addWidget(rotationAngleLabel, 5, 0);
+    mainLayout-&gt;addWidget(rotationAngleSpinBox, 5, 1, 1, 3);
+    setLayout(mainLayout);
+</pre> We add the <tt>RenderArea</tt> widgets to a separate layout which we then add to the main layout along with the rest of the widgets.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    fillRuleChanged();
+    fillGradientChanged();
+    penColorChanged();
+    penWidthSpinBox-&gt;setValue(2);
+
+    setWindowTitle(tr("Painter Paths"));
+}
+</pre> Finally, we initialize the <tt>RenderArea</tt> widgets by calling the <tt>fillRuleChanged()</tt>, <tt>fillGradientChanged()</tt> and <tt>penColorChanged()</tt> slots, and we set the inital pen width and window title.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void Window::fillRuleChanged()
+{
+    Qt::FillRule rule = (Qt::FillRule)currentItemData(fillRuleComboBox).toInt();
+
+    for (int i = 0; i &lt; NumRenderAreas; ++i)
+        renderAreas[i]-&gt;setFillRule(rule);
+}
+<br>
+void Window::fillGradientChanged()
+{
+    QColor color1 = qvariant_cast&lt;QColor&gt;(currentItemData(fillColor1ComboBox));
+    QColor color2 = qvariant_cast&lt;QColor&gt;(currentItemData(fillColor2ComboBox));
+
+    for (int i = 0; i &lt; NumRenderAreas; ++i)
+        renderAreas[i]-&gt;setFillGradient(color1, color2);
+}
+<br>
+void Window::penColorChanged()
+{
+    QColor color = qvariant_cast&lt;QColor&gt;(currentItemData(penColorComboBox));
+
+    for (int i = 0; i &lt; NumRenderAreas; ++i)
+        renderAreas[i]-&gt;setPenColor(color);
+}
+</pre> The private slots are implemented to retrieve the new value, or values, from the associated comboboxes and update the RenderArea widgets. <p>First we determine the new value, or values, using the private <tt>currentItemData()</tt> function and the qvariant_cast() template function. Then we call the associated slot for each of the <tt>RenderArea</tt> widgets to update the painter paths.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void Window::populateWithColors(QComboBox *comboBox)
+{
+    QStringList colorNames = QColor::colorNames();
+    foreach (QString name, colorNames)
+        comboBox-&gt;addItem(name, QColor(name));
+}
+</pre> The <tt>populateWithColors()</tt> function populates the given combobox with items corresponding to the color names Qt knows about provided by the static <a href="../../../com/trolltech/qt/gui/QColor.html#colorNames()">QColor::colorNames()</a> function.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QVariant Window::currentItemData(QComboBox *comboBox)
+{
+    return comboBox-&gt;itemData(comboBox-&gt;currentIndex());
+}
+</pre> The <tt>currentItemData()</tt> function simply return the current item of the given combobox.<a name="renderarea-class-definition"><h2>RenderArea Class Definition</h2> The <tt>RenderArea</tt> class inherits <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>, and is a custom widget displaying a single painter path. <pre class="snippet">
+class RenderArea : public QWidget
+{
+    Q_OBJECT
+
+public:
+    RenderArea(const QPainterPath &path, QWidget *parent = 0);
+
+    QSize minimumSizeHint() const;
+    QSize sizeHint() const;
+
+public slots:
+    void setFillRule(Qt::FillRule rule);
+    void setFillGradient(const QColor &color1, const QColor &color2);
+    void setPenWidth(int width);
+    void setPenColor(const QColor &color);
+    void setRotationAngle(int degrees);
+
+protected:
+    void paintEvent(QPaintEvent *event);
+</pre> We declare several public slots updating the <tt>RenderArea</tt> widget's associated painter path. In addition we reimplement the <a href="../../../com/trolltech/qt/gui/QWidget.html#minimumSizeHint()">QWidget::minimumSizeHint()</a> and <a href="../../../com/trolltech/qt/gui/QWidget.html#sizeHint()">QWidget::sizeHint()</a> functions to give the <tt>RenderArea</tt> widget a reasonable size within our application, and we reimplement the <a href="../../../com/trolltech/qt/gui/QWidget.html#paintEvent(com.trolltech.qt.gui.QPaintEvent)">QWidget::paintEvent()</a> event handler to draw its painter path. <pre class="snippet">
+private:
+    QPainterPath path;
+    QColor fillColor1;
+    QColor fillColor2;
+    int penWidth;
+    QColor penColor;
+    int rotationAngle;
+};
+</pre> Each instance of the <tt>RenderArea</tt> class has a <a href="../../../com/trolltech/qt/gui/QPainterPath.html">QPainterPath</a>, a couple of fill colors, a pen width, a pen color and a rotation angle.<a name="renderarea-class-implementation"><h2>RenderArea Class Implementation</h2> The constructor takes a <a href="../../../com/trolltech/qt/gui/QPainterPath.html">QPainterPath</a> as argument (in addition to the optional <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> parent):<br><br>The following code example is written in c++.<br> <pre class="snippet">
+RenderArea::RenderArea(const QPainterPath &path, QWidget *parent)
+    : QWidget(parent), path(path)
+{
+    penWidth = 1;
+    rotationAngle = 0;
+    setBackgroundRole(QPalette::Base);
+}
+</pre> In the constructor we initialize the <tt>RenderArea</tt> widget with the <a href="../../../com/trolltech/qt/gui/QPainterPath.html">QPainterPath</a> parameter as well as initializing the pen width and rotation angle. We also set the widgets <a href="../../../com/trolltech/qt/gui/QWidget.html#backgroundRole()">background role</a>; <a href="../../../com/trolltech/qt/gui/QPalette.ColorRole.html">QPalette::Base</a> is typically white.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QSize RenderArea::minimumSizeHint() const
+{
+    return QSize(50, 50);
+}
+<br>
+QSize RenderArea::sizeHint() const
+{
+    return QSize(100, 100);
+}
+</pre> Then we reimplement the <a href="../../../com/trolltech/qt/gui/QWidget.html#minimumSizeHint()">QWidget::minimumSizeHint()</a> and <a href="../../../com/trolltech/qt/gui/QWidget.html#sizeHint()">QWidget::sizeHint()</a> functions to give the <tt>RenderArea</tt> widget a reasonable size within our application.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void RenderArea::setFillRule(Qt::FillRule rule)
+{
+    path.setFillRule(rule);
+    update();
+}
+<br>
+void RenderArea::setFillGradient(const QColor &color1, const QColor &color2)
+{
+    fillColor1 = color1;
+    fillColor2 = color2;
+    update();
+}
+<br>
+void RenderArea::setPenWidth(int width)
+{
+    penWidth = width;
+    update();
+}
+<br>
+void RenderArea::setPenColor(const QColor &color)
+{
+    penColor = color;
+    update();
+}
+<br>
+void RenderArea::setRotationAngle(int degrees)
+{
+    rotationAngle = degrees;
+    update();
+}
+</pre> The various public slots updates the <tt>RenderArea</tt> widget's painter path by setting the associated property and make a call to the <a href="../../../com/trolltech/qt/gui/QWidget.html#update()">QWidget::update()</a> function, forcing a repaint of the widget with the new rendering preferences. <p>The <a href="../../../com/trolltech/qt/gui/QWidget.html#update()">QWidget::update()</a> slot does not cause an immediate repaint; instead it schedules a paint event for processing when Qt returns to the main event loop.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void RenderArea::paintEvent(QPaintEvent *)
+{
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+</pre> A paint event is a request to repaint all or parts of the widget. The paintEvent() function is an event handler that can be reimplemented to receive the widget's paint events. We reimplement the event handler to render the <tt>RenderArea</tt> widget's painter path. <p>First, we create a <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a> for the <tt>RenderArea</tt> instance, and set the painter's render hints. The QPainter::RenderHints are used to specify flags to <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a> that may, or may not, be respected by any given engine. <a href="../../../com/trolltech/qt/gui/QPainter.RenderHint.html">QPainter::Antialiasing</a> indicates that the engine should anti-alias the edges of primitives if possible, i.e. put additional pixels around the original ones to smooth the edges.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    painter.scale(width() / 100.0, height() / 100.0);
+    painter.translate(50.0, 50.0);
+    painter.rotate(-rotationAngle);
+    painter.translate(-50.0, -50.0);
+
+</pre> Then we scale the <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a>'s coordinate system to ensure that the painter path is rendered in the right size, i.e that it grows with the <tt>RenderArea</tt> widget when the application is resized. When we constructed the various painter paths, they were all rnedered within a square with a 100 pixel width wich is equivalent to <tt>RenderArea::sizeHint()</tt>. The <a href="../../../com/trolltech/qt/gui/QPainter.html#scale(double, double)">QPainter::scale()</a> function scales the coordinate system by the <tt>RenderArea</tt> widget's current width and height divided by 100. <p>Now, when we are sure that the painter path has the right size, we can translate the coordinate system to make the painter path rotate around the <tt>RenderArea</tt> widget's center. After we have performed the rotation, we must remember to translate the coordinate system back again.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    painter.setPen(QPen(penColor, penWidth, Qt::SolidLine, Qt::RoundCap,
+                        Qt::RoundJoin));
+    QLinearGradient gradient(0, 0, 0, 100);
+    gradient.setColorAt(0.0, fillColor1);
+    gradient.setColorAt(1.0, fillColor2);
+    painter.setBrush(gradient);
+    painter.drawPath(path);
+}
+</pre> Then we set the <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a>'s pen with the instance's rendering preferences. We create a <a href="../../../com/trolltech/qt/gui/QLinearGradient.html">QLinearGradient</a> and set its colors corresponding to the <tt>RenderArea</tt> widget's fill colors. Finally, we set the <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a>'s brush (the gradient is automatically converted into a <a href="../../../com/trolltech/qt/gui/QBrush.html">QBrush</a>), and draw the <tt>RenderArea</tt> widget's painter path using the <a href="../../../com/trolltech/qt/gui/QPainter.html#drawPath(com.trolltech.qt.gui.QPainterPath)">QPainter::drawPath()</a> function.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

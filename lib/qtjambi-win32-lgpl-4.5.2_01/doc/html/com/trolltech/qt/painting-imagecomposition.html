@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Image Composition Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Image Composition Example</h1></center><p> The Image Composition example lets the user combine images together using any composition mode supported by <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a>, described in detail in <a href="../../../com/trolltech/qt/gui/QPainter.html">Composition Modes</a>. <br><center><img src="images/imagecomposition-example.png"></center><br><a name="setting-up-the-resource-file"><h2>Setting Up The Resource File</h2> The Image Composition example requires two source images, butterfly.png and checker.png that are embedded within imagecomposition.qrc. The file contains the following code:<pre class="snippet">&lt;!DOCTYPE RCC&gt;&lt;RCC version="1.0"&gt;
+&lt;qresource&gt;
+    &lt;file&gt;images/butterfly.png&lt;/file&gt;
+    &lt;file&gt;images/checker.png&lt;/file&gt;
+&lt;/qresource&gt;
+&lt;/RCC&gt;
+</pre> For more information on resource files, see <a href="resources.html">The Qt Resource System</a>.<a name="imagecomposer-class-definition"><h2>ImageComposer Class Definition</h2> The <tt>ImageComposer</tt> class is a subclass of <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> that implements three private slots, <tt>chooseSource()</tt>, <tt>chooseDestination()</tt>, and <tt>recalculateResult()</tt>. <pre class="snippet">
+class ImageComposer : public QWidget
+{
+    Q_OBJECT
+
+public:
+    ImageComposer();
+
+private slots:
+    void chooseSource();
+    void chooseDestination();
+    void recalculateResult();
+</pre> In addition, <tt>ImageComposer</tt> consists of five private functions, <tt>addOp()</tt>, <tt>chooseImage()</tt>, <tt>loadImage()</tt>, <tt>currentMode()</tt>, and <tt>imagePos()</tt>, as well as private instances of <a href="../../../com/trolltech/qt/gui/QToolButton.html">QToolButton</a>, <a href="../../../com/trolltech/qt/gui/QComboBox.html">QComboBox</a>, <a href="../../../com/trolltech/qt/gui/QLabel.html">QLabel</a>, and <a href="../../../com/trolltech/qt/gui/QImage.html">QImage</a>. <pre class="snippet">
+private:
+    void addOp(QPainter::CompositionMode mode, const QString &name);
+    void chooseImage(const QString &title, QImage *image, QToolButton *button);
+    void loadImage(const QString &fileName, QImage *image, QToolButton *button);
+    QPainter::CompositionMode currentMode() const;
+    QPoint imagePos(const QImage &image) const;
+
+    QToolButton *sourceButton;
+    QToolButton *destinationButton;
+    QComboBox *operatorComboBox;
+    QLabel *equalLabel;
+    QLabel *resultLabel;
+
+    QImage sourceImage;
+    QImage destinationImage;
+    QImage resultImage;
+};
+</pre><a name="imagecomposer-class-implementation"><h2>ImageComposer Class Implementation</h2> We declare a <a href="../../../com/trolltech/qt/core/QSize.html">QSize</a> object, <tt>resultSize</tt>, as a static constant with width and height equal to 200.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+static const QSize resultSize(200, 200);
+</pre> Within the constructor, we instantiate a <a href="../../../com/trolltech/qt/gui/QToolButton.html">QToolButton</a> object, <tt>sourceButton</tt> and set its <a href="../../../com/trolltech/qt/gui/QAbstractButton.html#setIconSize(com.trolltech.qt.core.QSize)">iconSize</a> property to <tt>resultSize</tt>. The <tt>operatorComboBox</tt> is instantiated and then populated using the <tt>addOp()</tt> function. This function accepts a <a href="../../../com/trolltech/qt/gui/QPainter.CompositionMode.html">QPainter::CompositionMode</a>, <tt>mode</tt>, and a QString, <tt>name</tt>, representing the name of the composition mode.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+ImageComposer::ImageComposer()
+{
+    sourceButton = new QToolButton;
+    sourceButton-&gt;setIconSize(resultSize);
+
+    operatorComboBox = new QComboBox;
+    addOp(QPainter::CompositionMode_SourceOver, tr("SourceOver"));
+    addOp(QPainter::CompositionMode_DestinationOver, tr("DestinationOver"));
+    addOp(QPainter::CompositionMode_Clear, tr("Clear"));
+    addOp(QPainter::CompositionMode_Source, tr("Source"));
+    addOp(QPainter::CompositionMode_Destination, tr("Destination"));
+    addOp(QPainter::CompositionMode_SourceIn, tr("SourceIn"));
+    addOp(QPainter::CompositionMode_DestinationIn, tr("DestinationIn"));
+    addOp(QPainter::CompositionMode_SourceOut, tr("SourceOut"));
+    addOp(QPainter::CompositionMode_DestinationOut, tr("DestinationOut"));
+    addOp(QPainter::CompositionMode_SourceAtop, tr("SourceAtop"));
+    addOp(QPainter::CompositionMode_DestinationAtop, tr("DestinationAtop"));
+    addOp(QPainter::CompositionMode_Xor, tr("Xor"));
+    addOp(QPainter::CompositionMode_Plus, tr("Plus"));
+    addOp(QPainter::CompositionMode_Multiply, tr("Multiply"));
+    addOp(QPainter::CompositionMode_Screen, tr("Screen"));
+    addOp(QPainter::CompositionMode_Overlay, tr("Overlay"));
+    addOp(QPainter::CompositionMode_Darken, tr("Darken"));
+    addOp(QPainter::CompositionMode_Lighten, tr("Lighten"));
+    addOp(QPainter::CompositionMode_ColorDodge, tr("ColorDodge"));
+    addOp(QPainter::CompositionMode_ColorBurn, tr("ColorBurn"));
+    addOp(QPainter::CompositionMode_HardLight, tr("HardLight"));
+    addOp(QPainter::CompositionMode_SoftLight, tr("SoftLight"));
+    addOp(QPainter::CompositionMode_Difference, tr("Difference"));
+    addOp(QPainter::CompositionMode_Exclusion, tr("Exclusion"));
+</pre> The <tt>destinationButton</tt> is instantiated and its <a href="../../../com/trolltech/qt/gui/QAbstractButton.html#setIconSize(com.trolltech.qt.core.QSize)">iconSize</a> property is set to <tt>resultSize</tt> as well. The <a href="../../../com/trolltech/qt/gui/QLabel.html">QLabel</a>s <tt>equalLabel</tt> and <tt>resultLabel</tt> are created and <tt>resultLabel</tt>'s <a href="../../../com/trolltech/qt/gui/QWidget.html#setMinimumWidth(int)">minimumWidth</a> is set.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    destinationButton = new QToolButton;
+    destinationButton-&gt;setIconSize(resultSize);
+
+    equalLabel = new QLabel(tr("="));
+
+    resultLabel = new QLabel;
+    resultLabel-&gt;setMinimumWidth(resultSize.width());
+</pre> We connect the following signals to their corresponding slots: <ul><li> <tt>sourceButton</tt>'s clicked() signal is connected to <tt>chooseSource()</tt>,</li><li> <tt>operatorComboBox</tt>'s activated() signal is connected to <tt>recalculateResult()</tt>, and</li><li> <tt>destinationButton</tt>'s clicked() signal is connected to <tt>chooseDestination()</tt>.</li></ul><br><br>The following code example is written in c++.<br> <pre class="snippet">
+    connect(sourceButton, SIGNAL(clicked()), this, SLOT(chooseSource()));
+    connect(operatorComboBox, SIGNAL(activated(int)),
+            this, SLOT(recalculateResult()));
+    connect(destinationButton, SIGNAL(clicked()),
+            this, SLOT(chooseDestination()));
+</pre> A <a href="../../../com/trolltech/qt/gui/QGridLayout.html">QGridLayout</a>, <tt>mainLayout</tt>, is used to place all the widgets. Note that <tt>mainLayout</tt>'s <a href="../../../com/trolltech/qt/gui/QLayout.html#setSizeConstraint(com.trolltech.qt.gui.QLayout.SizeConstraint)">sizeConstraint</a> property is set to <a href="../../../com/trolltech/qt/gui/QLayout.SizeConstraint.html">QLayout::SetFixedSize</a>, which means that <tt>ImageComposer</tt>'s size cannot be resized at all.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QGridLayout *mainLayout = new QGridLayout;
+    mainLayout-&gt;addWidget(sourceButton, 0, 0, 3, 1);
+    mainLayout-&gt;addWidget(operatorComboBox, 1, 1);
+    mainLayout-&gt;addWidget(destinationButton, 0, 2, 3, 1);
+    mainLayout-&gt;addWidget(equalLabel, 1, 3);
+    mainLayout-&gt;addWidget(resultLabel, 0, 4, 3, 1);
+    mainLayout-&gt;setSizeConstraint(QLayout::SetFixedSize);
+    setLayout(mainLayout);
+</pre> We create a <a href="../../../com/trolltech/qt/gui/QImage.html">QImage</a>, <tt>resultImage</tt>, and we invoke <tt>loadImage()</tt> twice to load both the image files in our imagecomposition.qrc file. Then, we set the <a href="../../../com/trolltech/qt/gui/QWidget.html#setWindowTitle(java.lang.String)">windowTitle</a> property to "Image Composition".<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    resultImage = QImage(resultSize, QImage::Format_ARGB32_Premultiplied);
+
+    loadImage(":/images/butterfly.png", &sourceImage, sourceButton);
+    loadImage(":/images/checker.png", &destinationImage, destinationButton);
+
+    setWindowTitle(tr("Image Composition"));
+}
+</pre> The <tt>chooseSource()</tt> and <tt>chooseDestination()</tt> functions are convenience functions that invoke <tt>chooseImage()</tt> with specific parameters.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void ImageComposer::chooseSource()
+{
+    chooseImage(tr("Choose Source Image"), &sourceImage, sourceButton);
+}
+<br>
+void ImageComposer::chooseDestination()
+{
+    chooseImage(tr("Choose Destination Image"), &destinationImage,
+                destinationButton);
+}
+</pre> The <tt>chooseImage()</tt> function loads an image of the user's choice, depending on the <tt>title</tt>, <tt>image</tt>, and <tt>button</tt>.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void ImageComposer::chooseImage(const QString &title, QImage *image,
+                                QToolButton *button)
+{
+    QString fileName = QFileDialog::getOpenFileName(this, title);
+    if (!fileName.isEmpty())
+        loadImage(fileName, image, button);
+}
+</pre> The <tt>recalculateResult()</tt> function is used to calculate amd display the result of combining the two images together with the user's choice of composition mode.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void ImageComposer::recalculateResult()
+{
+    QPainter::CompositionMode mode = currentMode();
+
+    QPainter painter(&resultImage);
+    painter.setCompositionMode(QPainter::CompositionMode_Source);
+    painter.fillRect(resultImage.rect(), Qt::transparent);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+    painter.drawImage(0, 0, destinationImage);
+    painter.setCompositionMode(mode);
+    painter.drawImage(0, 0, sourceImage);
+    painter.setCompositionMode(QPainter::CompositionMode_DestinationOver);
+    painter.fillRect(resultImage.rect(), Qt::white);
+    painter.end();
+
+    resultLabel-&gt;setPixmap(QPixmap::fromImage(resultImage));
+}
+</pre> The <tt>addOp()</tt> function adds an item to the <tt>operatorComboBox</tt> using <a href="../../../com/trolltech/qt/gui/QComboBox.html">QComboBox</a>'s <a href="../../../com/trolltech/qt/gui/QComboBox.html#addItem(com.trolltech.qt.gui.QIcon, java.lang.String)">addItem</a> function. This function accepts a <a href="../../../com/trolltech/qt/gui/QPainter.CompositionMode.html">QPainter::CompositionMode</a>, <tt>mode</tt>, and a QString, <tt>name</tt>. The rectangle is filled with Qt::Transparent and both the <tt>sourceImage</tt> and <tt>destinationImage</tt> are painted, before displaying it on <tt>resultLabel</tt>.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void ImageComposer::addOp(QPainter::CompositionMode mode, const QString &name)
+{
+    operatorComboBox-&gt;addItem(name, mode);
+}
+</pre> The <tt>loadImage()</tt> function paints a transparent background using <a href="../../../com/trolltech/qt/gui/QPainter.html#fillRect(com.trolltech.qt.core.QRect, com.trolltech.qt.gui.QBrush)">fillRect()</a> and draws <tt>image</tt> in a centralized position using <a href="../../../com/trolltech/qt/gui/QPainter.html#drawImage(com.trolltech.qt.core.QPoint, com.trolltech.qt.gui.QImage)">drawImage()</a>. This <tt>image</tt> is then set as the <tt>button</tt>'s icon.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void ImageComposer::loadImage(const QString &fileName, QImage *image,
+                              QToolButton *button)
+{
+    image-&gt;load(fileName);
+
+    QImage fixedImage(resultSize, QImage::Format_ARGB32_Premultiplied);
+    QPainter painter(&fixedImage);
+    painter.setCompositionMode(QPainter::CompositionMode_Source);
+    painter.fillRect(fixedImage.rect(), Qt::transparent);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+    painter.drawImage(imagePos(*image), *image);
+    painter.end();
+    button-&gt;setIcon(QPixmap::fromImage(fixedImage));
+
+    *image = fixedImage;
+
+    recalculateResult();
+}
+</pre> The <tt>currentMode()</tt> function returns the composition mode currently selected in <tt>operatorComboBox</tt>.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QPainter::CompositionMode ImageComposer::currentMode() const
+{
+    return (QPainter::CompositionMode)
+           operatorComboBox-&gt;itemData(operatorComboBox-&gt;currentIndex()).toInt();
+}
+</pre> We use the <tt>imagePos()</tt> function to ensure that images loaded onto the <a href="../../../com/trolltech/qt/gui/QToolButton.html">QToolButton</a> objects, <tt>sourceButton</tt> and <tt>destinationButton</tt>, are centralized.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QPoint ImageComposer::imagePos(const QImage &image) const
+{
+    return QPoint((resultSize.width() - image.width()) / 2,
+                  (resultSize.height() - image.height()) / 2);
+}
+</pre><a name="the-function"><h2>The main() Function</h2><tt>main()</tt> The <tt>main()</tt> function instantiates <a href="../../../com/trolltech/qt/gui/QApplication.html">QApplication</a> and <tt>ImageComposer</tt> and invokes its <a href="../../../com/trolltech/qt/gui/QWidget.html#show()">show()</a> function.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+int main(int argc, char *argv[])
+{
+    Q_INIT_RESOURCE(imagecomposition);
+
+    QApplication app(argc, argv);
+    ImageComposer composer;
+    composer.show();
+    return app.exec();
+}
+</pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
