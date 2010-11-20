@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Wrapper Example (ActiveQt)</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Wrapper Example (ActiveQt)</h1></center><p> The Wrapper example demonstrates how to export existing <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> classes as ActiveX controls, and the use of QAxFactory together with the <tt>QAXFACTORY_EXPORT()</tt> macro. ActiveX controls in this example are the standard button classes <a href="../../../com/trolltech/qt/gui/QPushButton.html">QPushButton</a>, <a href="../../../com/trolltech/qt/gui/QCheckBox.html">QCheckBox</a> and <a href="../../../com/trolltech/qt/gui/QRadioButton.html">QRadioButton</a> as provided by Qt.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+class ActiveQtFactory : public QAxFactory
+{
+public:
+    ActiveQtFactory( const QUuid &lib, const QUuid &app ) 
+	: QAxFactory( lib, app ) 
+    {}
+    QStringList featureList() const
+    {
+	QStringList list;
+	list &lt;&lt; "QCheckBox";
+	list &lt;&lt; "QRadioButton";
+	list &lt;&lt; "QPushButton";
+	list &lt;&lt; "QToolButton";
+	return list;
+    }
+    QObject *createObject(const QString &key)
+    {
+	if ( key == "QCheckBox" )
+	    return new QCheckBox(0);
+	if ( key == "QRadioButton" )
+	    return new QRadioButton(0);
+	if ( key == "QPushButton" )
+	    return new QPushButton(0 );
+	if ( key == "QToolButton" ) {
+	    QToolButton *tb = new QToolButton(0);
+//	    tb-&gt;setIcon( QPixmap(fileopen) );
+	    return tb;
+	}
+
+	return 0;
+    }
+    const QMetaObject *metaObject( const QString &key ) const
+    {
+	if ( key == "QCheckBox" )
+	    return &QCheckBox::staticMetaObject;
+	if ( key == "QRadioButton" )
+	    return &QRadioButton::staticMetaObject;
+	if ( key == "QPushButton" )
+	    return &QPushButton::staticMetaObject;
+	if ( key == "QToolButton" )
+	    return &QToolButton::staticMetaObject;
+
+	return 0;
+    }
+    QUuid classID( const QString &key ) const
+    {
+	if ( key == "QCheckBox" )
+	    return "{6E795DE9-872D-43CF-A831-496EF9D86C68}";
+	if ( key == "QRadioButton" )
+	    return "{AFCF78C8-446C-409A-93B3-BA2959039189}";
+	if ( key == "QPushButton" )
+	    return "{2B262458-A4B6-468B-B7D4-CF5FEE0A7092}";
+	if ( key == "QToolButton" )
+	    return "{7c0ffe7a-60c3-4666-bde2-5cf2b54390a1}";
+
+	return QUuid();
+    }
+    QUuid interfaceID( const QString &key ) const
+    {
+	if ( key == "QCheckBox" )
+	    return "{4FD39DD7-2DE0-43C1-A8C2-27C51A052810}";
+	if ( key == "QRadioButton" )
+	    return "{7CC8AE30-206C-48A3-A009-B0A088026C2F}";
+	if ( key == "QPushButton" )
+	    return "{06831CC9-59B6-436A-9578-6D53E5AD03D3}";
+	if ( key == "QToolButton" )
+	    return "{6726080f-d63d-4950-a366-9bf33e5cdf84}";
+
+	return QUuid();
+    }
+    QUuid eventsID( const QString &key ) const
+    {
+	if ( key == "QCheckBox" )
+	    return "{FDB6FFBE-56A3-4E90-8F4D-198488418B3A}";
+	if ( key == "QRadioButton" )
+	    return "{73EE4860-684C-4A66-BF63-9B9EFFA0CBE5}";
+	if ( key == "QPushButton" )
+	    return "{3CC3F17F-EA59-4B58-BBD3-842D467131DD}";
+	if ( key == "QToolButton" )
+	    return "{f4d421fd-4ead-4fd9-8a25-440766939639}";
+
+	return QUuid();
+    }
+};
+</pre> The factory implementation returns the list of supported controls, creates controls on request and provides information about the unique IDs of the COM classes and interfaces for each control.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+
+QAXFACTORY_EXPORT( ActiveQtFactory, "{3B756301-0075-4E40-8BE8-5A81DE2426B7}", "{AB068077-4924-406a-BBAF-42D91C8727DD}" )
+</pre> The factory is exported using the QAXFACTORY_EXPORT macro. <p>To build the example you must first build the <a href="qaxserver.html">QAxServer</a> library. Then run <tt>qmake</tt> and your make tool in <tt>examples/activeqt/wrapper</tt>. <p>The <a href="qaxserver-demo-wrapper.html">demonstration</a> requires a web browser that supports ActiveX controls, and scripting to be enabled. <pre class="snippet">
+&lt;SCRIPT LANGUAGE="VBScript"&gt;
+Sub ToolButton_Clicked()
+    RadioButton.text = InputBox( "Enter something", "Wrapper Demo" )
+End Sub
+
+Sub PushButton_clicked()
+    MsgBox( "Thank you!" )
+End Sub
+
+Sub CheckBox_toggled( state )
+    if state = 0 then
+        CheckBox.text = "Check me!"
+    else
+        CheckBox.text = "Uncheck me!"
+    end if
+End Sub
+&lt;/SCRIPT&gt;
+&lt;p /&gt;
+A QPushButton:&lt;br /&gt;
+&lt;object ID="PushButton" CLASSID="CLSID:2B262458-A4B6-468B-B7D4-CF5FEE0A7092"
+CODEBASE="http://qtsoftware.com/demos/wrapperax.cab"&gt;
+    &lt;PARAM NAME="text" VALUE="Click me!" /&gt;
+[Object not available! Did you forget to build and register the server?]
+&lt;/object&gt;&lt;br /&gt;
+
+&lt;p /&gt;
+A QCheckBox:&lt;br /&gt;
+&lt;object ID="CheckBox" CLASSID="CLSID:6E795de9-872d-43cf-a831-496ef9d86c68"
+CODEBASE="http://qtsoftware.com/demos/wrapperax.cab"&gt;
+    &lt;PARAM NAME="text" VALUE="Check me!" /&gt;
+[Object not available! Did you forget to build and register the server?]
+&lt;/object&gt;&lt;br /&gt;
+
+&lt;p /&gt;
+A QToolButton:&lt;br /&gt;
+&lt;object ID="ToolButton" CLASSID="CLSID:7c0ffe7a-60c3-4666-bde2-5cf2b54390a1"
+CODEBASE="http://qtsoftware.com/demos/wrapperax.cab"&gt;
+[Object not available! Did you forget to build and register the server?]
+&lt;/object&gt;&lt;br /&gt;
+
+&lt;p /&gt;
+A QRadioButton:&lt;br /&gt;
+&lt;object ID="RadioButton" CLASSID="CLSID:afcf78c8-446c-409a-93b3-ba2959039189"
+CODEBASE="http://qtsoftware.com/demos/wrapperax.cab"&gt;
+    &lt;PARAM NAME="text" VALUE="Tune me!" /&gt;
+[Object not available! Did you forget to build and register the server?]
+&lt;/object&gt;&lt;br /&gt;
+</pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
