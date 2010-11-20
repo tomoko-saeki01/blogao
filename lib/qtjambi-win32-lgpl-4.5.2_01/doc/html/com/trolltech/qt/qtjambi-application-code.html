@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Code for Application Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Code for Application Example</h1></center><p><pre class="snippet"><html style="white-space:pre-wrap;font-family:courier new"><font color=darkgreen><i>/****************************************************************************
+**
+** Copyright (C) 1992-2009 Nokia Corporation and/or its subsidiary(-ies).
+** All rights reserved.
+**
+** This file is part of Qt Jambi.
+**
+** 
+** Commercial Usage
+** Licensees holding valid Qt Commercial licenses may use this file in
+** accordance with the Qt Commercial License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Nokia.
+** 
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 2.1 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU Lesser General Public License version 2.1 requirements
+** will be met: http:<font color=darkgreen><i>//www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+</i></font>** 
+** In addition, as a special exception, Nokia gives you certain
+** additional rights. These rights are described in the Nokia Qt LGPL
+** Exception version 1.0, included in the file LGPL_EXCEPTION.txt in this
+** package.
+** 
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 3.0 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU General Public License version 3.0 requirements will be
+** met: http:<font color=darkgreen><i>//www.gnu.org/copyleft/gpl.html.
+</i></font>** 
+** If you are unsure which license is appropriate for your use, please
+** contact the sales department at qt-sales@nokia.com.
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/</i></font>
+
+<font color=blue>package</font> com.trolltech.examples;
+
+<font color=blue>import</font> com.trolltech.qt.<font color=darkmagenta><i>QVariant</i></font>;
+<font color=blue>import</font> com.trolltech.qt.core.*;
+<font color=blue>import</font> com.trolltech.qt.gui.*;
+
+@<font color=darkmagenta><i>QtJambiExample</i></font>(name = <font color=darkgreen><i>"Application"</i></font>)
+<font color=blue>public</font> <font color=blue>class</font> Application <font color=blue>extends</font> <font color=darkmagenta><i>QMainWindow</i></font> {
+
+    <font color=blue>private</font> String curFile;
+    <font color=blue>private</font> <font color=darkmagenta><i>QTextEdit</i></font> textEdit;
+    <font color=blue>private</font> <font color=darkmagenta><i>QMenu</i></font> fileMenu;
+    <font color=blue>private</font> <font color=darkmagenta><i>QMenu</i></font> editMenu;
+    <font color=blue>private</font> <font color=darkmagenta><i>QMenu</i></font> helpMenu;
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QToolBar</i></font> fileToolBar;
+    <font color=blue>private</font> <font color=darkmagenta><i>QToolBar</i></font> editToolBar;
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> newAct;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> openAct;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> saveAct;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> saveAsAct;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> exitAct;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> cutAct;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> copyAct;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> pasteAct;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> aboutAct;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> aboutQtJambiAct;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> aboutQtAct;
+
+    <font color=blue>private</font> String rsrcPath = <font color=darkgreen><i>"classpath:com/trolltech/images"</i></font>;
+
+    <font color=blue>public</font> Application()
+    {
+        <font color=darkmagenta><i>QMenuBar</i></font> menuBar = <font color=blue>new</font> <font color=darkmagenta><i>QMenuBar</i></font>();
+        setMenuBar(menuBar);
+
+        setWindowIcon(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(<font color=darkgreen><i>"classpath:com/trolltech/images/qt-logo.png"</i></font>));
+
+        textEdit = <font color=blue>new</font> <font color=darkmagenta><i>QTextEdit</i></font>();
+        setCentralWidget(textEdit);
+
+        <font color=blue>try</font> {
+            createActions();
+        } <font color=blue>catch</font> (Exception e) {
+            e.printStackTrace();
+        }
+        createMenus();
+        createToolBars();
+        createStatusBar();
+
+        readSettings();
+
+        textEdit.document().contentsChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"documentWasModified()"</i></font>);
+
+        setCurrentFile(<font color=darkgreen><i>""</i></font>);
+    }
+
+    @Override
+    <font color=blue>public</font> <font color=blue>void</font> closeEvent(<font color=darkmagenta><i>QCloseEvent</i></font> event)
+    {
+        <font color=blue>if</font> (maybeSave()) {
+            writeSettings();
+            event.accept();
+        } <font color=blue>else</font> {
+            event.ignore();
+        }
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> newFile()
+    {
+        <font color=blue>if</font> (maybeSave()) {
+            textEdit.clear();
+            setCurrentFile(<font color=darkgreen><i>""</i></font>);
+        }
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> open()
+    {
+        <font color=blue>if</font> (maybeSave()) {
+            String fileName = <font color=darkmagenta><i>QFileDialog</i></font>.getOpenFileName(<font color=blue>this</font>);
+            <font color=blue>if</font> (fileName.length() != 0)
+                loadFile(fileName);
+        }
+    }
+
+    <font color=blue>public</font> <font color=blue>boolean</font> save()
+    {
+        <font color=blue>if</font> (curFile.length() == 0) {
+            <font color=blue>return</font> saveAs();
+        } <font color=blue>else</font> {
+            <font color=blue>return</font> saveFile(curFile);
+        }
+    }
+
+    <font color=blue>public</font> <font color=blue>boolean</font> saveAs()
+    {
+        String fileName = <font color=darkmagenta><i>QFileDialog</i></font>.getSaveFileName(<font color=blue>this</font>);
+        <font color=blue>if</font> (fileName.length() == 0)
+            <font color=blue>return</font> false;
+
+        <font color=blue>return</font> saveFile(fileName);
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> about()
+    {
+        <font color=darkmagenta><i>QMessageBox</i></font>.about(<font color=blue>this</font>,
+                         tr(<font color=darkgreen><i>"About Application"</i></font>),
+                         tr(<font color=darkgreen><i>"The &lt;b&gt;Application&lt;/b&gt; example demonstrates how to "</i></font> +
+                            <font color=darkgreen><i>"write modern GUI applications using Qt, with a menu bar, "</i></font> +
+                            <font color=darkgreen><i>"toolbars, and a status bar."</i></font>));
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> documentWasModified()
+    {
+        setWindowModified(textEdit.document().isModified());
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> createActions()
+    {
+        newAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(rsrcPath + <font color=darkgreen><i>"/new.png"</i></font>), tr(<font color=darkgreen><i>"&New"</i></font>), <font color=blue>this</font>);
+        newAct.setShortcut(<font color=blue>new</font> <font color=darkmagenta><i>QKeySequence</i></font>(tr(<font color=darkgreen><i>"Ctrl+N"</i></font>)));
+        newAct.setStatusTip(tr(<font color=darkgreen><i>"Create a new file"</i></font>));
+        newAct.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"newFile()"</i></font>);
+
+        openAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(rsrcPath + <font color=darkgreen><i>"/open.png"</i></font>), tr(<font color=darkgreen><i>"&Open..."</i></font>), <font color=blue>this</font>);
+        openAct.setShortcut(tr(<font color=darkgreen><i>"Ctrl+O"</i></font>));
+        openAct.setStatusTip(tr(<font color=darkgreen><i>"Open an existing file"</i></font>));
+        openAct.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"open()"</i></font>);
+
+        saveAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(rsrcPath + <font color=darkgreen><i>"/save.png"</i></font>), tr(<font color=darkgreen><i>"&Save"</i></font>), <font color=blue>this</font>);
+        saveAct.setShortcut(tr(<font color=darkgreen><i>"Ctrl+S"</i></font>));
+        saveAct.setStatusTip(tr(<font color=darkgreen><i>"Save the document to disk"</i></font>));
+        saveAct.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"save()"</i></font>);
+
+        saveAsAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"Save &As..."</i></font>), <font color=blue>this</font>);
+        saveAsAct.setStatusTip(tr(<font color=darkgreen><i>"Save the document under a new name"</i></font>));
+        saveAsAct.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"saveAs()"</i></font>);
+
+        exitAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"E&xit"</i></font>), <font color=blue>this</font>);
+        exitAct.setShortcut(tr(<font color=darkgreen><i>"Ctrl+Q"</i></font>));
+        exitAct.setStatusTip(tr(<font color=darkgreen><i>"Exit the application"</i></font>));
+        exitAct.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"close()"</i></font>);
+
+        cutAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(rsrcPath + <font color=darkgreen><i>"/cut.png"</i></font>), tr(<font color=darkgreen><i>"Cu&t"</i></font>), <font color=blue>this</font>);
+        cutAct.setShortcut(tr(<font color=darkgreen><i>"Ctrl+X"</i></font>));
+        cutAct.setStatusTip(tr(<font color=darkgreen><i>"Cut the current selection's contents to the clipboard"</i></font>));
+        cutAct.triggered.connect(textEdit, <font color=darkgreen><i>"cut()"</i></font>);
+
+        copyAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(rsrcPath + <font color=darkgreen><i>"/copy.png"</i></font>), tr(<font color=darkgreen><i>"&Copy"</i></font>), <font color=blue>this</font>);
+        copyAct.setShortcut(tr(<font color=darkgreen><i>"Ctrl+C"</i></font>));
+        copyAct.setStatusTip(tr(<font color=darkgreen><i>"Copy the current selection's contents to the clipboard"</i></font>));
+        copyAct.triggered.connect(textEdit, <font color=darkgreen><i>"copy()"</i></font>);
+
+        pasteAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(rsrcPath + <font color=darkgreen><i>"/paste.png"</i></font>), tr(<font color=darkgreen><i>"&Paste"</i></font>), <font color=blue>this</font>);
+        pasteAct.setShortcut(tr(<font color=darkgreen><i>"Ctrl+V"</i></font>));
+        pasteAct.setStatusTip(tr(<font color=darkgreen><i>"Paste the clipboard's contents into the current selection"</i></font>));
+        pasteAct.triggered.connect(textEdit, <font color=darkgreen><i>"paste()"</i></font>);
+
+        aboutAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&About"</i></font>), <font color=blue>this</font>);
+        aboutAct.setStatusTip(tr(<font color=darkgreen><i>"Show the application's About box"</i></font>));
+        aboutAct.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"about()"</i></font>);
+
+        aboutQtJambiAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"About &Qt Jambi"</i></font>), <font color=blue>this</font>);
+        aboutQtJambiAct.setStatusTip(tr(<font color=darkgreen><i>"Show the Qt Jambi library's About box"</i></font>));
+        aboutQtJambiAct.triggered.connect(<font color=darkmagenta><i>QApplication</i></font>.instance(), <font color=darkgreen><i>"aboutQtJambi()"</i></font>);
+
+        aboutQtAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"About Q&t"</i></font>), <font color=blue>this</font>);
+        aboutQtAct.setStatusTip(tr(<font color=darkgreen><i>"Show the Qt library's About box"</i></font>));
+        aboutQtAct.triggered.connect(<font color=darkmagenta><i>QApplication</i></font>.instance(), <font color=darkgreen><i>"aboutQt()"</i></font>);
+
+
+        cutAct.setEnabled(false);
+        copyAct.setEnabled(false);
+        textEdit.copyAvailable.connect(cutAct, <font color=darkgreen><i>"setEnabled(boolean)"</i></font>);
+        textEdit.copyAvailable.connect(copyAct, <font color=darkgreen><i>"setEnabled(boolean)"</i></font>);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> createMenus()
+    {
+        fileMenu = menuBar().addMenu(tr(<font color=darkgreen><i>"&File"</i></font>));
+        fileMenu.addAction(newAct);
+        fileMenu.addAction(openAct);
+        fileMenu.addAction(saveAct);
+        fileMenu.addAction(saveAsAct);
+        fileMenu.addSeparator();
+        fileMenu.addAction(exitAct);
+
+        editMenu = menuBar().addMenu(tr(<font color=darkgreen><i>"&Edit"</i></font>));
+        editMenu.addAction(cutAct);
+        editMenu.addAction(copyAct);
+        editMenu.addAction(pasteAct);
+
+        menuBar().addSeparator();
+
+        helpMenu = menuBar().addMenu(tr(<font color=darkgreen><i>"&Help"</i></font>));
+        helpMenu.addAction(aboutAct);
+        helpMenu.addSeparator();
+        helpMenu.addAction(aboutQtJambiAct);
+        helpMenu.addAction(aboutQtAct);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> createToolBars()
+    {
+        fileToolBar = addToolBar(tr(<font color=darkgreen><i>"File"</i></font>));
+        fileToolBar.addAction(newAct);
+        fileToolBar.addAction(openAct);
+        fileToolBar.addAction(saveAct);
+
+        editToolBar = addToolBar(tr(<font color=darkgreen><i>"Edit"</i></font>));
+        editToolBar.addAction(cutAct);
+        editToolBar.addAction(copyAct);
+        editToolBar.addAction(pasteAct);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> createStatusBar()
+    {
+        statusBar().showMessage(tr(<font color=darkgreen><i>"Ready"</i></font>));
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> readSettings()
+    {
+        <font color=darkmagenta><i>QSettings</i></font> settings = <font color=blue>new</font> <font color=darkmagenta><i>QSettings</i></font>(<font color=darkgreen><i>"Nokia"</i></font>, <font color=darkgreen><i>"Application Example"</i></font>);
+        <font color=darkmagenta><i>QPoint</i></font> pos = <font color=darkmagenta><i>QVariant</i></font>.toPoint(settings.value(<font color=darkgreen><i>"pos"</i></font>, <font color=blue>new</font> <font color=darkmagenta><i>QPoint</i></font>(200, 200)));
+        <font color=darkmagenta><i>QSize</i></font> size = <font color=darkmagenta><i>QVariant</i></font>.toSize(settings.value(<font color=darkgreen><i>"size"</i></font>, <font color=blue>new</font> <font color=darkmagenta><i>QSize</i></font>(400, 400)));
+        resize(size);
+        move(pos);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> writeSettings()
+    {
+        <font color=darkmagenta><i>QSettings</i></font> settings = <font color=blue>new</font> <font color=darkmagenta><i>QSettings</i></font>(<font color=darkgreen><i>"Nokia"</i></font>, <font color=darkgreen><i>"Application Example"</i></font>);
+        settings.setValue(<font color=darkgreen><i>"pos"</i></font>, pos());
+        settings.setValue(<font color=darkgreen><i>"size"</i></font>, size());
+    }
+
+    <font color=blue>private</font> <font color=blue>boolean</font> maybeSave()
+    {
+        <font color=blue>if</font> (textEdit.document().isModified()) {
+            <font color=darkmagenta><i>QMessageBox</i></font>.StandardButton ret = <font color=darkmagenta><i>QMessageBox</i></font>.warning(<font color=blue>this</font>, tr(<font color=darkgreen><i>"Application"</i></font>),
+                                                                 tr(<font color=darkgreen><i>"The document has been modified.\n"</i></font> +
+                                                                    <font color=darkgreen><i>"Save your changes?"</i></font>),
+                                                                 <font color=blue>new</font> <font color=darkmagenta><i>QMessageBox</i></font>.StandardButtons(<font color=darkmagenta><i>QMessageBox</i></font>.StandardButton.Ok,
+                                                                                                 <font color=darkmagenta><i>QMessageBox</i></font>.StandardButton.Discard,
+                                                                                                 <font color=darkmagenta><i>QMessageBox</i></font>.StandardButton.Cancel));
+            <font color=blue>if</font> (ret == <font color=darkmagenta><i>QMessageBox</i></font>.StandardButton.Ok) {
+                <font color=blue>return</font> save();
+            } <font color=blue>else</font> <font color=blue>if</font> (ret == <font color=darkmagenta><i>QMessageBox</i></font>.StandardButton.Cancel) {
+                <font color=blue>return</font> false;
+            }
+        }
+        <font color=blue>return</font> true;
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> loadFile(String fileName)
+    {
+        <font color=darkmagenta><i>QFile</i></font> file = <font color=blue>new</font> <font color=darkmagenta><i>QFile</i></font>(fileName);
+        <font color=blue>if</font> (!file.open(<font color=blue>new</font> <font color=darkmagenta><i>QFile</i></font>.OpenMode(<font color=darkmagenta><i>QFile</i></font>.OpenModeFlag.ReadOnly, <font color=darkmagenta><i>QFile</i></font>.OpenModeFlag.Text))) {
+            <font color=darkmagenta><i>QMessageBox</i></font>.warning(<font color=blue>this</font>, tr(<font color=darkgreen><i>"Application"</i></font>), String.format(tr(<font color=darkgreen><i>"Cannot read file %1$s:\n%2$s."</i></font>), fileName, file.errorString()));
+            <font color=blue>return</font>;
+        }
+
+        <font color=darkmagenta><i>QTextStream</i></font> in = <font color=blue>new</font> <font color=darkmagenta><i>QTextStream</i></font>(file);
+        <font color=darkmagenta><i>QApplication</i></font>.setOverrideCursor(<font color=blue>new</font> <font color=darkmagenta><i>QCursor</i></font>(<font color=darkmagenta><i>Qt</i></font>.CursorShape.WaitCursor));
+        textEdit.setPlainText(in.readAll());
+        <font color=darkmagenta><i>QApplication</i></font>.restoreOverrideCursor();
+
+        setCurrentFile(fileName);
+        statusBar().showMessage(tr(<font color=darkgreen><i>"File loaded"</i></font>), 2000);
+    }
+
+    <font color=blue>public</font> <font color=blue>boolean</font> saveFile(String fileName)
+    {
+        <font color=darkmagenta><i>QFile</i></font> file = <font color=blue>new</font> <font color=darkmagenta><i>QFile</i></font>(fileName);
+        <font color=blue>if</font> (!file.open(<font color=blue>new</font> <font color=darkmagenta><i>QFile</i></font>.OpenMode(<font color=darkmagenta><i>QFile</i></font>.OpenModeFlag.WriteOnly, <font color=darkmagenta><i>QFile</i></font>.OpenModeFlag.Text))) {
+            <font color=darkmagenta><i>QMessageBox</i></font>.warning(<font color=blue>this</font>, tr(<font color=darkgreen><i>"Application"</i></font>), String.format(tr(<font color=darkgreen><i>"Cannot write file %1$s:\n%2$s."</i></font>), fileName, file.errorString()));
+            <font color=blue>return</font> false;
+        }
+
+        <font color=darkmagenta><i>QTextStream</i></font> out = <font color=blue>new</font> <font color=darkmagenta><i>QTextStream</i></font>(file);
+        <font color=darkmagenta><i>QApplication</i></font>.setOverrideCursor(<font color=blue>new</font> <font color=darkmagenta><i>QCursor</i></font>(<font color=darkmagenta><i>Qt</i></font>.CursorShape.WaitCursor));
+        out.writeString(textEdit.toPlainText());
+        <font color=darkmagenta><i>QApplication</i></font>.restoreOverrideCursor();
+
+        setCurrentFile(fileName);
+        statusBar().showMessage(tr(<font color=darkgreen><i>"File saved"</i></font>), 2000);
+        file.close();
+        <font color=blue>return</font> true;
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> setCurrentFile(String fileName)
+    {
+        curFile = fileName;
+        textEdit.document().setModified(false);
+        setWindowModified(false);
+
+        String shownName;
+        <font color=blue>if</font> (curFile.length() == 0)
+            shownName = <font color=darkgreen><i>"untitled.txt"</i></font>;
+        <font color=blue>else</font>
+            shownName = strippedName(curFile);
+
+        setWindowTitle(String.format(tr(<font color=darkgreen><i>"%1$s[*] - %2$s"</i></font>), shownName, tr(<font color=darkgreen><i>"Application"</i></font>)));
+    }
+
+    <font color=blue>private</font> <font color=blue>static</font> String strippedName(String fullFileName)
+    {
+        <font color=blue>return</font> <font color=blue>new</font> <font color=darkmagenta><i>QFileInfo</i></font>(fullFileName).fileName();
+    }
+
+    <font color=blue>public</font> <font color=blue>static</font> <font color=blue>void</font> main(String[] args) {
+        <font color=darkmagenta><i>QApplication</i></font>.initialize(args);
+
+        Application application = <font color=blue>new</font> Application();
+        application.show();
+
+        <font color=darkmagenta><i>QApplication</i></font>.exec();
+    }
+
+}
+</html></pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

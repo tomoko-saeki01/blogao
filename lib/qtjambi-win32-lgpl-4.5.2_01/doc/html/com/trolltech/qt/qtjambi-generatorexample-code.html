@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Code for Qt Jambi Generator Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Code for Qt Jambi Generator Example</h1></center><p> This is the Java code for the generator example. The the typesystem specification and C++ files are found in the <tt>generator_example</tt> directory in the directory where Qt Jambi was installed.<pre class="snippet"><html style="white-space:pre-wrap;font-family:courier new"><font color=darkgreen><i>/****************************************************************************
+**
+** Copyright (C) 1992-2009 Nokia Corporation and/or its subsidiary(-ies).
+** All rights reserved.
+**
+** This file is part of Qt Jambi.
+**
+** 
+** Commercial Usage
+** Licensees holding valid Qt Commercial licenses may use this file in
+** accordance with the Qt Commercial License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Nokia.
+** 
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 2.1 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU Lesser General Public License version 2.1 requirements
+** will be met: http:<font color=darkgreen><i>//www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+</i></font>** 
+** In addition, as a special exception, Nokia gives you certain
+** additional rights. These rights are described in the Nokia Qt LGPL
+** Exception version 1.0, included in the file LGPL_EXCEPTION.txt in this
+** package.
+** 
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 3.0 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU General Public License version 3.0 requirements will be
+** met: http:<font color=darkgreen><i>//www.gnu.org/copyleft/gpl.html.
+</i></font>** 
+** If you are unsure which license is appropriate for your use, please
+** contact the sales department at qt-sales@nokia.com.
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/</i></font>
+
+<font color=blue>package</font> com.trolltech.examples;
+
+<font color=blue>import</font> java.util.List;
+
+<font color=blue>import</font> com.trolltech.examples.generator.AbstractGameObjectInterface;
+<font color=blue>import</font> com.trolltech.examples.generator.Game;
+<font color=blue>import</font> com.trolltech.examples.generator.GameAction;
+<font color=blue>import</font> com.trolltech.examples.generator.GameAnimation;
+<font color=blue>import</font> com.trolltech.examples.generator.GameObject;
+<font color=blue>import</font> com.trolltech.examples.generator.GameScene;
+<font color=blue>import</font> com.trolltech.examples.generator.Point3D;
+<font color=blue>import</font> com.trolltech.qt.core.<font color=darkmagenta><i>QPointF</i></font>;
+<font color=blue>import</font> com.trolltech.qt.core.<font color=darkmagenta><i>QRectF</i></font>;
+<font color=blue>import</font> com.trolltech.qt.gui.<font color=darkmagenta><i>QApplication</i></font>;
+<font color=blue>import</font> com.trolltech.qt.gui.<font color=darkmagenta><i>QGraphicsView</i></font>;
+<font color=blue>import</font> com.trolltech.qt.gui.<font color=darkmagenta><i>QIcon</i></font>;
+<font color=blue>import</font> com.trolltech.qt.gui.<font color=darkmagenta><i>QImage</i></font>;
+<font color=blue>import</font> com.trolltech.qt.gui.<font color=darkmagenta><i>QPainterPath</i></font>;
+
+<font color=blue>class</font> InventoryAction <font color=blue>extends</font> GameAction
+{
+    @Override
+    <font color=blue>public</font> GameAction clone() {
+        <font color=blue>return</font> <font color=blue>new</font> InventoryAction();
+    }
+
+    @Override
+    <font color=blue>public</font> <font color=blue>boolean</font> perform(GameScene scene) {
+        <font color=blue>if</font> (objects().isEmpty()) {
+            List&lt;AbstractGameObjectInterface&gt; inventory = scene.egoInventory();
+
+            <font color=blue>if</font> (inventory.isEmpty()) {
+                scene.message(<font color=darkgreen><i>"Your pockets are empty"</i></font>);
+            } <font color=blue>else</font> {
+                String msg = <font color=darkgreen><i>"You are carrying:\n"</i></font>;
+                <font color=blue>for</font> (AbstractGameObjectInterface gameObject : inventory) {
+                    <font color=blue>if</font> (gameObject <font color=blue>instanceof</font> GameObject) {
+                        msg += ((GameObject) gameObject).description() + <font color=darkgreen><i>"\n"</i></font>;
+                    }
+                }
+
+                scene.message(msg);
+            }
+
+            <font color=blue>return</font> true;
+        } <font color=blue>else</font> {
+            <font color=blue>return</font> false;
+        }
+    }
+
+    <font color=blue>public</font> InventoryAction() {
+        <font color=blue>super</font>(Game.ActionType.resolve(Game.ActionType.UserAction.value()));
+    }
+}
+
+<font color=blue>class</font> ChickenObject <font color=blue>extends</font> GameObject {
+
+    <font color=blue>public</font> ChickenObject(GameScene scene, String name) {
+        <font color=blue>super</font>(scene, name);
+
+        used.connect(<font color=blue>this</font>, <font color=darkgreen><i>"youCantUseTheChicken()"</i></font>);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> youCantUseTheChicken() {
+        gameScene().message(<font color=darkgreen><i>"You can't use the rubber chicken for anything"</i></font>);
+    }
+}
+
+@<font color=darkmagenta><i>QtJambiExample</i></font>(name = <font color=darkgreen><i>"Generator Example"</i></font>)
+<font color=blue>public</font> <font color=blue>class</font> GeneratorExample <font color=blue>extends</font> GameScene {
+
+    <font color=blue>private</font> <font color=blue>static</font> <font color=blue>final</font> String resourcesLocation = <font color=darkgreen><i>"classpath:com/trolltech/examples/generator/images/"</i></font>;
+
+    <font color=blue>public</font> GeneratorExample()
+    {
+        <font color=blue>int</font> w = 0; <font color=blue>int</font> h = 0;
+
+        <font color=darkgreen><i>// Set up scene
+</i></font>        {
+            setCacheMode(<font color=darkmagenta><i>QGraphicsView</i></font>.CacheModeFlag.CacheBackground);
+            setDescription(<font color=darkgreen><i>"You are standing next to a restaurant and it is sunny outside."</i></font>);
+
+            <font color=darkmagenta><i>QImage</i></font> img = <font color=blue>new</font> <font color=darkmagenta><i>QImage</i></font>(resourcesLocation + <font color=darkgreen><i>"background.png"</i></font>);
+            setBackground(img);
+
+            setHorizon(250.0);
+            w = img.width(); h = img.height();
+            setSceneRect(<font color=blue>new</font> <font color=darkmagenta><i>QRectF</i></font>(0.0, 0.0, w, h));
+        }
+
+        <font color=darkgreen><i>// Player avatar
+</i></font>        setEgoObject(makeEgo(w, h));
+
+        <font color=darkgreen><i>// Inventory command
+</i></font>        grammar().addVerb(<font color=darkgreen><i>"inventory"</i></font>, <font color=blue>new</font> InventoryAction());
+        grammar().addVerb(<font color=darkgreen><i>"inv"</i></font>, <font color=blue>new</font> InventoryAction());
+
+
+        <font color=darkgreen><i>// Make boundary
+</i></font>        {
+            <font color=darkmagenta><i>QPainterPath</i></font> path = <font color=blue>new</font> <font color=darkmagenta><i>QPainterPath</i></font>(<font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(0, 305));
+            path.lineTo(<font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(306, 305));
+            path.lineTo(<font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(326, 293));
+            path.lineTo(<font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(357, 293));
+            path.lineTo(<font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(378, 305));
+            path.lineTo(<font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(635, 305));
+            path.lineTo(<font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(635, 200));
+            path.lineTo(<font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(0, 200));
+            path.closeSubpath();
+
+            GameObject boundary = <font color=blue>new</font> GameObject(<font color=blue>this</font>, <font color=darkgreen><i>"boundary"</i></font>);
+            boundary.setVisible(false);
+            boundary.setShape(path);
+            boundary.setFlags(Game.ObjectFlag.Blocking);
+
+
+            addGameObject(boundary);
+        }
+
+        <font color=darkgreen><i>// Make chicken
+</i></font>        {
+            GameObject chicken = <font color=blue>new</font> ChickenObject(<font color=blue>this</font>, <font color=darkgreen><i>"a rubber chicken with a pulley in the middle"</i></font>);
+
+            chicken.setDescription(<font color=darkgreen><i>"It's a rubber chicken with a pulley in the middle."</i></font>);
+            chicken.addName(<font color=darkgreen><i>"rubber chicken"</i></font>);
+            chicken.addName(<font color=darkgreen><i>"chicken"</i></font>);
+            chicken.addName(<font color=darkgreen><i>"rubber chicken with a pulley in the middle"</i></font>);
+            chicken.addName(<font color=darkgreen><i>"rubber chicken with pulley"</i></font>);
+            chicken.addName(<font color=darkgreen><i>"rubber chicken with pulley in the middle"</i></font>);
+            chicken.addName(<font color=darkgreen><i>"rubber chicken with pulley in middle"</i></font>);
+            chicken.addName(<font color=darkgreen><i>"chicken with a pulley in the middle"</i></font>);
+            chicken.addName(<font color=darkgreen><i>"chicken with pulley"</i></font>);
+            chicken.addName(<font color=darkgreen><i>"chicken with pulley in the middle"</i></font>);
+            chicken.addName(<font color=darkgreen><i>"chicken with pulley in middle"</i></font>);
+            chicken.setVisible(true);
+            chicken.setPosition(<font color=blue>new</font> Point3D(100.0, 330.0, 0.0));
+            chicken.setFlags(Game.ObjectFlag.Blocking, Game.ObjectFlag.CanPickUp);
+
+            GameAnimation a = <font color=blue>new</font> GameAnimation(Game.AnimationType.NoAnimation);
+            a.addFrame(<font color=blue>new</font> <font color=darkmagenta><i>QImage</i></font>(resourcesLocation + <font color=darkgreen><i>"chicken.png"</i></font>));
+            chicken.setAnimation(a);
+
+            addGameObject(chicken);
+        }
+
+        setWindowIcon(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(<font color=darkgreen><i>"classpath:com/trolltech/images/qt-logo.png"</i></font>));
+        setWindowTitle(tr(<font color=darkgreen><i>"Generator Example"</i></font>));
+
+        message(<font color=darkgreen><i>"Press any letter to write a command and enter when you are done. Use the arrow keys to move around."</i></font>
+                     +<font color=darkgreen><i>" Hit enter when you are done reading this message."</i></font>);
+    }
+
+    <font color=blue>private</font> GameAnimation makeAnimation(Game.AnimationType type, String nameTemplate, <font color=blue>int</font> startIdx, <font color=blue>int</font> endIdx) {
+        GameAnimation a = <font color=blue>new</font> GameAnimation(type);
+
+        a.setSpeed(100);
+        a.setLooping(true);
+
+        <font color=blue>for</font> (<font color=blue>int</font> i=startIdx; i&lt;=endIdx; ++i)
+            a.addFrame(<font color=blue>new</font> <font color=darkmagenta><i>QImage</i></font>(resourcesLocation + nameTemplate.replace(<font color=darkgreen><i>"#"</i></font>, <font color=blue>new</font> Integer(i).toString())));
+
+        <font color=blue>return</font> a;
+    }
+
+    <font color=blue>private</font> GameObject makeEgo(<font color=blue>int</font> w, <font color=blue>int</font> h) {
+        GameObject ego = <font color=blue>new</font> GameObject(<font color=blue>this</font>);
+
+        ego.setPosition(<font color=blue>new</font> Point3D(w / 2.0, 350.0, 0.0));
+        ego.setVisible(true);
+
+        ego.setAnimation(makeAnimation(Game.AnimationType.WalkingHorizontally, <font color=darkgreen><i>"walk#.png"</i></font>, 1, 4));
+        ego.setAnimation(makeAnimation(Game.AnimationType.StandingStill, <font color=darkgreen><i>"walk#.png"</i></font>, 2, 2));
+        ego.setAnimation(makeAnimation(Game.AnimationType.WalkingFromScreen, <font color=darkgreen><i>"walkaway#.png"</i></font>, 1, 2));
+        ego.setAnimation(makeAnimation(Game.AnimationType.WalkingToScreen, <font color=darkgreen><i>"walktowards#.png"</i></font>, 1, 2));
+
+        <font color=blue>return</font> ego;
+    }
+
+    <font color=blue>public</font> <font color=blue>static</font> <font color=blue>void</font> main(String[] args) {
+        <font color=darkmagenta><i>QApplication</i></font>.initialize(args);
+        GeneratorExample ex = <font color=blue>new</font> GeneratorExample();
+        ex.show();
+        <font color=darkmagenta><i>QApplication</i></font>.exec();
+
+    }
+
+}
+</html></pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

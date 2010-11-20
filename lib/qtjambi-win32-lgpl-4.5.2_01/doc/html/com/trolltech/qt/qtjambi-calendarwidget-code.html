@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Code for Calendar Widget Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Code for Calendar Widget Example</h1></center><p><pre class="snippet"><html style="white-space:pre-wrap;font-family:courier new"><font color=darkgreen><i>/****************************************************************************
+**
+** Copyright (C) 1992-2009 Nokia Corporation and/or its subsidiary(-ies).
+** All rights reserved.
+**
+** This file is part of Qt Jambi.
+**
+** 
+** Commercial Usage
+** Licensees holding valid Qt Commercial licenses may use this file in
+** accordance with the Qt Commercial License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Nokia.
+** 
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 2.1 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU Lesser General Public License version 2.1 requirements
+** will be met: http:<font color=darkgreen><i>//www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+</i></font>** 
+** In addition, as a special exception, Nokia gives you certain
+** additional rights. These rights are described in the Nokia Qt LGPL
+** Exception version 1.0, included in the file LGPL_EXCEPTION.txt in this
+** package.
+** 
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 3.0 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU General Public License version 3.0 requirements will be
+** met: http:<font color=darkgreen><i>//www.gnu.org/copyleft/gpl.html.
+</i></font>** 
+** If you are unsure which license is appropriate for your use, please
+** contact the sales department at qt-sales@nokia.com.
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/</i></font>
+
+<font color=blue>package</font> com.trolltech.examples;
+
+<font color=blue>import</font> com.trolltech.qt.gui.*;
+<font color=blue>import</font> com.trolltech.qt.core.*;
+
+<font color=blue>import</font> java.util.*;
+
+@<font color=darkmagenta><i>QtJambiExample</i></font> (name = <font color=darkgreen><i>"Calendar Widget"</i></font>)
+<font color=blue>public</font> <font color=blue>class</font> CalendarWidget <font color=blue>extends</font> <font color=darkmagenta><i>QWidget</i></font> {
+    <font color=blue>private</font> <font color=darkmagenta><i>QGroupBox</i></font> previewGroupBox;
+    <font color=blue>private</font> <font color=darkmagenta><i>QGridLayout</i></font> previewLayout;
+    <font color=blue>private</font> <font color=darkmagenta><i>QCalendarWidget</i></font> calendar;
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QGroupBox</i></font> generalOptionsGroupBox;
+    <font color=blue>private</font> <font color=darkmagenta><i>QLabel</i></font> localeLabel;
+    <font color=blue>private</font> <font color=darkmagenta><i>QLabel</i></font> firstDayLabel;
+    <font color=blue>private</font> <font color=darkmagenta><i>QLabel</i></font> selectionModeLabel;
+    <font color=blue>private</font> <font color=darkmagenta><i>QLabel</i></font> horizontalHeaderLabel;
+    <font color=blue>private</font> <font color=darkmagenta><i>QLabel</i></font> verticalHeaderLabel;
+    <font color=blue>private</font> <font color=darkmagenta><i>QComboBox</i></font> localeCombo;
+    <font color=blue>private</font> <font color=darkmagenta><i>QComboBox</i></font> firstDayCombo;
+    <font color=blue>private</font> <font color=darkmagenta><i>QComboBox</i></font> selectionModeCombo;
+    <font color=blue>private</font> <font color=darkmagenta><i>QCheckBox</i></font> gridCheckBox;
+    <font color=blue>private</font> <font color=darkmagenta><i>QCheckBox</i></font> navigationCheckBox;
+    <font color=blue>private</font> <font color=darkmagenta><i>QComboBox</i></font> horizontalHeaderCombo;
+    <font color=blue>private</font> <font color=darkmagenta><i>QComboBox</i></font> verticalHeaderCombo;
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QGroupBox</i></font> datesGroupBox;
+    <font color=blue>private</font> <font color=darkmagenta><i>QLabel</i></font> currentDateLabel;
+    <font color=blue>private</font> <font color=darkmagenta><i>QLabel</i></font> minimumDateLabel;
+    <font color=blue>private</font> <font color=darkmagenta><i>QLabel</i></font> maximumDateLabel;
+    <font color=blue>private</font> <font color=darkmagenta><i>QDateEdit</i></font> currentDateEdit;
+    <font color=blue>private</font> <font color=darkmagenta><i>QDateEdit</i></font> minimumDateEdit;
+    <font color=blue>private</font> <font color=darkmagenta><i>QDateEdit</i></font> maximumDateEdit;
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QGroupBox</i></font> textFormatsGroupBox;
+    <font color=blue>private</font> <font color=darkmagenta><i>QLabel</i></font> weekdayColorLabel;
+    <font color=blue>private</font> <font color=darkmagenta><i>QLabel</i></font> weekendColorLabel;
+    <font color=blue>private</font> <font color=darkmagenta><i>QLabel</i></font> headerTextFormatLabel;
+    <font color=blue>private</font> <font color=darkmagenta><i>QComboBox</i></font> weekdayColorCombo;
+    <font color=blue>private</font> <font color=darkmagenta><i>QComboBox</i></font> weekendColorCombo;
+    <font color=blue>private</font> <font color=darkmagenta><i>QComboBox</i></font> headerTextFormatCombo;
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QCheckBox</i></font> firstFridayCheckBox;
+    <font color=blue>private</font> <font color=darkmagenta><i>QCheckBox</i></font> mayFirstCheckBox;
+
+    <font color=blue>public</font> CalendarWidget() {
+        createPreviewGroupBox();
+        createGeneralOptionsGroupBox();
+        createDatesGroupBox();
+        createTextFormatsGroupBox();
+
+        <font color=darkmagenta><i>QGridLayout</i></font> layout = <font color=blue>new</font> <font color=darkmagenta><i>QGridLayout</i></font>();
+        layout.addWidget(previewGroupBox, 0, 0);
+        layout.addWidget(generalOptionsGroupBox, 0, 1);
+        layout.addWidget(datesGroupBox, 1, 0);
+        layout.addWidget(textFormatsGroupBox, 1, 1);
+        layout.setSizeConstraint(<font color=darkmagenta><i>QLayout</i></font>.SizeConstraint.SetFixedSize);
+        setLayout(layout);
+
+        previewLayout.setRowMinimumHeight(0, calendar.sizeHint().height());
+        previewLayout.setColumnMinimumWidth(0, calendar.sizeHint().width());
+
+        setWindowTitle(tr(<font color=darkgreen><i>"Calendar Widget"</i></font>));
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> localeChanged(<font color=blue>int</font> index) {
+        calendar.setLocale((<font color=darkmagenta><i>QLocale</i></font>) localeCombo.itemData(index));
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> firstDayChanged(<font color=blue>int</font> index) {
+        calendar.setFirstDayOfWeek((<font color=darkmagenta><i>Qt</i></font>.DayOfWeek) firstDayCombo.itemData(index));
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> selectionModeChanged(<font color=blue>int</font> index) {
+        calendar.setSelectionMode((<font color=darkmagenta><i>QCalendarWidget</i></font>.SelectionMode) selectionModeCombo.itemData(index));
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> horizontalHeaderChanged(<font color=blue>int</font> index) {
+        calendar.setHorizontalHeaderFormat((<font color=darkmagenta><i>QCalendarWidget</i></font>.HorizontalHeaderFormat)
+            horizontalHeaderCombo.itemData(index));
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> verticalHeaderChanged(<font color=blue>int</font> index) {
+        calendar.setVerticalHeaderFormat((<font color=darkmagenta><i>QCalendarWidget</i></font>.VerticalHeaderFormat)
+            verticalHeaderCombo.itemData(index));
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> selectedDateChanged() {
+        currentDateEdit.setDate(calendar.selectedDate());
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> minimumDateChanged(<font color=darkmagenta><i>QDate</i></font> date) {
+        calendar.setMinimumDate(date);
+        maximumDateEdit.setDate(calendar.maximumDate());
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> maximumDateChanged(<font color=darkmagenta><i>QDate</i></font> date) {
+        calendar.setMaximumDate(date);
+        minimumDateEdit.setDate(calendar.minimumDate());
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> weekdayFormatChanged() {
+        <font color=darkmagenta><i>QTextCharFormat</i></font> format = <font color=blue>new</font> <font color=darkmagenta><i>QTextCharFormat</i></font>();
+
+        format.setForeground(<font color=blue>new</font> <font color=darkmagenta><i>QBrush</i></font>((<font color=darkmagenta><i>QColor</i></font>) weekdayColorCombo.itemData(weekdayColorCombo.currentIndex())));
+        calendar.setWeekdayTextFormat(<font color=darkmagenta><i>Qt</i></font>.DayOfWeek.Monday, format);
+        calendar.setWeekdayTextFormat(<font color=darkmagenta><i>Qt</i></font>.DayOfWeek.Tuesday, format);
+        calendar.setWeekdayTextFormat(<font color=darkmagenta><i>Qt</i></font>.DayOfWeek.Wednesday, format);
+        calendar.setWeekdayTextFormat(<font color=darkmagenta><i>Qt</i></font>.DayOfWeek.Thursday, format);
+        calendar.setWeekdayTextFormat(<font color=darkmagenta><i>Qt</i></font>.DayOfWeek.Friday, format);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> weekendFormatChanged() {
+        <font color=darkmagenta><i>QTextCharFormat</i></font> format = <font color=blue>new</font> <font color=darkmagenta><i>QTextCharFormat</i></font>();
+
+        format.setForeground(<font color=blue>new</font> <font color=darkmagenta><i>QBrush</i></font>((<font color=darkmagenta><i>QColor</i></font>) weekendColorCombo.itemData(weekendColorCombo.currentIndex())));
+        calendar.setWeekdayTextFormat(<font color=darkmagenta><i>Qt</i></font>.DayOfWeek.Saturday, format);
+        calendar.setWeekdayTextFormat(<font color=darkmagenta><i>Qt</i></font>.DayOfWeek.Sunday, format);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> reformatHeaders() {
+        String text = headerTextFormatCombo.currentText();
+        <font color=darkmagenta><i>QTextCharFormat</i></font> format = <font color=blue>new</font> <font color=darkmagenta><i>QTextCharFormat</i></font>();
+
+        <font color=blue>if</font> (text.equals(tr(<font color=darkgreen><i>"Bold"</i></font>))) {
+            format.setFontWeight(<font color=darkmagenta><i>QFont</i></font>.Weight.Bold.value());
+        } <font color=blue>else</font> <font color=blue>if</font> (text.equals(tr(<font color=darkgreen><i>"Italic"</i></font>))) {
+            format.setFontItalic(true);
+        } <font color=blue>else</font> <font color=blue>if</font> (text.equals(tr(<font color=darkgreen><i>"Green"</i></font>))) {
+            format.setForeground(<font color=blue>new</font> <font color=darkmagenta><i>QBrush</i></font>(<font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(<font color=darkmagenta><i>Qt</i></font>.GlobalColor.green)));
+        }
+        calendar.setHeaderTextFormat(format);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> reformatCalendarPage() {
+        <font color=darkmagenta><i>QTextCharFormat</i></font> mayFirstFormat = <font color=blue>new</font> <font color=darkmagenta><i>QTextCharFormat</i></font>();
+        <font color=blue>if</font> (mayFirstCheckBox.isChecked())
+            mayFirstFormat.setForeground(<font color=blue>new</font> <font color=darkmagenta><i>QBrush</i></font>(<font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(<font color=darkmagenta><i>Qt</i></font>.GlobalColor.red)));
+
+        <font color=darkmagenta><i>QTextCharFormat</i></font> firstFridayFormat = <font color=blue>new</font> <font color=darkmagenta><i>QTextCharFormat</i></font>();
+        <font color=blue>if</font> (firstFridayCheckBox.isChecked())
+            firstFridayFormat.setForeground(<font color=blue>new</font> <font color=darkmagenta><i>QBrush</i></font>(<font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(<font color=darkmagenta><i>Qt</i></font>.GlobalColor.blue)));
+
+        <font color=darkmagenta><i>QDate</i></font> date = <font color=blue>new</font> <font color=darkmagenta><i>QDate</i></font>(calendar.yearShown(), calendar.monthShown(), 1);
+
+        calendar.setDateTextFormat(<font color=blue>new</font> <font color=darkmagenta><i>QDate</i></font>(date.year(), 5, 1), mayFirstFormat);
+
+        date.setDate(date.year(), date.month(), 1);
+        <font color=blue>while</font> (date.dayOfWeek() != <font color=darkmagenta><i>Qt</i></font>.DayOfWeek.Friday.value())
+            date = date.addDays(1);
+        calendar.setDateTextFormat(date, firstFridayFormat);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> createPreviewGroupBox() {
+        previewGroupBox = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(tr(<font color=darkgreen><i>"Preview"</i></font>));
+
+        calendar = <font color=blue>new</font> <font color=darkmagenta><i>QCalendarWidget</i></font>();
+        calendar.setMinimumDate(<font color=blue>new</font> <font color=darkmagenta><i>QDate</i></font>(1900, 1, 1));
+        calendar.setMaximumDate(<font color=blue>new</font> <font color=darkmagenta><i>QDate</i></font>(3000, 1, 1));
+        calendar.setGridVisible(true);
+
+        calendar.currentPageChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"reformatCalendarPage()"</i></font>);
+
+        previewLayout = <font color=blue>new</font> <font color=darkmagenta><i>QGridLayout</i></font>();
+        previewLayout.addWidget(calendar, 0, 0, <font color=darkmagenta><i>Qt</i></font>.AlignmentFlag.AlignCenter);
+        previewGroupBox.setLayout(previewLayout);
+
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> createGeneralOptionsGroupBox() {
+        generalOptionsGroupBox = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(tr(<font color=darkgreen><i>"General Options"</i></font>));
+
+        localeCombo = <font color=blue>new</font> <font color=darkmagenta><i>QComboBox</i></font>();
+        <font color=blue>int</font> curLocaleIndex = -1;
+        <font color=blue>int</font> index = 0;
+        <font color=blue>for</font> (<font color=darkmagenta><i>QLocale</i></font>.Language lang : <font color=darkmagenta><i>QLocale</i></font>.Language.values()) {
+            List&lt;<font color=darkmagenta><i>QLocale</i></font>.Country&gt; countries = <font color=darkmagenta><i>QLocale</i></font>.countriesForLanguage(lang);
+            <font color=blue>for</font> (<font color=blue>int</font> i = 0; i &lt; countries.size(); ++i) {
+                <font color=darkmagenta><i>QLocale</i></font>.Country country = countries.get(i);
+                String label = <font color=darkmagenta><i>QLocale</i></font>.languageToString(lang);
+                label += <font color=darkgreen><i>"/"</i></font>;
+                label += <font color=darkmagenta><i>QLocale</i></font>.countryToString(country);
+                <font color=darkmagenta><i>QLocale</i></font> locale = <font color=blue>new</font> <font color=darkmagenta><i>QLocale</i></font>(lang, country);
+                <font color=blue>if</font> (<font color=blue>this</font>.locale().language() == lang && <font color=blue>this</font>.locale().country() == country)
+                    curLocaleIndex = index;
+                localeCombo.addItem(label, locale);
+                ++index;
+            }
+        }
+        <font color=blue>if</font> (curLocaleIndex != -1)
+            localeCombo.setCurrentIndex(curLocaleIndex);
+        localeLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"&Locale"</i></font>));
+        localeLabel.setBuddy(localeCombo);
+
+        firstDayCombo = <font color=blue>new</font> <font color=darkmagenta><i>QComboBox</i></font>();
+        firstDayCombo.addItem(tr(<font color=darkgreen><i>"Sunday"</i></font>), <font color=darkmagenta><i>Qt</i></font>.DayOfWeek.Sunday);
+        firstDayCombo.addItem(tr(<font color=darkgreen><i>"Monday"</i></font>), <font color=darkmagenta><i>Qt</i></font>.DayOfWeek.Monday);
+        firstDayCombo.addItem(tr(<font color=darkgreen><i>"Tuesday"</i></font>), <font color=darkmagenta><i>Qt</i></font>.DayOfWeek.Tuesday);
+        firstDayCombo.addItem(tr(<font color=darkgreen><i>"Wednesday"</i></font>), <font color=darkmagenta><i>Qt</i></font>.DayOfWeek.Wednesday);
+        firstDayCombo.addItem(tr(<font color=darkgreen><i>"Thursday"</i></font>), <font color=darkmagenta><i>Qt</i></font>.DayOfWeek.Thursday);
+        firstDayCombo.addItem(tr(<font color=darkgreen><i>"Friday"</i></font>), <font color=darkmagenta><i>Qt</i></font>.DayOfWeek.Friday);
+        firstDayCombo.addItem(tr(<font color=darkgreen><i>"Saturday"</i></font>), <font color=darkmagenta><i>Qt</i></font>.DayOfWeek.Saturday);
+
+        firstDayLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"Wee&k starts on:"</i></font>));
+        firstDayLabel.setBuddy(firstDayCombo);
+
+        selectionModeCombo = <font color=blue>new</font> <font color=darkmagenta><i>QComboBox</i></font>();
+        selectionModeCombo.addItem(tr(<font color=darkgreen><i>"Single selection"</i></font>),
+                                   <font color=darkmagenta><i>QCalendarWidget</i></font>.SelectionMode.SingleSelection);
+        selectionModeCombo.addItem(tr(<font color=darkgreen><i>"None"</i></font>), <font color=darkmagenta><i>QCalendarWidget</i></font>.SelectionMode.NoSelection);
+
+        selectionModeLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"&Selection mode:"</i></font>));
+        selectionModeLabel.setBuddy(selectionModeCombo);
+
+        gridCheckBox = <font color=blue>new</font> <font color=darkmagenta><i>QCheckBox</i></font>(tr(<font color=darkgreen><i>"&Grid"</i></font>));
+        gridCheckBox.setChecked(calendar.isGridVisible());
+
+        navigationCheckBox = <font color=blue>new</font> <font color=darkmagenta><i>QCheckBox</i></font>(tr(<font color=darkgreen><i>"&Navigation bar"</i></font>));
+        navigationCheckBox.setChecked(true);
+
+        horizontalHeaderCombo = <font color=blue>new</font> <font color=darkmagenta><i>QComboBox</i></font>();
+        horizontalHeaderCombo.addItem(tr(<font color=darkgreen><i>"Single letter day names"</i></font>),
+                                       <font color=darkmagenta><i>QCalendarWidget</i></font>.HorizontalHeaderFormat.SingleLetterDayNames);
+        horizontalHeaderCombo.addItem(tr(<font color=darkgreen><i>"Short day names"</i></font>),
+                                       <font color=darkmagenta><i>QCalendarWidget</i></font>.HorizontalHeaderFormat.ShortDayNames);
+        horizontalHeaderCombo.addItem(tr(<font color=darkgreen><i>"None"</i></font>),
+                                       <font color=darkmagenta><i>QCalendarWidget</i></font>.HorizontalHeaderFormat.NoHorizontalHeader);
+        horizontalHeaderCombo.setCurrentIndex(1);
+
+        horizontalHeaderLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"&Horizontal header:"</i></font>));
+        horizontalHeaderLabel.setBuddy(horizontalHeaderCombo);
+
+        verticalHeaderCombo = <font color=blue>new</font> <font color=darkmagenta><i>QComboBox</i></font>();
+        verticalHeaderCombo.addItem(tr(<font color=darkgreen><i>"ISO week numbers"</i></font>),
+                                     <font color=darkmagenta><i>QCalendarWidget</i></font>.VerticalHeaderFormat.ISOWeekNumbers);
+        verticalHeaderCombo.addItem(tr(<font color=darkgreen><i>"None"</i></font>), <font color=darkmagenta><i>QCalendarWidget</i></font>.VerticalHeaderFormat.NoVerticalHeader);
+
+        verticalHeaderLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"&Vertical header:"</i></font>));
+        verticalHeaderLabel.setBuddy(verticalHeaderCombo);
+
+        localeCombo.currentIndexChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"localeChanged(int)"</i></font>);
+        firstDayCombo.currentIndexChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"firstDayChanged(int)"</i></font>);
+        selectionModeCombo.currentIndexChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"selectionModeChanged(int)"</i></font>);
+        gridCheckBox.toggled.connect(calendar, <font color=darkgreen><i>"setGridVisible(boolean)"</i></font>);
+        navigationCheckBox.toggled.connect(calendar, <font color=darkgreen><i>"setNavigationBarVisible(boolean)"</i></font>);
+        horizontalHeaderCombo.currentIndexChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"horizontalHeaderChanged(int)"</i></font>);
+        verticalHeaderCombo.currentIndexChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"verticalHeaderChanged(int)"</i></font>);
+
+        <font color=darkmagenta><i>QHBoxLayout</i></font> checkBoxLayout = <font color=blue>new</font> <font color=darkmagenta><i>QHBoxLayout</i></font>();
+        checkBoxLayout.addWidget(gridCheckBox);
+        checkBoxLayout.addStretch();
+        checkBoxLayout.addWidget(navigationCheckBox);
+
+        <font color=darkmagenta><i>QGridLayout</i></font> outerLayout = <font color=blue>new</font> <font color=darkmagenta><i>QGridLayout</i></font>();
+        outerLayout.addWidget(localeLabel, 0, 0);
+        outerLayout.addWidget(localeCombo, 0, 1);
+        outerLayout.addWidget(firstDayLabel, 1, 0);
+        outerLayout.addWidget(firstDayCombo, 1, 1);
+        outerLayout.addWidget(selectionModeLabel, 2, 0);
+        outerLayout.addWidget(selectionModeCombo, 2, 1);
+        outerLayout.addLayout(checkBoxLayout, 3, 0, 1, 2);
+        outerLayout.addWidget(horizontalHeaderLabel, 4, 0);
+        outerLayout.addWidget(horizontalHeaderCombo, 4, 1);
+        outerLayout.addWidget(verticalHeaderLabel, 5, 0);
+        outerLayout.addWidget(verticalHeaderCombo, 5, 1);
+        generalOptionsGroupBox.setLayout(outerLayout);
+
+        firstDayChanged(firstDayCombo.currentIndex());
+        selectionModeChanged(selectionModeCombo.currentIndex());
+        horizontalHeaderChanged(horizontalHeaderCombo.currentIndex());
+        verticalHeaderChanged(verticalHeaderCombo.currentIndex());
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> createDatesGroupBox() {
+        datesGroupBox = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(tr(<font color=darkgreen><i>"Dates"</i></font>));
+
+        minimumDateEdit = <font color=blue>new</font> <font color=darkmagenta><i>QDateEdit</i></font>();
+        minimumDateEdit.setDisplayFormat(<font color=darkgreen><i>"MMM d, yyyy"</i></font>);
+        minimumDateEdit.setDateRange(calendar.minimumDate(),
+                                      calendar.maximumDate());
+        minimumDateEdit.setDate(calendar.minimumDate());
+
+
+        minimumDateLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"&Minimum Date:"</i></font>));
+        minimumDateLabel.setBuddy(minimumDateEdit);
+
+        currentDateEdit = <font color=blue>new</font> <font color=darkmagenta><i>QDateEdit</i></font>();
+        currentDateEdit.setDisplayFormat(<font color=darkgreen><i>"MMM d, yyyy"</i></font>);
+        currentDateEdit.setDate(calendar.selectedDate());
+        currentDateEdit.setDateRange(calendar.minimumDate(),
+                                      calendar.maximumDate());
+
+        currentDateLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"&Current Date:"</i></font>));
+        currentDateLabel.setBuddy(currentDateEdit);
+
+        maximumDateEdit = <font color=blue>new</font> <font color=darkmagenta><i>QDateEdit</i></font>();
+        maximumDateEdit.setDisplayFormat(<font color=darkgreen><i>"MMM d, yyyy"</i></font>);
+        maximumDateEdit.setDateRange(calendar.minimumDate(),
+                                     calendar.maximumDate());
+        maximumDateEdit.setDate(calendar.maximumDate());
+
+        maximumDateLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"Ma&ximum Date:"</i></font>));
+        maximumDateLabel.setBuddy(maximumDateEdit);
+
+        currentDateEdit.dateChanged.connect(calendar, <font color=darkgreen><i>"setSelectedDate(QDate)"</i></font>);
+        calendar.selectionChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"selectedDateChanged()"</i></font>);
+        minimumDateEdit.dateChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"minimumDateChanged(QDate)"</i></font>);
+        maximumDateEdit.dateChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"maximumDateChanged(QDate)"</i></font>);
+
+        <font color=darkmagenta><i>QGridLayout</i></font> dateBoxLayout = <font color=blue>new</font> <font color=darkmagenta><i>QGridLayout</i></font>();
+        dateBoxLayout.addWidget(currentDateLabel, 1, 0);
+        dateBoxLayout.addWidget(currentDateEdit, 1, 1);
+        dateBoxLayout.addWidget(minimumDateLabel, 0, 0);
+        dateBoxLayout.addWidget(minimumDateEdit, 0, 1);
+        dateBoxLayout.addWidget(maximumDateLabel, 2, 0);
+        dateBoxLayout.addWidget(maximumDateEdit, 2, 1);
+        dateBoxLayout.setRowStretch(3, 1);
+
+        datesGroupBox.setLayout(dateBoxLayout);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> createTextFormatsGroupBox() {
+        textFormatsGroupBox = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(tr(<font color=darkgreen><i>"Text Formats"</i></font>));
+
+        weekdayColorCombo = createColorComboBox();
+        weekdayColorCombo.setCurrentIndex(
+                weekdayColorCombo.findText(tr(<font color=darkgreen><i>"Black"</i></font>)));
+
+        weekdayColorLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"&Weekday color:"</i></font>));
+        weekdayColorLabel.setBuddy(weekdayColorCombo);
+
+        weekendColorCombo = createColorComboBox();
+        weekendColorCombo.setCurrentIndex(
+                weekendColorCombo.findText(tr(<font color=darkgreen><i>"Red"</i></font>)));
+
+        weekendColorLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"Week&end color:"</i></font>));
+        weekendColorLabel.setBuddy(weekendColorCombo);
+
+        headerTextFormatCombo = <font color=blue>new</font> <font color=darkmagenta><i>QComboBox</i></font>();
+        headerTextFormatCombo.addItem(tr(<font color=darkgreen><i>"Bold"</i></font>));
+        headerTextFormatCombo.addItem(tr(<font color=darkgreen><i>"Italic"</i></font>));
+        headerTextFormatCombo.addItem(tr(<font color=darkgreen><i>"Plain"</i></font>));
+
+        headerTextFormatLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"&Header text:"</i></font>));
+        headerTextFormatLabel.setBuddy(headerTextFormatCombo);
+
+        firstFridayCheckBox = <font color=blue>new</font> <font color=darkmagenta><i>QCheckBox</i></font>(tr(<font color=darkgreen><i>"&First Friday in blue"</i></font>));
+
+        mayFirstCheckBox = <font color=blue>new</font> <font color=darkmagenta><i>QCheckBox</i></font>(tr(<font color=darkgreen><i>"May &1 in red"</i></font>));
+
+        weekdayColorCombo.currentIndexChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"weekdayFormatChanged()"</i></font>);
+        weekendColorCombo.currentIndexChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"weekendFormatChanged()"</i></font>);
+        headerTextFormatCombo.currentStringChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"reformatHeaders()"</i></font>);
+        firstFridayCheckBox.toggled.connect(<font color=blue>this</font>, <font color=darkgreen><i>"reformatCalendarPage()"</i></font>);
+        mayFirstCheckBox.toggled.connect(<font color=blue>this</font>, <font color=darkgreen><i>"reformatCalendarPage()"</i></font>);
+
+        <font color=darkmagenta><i>QHBoxLayout</i></font> checkBoxLayout = <font color=blue>new</font> <font color=darkmagenta><i>QHBoxLayout</i></font>();
+        checkBoxLayout.addWidget(firstFridayCheckBox);
+        checkBoxLayout.addStretch();
+        checkBoxLayout.addWidget(mayFirstCheckBox);
+
+        <font color=darkmagenta><i>QGridLayout</i></font> outerLayout = <font color=blue>new</font> <font color=darkmagenta><i>QGridLayout</i></font>();
+        outerLayout.addWidget(weekdayColorLabel, 0, 0);
+        outerLayout.addWidget(weekdayColorCombo, 0, 1);
+        outerLayout.addWidget(weekendColorLabel, 1, 0);
+        outerLayout.addWidget(weekendColorCombo, 1, 1);
+        outerLayout.addWidget(headerTextFormatLabel, 2, 0);
+        outerLayout.addWidget(headerTextFormatCombo, 2, 1);
+        outerLayout.addLayout(checkBoxLayout, 3, 0, 1, 2);
+        textFormatsGroupBox.setLayout(outerLayout);
+
+        weekdayFormatChanged();
+        weekendFormatChanged();
+        reformatHeaders();
+        reformatCalendarPage();
+    }
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QComboBox</i></font> createColorComboBox() {
+        <font color=darkmagenta><i>QComboBox</i></font> comboBox = <font color=blue>new</font> <font color=darkmagenta><i>QComboBox</i></font>();
+        comboBox.addItem(tr(<font color=darkgreen><i>"Red"</i></font>), <font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(<font color=darkmagenta><i>Qt</i></font>.GlobalColor.red));
+        comboBox.addItem(tr(<font color=darkgreen><i>"Blue"</i></font>), <font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(<font color=darkmagenta><i>Qt</i></font>.GlobalColor.blue));
+        comboBox.addItem(tr(<font color=darkgreen><i>"Black"</i></font>), <font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(<font color=darkmagenta><i>Qt</i></font>.GlobalColor.black));
+        comboBox.addItem(tr(<font color=darkgreen><i>"Magenta"</i></font>), <font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(<font color=darkmagenta><i>Qt</i></font>.GlobalColor.magenta));
+        <font color=blue>return</font> comboBox;
+    }
+
+    <font color=blue>public</font> <font color=blue>static</font> <font color=blue>void</font> main(String args[]) {
+        <font color=darkmagenta><i>QApplication</i></font>.initialize(args);
+
+        CalendarWidget widget = <font color=blue>new</font> CalendarWidget();
+        widget.show();
+
+        <font color=darkmagenta><i>QApplication</i></font>.exec();
+    }
+}
+</html></pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Tablet Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Tablet Example</h1></center><p> <b>Code</b>: <ul><li> <a href="qtjambi-tablet-code.html">Tablet.java</a></li></ul> This example shows how to use a Wacom tablet in Qt applications. <br><center><img src="images/tabletexample.png"></center><br> When you use a tablet with Qt applications, <a href="../../../com/trolltech/qt/gui/QTabletEvent.html">QTabletEvent</a>s are genarated. You need to reimplement the <a href="../../../com/trolltech/qt/gui/QWidget.html#tabletEvent(com.trolltech.qt.gui.QTabletEvent)">tabletEvent()</a> event handler if you want to handle tablet events. Events are generated when the device used for drawing enters and leaves the proximity of the tablet (i.e., when it is close but not pressed down on it), when a device is pushed down and released from it, and when a device is moved on the tablet. <p>The information available in <a href="../../../com/trolltech/qt/gui/QTabletEvent.html">QTabletEvent</a> depends on the device used. The tablet in this example has two different devices for drawing: a stylus and an airbrush. For both devices the event contains the position of the device, pressure on the tablet, vertical tilt, and horizontal tilt (i.e, the angle between the device and the perpendicular of the tablet). The airbrush has a finger wheel; the position of this is also available in the tablet event. <p>In this example we implement a drawing program. You can use the stylus to draw on the tablet as you use a pencil on paper. When you draw with the airbrush you get a spray of paint; the finger wheel is used to change the density of the spray. The pressure and tilt can change the alpha and saturation values of the <a href="../../../com/trolltech/qt/gui/QColor.html">QColor</a> and the width of the <a href="../../../com/trolltech/qt/gui/QPen.html">QPen</a> used for drawing. <p>The example consists of the following: <ul><li> The <tt>Tablet</tt> class inherits <a href="../../../com/trolltech/qt/gui/QMainWindow.html">QMainWindow</a> and creates the examples menus and connect their slots and signals.</li><li> The <tt>TabletCanvas</tt> class inherits <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> and receives tablet events. It uses the events to paint on a <a href="../../../com/trolltech/qt/gui/QImage.html">QImage</a>, which it draws onto itself.</li><li> The <tt>TabletApplication</tt> class inherits <a href="../../../com/trolltech/qt/gui/QApplication.html">QApplication</a>. This class handles tablet events that are not sent to <tt>tabletEvent()</tt>. We will look at this later.</li><li> The <tt>main()</tt> method creates a <tt>MainWindow</tt> and shows it as a top level window.</li></ul><a name="tablet-class"><h2>Tablet Class</h2> The <tt>Tablet</tt> class creates a <tt>TabletCanvas</tt> and sets it as its center widget. <pre class="snippet">
+public class Tablet extends QMainWindow
+{
+    public static TabletCanvas myCanvas;
+
+    private QAction brushColorAction;
+
+    private QActionGroup alphaChannelGroup;
+    private QAction alphaChannelPressureAction;
+    private QAction alphaChannelTiltAction;
+    private QAction noAlphaChannelAction;
+
+    private QActionGroup colorSaturationGroup;
+    private QAction colorSaturationVTiltAction;
+    private QAction colorSaturationHTiltAction;
+    private QAction colorSaturationPressureAction;
+    private QAction noColorSaturationAction;
+
+    private QActionGroup lineWidthGroup;
+    private QAction lineWidthPressureAction;
+    private QAction lineWidthTiltAction;
+    private QAction lineWidthFixedAction;
+
+    private QAction exitAction;
+    private QAction saveAction;
+    private QAction loadAction;
+</pre> The QActions let the user select if the tablets pressure and tilt should change the pen width, color alpha component and color saturation. The method <tt>createActions()</tt> creates all actions, and <tt>createMenus()</tt> sets up the menus with the actions. We have one <a href="../../../com/trolltech/qt/gui/QActionGroup.html">QActionGroup</a> for the actions that alter the alpha channel, color saturation and line width respectively. The action groups are connected to the <tt>alphaActionTriggered()</tt>, <tt>colorSaturationActiontriggered()</tt>, and <tt>lineWidthActionTriggered()</tt> slots, which calls methodss in <tt>myCanvas</tt>. <p>We start with a look at the constructor <tt>Tablet()</tt>: <pre class="snippet">
+    public Tablet()
+    {
+        myCanvas = new TabletCanvas();
+
+        createActions();
+        createMenus();
+
+        myCanvas.setColor(new QColor(Qt.GlobalColor.red));
+        myCanvas.setLineWidthType(LineWidthType.LineWidthPressure);
+        myCanvas.setAlphaChannelType(AlphaChannelType.NoAlpha);
+        myCanvas.setColorSaturationType(ColorSaturationType.NoSaturation);
+
+        setWindowTitle(tr("Tablet Example"));
+        setCentralWidget(myCanvas);
+    }
+</pre> In the constructor we create the canvas, actions, and menus. We set the canvas as the center widget. We also initialize the canvas to match the state of our menus and start drawing with a red color. <p>Here is the implementation of <tt>brushColorAct()</tt>: <pre class="snippet">
+    public void brushColorAct()
+    {
+        QColor color = QColorDialog.getColor(myCanvas.color());
+
+        if (color.isValid())
+            myCanvas.setColor(color);
+    }
+</pre> We let the user pick a color with a <a href="../../../com/trolltech/qt/gui/QColorDialog.html">QColorDialog</a>. If it is valid, we set a new drawing color with <tt>setColor()</tt>. <p>Here is the implementation of <tt>alphaActionTriggered()</tt>: <pre class="snippet">
+    public void alphaActionTriggered(QAction action)
+    {
+        if (action.equals(alphaChannelPressureAction)) {
+            myCanvas.setAlphaChannelType(AlphaChannelType.AlphaPressure);
+        } else if (action.equals(alphaChannelTiltAction)) {
+            myCanvas.setAlphaChannelType(AlphaChannelType.AlphaTilt);
+        } else {
+            myCanvas.setAlphaChannelType(AlphaChannelType.NoAlpha);
+        }
+    }
+</pre> The <tt>TabletCanvas</tt> class supports two ways by which the alpha channel of the drawing color can be changed: tablet pressure and tilt. We have one action for each and an action if the alpha channel should not be changed. <p>Here is the implementation of <tt>lineWidthActionTriggered()</tt>: <pre class="snippet">
+    public void lineWidthActionTriggered(QAction action)
+    {
+        if (action.equals(lineWidthPressureAction)) {
+            myCanvas.setLineWidthType(LineWidthType.LineWidthPressure);
+        } else if (action.equals(lineWidthTiltAction)) {
+            myCanvas.setLineWidthType(LineWidthType.LineWidthTilt);
+        } else {
+            myCanvas.setLineWidthType(LineWidthType.NoLineWidth);
+        }
+    }
+</pre> We check which action is selected in <tt>lineWidthGroup</tt>, and set how the canvas should change the drawing line width. <p>Here is the implementation of <tt>saturationActionTriggered()</tt>: <pre class="snippet">
+    public void saturationActionTriggered(QAction action)
+    {
+        if (action.equals(colorSaturationVTiltAction)) {
+            myCanvas.setColorSaturationType(ColorSaturationType.SaturationVTilt);
+        } else if (action.equals(colorSaturationHTiltAction)) {
+            myCanvas.setColorSaturationType(ColorSaturationType.SaturationHTilt);
+        } else if (action.equals(colorSaturationPressureAction)) {
+            myCanvas.setColorSaturationType(ColorSaturationType.SaturationPressure);
+        } else {
+            myCanvas.setColorSaturationType(ColorSaturationType.NoSaturation);
+        }
+    }
+</pre> We check which action is selected in <tt>colorSaturationGroup</tt>, and set how the canvas should change the color saturation of the drawing color. <p>Here is the implementation of <tt>saveAct()</tt>: <pre class="snippet">
+    public void saveAct()
+    {
+        String path = QDir.currentPath() + tr("/untitled.png");
+        String fileName = QFileDialog.getSaveFileName(this, tr("Save Picture"),
+                                 path);
+
+        if (!myCanvas.saveImage(fileName))
+            QMessageBox.information(this, tr("Error Saving Picture"),
+                                          tr("Could not save the image"));
+    }
+</pre> We use the <a href="../../../com/trolltech/qt/gui/QFileDialog.html">QFileDialog</a> to let the user select a file to save the drawing in. It is the <tt>TabletCanvas</tt> that save the drawing, so we call its <tt>saveImage()</tt> method. <p>Here is the implementation of <tt>loadAct()</tt>: <pre class="snippet">
+    public void loadAct()
+    {
+        String fileName = QFileDialog.getOpenFileName(this, tr("Open Picture"),
+                                                            QDir.currentPath());
+
+        if (!myCanvas.loadImage(fileName))
+            QMessageBox.information(this, tr("Error Opening Picture"),
+                                          tr("Could not open picture"));
+    }
+</pre> We let the user select the image file to be opened with a <a href="../../../com/trolltech/qt/gui/QFileDialog.html">QFileDialog</a>; we then ask the canvas to load the image with <tt>loadImage()</tt>. <p>Here is the implementation of <tt>aboutAct()</tt>: <pre class="snippet">
+    public void aboutAct()
+    {
+        QMessageBox.about(this, tr("About Tablet Example"),
+                       tr("This example shows use of a Wacom tablet in Jambi Qt"));
+    }
+</pre> We show a message box with a short description of the example. <p><tt>createActions()</tt> creates all actions and action groups of the example. We look at the creation of one action group and its actions. See the <a href="qtjambi-application.html">application example</a> if you want a high-level introduction to QActions. <p>Here is the implementation of <tt>createActions</tt>: <pre class="snippet">
+    private void createActions()
+    {
+...
+        alphaChannelPressureAction = new QAction(tr("&Pressure"), this);
+        alphaChannelPressureAction.setCheckable(true);
+
+        alphaChannelTiltAction = new QAction(tr("&Tilt"), this);
+        alphaChannelTiltAction.setCheckable(true);
+
+        noAlphaChannelAction = new QAction(tr("No Alpha Channel"), this);
+        noAlphaChannelAction.setCheckable(true);
+        noAlphaChannelAction.setChecked(true);
+
+        alphaChannelGroup = new QActionGroup(this);
+        alphaChannelGroup.addAction(alphaChannelPressureAction);
+        alphaChannelGroup.addAction(alphaChannelTiltAction);
+        alphaChannelGroup.addAction(noAlphaChannelAction);
+        alphaChannelGroup.triggered.connect(this, "alphaActionTriggered(QAction)");
+
+</pre> We want the user to be able to choose if the drawing color's alpha component should be changed by the tablet pressure or tilt. We have one action for each choice and an action if the alpha channel is not to be changed, i.e, the color is opaque. We make the actions checkable; the <tt>alphaChannelGroup</tt> will then ensure that only one of the actions are checked at any time. The <tt>triggered()</tt> signal is emitted when an action is checked.... <pre class="snippet">
+    }
+</pre> Here is the implementation of <tt>createMenus()</tt>: <pre class="snippet">
+    private void createMenus()
+    {
+        fileMenu = menuBar().addMenu(tr("&File"));
+        fileMenu.addAction(loadAction);
+        fileMenu.addAction(saveAction);
+        fileMenu.addSeparator();
+        fileMenu.addAction(exitAction);
+
+        brushMenu = menuBar().addMenu(tr("&Brush"));
+        brushMenu.addAction(brushColorAction);
+
+        tabletMenu = menuBar().addMenu(tr("&Tablet"));
+
+        lineWidthMenu = tabletMenu.addMenu(tr("&Line Width"));
+        lineWidthMenu.addAction(lineWidthPressureAction);
+        lineWidthMenu.addAction(lineWidthTiltAction);
+        lineWidthMenu.addAction(lineWidthFixedAction);
+
+        alphaChannelMenu = tabletMenu.addMenu(tr("&Alpha Channel"));
+        alphaChannelMenu.addAction(alphaChannelPressureAction);
+        alphaChannelMenu.addAction(alphaChannelTiltAction);
+        alphaChannelMenu.addAction(noAlphaChannelAction);
+
+        colorSaturationMenu = tabletMenu.addMenu(tr("&Color Saturation"));
+        colorSaturationMenu.addAction(colorSaturationVTiltAction);
+        colorSaturationMenu.addAction(colorSaturationHTiltAction);
+        colorSaturationMenu.addAction(noColorSaturationAction);
+
+        helpMenu = menuBar().addMenu("&Help");
+        helpMenu.addAction(aboutAction);
+        helpMenu.addAction(aboutQtAction);
+    }
+</pre> We create the menus of the example and add the actions to them.<a name="tabletcanvas-class"><h2>TabletCanvas Class</h2> The <tt>TabletCanvas</tt> class provides a surface on which the user can draw with a tablet. <pre class="snippet">
+    class TabletCanvas extends QWidget
+    {
+        private AlphaChannelType alphaChannelType;
+        private ColorSaturationType colorSaturationType;
+        private LineWidthType lineWidthType;
+        private QTabletEvent.TabletDevice myTabletDevice;
+        private QColor myColor;
+
+        private QImage image;
+        private QBrush myBrush;
+        private QPen myPen;
+        private boolean deviceDown;
+        private QPoint polyLine[] = new QPoint[3];
+</pre> The canvas can change the alpha channel, color saturation, and line width of the drawing. We have one enum for each of these; their values decide if it is the tablet pressure or tilt that will alter them. We keep a private variable for each, the <tt>alphaChannelType</tt>, <tt>colorSturationType</tt>, and <tt>penWidthType</tt>, which we provide access methods for. <p>We draw on a <a href="../../../com/trolltech/qt/gui/QImage.html">QImage</a> with <tt>myPen</tt> and <tt>myBrush</tt> using <tt>myColor</tt>. The <tt>saveImage()</tt> and <tt>loadImage()</tt> saves and loads the <a href="../../../com/trolltech/qt/gui/QImage.html">QImage</a> to disk. The image is drawn on the widget in <tt>paintEvent()</tt>. The <tt>pointerType</tt> and <tt>deviceType</tt> keeps the type of pointer, which is either a pen or an eraser, and device currently used on the tablet, which is either a stylus or an airbrush. <p>The interpretation of events from the tablet is done in <tt>tabletEvent()</tt>; <tt>paintImage()</tt>, <tt>updateBrush()</tt>, and <tt>brushPattern()</tt> are helper methods used by <tt>tabletEvent()</tt>. <p>We start with a look at the constructor: <pre class="snippet">
+        public TabletCanvas()
+        {
+            myBrush = new QBrush();
+            myPen = new QPen();
+            image = new QImage(500, 500, QImage.Format.Format_ARGB32);
+            QPainter painter = new QPainter(image);
+            painter.fillRect(0, 0, 499, 499, new QBrush(new QColor(Qt.GlobalColor.white)));
+            setAutoFillBackground(true);
+            deviceDown = false;
+            myColor = new QColor(Qt.GlobalColor.red);
+            myTabletDevice = QTabletEvent.TabletDevice.Stylus;
+            alphaChannelType = AlphaChannelType.NoAlpha;
+            colorSaturationType = ColorSaturationType.NoSaturation;
+            lineWidthType = LineWidthType.LineWidthPressure;
+        }
+</pre> In the constructor we initialize our class variables. We need to draw the background of our image, as the default is gray. <p>Here is the implementation of <tt>saveImage()</tt>: <pre class="snippet">
+        boolean saveImage(String file)
+        {
+            return image.save(file);
+        }
+</pre> <a href="../../../com/trolltech/qt/gui/QImage.html">QImage</a> implements functionality to save itself to disk, so we simply call <a href="../../../com/trolltech/qt/gui/QImage.html#save(java.lang.String, java.lang.String, int)">save()</a>. <p>Here is the implementation of <tt>loadImage()</tt>: <pre class="snippet">
+        boolean loadImage(String file)
+        {
+            boolean success = image.load(file);
+
+            if (success) {
+                update();
+                return true;
+            }
+            return false;
+        }
+</pre> We simply call <a href="../../../com/trolltech/qt/gui/QImage.html#load(java.lang.String, java.lang.String)">load()</a>, which loads the image in <tt>file</tt>. <p>Here is the implementation of <tt>tabletEvent()</tt>: <pre class="snippet">
+        protected void tabletEvent(QTabletEvent event)
+        {
+            switch (event.type()) {
+                case TabletPress:
+                    if (deviceDown)
+                        deviceDown = true;
+                    break;
+                case TabletRelease:
+                    if (!deviceDown)
+                        deviceDown = false;
+                    break;
+                case TabletMove:
+                    polyLine[2] = polyLine[1];
+                    polyLine[1] = polyLine[0];
+                    polyLine[0] = event.pos();
+
+                    if (deviceDown) {
+                        updateBrush(event);
+                        QPainter painter = new QPainter(image);
+                        paintImage(painter, event);
+                    }
+                    break;
+                default:
+                    break;
+            }
+            update();
+        }
+</pre> We get three kind of events to this method: TabletPress, TabletRelease, and TabletMove, which is generated when a device is pressed down on, leaves, or moves on the tablet. We set the <tt>deviceDown</tt> to true when a device is pressed down on the tablet; we then know when we should draw when we receive move events. We have implemented the <tt>updateBrush()</tt> and <tt>paintImage()</tt> helper methods to update <tt>myBrush</tt> and <tt>myPen</tt> after the state of <tt>alphaChannelType</tt>, <tt>colorSaturationType</tt>, and <tt>lineWidthType</tt>. <p>Here is the implementation of <tt>paintEvent()</tt>: <pre class="snippet">
+        protected void paintEvent(QPaintEvent event)
+        {
+            QPainter painter = new QPainter(this);
+            painter.drawImage(new QPoint(0, 0), image);
+        }
+</pre> We simply draw the image to the top left of the widget. <p>Here is the implementation of <tt>paintImage()</tt>: <pre class="snippet">
+        private void paintImage(QPainter painter, QTabletEvent event)
+        {
+            QPoint brushAdjust = new QPoint(10, 10);
+
+            switch (myTabletDevice) {
+                case Stylus:
+                    painter.setBrush(myBrush);
+                    painter.setPen(myPen);
+                    painter.drawLine(polyLine[1], event.pos());
+                    break;
+                case Airbrush:
+                    myBrush.setColor(myColor);
+                    myBrush.setStyle(brushPattern(event.pressure()));
+                    painter.setPen(Qt.PenStyle.NoPen);
+                    painter.setBrush(myBrush);
+
+                    for (int i = 0; i &lt; 3; ++i) {
+                        painter.drawEllipse(new QRect(polyLine[i].subtract(brushAdjust),
+                                                      polyLine[i].add(brushAdjust)));
+                    }
+                    break;
+                default:
+                    System.err.println("Unsupported tablet device.");
+            }
+        }
+</pre> In this method we draw on the image based on the movement of the device. If the device used on the tablet is a stylus we want to draw a line between the positions of the stylus recorded in <tt>polyLine</tt>. If it is an airbrush we want to draw a circle of points with a point density based on the tangential pressure, which is the position of the finger wheel on the airbrush. We use the <a href="../../../com/trolltech/qt/core/Qt.BrushStyle.html">Qt::BrushStyle</a> to draw the points as it has styles that draw points with different density; we select the style based on the tangential pressure in <tt>brushPattern()</tt>. <pre class="snippet">
+        private Qt.BrushStyle brushPattern(double value)
+        {
+            int pattern = ((int) (value * 100.0)) % 7;
+
+            switch (pattern) {
+                case 0:
+                    return Qt.BrushStyle.SolidPattern;
+                case 1:
+                    return Qt.BrushStyle.Dense1Pattern;
+                case 2:
+                    return Qt.BrushStyle.Dense2Pattern;
+                case 3:
+                    return Qt.BrushStyle.Dense3Pattern;
+               case 4:
+                    return Qt.BrushStyle.Dense4Pattern;
+                case 5:
+                    return Qt.BrushStyle.Dense5Pattern;
+                case 6:
+                    return Qt.BrushStyle.Dense6Pattern;
+                default:
+                    return Qt.BrushStyle.Dense7Pattern;
+            }
+        }
+</pre> We return a brush style with a point density that increases with the tangential pressure. <p>In <tt>updateBrush()</tt> we set the pen and brush used for drawing to match <tt>alphaChannelType</tt>, <tt>lineWidthType</tt>, <tt>colorSaturationType</tt>, and <tt>myColor</tt>. We will examine the code to set up <tt>myBrush</tt> and <tt>myPen</tt> for each of these variables: <pre class="snippet">
+        private void updateBrush(QTabletEvent event)
+        {
+            int hue, value, alpha;
+            hue = myColor.hue();
+            value = myColor.value();
+            alpha = myColor.alpha();
+
+            int vValue = (int) (((event.yTilt() + 60.0) / 120.0) * 255);
+            int hValue = (int) (((event.xTilt() + 60.0) / 120.0) * 255);
+</pre> We fetch the current drawingcolor's hue, saturation, value, and alpha values. <tt>hValue</tt> and <tt>vValue</tt> are set to the horizontal and vertical tilt as a number from 0 to 255. The original values are in degrees from -60 to 60, i.e., 0 equals -60, 127 equals 0, and 255 equals 60 degrees. The angle measured is between the device and the perpendicular of the tablet (see <a href="../../../com/trolltech/qt/gui/QTabletEvent.html">QTabletEvent</a> for an illustration). <pre class="snippet">
+
+            switch (alphaChannelType) {
+                case AlphaPressure:
+                    myColor.setAlpha((int) (event.pressure() * 255.0));
+                    break;
+                case AlphaTilt:
+                    myColor.setAlpha(Math.max(Math.abs(vValue - 127), Math.abs(hValue - 127)));
+                    break;
+                default:
+                    myColor.setAlpha(255);
+            }
+
+</pre> The alpha channel of <a href="../../../com/trolltech/qt/gui/QColor.html">QColor</a> is given as a number between 0 and 255 where 0 is transparent and 255 is opaque. <a href="../../../com/trolltech/qt/gui/QTabletEvent.html#pressure()">pressure()</a> returns the pressure as a qreal between 0.0 and 1.0. By subtracting 127 from the tilt values and taking the absolute value we get the smallest alpha values (i.e., the color is most transparent) when the pen is perpendicular to the tablet. We select the largest of the vertical and horizontal tilt value. <pre class="snippet">
+            switch (colorSaturationType) {
+                case SaturationVTilt:
+                    myColor.setHsv(hue, vValue, value, alpha);
+                    break;
+                case SaturationHTilt:
+                    myColor.setHsv(hue, hValue, value, alpha);
+                    break;
+                case SaturationPressure:
+                    myColor.setHsv(hue, (int) (event.pressure() * 255.0), value, alpha);
+                    break;
+                default:
+                    ;
+            }
+
+</pre> The colorsaturation is given as a number between 0 and 255. It is set with <a href="../../../com/trolltech/qt/gui/QColor.html#setHsv(int, int, int)">setHsv()</a>. We can set the tilt values directly, but must multiply the pressure to a number between 0 and 255. <pre class="snippet">
+            switch (lineWidthType) {
+                case LineWidthPressure:
+                    myPen.setWidthF(event.pressure() * 10 + 1);
+                    break;
+                case LineWidthTilt:
+                    myPen.setWidthF(Math.max(Math.abs(vValue - 127), Math.abs(hValue - 127)) / 12);
+                    break;
+                default:
+                    myPen.setWidthF(1);
+            }
+
+</pre> The width of the pen increases with the pressure. When the pen width is controlled with the tilt we let the width increse with the angle between the device and the perpendicular of the tablet. <pre class="snippet">
+            if (event.pointerType().equals(QTabletEvent.PointerType.Eraser)) {
+                myBrush.setColor(new QColor(Qt.GlobalColor.white));
+                myPen.setColor(new QColor(Qt.GlobalColor.white));
+                myPen.setWidthF(event.pressure() * 10 + 1);
+            } else {
+                myBrush.setColor(myColor);
+                myPen.setColor(myColor);
+            }
+        }
+</pre> We finally check wether the pointer is the stylus or the eraser. If it is the eraser, we set the color to the background color of the image an let the pressure decide the pen width, else we set the colors we have set up previously in the method.<a name="tabletapplication-class"><h2>TabletApplication Class</h2> We inherit <a href="../../../com/trolltech/qt/gui/QApplication.html">QApplication</a> in this class because we want to reimplement the <a href="../../../com/trolltech/qt/core/QObject.html#event(com.trolltech.qt.core.QEvent)">event()</a> method. <p>The TabletEnterProximity and TabletLeaveProximity events are sendt to the <a href="../../../com/trolltech/qt/gui/QApplication.html">QApplication</a> object, while other tablet events are sendt to the <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>'s <tt>event()</tt>, which sends them on to <a href="../../../com/trolltech/qt/gui/QWidget.html#tabletEvent(com.trolltech.qt.gui.QTabletEvent)">tabletEvent()</a>. Since we want to handle these events we have implemented <tt>TabletApplication</tt>. <p>Here is the implementation of <tt>event()</tt>: <pre class="snippet">
+        public boolean event(QEvent event)
+        {
+            if (event.type().equals(QEvent.Type.TabletEnterProximity) ||
+                event.type().equals(QEvent.Type.TabletLeaveProximity)) {
+                Tablet.myCanvas.setTabletDevice(((QTabletEvent) event).device());
+                return true;
+            }
+            return super.event(event);
+        }
+</pre> We use this method to handle the TabletEnterProximity and TabletLeaveProximity events, which is generated when a device enters and leaves the proximity of the tablet. The intended use of these events is to do work that is dependent on what kind of device is used on the tablet. This way, you don't have to do this work when other events are generated, which is more frequently than the leave and enter proximity events. We call <tt>setTabletDevice()</tt> in <tt>TabletCanvas</tt>.<a name="the-method"><h2>The main() method</h2><tt>main()</tt> Here is the examples <tt>main()</tt> method: <pre class="snippet">
+    public static void main(String args[])
+    {
+        Tablet.TabletApplication.initialize(args);
+
+        Tablet mainWindow = new Tablet();
+        mainWindow.resize(500, 500);
+        mainWindow.show();
+
+        Tablet.TabletApplication.exec();
+    }
+</pre> In the <tt>main()</tt> method we create a <tt>Tablet</tt> and display it as a top level window. We use the <tt>TabletApplication</tt> class. We need to set the canvas after the application is created. We cannot use classes that implement event handling before an <a href="../../../com/trolltech/qt/gui/QApplication.html">QApplication</a> object is instantiated.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

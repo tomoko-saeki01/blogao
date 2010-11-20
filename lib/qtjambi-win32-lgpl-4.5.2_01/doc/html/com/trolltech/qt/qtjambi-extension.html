@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Extension Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Extension Example</h1></center><p> <b>Code</b>: <ul><li> <a href="qtjambi-extension-code.html">ExtensionDialog.java</a></li></ul> The Extension example shows how to add an extension to a <a href="../../../com/trolltech/qt/gui/QDialog.html">QDialog</a> using the QAbstractButton::toggled() signal and the <a href="../../../com/trolltech/qt/gui/QWidget.html#setVisible(boolean)">QWidget::setVisible()</a> slot. <br><center><img src="images/extension-example.png"></center><br> The Extension application is a dialog that allows the user to perform a simple search as well as a more advanced search. <p>The simple search has two options: <b>Match case</b> and <b>Search from start</b>. The advanced search options include the possibilities to search for <b>Whole words</b>, <b>Search backward</b> and <b>Search selection</b>. Only the simple search is visible when the application starts. The advanced search options are located in the application's extension part, and can be made visible by pressing the <b>More</b> button: <br><center><img src="images/extension_more.png"></center><br><a name="the-extensiondialog-class"><h2>The ExtensionDialog Class</h2> The <tt>ExtensionDialog</tt> class inherits <a href="../../../com/trolltech/qt/gui/QDialog.html">QDialog</a>. The <a href="../../../com/trolltech/qt/gui/QDialog.html">QDialog</a> class is the base class of dialog windows. A dialog window is a top-level window mostly used for short-term tasks and brief communications with the user. <p>The <tt>ExtensionDialog</tt> widget is the main application widget, and displays the application's search options and controlling buttons. <pre class="snippet">
+public class ExtensionDialog extends QDialog
+{
+    private QLabel label;
+    private QLineEdit lineEdit;
+    private QCheckBox caseCheckBox;
+    private QCheckBox fromStartCheckBox;
+    private QCheckBox wholeWordsCheckBox;
+    private QCheckBox searchSelectionCheckBox;
+    private QCheckBox backwardCheckBox;
+    private QDialogButtonBox buttonBox;
+    private QPushButton findButton;
+    private QPushButton moreButton;
+    private QWidget extension;
+</pre> The class contains several private widgets. We need a <a href="../../../com/trolltech/qt/gui/QLineEdit.html">QLineEdit</a> with an associated <a href="../../../com/trolltech/qt/gui/QLabel.html">QLabel</a> to let the user type a word to search for, we need several <a href="../../../com/trolltech/qt/gui/QCheckBox.html">QCheckBox</a>es to facilitate the search options, and we need three <a href="../../../com/trolltech/qt/gui/QPushButton.html">QPushButton</a>s: the <b>Find</b> button to start a search, the <b>More</b> button to enable an advanced search, and the <b>Close</b> button to exit the application. Finally, we need a <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> representing the application's extension part. <p>The ExtensionDialog does not contain an API, but only a constructor: <pre class="snippet">
+    public ExtensionDialog()
+    {
+        label = new QLabel(tr("Find &what:"));
+        lineEdit = new QLineEdit();
+        label.setBuddy(lineEdit);
+
+        caseCheckBox = new QCheckBox(tr("Match &case"));
+        fromStartCheckBox = new QCheckBox(tr("Search from &start"));
+        fromStartCheckBox.setChecked(true);
+
+        findButton = new QPushButton(tr("&Find"));
+        findButton.setDefault(true);
+
+        moreButton = new QPushButton(tr("&More"));
+        moreButton.setCheckable(true);
+</pre> In the constructor we first create the standard child widgets for the simple search: the <a href="../../../com/trolltech/qt/gui/QLineEdit.html">QLineEdit</a> with the associated <a href="../../../com/trolltech/qt/gui/QLabel.html">QLabel</a>, two of the <a href="../../../com/trolltech/qt/gui/QCheckBox.html">QCheckBox</a>es and all the <a href="../../../com/trolltech/qt/gui/QPushButton.html">QPushButton</a>s. <p>We give the options and buttons a shortcut key using the & character. In the <b>Find what</b> option's case, we also need to use the <a href="../../../com/trolltech/qt/gui/QLabel.html#setBuddy(com.trolltech.qt.gui.QWidget)">QLabel::setBuddy()</a> method to make the shortcut key work as expected; then, when the user presses the shortcut key indicated by the label, the keyboard focus is transferred to the label's buddy widget, the <a href="../../../com/trolltech/qt/gui/QLineEdit.html">QLineEdit</a>. <p>We set the <b>Find</b> button's default property to true, using the <a href="../../../com/trolltech/qt/gui/QPushButton.html#setDefault(boolean)">QPushButton::setDefault()</a> method. Then the push button will be pressed if the user presses the Enter (or Return) key. Note that a <a href="../../../com/trolltech/qt/gui/QDialog.html">QDialog</a> can only have one default button. <pre class="snippet">
+        extension = new QWidget();
+
+        wholeWordsCheckBox = new QCheckBox(tr("&Whole words"));
+        backwardCheckBox = new QCheckBox(tr("Search &backward"));
+        searchSelectionCheckBox = new QCheckBox(tr("Search se&lection"));
+</pre> Then we create the extension widget, and the <a href="../../../com/trolltech/qt/gui/QCheckBox.html">QCheckBox</a>es associated with the advanced search options. <pre class="snippet">
+        moreButton.toggled.connect(extension, "setVisible(boolean)");
+
+        QVBoxLayout extensionLayout = new QVBoxLayout();
+        extensionLayout.setMargin(0);
+        extensionLayout.addWidget(wholeWordsCheckBox);
+        extensionLayout.addWidget(backwardCheckBox);
+        extensionLayout.addWidget(searchSelectionCheckBox);
+        extension.setLayout(extensionLayout);
+</pre> Now that the extension widget is created, we can connect the <b>More</b> button's toggled() signal to the extension widget's <a href="../../../com/trolltech/qt/gui/QWidget.html#setVisible(boolean)">setVisible()</a> slot. <p>The QAbstractButton::toggled() signal is emitted whenever a checkable button changes its state. The signal's argument is true if the button is checked, or false if the button is unchecked. The <a href="../../../com/trolltech/qt/gui/QWidget.html#setVisible(boolean)">QWidget::setVisible()</a> slot sets the widget's visible status. If the status is true the widget is shown, otherwise the widget is hidden. <p>Since we made the <b>More</b> button checkable when we created it, the connection makes sure that the extension widget is shown depending on the state of <b>More</b> button. <p>We also connect the <b>Close</b> button to the <a href="../../../com/trolltech/qt/gui/QWidget.html#close()">QWidget::close()</a> slot, and we put the checkboxes associated with the advanced search options into a layout we install on the extension widget. <pre class="snippet">
+        QHBoxLayout topLeftLayout = new QHBoxLayout();
+        topLeftLayout.addWidget(label);
+        topLeftLayout.addWidget(lineEdit);
+
+        QVBoxLayout leftLayout = new QVBoxLayout();
+        leftLayout.addLayout(topLeftLayout);
+        leftLayout.addWidget(caseCheckBox);
+        leftLayout.addWidget(fromStartCheckBox);
+        leftLayout.addStretch(1);
+
+        QGridLayout mainLayout = new QGridLayout();
+        mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize);
+        mainLayout.addLayout(leftLayout, 0, 0);
+        mainLayout.addWidget(buttonBox, 0, 1);
+        mainLayout.addWidget(extension, 1, 0, 1, 2);
+        setLayout(mainLayout);
+
+        setWindowTitle(tr("Extension"));
+</pre> Before we create the main layout, we create several child layouts for the widgets: First we allign the <a href="../../../com/trolltech/qt/gui/QLabel.html">QLabel</a> ans its buddy, the <a href="../../../com/trolltech/qt/gui/QLineEdit.html">QLineEdit</a>, using a <a href="../../../com/trolltech/qt/gui/QHBoxLayout.html">QHBoxLayout</a>. Then we vertically allign the <a href="../../../com/trolltech/qt/gui/QLabel.html">QLabel</a> and <a href="../../../com/trolltech/qt/gui/QLineEdit.html">QLineEdit</a> with the checkboxes associated with the simple search, using a <a href="../../../com/trolltech/qt/gui/QVBoxLayout.html">QVBoxLayout</a>. We also create a <a href="../../../com/trolltech/qt/gui/QVBoxLayout.html">QVBoxLayout</a> for the buttons. In the end we lay out the two latter layouts and the extension widget using a <a href="../../../com/trolltech/qt/gui/QGridLayout.html">QGridLayout</a>. <pre class="snippet">
+        extension.hide();
+    }
+</pre> Finally, we hide the extension widget using the <a href="../../../com/trolltech/qt/gui/QWidget.html#hide()">QWidget::hide()</a> method, making the application only show the simple search options when it starts. When the user wants to access the advanced search options, the dialog only needs to change the visibility of the extension widget. Qt's layout management takes care of the dialog's appearance.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
