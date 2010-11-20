@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Declaring Slots in D-Bus Adaptors</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Declaring Slots in D-Bus Adaptors</h1></center><p> Slots in D-Bus adaptors are declared just like normal, public slots, but their parameters must follow certain rules (see <a href="qdbustypesystem.html">The QtDBus Type System</a> for more information). Slots whose parameters do not follow those rules or that are not public will not be accessible via D-Bus. <p>Slots can have one parameter of type <tt>const QDBusMessage &</tt>, which must appear at the end of the input parameter list, before any output parameters. This parameter, if present, will be initialized with a copy of the current message being processed, which allows the callee to obtain information about the caller, such as its connection name. <p>Slots can be of three kinds: <ol><li> Asynchronous</li><li> Input-only</li><li> Input-and-output</li></ol><a name="asynchronous-slots"><h2>Asynchronous Slots</h2> Asynchronous slots are those that do not normally return any reply to the caller. For that reason, they cannot take any output parameters. In most cases, by the time the first line of the slot is run, the caller function has already resumed working. <p>However, slots must not rely on that behavior. Scheduling and message-dispatching issues could change the order in which the slot is run. Code intending to synchronize with the caller should provide its own method of synchronization. <p>Asynchronous slots are marked by the keyword Q_NOREPLY in the method signature, before the <tt>void</tt> return type and the slot name. (See the <tt>quit()</tt> slot in the <a href="qdbusadaptorexample.html">D-Bus Adaptor Example</a>).<a name="input-only-slots"><h2>Input-Only Slots</h2> Input-only slots are normal slots that take parameters passed by value or by constant reference. However, unlike asynchronous slots, the caller is usually waiting for completion of the callee before resuming operation. Therefore, non-asynchronous slots should not block or should state it its documentation that they may do so. <p>Input-only slots have no special marking in their signature, except that they take only parameters passed by value or by constant reference. Optionally, slots can take a QDBusMessage parameter as a last parameter, which can be used to perform additional analysis of the method call message.<a name="input-and-output-slots"><h2>Input and Output Slots</h2> Like input-only slots, input-and-output slots are those that the caller is waiting for a reply. Unlike input-only ones, though, this reply will contain data. Slots that output data may contain non-constant references and may return a value as well. However, the output parameters must all appear at the end of the argument list and may not have input arguments interleaved. Optionally, a QDBusMessage argument may appear between the input and the output arguments.<a name="automatic-replies"><h2>Automatic Replies</h2> Method replies are generated automatically with the contents of the output parameters (if there were any) by the <a href="qtdbus.html">QtDBus</a> implementation. Slots need not worry about constructing proper QDBusMessage objects and sending them over the connection. <p>However, the possibility of doing so remains there. Should the slot find out it needs to send a special reply or even an error, it can do so by using QDBusMessage::createReply() or QDBusMessage::createErrorReply() on the QDBusMessage parameter and send it with QDBusConnection::send(). The <a href="qtdbus.html">QtDBus</a> implementation will not generate any reply if the slot did so. <p><b>Warning:</b> When a caller places a method call and waits for a reply, it will only wait for a limited amount of time. Slots intending to take a long time to complete should make that fact clear in documentation so that callers properly set higher timeouts.<a name="delayed-replies"><h2>Delayed Replies</h2> In some circumstances, the called slot may not be able to process the request immediately. This is frequently the case when the request involves an I/O or networking operation which may block. <p>If this is the case, the slot should return control to the application's main loop to avoid freezing the user interface, and resume the process later. To accomplish this, it should make use of the extra <tt>QDBusMessage</tt> parameter at the end of the input parameter list and request a delayed reply. <p>We do this by writing a slot that stores the request data in a persistent structure, indicating to the caller using QDBusMessage::setDelayedReply(true) that the response will be sent later. <pre class="snippet">
+struct RequestData
+{
+    QString request;
+    QString processedData;
+    QDBusMessage reply;
+};
+
+QString processRequest(const QString &request, const QDBusMessage &message)
+{
+    RequestData *data = new RequestData;
+    data-&gt;request = request;
+    message.setDelayedReply(true);
+    data-&gt;reply = message.createReply();
+    QDBusConnection::sessionBus().send(data-&gt;reply);
+
+    appendRequest(data);
+    return QString();
+}
+</pre> The use of QDBusConnection::sessionBus().send(data->reply) is needed to explicitly inform the caller that the response will be delayed. In this case, the return value is unimportant; we return an arbitrary value to satisfy the compiler. <p>When the request is processed and a reply is available, it should be sent using the <tt>QDBusMessage</tt> object that was obtained. In our example, the reply code could be something as follows: <pre class="snippet">
+void sendReply(RequestData *data)
+{
+    // data-&gt;processedData has been initialized with the request's reply
+    QDBusMessage &reply = &data-&gt;reply;
+
+    // send the reply over D-Bus:
+    reply &lt;&lt; data-&gt;processedData;
+    QDBusConnection::sessionBus().send(reply);
+
+    // dispose of the transaction data
+    delete data;
+}
+</pre> As can be seen in the example, when a delayed reply is in place, the return value(s) from the slot will be ignored by <a href="qtdbus.html">QtDBus</a>. They are used only to determine the slot's signature when communicating the adaptor's description to remote applications, or in case the code in the slot decides not to use a delayed reply. <p>The delayed reply itself is requested from <a href="qtdbus.html">QtDBus</a> by calling QDBusMessage::reply() on the original message. It then becomes the resposibility of the called code to eventually send a reply to the caller. <p><b>Warning:</b> When a caller places a method call and waits for a reply, it will only wait for a limited amount of time. Slots intending to take a long time to complete should make that fact clear in documentation so that callers properly set higher timeouts. <p><DT><b>See also:</b><br><DD><a href="usingadaptors.html">Using QtDBus Adaptors</a>, <a href="qdbusdeclaringsignals.html">Declaring Signals in D-Bus Adaptors</a>, <a href="qdbustypesystem.html">The QtDBus Type System</a>, QDBusConnection, and QDBusMessage. <br></DD></DT><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
