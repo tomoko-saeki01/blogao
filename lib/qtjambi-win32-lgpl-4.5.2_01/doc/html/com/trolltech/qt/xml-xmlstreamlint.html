@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>XML Stream Lint Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>XML Stream Lint Example</h1></center><p> The XML Stream Lint example provides a simple command line utility that accepts a file name as its single argument and writes it to the standard output file. <p>The specified file is parsed using an <a href="../../../com/trolltech/qt/xml/QXmlStreamReader.html">QXmlStreamReader</a> object and written to the standard output file using an <a href="../../../com/trolltech/qt/xml/QXmlStreamWriter.html">QXmlStreamWriter</a> object. If the file does not contain a well-formed XML document or the use of namespaces in the document is incorrect, a description of the error is printed to the standard error file and will appear in the console.<a name="basic-operation"><h2>Basic Operation</h2> The main function of the example opens the file specified by the user for input (<tt>inputFile</tt>), and it uses <a href="../../../com/trolltech/qt/core/QFile.html">QFile</a> to access the standard output file. <p>Reading XML is handled by an instance of the <a href="../../../com/trolltech/qt/xml/QXmlStreamReader.html">QXmlStreamReader</a> class, which operates on the input file object; writing is handled by an instance of <a href="../../../com/trolltech/qt/xml/QXmlStreamWriter.html">QXmlStreamWriter</a> operating on the output file object:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QXmlStreamReader reader(&inputFile);
+    QXmlStreamWriter writer(&outputFile);
+</pre> The work of parsing and rewriting the XML is done in a while loop, and is driven by input from the reader:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    while (!reader.atEnd())
+    {
+        reader.readNext();
+
+        if (reader.error())
+        {
+            errorStream &lt;&lt; XmlStreamLint::tr(
+                           "Error: %1 in file %2 at line %3, column %4.\n").arg(
+                               reader.errorString(), inputFilePath,
+                               QString::number(reader.lineNumber()),
+                               QString::number(reader.columnNumber()));
+            return ParseFailure;
+</pre> If more input is available, the next token from the input file is read and parsed. If an error occurred, information is written to the standard error file via a stream, and the example exits by returning a non-zero value from the main function.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+        } else
+            writer.writeCurrentToken(reader);
+    }
+</pre> For valid input, the writer is fed the current token from the reader, and this is written to the output file that was specified when it was constructed. <p>When there is no more input, the loop terminates, and the example can exit successfully.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
