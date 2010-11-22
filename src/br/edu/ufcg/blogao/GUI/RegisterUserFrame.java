@@ -93,7 +93,7 @@ public class RegisterUserFrame extends QWidget {
 		addressLabel.setFont(new QFont("Tempus Sans ITC", 11));
 		addressLabel.move(300, 180);
 
-		addressField = createLineEdit();
+		addressField = createLineEdit(this);
 		addressField.resize(250, 25);
 		addressField.move(460, 180);
 	}
@@ -104,7 +104,7 @@ public class RegisterUserFrame extends QWidget {
 		booksLabel.setFont(new QFont("Tempus Sans ITC", 11));
 		booksLabel.move(300, 390);
 
-		booksField = createLineEdit();
+		booksField = createLineEdit(this);
 		booksField.resize(250, 25);
 		booksField.move(460, 420);
 	}
@@ -139,7 +139,7 @@ public class RegisterUserFrame extends QWidget {
 		emailLabel.setFont(new QFont("Tempus Sans ITC", 11));
 		emailLabel.move(300, 210);
 
-		emailField = createLineEdit();
+		emailField = createLineEdit(this);
 		emailField.resize(250, 25);
 		emailField.move(460, 210);
 	}
@@ -150,7 +150,7 @@ public class RegisterUserFrame extends QWidget {
 		interestsLabel.setFont(new QFont("Tempus Sans ITC", 11));
 		interestsLabel.move(300, 240);
 
-		interestsField = createLineEdit();
+		interestsField = createLineEdit(this);
 		interestsField.resize(250, 25);
 		interestsField.move(460, 240);
 	}
@@ -161,7 +161,7 @@ public class RegisterUserFrame extends QWidget {
 		moviesLabel.setFont(new QFont("Tempus Sans ITC", 11));
 		moviesLabel.move(300, 360);
 
-		moviesField = createLineEdit();
+		moviesField = createLineEdit(this);
 		moviesField.resize(250, 25);
 		moviesField.move(460, 390);
 	}
@@ -172,7 +172,7 @@ public class RegisterUserFrame extends QWidget {
 		musicsLabel.setFont(new QFont("Tempus Sans ITC", 11));
 		musicsLabel.move(300, 420);
 
-		musicsField = createLineEdit();
+		musicsField = createLineEdit(this);
 		musicsField.resize(250, 25);
 		musicsField.move(460, 360);
 	}
@@ -183,7 +183,7 @@ public class RegisterUserFrame extends QWidget {
 		nameLabel.setFont(new QFont("Tempus Sans ITC", 11));
 		nameLabel.move(300, 150);
 
-		nameField = createLineEdit();
+		nameField = createLineEdit(this);
 		nameField.resize(250, 25);
 		nameField.move(460, 150);
 	}
@@ -208,7 +208,7 @@ public class RegisterUserFrame extends QWidget {
 		whoIAmLabel.setFont(new QFont("Tempus Sans ITC", 11));
 		whoIAmLabel.move(300, 270);
 
-		whoIAmField = createLineEdit();
+		whoIAmField = createLineEdit(this);
 		whoIAmField.resize(250, 25);
 		whoIAmField.move(460, 270);
 	}
@@ -221,8 +221,8 @@ public class RegisterUserFrame extends QWidget {
 		return new QLabel(text, this);
 	}
 
-	private QLineEdit createLineEdit() {
-		return new QLineEdit(this);
+	private QLineEdit createLineEdit(QWidget parent) {
+		return new QLineEdit(parent);
 	}
 
 	@SuppressWarnings("unused")
