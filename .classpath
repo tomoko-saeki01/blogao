@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="test"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/antenna-bin-1.2.1-beta.jar"/>
+	<classpathentry kind="lib" path="lib/easyaccept.jar"/>
 	<classpathentry kind="lib" path="lib/db/xpp3_min-1.1.4c.jar"/>
 	<classpathentry kind="lib" path="lib/db/xstream-1.3.1.jar"/>
 	<classpathentry kind="lib" path="lib/db/xstream-benchmark-1.3.1.jar"/>
@@ -73,35 +74,32 @@
 	<classpathentry kind="lib" path="lib/ws/xmlbeans-2.4.0.jar"/>
 	<classpathentry kind="lib" path="lib/ws/XmlSchema-1.4.5.jar"/>
 	<classpathentry kind="lib" path="lib/ws/xmlsec-1.4.3.jar"/>
-	<classpathentry kind="lib" path="lib/easyaccept.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/qtjambi-win32-lgpl-4.5.2_01/qtjambi-4.5.2_01.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/qtjambi-win32-lgpl-4.5.2_01/qtjambi-designer-4.5.2_01.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/qtjambi-win32-lgpl-4.5.2_01/qtjambi-examples-4.5.2_01.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/qtjambi-win32-lgpl-4.5.2_01/qtjambi-win32-msvc2005-4.5.2_01.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/cldcapi10.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/cldcapi11.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/j2me-ws.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/j2me-xmlrpc.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/jsr75.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/jsr082.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/jsr179.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/jsr180.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/jsr184.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/jsr211.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/jsr226.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/jsr229.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/jsr234.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/jsr238.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/jsr239.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/midpapi10.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/midpapi20.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/midpapi21.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/mmapi.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/satsa-apdu.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/satsa-crypto.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/satsa-jcrmi.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/satsa-pki.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/wma11.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Catharine/workspace/blogao/lib/WTK2.5.1/lib/wma20.jar"/>
+	<classpathentry kind="lib" path="lib/qtjambi-win32-lgpl-4.5.2_01/qtjambi-4.5.2_01.jar"/>
+	<classpathentry kind="lib" path="lib/qtjambi-win32-lgpl-4.5.2_01/qtjambi-designer-4.5.2_01.jar"/>
+	<classpathentry kind="lib" path="lib/qtjambi-win32-lgpl-4.5.2_01/qtjambi-examples-4.5.2_01.jar"/>
+	<classpathentry kind="lib" path="lib/qtjambi-win32-lgpl-4.5.2_01/qtjambi-win32-msvc2005-4.5.2_01.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/j2me-ws.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/j2me-xmlrpc.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/jsr082.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/jsr179.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/jsr180.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/jsr184.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/jsr211.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/jsr226.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/jsr229.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/jsr234.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/jsr238.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/jsr239.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/jsr75.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/midpapi10.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/midpapi20.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/midpapi21.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/mmapi.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/satsa-apdu.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/satsa-crypto.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/satsa-jcrmi.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/satsa-pki.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/wma11.jar"/>
+	<classpathentry kind="lib" path="lib/WTK2.5.1/lib/wma20.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
