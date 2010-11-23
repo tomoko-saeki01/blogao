@@ -21,4 +21,7 @@ public class FrameBlogao extends QWidget{
 		blogao.	setVisible(true);
 		QApplication.exec();
 	}
+	
+	
+	
 }
