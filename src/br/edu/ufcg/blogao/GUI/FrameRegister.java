@@ -121,7 +121,7 @@ public class FrameRegister extends QWidget {
 		musicsLabel.move(w + 750, h + 225);
 		booksLabel.move(w + 750, h + 8);
 		whoIAmLabel.move(w, h + 250);
-		
+			
 		loginField.move(w + 50, h);
 		passwordField.move(w + 50, h + 35);
 		confirmPasswordField.move(w + 280, h + 35);
