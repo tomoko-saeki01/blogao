@@ -9,6 +9,7 @@ import com.trolltech.qt.gui.QWidget;
 
 public class FrameLogin extends QWidget {
 
+	private FrameBlogao frameBlogao;
 	private QPushButton loginButton, registerButton;
 	private QLineEdit loginField, passwordField;
 	private QLabel loginLabel, passwordLabel;
@@ -26,17 +27,37 @@ public class FrameLogin extends QWidget {
 	}
 
 	private void actionsObjects() {
-		//TODO
-			
-	
+		// TODO
+		loginButton.click();
+		// se loginButton pressionado: authenticate().
 	}
 
-	private void resizeObjects() {
-		loginButton.maximumSize();
-		registerButton.maximumSize();
+	private void authenticate() {
+		String login = loginField.text();
+		String password = passwordField.text();
+		boolean authenticated = frameBlogao.authenticate(login, password);
+		if (authenticated) {
+			// TODO
+		} else {
+			frameBlogao.displayMessage("Login/senha invalidos.");
+		}
+	}
 
-		loginField.resize(300, 27);
-		passwordField.resize(300, 27);
+	private void initObjects() {
+		frameBlogao = new FrameBlogao();
+
+		loginButton = new QPushButton("Login", this);
+		registerButton = new QPushButton("Cadastrar", this);
+
+		loginField = new QLineEdit(this);
+		passwordField = new QLineEdit(this);
+		passwordField.setEchoMode(QLineEdit.EchoMode.Password);
+
+		loginLabel = new QLabel("Login", this);
+		loginLabel.setFont(new QFont("Tempus Sans ITC", 11));
+
+		passwordLabel = new QLabel("Senha", this);
+		passwordLabel.setFont(new QFont("Tempus Sans ITC", 11));
 	}
 
 	private void positionsObjects() {
@@ -50,19 +71,12 @@ public class FrameLogin extends QWidget {
 		registerButton.move(715, 370);
 	}
 
-	private void initObjects() {
-		loginButton = new QPushButton("Login", this);
-		registerButton = new QPushButton("Cadastrar", this);
+	private void resizeObjects() {
+		loginButton.maximumSize();
+		registerButton.maximumSize();
 
-		loginField = new QLineEdit(this);
-		passwordField = new QLineEdit(this);
-		passwordField.setEchoMode(QLineEdit.EchoMode.Password);
-
-		loginLabel = new QLabel("Login", this);
-		loginLabel.setFont(new QFont("Tempus Sans ITC", 11));
-
-		passwordLabel = new QLabel("Senha", this);
-		passwordLabel.setFont(new QFont("Tempus Sans ITC", 11));
+		loginField.resize(300, 27);
+		passwordField.resize(300, 27);
 	}
 
 	public static void main(String[] args) {

@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
+import br.edu.ufcg.blogao.user.UserIF;
 import br.edu.ufcg.blogao.webservice.BlogWSImpl;
 
 public class Blogao {
@@ -39,4 +40,9 @@ public class Blogao {
             System.out.println("Could not write.");
         }
     }
+
+	public UserIF getUser(String login) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
