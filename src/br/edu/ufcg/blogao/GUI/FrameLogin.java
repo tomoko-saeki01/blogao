@@ -15,7 +15,7 @@ public class FrameLogin extends QWidget {
 	private QLabel loginLabel, passwordLabel;
 
 	public FrameLogin() {
-		setWindowTitle("Login");
+		setWindowTitle("Blogão - Login");
 		resize(maximumSize());
 
 		initObjects();
@@ -27,14 +27,14 @@ public class FrameLogin extends QWidget {
 	}
 
 	private void actionsObjects() {
-		// TODO
-		loginButton.click();
-		// se loginButton pressionado: authenticate().
+		// TODO consertar!
+		loginButton.clicked.connect(this, "authenticate()");
 	}
 
+	@SuppressWarnings("unused")
 	private void authenticate() {
-		String login = loginField.text();
-		String password = passwordField.text();
+		String login = loginField.text().toString();
+		String password = passwordField.text().toString();
 		boolean authenticated = frameBlogao.authenticate(login, password);
 		if (authenticated) {
 			// TODO

@@ -13,14 +13,7 @@ public class FrameBlogao extends QWidget {
 	private UserIF userLoggedOn;
 	
 	public FrameBlogao() {
-		setWindowTitle("Blogão");
-		initUI();
-		show();
-	}
-
-	private void initUI() {
-		resize(maximumSize());
-
+	
 	}
 	
 	public boolean authenticate(String login, String password) {
