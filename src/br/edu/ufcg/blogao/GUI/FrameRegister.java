@@ -43,7 +43,7 @@ public class FrameRegister extends QWidget {
 		passwordLabel = new QLabel("Senha", this);
 		passwordLabel.setFont(new QFont("Tempus Sans ITC", 11));
 
-		confirmPasswordLabel = new QLabel("Confirme a senha", this);
+		/*confirmPasswordLabel = new QLabel("Confirme a senha", this);
 		confirmPasswordLabel.setFont(new QFont("Tempus Sans ITC", 11));
 
 		nameLabel = new QLabel("Nome", this);
@@ -74,30 +74,33 @@ public class FrameRegister extends QWidget {
 		sexLabel.setFont(new QFont("Tempus Sans ITC", 11));
 
 		dateBirthdayLabel = new QLabel("Data de Nascimento", this);
-		dateBirthdayLabel.setFont(new QFont("Tempus Sans ITC", 11));
+		dateBirthdayLabel.setFont(new QFont("Tempus Sans ITC", 11)); */
 
-		loginField = new QLineEdit(this);
-		passwordField = new QLineEdit(this);
-		confirmPasswordField = new QLineEdit(this);
-		nameField = new QLineEdit(this);
-		addressField = new QLineEdit(this);
-		emailField = new QLineEdit(this);
+		loginField = new QLineEdit(this);		
+		 passwordField = new QLineEdit(this); 
+		 /* confirmPasswordField = new QLineEdit(this); 
+		  * nameField = new QLineEdit(this); addressField = new
+		 * QLineEdit(this); emailField = new QLineEdit(this);
+		 */
 
-		interetsField = new QTextEdit(this);
-		moviesField = new QTextEdit(this);
-		musicsField = new QTextEdit(this);
-		booksField = new QTextEdit(this);
-		whoIAmField = new QTextEdit(this);
+		/*
+		 * interetsField = new QTextEdit(this); moviesField = new
+		 * QTextEdit(this); musicsField = new QTextEdit(this); booksField = new
+		 * QTextEdit(this); whoIAmField = new QTextEdit(this);
+		 */
 	}
 
 	private void positionsObjects() {
-		// TODO Auto-generated method stub
-
+		loginLabel.move(300, 100);
+		passwordLabel.move(300,130);
+		
+		loginField.move(350, 100);
+		//passwordField.move(350, 130);
+		
 	}
 
 	private void resizeObjects() {
-		// TODO Auto-generated method stub
-
+		loginField.resize(300, 25);
 	}
 
 	public static void main(String[] args) {
