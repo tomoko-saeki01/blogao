@@ -3,8 +3,10 @@ package br.edu.ufcg.blogao.GUI;
 import com.trolltech.qt.gui.QApplication;
 import com.trolltech.qt.gui.QComboBox;
 import com.trolltech.qt.gui.QFont;
+import com.trolltech.qt.gui.QIcon;
 import com.trolltech.qt.gui.QLabel;
 import com.trolltech.qt.gui.QLineEdit;
+import com.trolltech.qt.gui.QPushButton;
 import com.trolltech.qt.gui.QTextEdit;
 import com.trolltech.qt.gui.QWidget;
 
@@ -21,7 +23,8 @@ public class FrameRegister extends QWidget {
 			whoIAmField;
 	
 	private QComboBox sexCombo;
-
+	private QPushButton registerButton, cancelButton;
+	
 	public FrameRegister() {
 		setWindowTitle("Blogão - Cadastro de um novo usuário");
 		resize(maximumSize());
@@ -70,10 +73,8 @@ public class FrameRegister extends QWidget {
 		booksLabel = new QLabel("Livros Favoritos", this);
 		booksLabel.setFont(new QFont("Tempus Sans ITC", 11));
 
-		/*
 		whoIAmLabel = new QLabel("Quem sou eu", this);
 		whoIAmLabel.setFont(new QFont("Tempus Sans ITC", 11)); 
-		*/
 
 		sexLabel = new QLabel("Sexo", this);
 		sexLabel.setFont(new QFont("Tempus Sans ITC", 11));  
@@ -92,17 +93,21 @@ public class FrameRegister extends QWidget {
 		moviesField = new QTextEdit(this);
 		musicsField = new QTextEdit(this); 
 		booksField = new QTextEdit(this);
-		/*  whoIAmField = new QTextEdit(this);
-		 */
+		whoIAmField = new QTextEdit(this);
 		
 		sexCombo = new QComboBox(this);
 		sexCombo.addItem("Feminino");
 		sexCombo.addItem("Masculino");
+		
+		registerButton =  new QPushButton("Cadastrar", this);
+		registerButton.setIcon( new QIcon("pictures/right.png"));
+		cancelButton = new QPushButton("Cancelar", this);
+		cancelButton.setIcon(new QIcon("pictures/wrong.png"));
 	}
 
 	private void positionsObjects() {
-		int w = 250;
-		int h = 200;
+		int w = 150;
+		int h = 100;
 		loginLabel.move(w, h);
 		passwordLabel.move(w, h + 37);
 		confirmPasswordLabel.move(w + 160, h + 37);
@@ -111,10 +116,11 @@ public class FrameRegister extends QWidget {
 		sexLabel.move(w, h + 127);
 		emailLabel.move(w, h + 160);
 		addressLabel.move(w, h + 194);
-		interestsLabel.move(w + 500, h - 90);
-		moviesLabel.move(w + 500, h + 50);
-		musicsLabel.move(w + 500, h + 190);
-		booksLabel.move(w + 500, h + 320);
+		interestsLabel.move(w + 450, h + 8);
+		moviesLabel.move(w + 450, h + 225);
+		musicsLabel.move(w + 750, h + 225);
+		booksLabel.move(w + 750, h + 8);
+		whoIAmLabel.move(w, h + 250);
 		
 		loginField.move(w + 50, h);
 		passwordField.move(w + 50, h + 35);
@@ -124,10 +130,14 @@ public class FrameRegister extends QWidget {
 		sexCombo.move(w + 50, h + 127);
 		emailField.move(w + 50, h + 160);
 		addressField.move(w + 70, h + 192);
-		interestsField.move(w +  550, h - 65);
-		moviesField.move(w + 550, h + 78);
-		musicsField.move(w + 550, h + 220);
-		booksField.move(w + 550, h  + 395);
+		interestsField.move(w +  500, h + 33);
+		moviesField.move(w + 500, h + 250);
+		musicsField.move(w + 800, h + 250);
+		booksField.move(w + 800, h  + 33 );
+		whoIAmField.move(w + 50, h + 275);
+		
+		registerButton.move(w + 850, h + 500);
+		cancelButton.move(w + 930, h + 500);
 	}
 
 	private void resizeObjects() {
@@ -137,10 +147,14 @@ public class FrameRegister extends QWidget {
 		nameField.resize(330,25);
 		emailField.resize(328, 25);
 		addressField.resize(307,25);
-		interestsField.resize(200, 100);
-		moviesField.resize(200, 100);
-		musicsField.resize(200, 100);
-		booksField.resize(200, 100);
+		interestsField.resize(200, 150);
+		moviesField.resize(200, 150);
+		musicsField.resize(200, 150);
+		booksField.resize(200, 150);
+		whoIAmField.resize(320, 300);
+		
+		registerButton.maximumSize();
+		cancelButton.maximumSize();
 	}
 
 	public static void main(String[] args) {
