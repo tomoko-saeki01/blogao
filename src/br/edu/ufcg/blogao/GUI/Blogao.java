@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
 import br.edu.ufcg.blogao.user.UserIF;
+import br.edu.ufcg.blogao.user.UserImpl;
 import br.edu.ufcg.blogao.webservice.BlogWSImpl;
 
 public class Blogao {
@@ -41,8 +42,8 @@ public class Blogao {
         }
     }
 
-	public UserIF getUser(String login) {
-		// TODO Auto-generated method stub
+	public UserIF getUser(String login) throws Exception {
+		// TODO procurar usuario por login.
 		return null;
 	}
 }

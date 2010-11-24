@@ -1,6 +1,5 @@
 package br.edu.ufcg.blogao.GUI;
 
-import com.trolltech.qt.gui.QApplication;
 import com.trolltech.qt.gui.QFont;
 import com.trolltech.qt.gui.QLabel;
 import com.trolltech.qt.gui.QLineEdit;
@@ -28,19 +27,26 @@ public class FrameLogin extends QWidget {
 
 	private void actionsObjects() {
 		// TODO consertar!
-		loginButton.clicked.connect(this, "authenticate()");
+		//loginButton.clicked.connect(this, "authenticate()");
+		//registerButton.clicked.connect(this, "openRegisterFrame()");
+	}
+	
+	@SuppressWarnings("unused")
+	private void openRegisterFrame() {
+		//TODO checar.
+		frameBlogao.openNewFrame(new FrameRegister());
 	}
 
 	@SuppressWarnings("unused")
 	private void authenticate() {
-		String login = loginField.text().toString();
+		/*String login = loginField.text().toString();
 		String password = passwordField.text().toString();
 		boolean authenticated = frameBlogao.authenticate(login, password);
 		if (authenticated) {
 			// TODO
 		} else {
 			frameBlogao.displayMessage("Login/senha invalidos.");
-		}
+		} */
 	}
 
 	private void initObjects() {
@@ -79,9 +85,9 @@ public class FrameLogin extends QWidget {
 		passwordField.resize(300, 27);
 	}
 
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		QApplication.initialize(args);
 		new FrameLogin();
 		QApplication.exec();
-	}
+	} */
 }
