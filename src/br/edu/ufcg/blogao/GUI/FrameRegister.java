@@ -2,6 +2,7 @@ package br.edu.ufcg.blogao.GUI;
 
 import com.trolltech.qt.gui.QApplication;
 import com.trolltech.qt.gui.QComboBox;
+import com.trolltech.qt.gui.QDateEdit;
 import com.trolltech.qt.gui.QFont;
 import com.trolltech.qt.gui.QIcon;
 import com.trolltech.qt.gui.QLabel;
@@ -23,7 +24,8 @@ public class FrameRegister extends QWidget {
 			whoIAmField;
 	
 	private QComboBox sexCombo;
-	private QPushButton registerButton, cancelButton;
+	private QPushButton registerButton, cancelButton, calendarButton;
+	private QDateEdit dateBirthday;
 	
 	public FrameRegister() {
 		setWindowTitle("Blogão - Cadastro de um novo usuário");
@@ -39,7 +41,12 @@ public class FrameRegister extends QWidget {
 
 	private void actionsObjects() {
 		// TODO Auto-generated method stub
-
+		calendarButton.clicked.connect(this, "openCalendar()");
+	}
+	
+	@SuppressWarnings("unused")
+	private void openCalendar() {
+		CalendarFrame calendar = new CalendarFrame();
 	}
 
 	private void initObjects() {
@@ -101,8 +108,15 @@ public class FrameRegister extends QWidget {
 		
 		registerButton =  new QPushButton("Cadastrar", this);
 		registerButton.setIcon( new QIcon("pictures/right.png"));
+		
 		cancelButton = new QPushButton("Cancelar", this);
 		cancelButton.setIcon(new QIcon("pictures/wrong.png"));
+		
+		calendarButton =  new QPushButton(this);
+		calendarButton.setIcon(new QIcon("pictures/calendar.png"));
+		
+		dateBirthday = new QDateEdit(this);
+		dateBirthday.setDisplayFormat("dd MMM, yyyy");
 	}
 
 	private void positionsObjects() {
@@ -126,7 +140,9 @@ public class FrameRegister extends QWidget {
 		passwordField.move(w + 50, h + 35);
 		confirmPasswordField.move(w + 280, h + 35);
 		nameField.move(w + 50, h + 67);
-		//TODO inserir os campos de data!!
+		
+		dateBirthday.move(w + 140, h + 100);
+		calendarButton.move(w + 233, h + 98);
 		
 		sexCombo.move(w + 50, h + 127);
 		
