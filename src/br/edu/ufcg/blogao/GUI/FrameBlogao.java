@@ -2,6 +2,7 @@ package br.edu.ufcg.blogao.GUI;
 
 import com.trolltech.qt.gui.QApplication;
 import com.trolltech.qt.gui.QIcon;
+import com.trolltech.qt.gui.QMessageBox;
 import com.trolltech.qt.gui.QWidget;
 
 public class FrameBlogao extends QWidget {
@@ -12,7 +13,7 @@ public class FrameBlogao extends QWidget {
 		setWindowTitle("Blogão");
 		init();
 		objectsActions();
-		show();
+		//show();
 	}
 
 	private void objectsActions() {
@@ -37,5 +38,9 @@ public class FrameBlogao extends QWidget {
 
 	public void registerUser(String login, String password,String name, String email, String sex, String dateB, String address, String interests, String whoIAm, String movies, String musics, String books) throws Exception {
 		blogao.registerUser(login,password,name,email,sex, dateB,address, interests, whoIAm, movies, musics, books);		
+	}
+
+	public void displayMessage(String title, String message) {
+		 QMessageBox.critical(this, title, message);
 	}
 }

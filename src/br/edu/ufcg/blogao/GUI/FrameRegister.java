@@ -14,7 +14,7 @@ import com.trolltech.qt.gui.QTextEdit;
 import com.trolltech.qt.gui.QWidget;
 
 public class FrameRegister extends QWidget {
-	
+
 	private QLabel loginLabel, passwordLabel, confirmPasswordLabel, nameLabel,
 			addressLabel, emailLabel, interestsLabel, moviesLabel, musicsLabel,
 			booksLabel, whoIAmLabel, sexLabel, dateBirthdayLabel;
@@ -24,13 +24,13 @@ public class FrameRegister extends QWidget {
 
 	private QTextEdit interestsField, moviesField, musicsField, booksField,
 			whoIAmField;
-	
+
 	private QComboBox sexCombo;
 	private QPushButton registerButton, cancelButton, calendarButton;
 	private QDateEdit dateBirthday;
 
 	private FrameBlogao frameBlogao;
-	
+
 	public FrameRegister() {
 		setWindowTitle("Blogão - Cadastro de um novo usuário");
 		resize(maximumSize());
@@ -48,11 +48,10 @@ public class FrameRegister extends QWidget {
 		cancelButton.clicked.connect(this, "closeFrame()");
 		registerButton.clicked.connect(this, "registerUser()");
 	}
-	
+
 	@SuppressWarnings("unused")
 	private void registerUser() throws Exception {
-		//TODO Verificar se os dados estao todos como esperado.
-		String login =  loginField.text();
+		String login = loginField.text();
 		String password = passwordField.text();
 		String confirmPassword = confirmPasswordField.text();
 		String name = nameField.text();
@@ -65,22 +64,42 @@ public class FrameRegister extends QWidget {
 		String books = booksField.toPlainText();
 		String sex = sexCombo.currentText();
 		String dateB = dateBirthday.text();
-
-		frameBlogao.registerUser(login, password, name, email, sex, dateB, address,  interests, whoIAm, movies, musics, books);
+		
+		if (sex.trim().equals("")) {
+			sex = "Uninformed";
+		}
+		
+		if (!password.equals(confirmPassword)) {
+			frameBlogao.displayMessage("Erro",
+					"Senhas diferentes. Por favor insere-as novamente!");
+			passwordField.clear();
+			confirmPasswordField.clear();
+			
+		} else if (login.trim().equals("")){
+			frameBlogao.displayMessage("Erro", "Um login deve ser inserido.");
+			loginField.clear();
+		} 
+		try {
+			frameBlogao.registerUser(login, password, name, email, sex, dateB,
+					address, interests, whoIAm, movies, musics, books);
+		} catch (Exception e) {
+			frameBlogao.displayMessage("Erro", e.getMessage());
+			//TODO achar o modo certo de limpar o campo certo!
+		}
 	}
-	
+
 	@SuppressWarnings("unused")
 	private void closeFrame() {
 		close();
 	}
-	
+
 	@SuppressWarnings("unused")
 	private void openCalendar() {
 		getDate(new CalendarFrame());
 	}
-	
+
 	private void getDate(CalendarFrame c) {
-		//TODO fazer uma forma dele ficar sempre atualizando enquanto 
+		// TODO fazer uma forma dele ficar sempre atualizando enquanto
 		// a janela estiver aberta.
 		QDate d = c.getSelectedDate();
 		dateBirthday.setDate(d);
@@ -119,49 +138,49 @@ public class FrameRegister extends QWidget {
 		booksLabel.setFont(new QFont("Tempus Sans ITC", 11));
 
 		whoIAmLabel = new QLabel("Quem sou eu", this);
-		whoIAmLabel.setFont(new QFont("Tempus Sans ITC", 11)); 
+		whoIAmLabel.setFont(new QFont("Tempus Sans ITC", 11));
 
 		sexLabel = new QLabel("Sexo", this);
-		sexLabel.setFont(new QFont("Tempus Sans ITC", 11));  
+		sexLabel.setFont(new QFont("Tempus Sans ITC", 11));
 
 		dateBirthdayLabel = new QLabel("Data de Nascimento", this);
 		dateBirthdayLabel.setFont(new QFont("Tempus Sans ITC", 11));
 
-		loginField = new QLineEdit(this);		
-		
-		passwordField = new QLineEdit(this); 
+		loginField = new QLineEdit(this);
+
+		passwordField = new QLineEdit(this);
 		passwordField.setEchoMode(QLineEdit.EchoMode.Password);
-		
+
 		confirmPasswordField = new QLineEdit(this);
 		confirmPasswordField.setEchoMode(QLineEdit.EchoMode.Password);
-		
-		nameField = new QLineEdit(this); 
-		addressField = new QLineEdit(this); 
+
+		nameField = new QLineEdit(this);
+		addressField = new QLineEdit(this);
 		emailField = new QLineEdit(this);
 
-		interestsField = new QTextEdit(this); 
+		interestsField = new QTextEdit(this);
 		moviesField = new QTextEdit(this);
-		musicsField = new QTextEdit(this); 
+		musicsField = new QTextEdit(this);
 		booksField = new QTextEdit(this);
 		whoIAmField = new QTextEdit(this);
-		
+
 		sexCombo = new QComboBox(this);
 		sexCombo.addItem("");
 		sexCombo.addItem("Feminino");
 		sexCombo.addItem("Masculino");
-		
-		registerButton =  new QPushButton("Cadastrar", this);
-		registerButton.setIcon( new QIcon("pictures/right.png"));
-		
+
+		registerButton = new QPushButton("Cadastrar", this);
+		registerButton.setIcon(new QIcon("pictures/right.png"));
+
 		cancelButton = new QPushButton("Cancelar", this);
 		cancelButton.setIcon(new QIcon("pictures/wrong.png"));
-		
-		calendarButton =  new QPushButton(this);
+
+		calendarButton = new QPushButton(this);
 		calendarButton.setIcon(new QIcon("pictures/calendar.png"));
-				
+
 		dateBirthday = new QDateEdit(this);
 		dateBirthday.setDisplayFormat("dd/MM/yyyy");
-		dateBirthday.setDate(new  QCalendarWidget().minimumDate());
+		dateBirthday.setDate(new QCalendarWidget().minimumDate());
 		dateBirthday.setVisible(false);
 	}
 
@@ -181,28 +200,28 @@ public class FrameRegister extends QWidget {
 		musicsLabel.move(w + 750, h + 225);
 		booksLabel.move(w + 750, h + 8);
 		whoIAmLabel.move(w, h + 250);
-			
+
 		loginField.move(w + 50, h);
 		passwordField.move(w + 50, h + 35);
 		confirmPasswordField.move(w + 280, h + 35);
 		nameField.move(w + 50, h + 67);
-		
+
 		dateBirthday.move(w + 140, h + 100);
 		calendarButton.move(w + 233, h + 98);
-		
+
 		sexCombo.move(w + 50, h + 127);
-		
+
 		emailField.move(w + 50, h + 160);
 		addressField.move(w + 70, h + 192);
-		interestsField.move(w +  500, h + 33);
+		interestsField.move(w + 500, h + 33);
 		moviesField.move(w + 500, h + 250);
 		musicsField.move(w + 800, h + 250);
-		booksField.move(w + 800, h  + 33 );
+		booksField.move(w + 800, h + 33);
 		whoIAmField.move(w + 50, h + 275);
-		
+
 		registerButton.move(w + 850, h + 500);
 		cancelButton.move(w + 930, h + 500);
-		
+
 		frameBlogao = new FrameBlogao();
 	}
 
@@ -210,15 +229,15 @@ public class FrameRegister extends QWidget {
 		loginField.resize(328, 25);
 		passwordField.resize(100, 25);
 		confirmPasswordField.resize(100, 25);
-		nameField.resize(330,25);
+		nameField.resize(330, 25);
 		emailField.resize(328, 25);
-		addressField.resize(307,25);
+		addressField.resize(307, 25);
 		interestsField.resize(200, 150);
 		moviesField.resize(200, 150);
 		musicsField.resize(200, 150);
 		booksField.resize(200, 150);
 		whoIAmField.resize(320, 300);
-		
+
 		registerButton.maximumSize();
 		cancelButton.maximumSize();
 	}
