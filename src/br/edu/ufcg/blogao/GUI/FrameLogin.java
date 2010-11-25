@@ -1,6 +1,5 @@
 package br.edu.ufcg.blogao.GUI;
 
-import com.trolltech.qt.gui.QApplication;
 import com.trolltech.qt.gui.QFont;
 import com.trolltech.qt.gui.QLabel;
 import com.trolltech.qt.gui.QLineEdit;
@@ -22,7 +21,6 @@ public class FrameLogin extends QWidget {
 		positionsObjects();
 		actionsObjects();
 
-		//show();
 	}
 
 	private void actionsObjects() {
@@ -67,10 +65,4 @@ public class FrameLogin extends QWidget {
 		loginField.resize(300, 27);
 		passwordField.resize(300, 27);
 	}
-
-	public static void main(String[] args) {
-		QApplication.initialize(args);
-		new FrameLogin();
-		QApplication.exec();
-	} 
 }

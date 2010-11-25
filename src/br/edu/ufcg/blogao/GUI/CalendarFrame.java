@@ -49,6 +49,7 @@ public class CalendarFrame extends QWidget {
 		calendar = new QCalendarWidget();
 		calendar.setMinimumDate(new QDate(1900, 1, 1));
 		calendar.setMaximumDate(new QDate(3000, 1, 1));
+		
 		calendar.setGridVisible(true);
 
 		previewLayout = new QGridLayout();
