@@ -8,6 +8,7 @@ import com.trolltech.qt.gui.QWidget;
 public class FrameBlogao extends QWidget {
 
 	private Blogao blogao;
+	@SuppressWarnings("unused")
 	private UserIF userLoggedOn;
 
 	public FrameBlogao() {
@@ -36,5 +37,9 @@ public class FrameBlogao extends QWidget {
 	public void openWindow(QWidget frame) {
 		frame.setVisible(true);
 		// TODO terminar metodo.
+	}
+
+	public void registerUser() {
+		blogao.createUser();		
 	}
 }

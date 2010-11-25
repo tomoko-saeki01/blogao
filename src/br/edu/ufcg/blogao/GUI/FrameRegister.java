@@ -1,6 +1,8 @@
 package br.edu.ufcg.blogao.GUI;
 
+import com.trolltech.qt.core.QDate;
 import com.trolltech.qt.gui.QApplication;
+import com.trolltech.qt.gui.QCalendarWidget;
 import com.trolltech.qt.gui.QComboBox;
 import com.trolltech.qt.gui.QDateEdit;
 import com.trolltech.qt.gui.QFont;
@@ -13,6 +15,9 @@ import com.trolltech.qt.gui.QWidget;
 
 public class FrameRegister extends QWidget {
 
+	@SuppressWarnings("unused")
+	private FrameBlogao frameBlogao;
+	
 	private QLabel loginLabel, passwordLabel, confirmPasswordLabel, nameLabel,
 			addressLabel, emailLabel, interestsLabel, moviesLabel, musicsLabel,
 			booksLabel, whoIAmLabel, sexLabel, dateBirthdayLabel;
@@ -40,13 +45,48 @@ public class FrameRegister extends QWidget {
 	}
 
 	private void actionsObjects() {
-		// TODO Auto-generated method stub
 		calendarButton.clicked.connect(this, "openCalendar()");
+		cancelButton.clicked.connect(this, "closeFrame()");
+		registerButton.clicked.connect(this, "registerUser()");
+	}
+	
+	@SuppressWarnings("unused")
+	private void registerUser() {
+		//TODO Verificar se os dados estao todos como esperado.
+		String login =  loginField.text();
+		String password = passwordField.text();
+		String confirmPassword = confirmPasswordField.text();
+		String name = nameField.text();
+		String address = addressField.text();
+		String email = emailField.text();
+		String interests = interestsField.toPlainText();
+		String moviess = moviesField.toPlainText();
+		String musics = musicsField.toPlainText();
+		String books = booksField.toPlainText();
+		String sex = sexCombo.currentText();
+		//TODO recuperar a data!
+		//String dateB = dateBirthday.;
+	
+		//frameBlogao.registerUser();
+	}
+	
+	@SuppressWarnings("unused")
+	private void closeFrame() {
+		close();
 	}
 	
 	@SuppressWarnings("unused")
 	private void openCalendar() {
-		CalendarFrame calendar = new CalendarFrame();
+		getDate(new CalendarFrame());
+	}
+	
+	private void getDate(CalendarFrame c) {
+		//TODO fazer uma forma dele ficar sempre atualizando enquanto 
+		// a janela estiver aberta.
+		QDate d = null;
+		d = c.getSelectedDate();
+		dateBirthday.setDate(d);
+		dateBirthday.setVisible(true);
 	}
 
 	private void initObjects() {
@@ -90,8 +130,13 @@ public class FrameRegister extends QWidget {
 		dateBirthdayLabel.setFont(new QFont("Tempus Sans ITC", 11));
 
 		loginField = new QLineEdit(this);		
+		
 		passwordField = new QLineEdit(this); 
-		confirmPasswordField = new QLineEdit(this); 
+		passwordField.setEchoMode(QLineEdit.EchoMode.Password);
+		
+		confirmPasswordField = new QLineEdit(this);
+		confirmPasswordField.setEchoMode(QLineEdit.EchoMode.Password);
+		
 		nameField = new QLineEdit(this); 
 		addressField = new QLineEdit(this); 
 		emailField = new QLineEdit(this);
@@ -103,6 +148,7 @@ public class FrameRegister extends QWidget {
 		whoIAmField = new QTextEdit(this);
 		
 		sexCombo = new QComboBox(this);
+		sexCombo.addItem("");
 		sexCombo.addItem("Feminino");
 		sexCombo.addItem("Masculino");
 		
@@ -114,9 +160,13 @@ public class FrameRegister extends QWidget {
 		
 		calendarButton =  new QPushButton(this);
 		calendarButton.setIcon(new QIcon("pictures/calendar.png"));
-		
+				
 		dateBirthday = new QDateEdit(this);
 		dateBirthday.setDisplayFormat("dd MMM, yyyy");
+		dateBirthday.setDate(new  QCalendarWidget().minimumDate());
+		dateBirthday.setVisible(false);
+		
+		frameBlogao = new FrameBlogao();
 	}
 
 	private void positionsObjects() {
