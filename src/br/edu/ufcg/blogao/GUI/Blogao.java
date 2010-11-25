@@ -8,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
 import br.edu.ufcg.blogao.user.UserIF;
-import br.edu.ufcg.blogao.user.UserImpl;
 import br.edu.ufcg.blogao.webservice.BlogWSImpl;
 
 public class Blogao {
@@ -49,5 +48,10 @@ public class Blogao {
 
 	public void createUser() {
 		// TODO criar um usuario ;~
+	}
+
+	public void registerUser(String login, String password,String name, String email, String sex, String dateB, String address, String interests, String whoIAm, String movies, String musics, String books) throws Exception {
+	webService.createProfile(login, password, name, email, sex, dateB, address, interests, whoIAm, movies, musics, books);
+		
 	}
 }

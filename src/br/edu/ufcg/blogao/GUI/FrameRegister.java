@@ -14,9 +14,6 @@ import com.trolltech.qt.gui.QTextEdit;
 import com.trolltech.qt.gui.QWidget;
 
 public class FrameRegister extends QWidget {
-
-	@SuppressWarnings("unused")
-	private FrameBlogao frameBlogao;
 	
 	private QLabel loginLabel, passwordLabel, confirmPasswordLabel, nameLabel,
 			addressLabel, emailLabel, interestsLabel, moviesLabel, musicsLabel,
@@ -31,6 +28,8 @@ public class FrameRegister extends QWidget {
 	private QComboBox sexCombo;
 	private QPushButton registerButton, cancelButton, calendarButton;
 	private QDateEdit dateBirthday;
+
+	private FrameBlogao frameBlogao;
 	
 	public FrameRegister() {
 		setWindowTitle("Blogão - Cadastro de um novo usuário");
@@ -51,7 +50,7 @@ public class FrameRegister extends QWidget {
 	}
 	
 	@SuppressWarnings("unused")
-	private void registerUser() {
+	private void registerUser() throws Exception {
 		//TODO Verificar se os dados estao todos como esperado.
 		String login =  loginField.text();
 		String password = passwordField.text();
@@ -60,14 +59,14 @@ public class FrameRegister extends QWidget {
 		String address = addressField.text();
 		String email = emailField.text();
 		String interests = interestsField.toPlainText();
-		String moviess = moviesField.toPlainText();
+		String whoIAm = whoIAmField.toPlainText();
+		String movies = moviesField.toPlainText();
 		String musics = musicsField.toPlainText();
 		String books = booksField.toPlainText();
 		String sex = sexCombo.currentText();
-		//TODO recuperar a data!
-		//String dateB = dateBirthday.;
-	
-		//frameBlogao.registerUser();
+		String dateB = dateBirthday.text();
+
+		frameBlogao.registerUser(login, password, name, email, sex, dateB, address,  interests, whoIAm, movies, musics, books);
 	}
 	
 	@SuppressWarnings("unused")
@@ -83,8 +82,7 @@ public class FrameRegister extends QWidget {
 	private void getDate(CalendarFrame c) {
 		//TODO fazer uma forma dele ficar sempre atualizando enquanto 
 		// a janela estiver aberta.
-		QDate d = null;
-		d = c.getSelectedDate();
+		QDate d = c.getSelectedDate();
 		dateBirthday.setDate(d);
 		dateBirthday.setVisible(true);
 	}
@@ -162,11 +160,9 @@ public class FrameRegister extends QWidget {
 		calendarButton.setIcon(new QIcon("pictures/calendar.png"));
 				
 		dateBirthday = new QDateEdit(this);
-		dateBirthday.setDisplayFormat("dd MMM, yyyy");
+		dateBirthday.setDisplayFormat("dd/MM/yyyy");
 		dateBirthday.setDate(new  QCalendarWidget().minimumDate());
 		dateBirthday.setVisible(false);
-		
-		frameBlogao = new FrameBlogao();
 	}
 
 	private void positionsObjects() {
@@ -206,6 +202,8 @@ public class FrameRegister extends QWidget {
 		
 		registerButton.move(w + 850, h + 500);
 		cancelButton.move(w + 930, h + 500);
+		
+		frameBlogao = new FrameBlogao();
 	}
 
 	private void resizeObjects() {
