@@ -1,5 +1,6 @@
 package br.edu.ufcg.blogao.GUI;
 
+import com.trolltech.qt.gui.QApplication;
 import com.trolltech.qt.gui.QFont;
 import com.trolltech.qt.gui.QLabel;
 import com.trolltech.qt.gui.QLineEdit;
@@ -8,49 +9,29 @@ import com.trolltech.qt.gui.QWidget;
 
 public class FrameLogin extends QWidget {
 
-	private FrameBlogao frameBlogao;
 	private QPushButton loginButton, registerButton;
 	private QLineEdit loginField, passwordField;
 	private QLabel loginLabel, passwordLabel;
 
 	public FrameLogin() {
 		setWindowTitle("Blogão - Login");
-		resize(maximumSize());
+		resize(500, 200);
 
 		initObjects();
 		resizeObjects();
 		positionsObjects();
 		actionsObjects();
 
-		show();
+		//show();
 	}
 
 	private void actionsObjects() {
 		// TODO consertar!
 		//loginButton.clicked.connect(this, "authenticate()");
 		//registerButton.clicked.connect(this, "openRegisterFrame()");
-	}
+	}	
 	
-	@SuppressWarnings("unused")
-	private void openRegisterFrame() {
-		//TODO checar.
-		frameBlogao.openNewFrame(new FrameRegister());
-	}
-
-	@SuppressWarnings("unused")
-	private void authenticate() {
-		/*String login = loginField.text().toString();
-		String password = passwordField.text().toString();
-		boolean authenticated = frameBlogao.authenticate(login, password);
-		if (authenticated) {
-			// TODO
-		} else {
-			frameBlogao.displayMessage("Login/senha invalidos.");
-		} */
-	}
-
 	private void initObjects() {
-		frameBlogao = new FrameBlogao();
 
 		loginButton = new QPushButton("Login", this);
 		registerButton = new QPushButton("Cadastrar", this);
@@ -67,14 +48,16 @@ public class FrameLogin extends QWidget {
 	}
 
 	private void positionsObjects() {
-		loginLabel.move(475, 300);
-		passwordLabel.move(475, 330);
+		int w = 80;
+		int h = 35;
+		loginLabel.move(w, h );
+		passwordLabel.move(w, h + 40);
 
-		loginField.move(520, 300);
-		passwordField.move(520, 330);
+		loginField.move(w + 44, h - 2);
+		passwordField.move(w + 44, h + 36);
 
-		loginButton.move(625, 370);
-		registerButton.move(715, 370);
+		loginButton.move(w + 200 , h + 80);
+		registerButton.move(w + 280, h + 80);
 	}
 
 	private void resizeObjects() {
@@ -85,9 +68,9 @@ public class FrameLogin extends QWidget {
 		passwordField.resize(300, 27);
 	}
 
-	/*public static void main(String[] args) {
+	public static void main(String[] args) {
 		QApplication.initialize(args);
 		new FrameLogin();
 		QApplication.exec();
-	} */
+	} 
 }
