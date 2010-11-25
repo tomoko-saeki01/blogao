@@ -46,4 +46,8 @@ public class Blogao {
 		// TODO procurar usuario por login.
 		return null;
 	}
+
+	public void createUser() {
+		// TODO criar um usuario ;~
+	}
 }
