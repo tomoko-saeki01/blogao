@@ -127,7 +127,9 @@ public class FrameRegister extends QWidget {
 		confirmPasswordField.move(w + 280, h + 35);
 		nameField.move(w + 50, h + 67);
 		//TODO inserir os campos de data!!
+		
 		sexCombo.move(w + 50, h + 127);
+		
 		emailField.move(w + 50, h + 160);
 		addressField.move(w + 70, h + 192);
 		interestsField.move(w +  500, h + 33);
