@@ -70,20 +70,21 @@ public class FrameRegister extends QWidget {
 		}
 		
 		if (!password.equals(confirmPassword)) {
-			frameBlogao.displayMessage("Erro",
+			frameBlogao.displayMessageErro("Erro",
 					"Senhas diferentes. Por favor insere-as novamente!");
 			passwordField.clear();
 			confirmPasswordField.clear();
 			
 		} else if (login.trim().equals("")){
-			frameBlogao.displayMessage("Erro", "Um login deve ser inserido.");
+			frameBlogao.displayMessageErro("Erro", "Um login deve ser inserido.");
 			loginField.clear();
 		} 
 		try {
 			frameBlogao.registerUser(login, password, name, email, sex, dateB,
 					address, interests, whoIAm, movies, musics, books);
+			frameBlogao.displayMessageInformation("Informação", "Cadastro feito com sucesso!");
 		} catch (Exception e) {
-			frameBlogao.displayMessage("Erro", e.getMessage());
+			frameBlogao.displayMessageErro("Erro", e.getMessage());
 			//TODO achar o modo certo de limpar o campo certo!
 		}
 	}

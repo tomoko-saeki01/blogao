@@ -40,7 +40,12 @@ public class FrameBlogao extends QWidget {
 		blogao.registerUser(login,password,name,email,sex, dateB,address, interests, whoIAm, movies, musics, books);		
 	}
 
-	public void displayMessage(String title, String message) {
+	public void displayMessageErro(String title, String message) {
 		 QMessageBox.critical(this, title, message);
+	}
+	
+	public void displayMessageInformation(String title, String message) {
+		 QMessageBox.information(this, title, message);
+
 	}
 }
