@@ -13,13 +13,12 @@ public class FrameLogin extends QWidget {
 	private QLabel loginLabel, passwordLabel;
 
 	public FrameLogin() {
-		resize(500, 200);
+		resize(maximumSize());
 
 		initObjects();
 		resizeObjects();
 		positionsObjects();
 		actionsObjects();
-
 	}
 
 	private void actionsObjects() {
@@ -46,13 +45,11 @@ public class FrameLogin extends QWidget {
 
 		passwordLabel = new QLabel("Senha", this);
 		passwordLabel.setFont(new QFont("Tempus Sans ITC", 11));
-		
-		
 	}
 
 	private void positionsObjects() {
-		int w = 80;
-		int h = 35;
+		int w = 450;
+		int h = 120;
 		loginLabel.move(w, h);
 		passwordLabel.move(w, h + 40);
 
