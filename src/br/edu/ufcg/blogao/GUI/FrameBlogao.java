@@ -49,6 +49,5 @@ public class FrameBlogao extends QWidget {
 
 	public void displayMessageInformation(String title, String message) {
 		QMessageBox.information(this, title, message);
-
 	}
 }
