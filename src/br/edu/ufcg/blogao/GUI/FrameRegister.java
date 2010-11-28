@@ -32,15 +32,12 @@ public class FrameRegister extends QWidget {
 	private FrameBlogao frameBlogao;
 
 	public FrameRegister() {
-		setWindowTitle("Blogão - Cadastro de um novo usuário");
-		resize(maximumSize());
+		resize(1200, 700);
 
 		initObjects();
 		resizeObjects();
 		positionsObjects();
 		actionsObjects();
-
-		show();
 	}
 
 	private void actionsObjects() {
@@ -183,10 +180,12 @@ public class FrameRegister extends QWidget {
 		dateBirthday.setDisplayFormat("dd/MM/yyyy");
 		dateBirthday.setDate(new QCalendarWidget().minimumDate());
 		dateBirthday.setVisible(false);
+		
+		frameBlogao = new FrameBlogao();
 	}
 
 	private void positionsObjects() {
-		int w = 150;
+		int w = 100;
 		int h = 100;
 		loginLabel.move(w, h);
 		passwordLabel.move(w, h + 37);
@@ -222,8 +221,6 @@ public class FrameRegister extends QWidget {
 
 		registerButton.move(w + 850, h + 500);
 		cancelButton.move(w + 930, h + 500);
-
-		frameBlogao = new FrameBlogao();
 	}
 
 	private void resizeObjects() {

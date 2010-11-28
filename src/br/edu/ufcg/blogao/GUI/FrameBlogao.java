@@ -1,6 +1,7 @@
 package br.edu.ufcg.blogao.GUI;
 
 import com.trolltech.qt.gui.QApplication;
+import com.trolltech.qt.gui.QGridLayout;
 import com.trolltech.qt.gui.QIcon;
 import com.trolltech.qt.gui.QMessageBox;
 import com.trolltech.qt.gui.QWidget;
@@ -8,26 +9,24 @@ import com.trolltech.qt.gui.QWidget;
 public class FrameBlogao extends QWidget {
 
 	private Blogao blogao;
-	
+	private QGridLayout layout;
+
 	public FrameBlogao() {
 		setWindowTitle("Blogão");
 		init();
-		objectsActions();
-		//show();
+		objectsActions();		
 	}
 
 	private void objectsActions() {
-		openWindow(new FrameLogin());
 		blogao = new Blogao();
 	}
-
-	private void openWindow(QWidget f) {
-		
-	}
-
+	
 	private void init() {
-		resize(maximumSize());
 		setWindowIcon(new QIcon("pictures/icon.png"));
+		layout = new QGridLayout();
+		setLayout(layout);
+		layout.addWidget(new FrameLogin());
+		showMaximized();
 	}
 
 	public static void main(String[] args) {
@@ -36,16 +35,20 @@ public class FrameBlogao extends QWidget {
 		QApplication.exec();
 	}
 
-	public void registerUser(String login, String password,String name, String email, String sex, String dateB, String address, String interests, String whoIAm, String movies, String musics, String books) throws Exception {
-		blogao.registerUser(login,password,name,email,sex, dateB,address, interests, whoIAm, movies, musics, books);		
+	public void registerUser(String login, String password, String name,
+			String email, String sex, String dateB, String address,
+			String interests, String whoIAm, String movies, String musics,
+			String books) throws Exception {
+		blogao.registerUser(login, password, name, email, sex, dateB, address,
+				interests, whoIAm, movies, musics, books);
 	}
 
 	public void displayMessageErro(String title, String message) {
-		 QMessageBox.critical(this, title, message);
+		QMessageBox.critical(this, title, message);
 	}
-	
+
 	public void displayMessageInformation(String title, String message) {
-		 QMessageBox.information(this, title, message);
+		QMessageBox.information(this, title, message);
 
 	}
 }
