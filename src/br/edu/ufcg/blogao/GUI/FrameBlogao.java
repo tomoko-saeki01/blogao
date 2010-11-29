@@ -12,7 +12,7 @@ import com.trolltech.qt.gui.QWidget;
 
 public class FrameBlogao extends QWidget {
 
-	private QGridLayout layout;
+	
 	private FrameContainer container = FrameContainer.getInstance();
 		
 	public FrameBlogao() {
@@ -24,19 +24,19 @@ public class FrameBlogao extends QWidget {
 	
 	private void openFrameLogin() {
 		
-		layout.addWidget(container.getLoginFrame());
+		container.getLayout().addWidget(container.getNewLoginFrame());
 	}
 	
 	@SuppressWarnings("unused")
 	private void openFrameRegister() {
 		
-		layout.addWidget(container.getRegisterFrame());
+		container.getLayout().addWidget(container.getNewRegisterFrame());
 	}
 
 	private void init() {
 		setWindowIcon(new QIcon("pictures/icon.png"));
-		layout = new QGridLayout();
-		setLayout(layout);	
+		
+		setLayout(container.getLayout());	
 	}
 	
 	private void setColor() {
