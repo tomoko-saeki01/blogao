@@ -11,7 +11,7 @@ public class FrameLogin extends QWidget {
 	private QPushButton loginButton, registerButton;
 	private QLineEdit loginField, passwordField;
 	private QLabel loginLabel, passwordLabel;
-
+		
 	public FrameLogin() {
 		resize(maximumSize());
 
@@ -20,16 +20,17 @@ public class FrameLogin extends QWidget {
 		positionsObjects();
 		actionsObjects();
 	}
-
+	
 	private void actionsObjects() {
 		// TODO consertar!
 		// loginButton.clicked.connect(this, "authenticate()");
-		//registerButton.clicked.connect(this, "openRegisterFrame()");
+		registerButton.clicked.connect(this, "openRegisterFrame()");
 	}
 
 	@SuppressWarnings("unused")
 	private void openRegisterFrame() {
 		
+		close();		
 	}
 
 	private void initObjects() {
