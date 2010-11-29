@@ -2,6 +2,7 @@ package br.edu.ufcg.blogao.GUI;
 
 import com.trolltech.qt.gui.QApplication;
 import com.trolltech.qt.gui.QBrush;
+import com.trolltech.qt.gui.QCloseEvent;
 import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QIcon;
 import com.trolltech.qt.gui.QLinearGradient;
@@ -18,8 +19,40 @@ public class FrameBlogao extends QWidget {
 		init();
 		setColor();
 		openFrameLogin();
+
+
 	}
 
+
+	@Override
+	public void closeEvent(QCloseEvent event) {
+		if (askOnExit()) {
+			try {
+				container.getBlog().logoff(container.getActualSession());
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			event.accept();
+		} else {
+			event.ignore();
+		}
+	}
+	
+	private boolean askOnExit()
+    {
+        
+		QMessageBox.StandardButton ret = QMessageBox.warning(this, tr("Application"),
+				tr("Deseja realmente sair?"),
+				new QMessageBox.StandardButtons(QMessageBox.StandardButton.Ok,
+						QMessageBox.StandardButton.Cancel));
+		if (ret == QMessageBox.StandardButton.Cancel) {
+			return false;
+		}
+        
+        return true;
+
+    }
+	
 	private void openFrameLogin() {
 		container.getLayout().addWidget(container.getNewLoginFrame());
 	}

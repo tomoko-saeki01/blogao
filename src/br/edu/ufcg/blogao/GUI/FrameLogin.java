@@ -38,7 +38,8 @@ public class FrameLogin extends QWidget {
 	@SuppressWarnings("unused")
 	private void authenticate() {
 		try {
-			container.getBlog().logon(loginField.text(), passwordField.text());
+			String session = container.getBlog().logon(loginField.text(), passwordField.text());
+			container.setActualSession(session);
 		} catch (Exception e) {
 			displayMessageErro("Erro", e.getMessage());
 		}
