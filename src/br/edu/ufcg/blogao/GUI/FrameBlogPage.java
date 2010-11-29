@@ -148,7 +148,12 @@ public class FrameBlogPage extends QWidget {
 
 		whoIAmLabel = new QLabel("Quem sou eu", this);
 		whoIAmLabel.setFont(new QFont("Tempus Sans ITC", 11));
-		//whoIAmLabel.setText(container.getBlog().getProfileInformationBySessionId(sessionId, atributo))
+		try {
+			whoIAmLabel.setText(container.getBlog().getProfileInformationBySessionId(container.getActualSession(), "interesses"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 
 		sexLabel = new QLabel("Sexo", this);
 		sexLabel.setFont(new QFont("Tempus Sans ITC", 11));
