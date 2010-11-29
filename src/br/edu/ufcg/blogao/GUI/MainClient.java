@@ -1,9 +1,5 @@
 package br.edu.ufcg.blogao.GUI;
 
-import java.net.InetAddress;
-
-import com.trolltech.qt.gui.QApplication;
-
 import br.edu.ufcg.blogao.webservice.BlogWS;
 
 public class MainClient {
@@ -16,12 +12,8 @@ public class MainClient {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 		//QApplication.initialize(args);
 		//new FrameLogin(blog);
 		//QApplication.exec();
-		
-		
 	}
-
 }

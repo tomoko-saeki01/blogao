@@ -1,7 +1,5 @@
 package br.edu.ufcg.blogao.GUI;
 
-import java.awt.Frame;
-
 import com.trolltech.qt.gui.QFont;
 import com.trolltech.qt.gui.QLabel;
 import com.trolltech.qt.gui.QLineEdit;
@@ -26,14 +24,12 @@ public class FrameLogin extends QWidget {
 	}
 	
 	private void actionsObjects() {
-		// TODO consertar!
 		loginButton.clicked.connect(this, "authenticate()");
 		registerButton.clicked.connect(this, "openRegisterFrame()");
 	}
 
 	@SuppressWarnings("unused")
 	private void openRegisterFrame() {
-		
 		close();
 		container.getLayout().removeWidget(container.getActualLoginFrame());
 		container.getLayout().addWidget(container.getNewRegisterFrame());
@@ -41,7 +37,6 @@ public class FrameLogin extends QWidget {
 	
 	@SuppressWarnings("unused")
 	private void authenticate() {
-		
 		try {
 			container.getBlog().logon(loginField.text(), passwordField.text());
 		} catch (Exception e) {
