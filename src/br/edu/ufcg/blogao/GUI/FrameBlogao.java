@@ -40,7 +40,7 @@ public class FrameBlogao extends QWidget {
 		setLayout(layout);	
 	}
 	
-	public void setColor() {
+	private void setColor() {
 		QPalette palette = new QPalette();
         QLinearGradient gradient = new QLinearGradient(0, 0, 0, this.height());
         gradient.setColorAt(0.0, new QColor("#c5c5c5"));
