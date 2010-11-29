@@ -1,7 +1,6 @@
 package br.edu.ufcg.blogao.GUI;
 
 import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 
 import br.edu.ufcg.blogao.webservice.BlogWS;
@@ -23,5 +22,4 @@ public class HelperClient {
 		factory.setAddress(port);
 		return (BlogWS) factory.create();
 	}
-
 }

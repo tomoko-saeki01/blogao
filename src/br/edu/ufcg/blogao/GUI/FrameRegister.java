@@ -28,7 +28,7 @@ public class FrameRegister extends QWidget {
 	private QComboBox sexCombo;
 	private QPushButton registerButton, cancelButton, calendarButton;
 	private QDateEdit dateBirthday;
-	
+
 	private FrameContainer container = FrameContainer.getInstance();
 
 	public FrameRegister() {
@@ -38,8 +38,8 @@ public class FrameRegister extends QWidget {
 		resizeObjects();
 		positionsObjects();
 		actionsObjects();
-		
-		//show();
+
+		// show();
 	}
 
 	private void actionsObjects() {
@@ -63,38 +63,40 @@ public class FrameRegister extends QWidget {
 		String books = booksField.toPlainText();
 		String sex = sexCombo.currentText();
 		String dateB = dateBirthday.text();
-		
+
 		if (sex.trim().equals("")) {
 			sex = "Uninformed";
 		}
-		
+
 		if (!password.equals(confirmPassword)) {
 			displayMessageErro("Erro",
 					"Senhas diferentes. Por favor insere-as novamente!");
 			passwordField.clear();
 			confirmPasswordField.clear();
-			
-		} else if (login.trim().equals("")){
+
+		} else if (login.trim().equals("")) {
 			displayMessageErro("Erro", "Um login deve ser inserido.");
 			loginField.clear();
-		} 
-		try {
-			//soh teste de telar, nao precisa desse metodo.
-			container.getBlog().createProfile(login, password, name, email, sex, dateB,
-					address, interests, whoIAm, movies, musics, books);
-			displayMessageInformation("Informação", "Cadastro feito com sucesso!");
-		} catch (Exception e) {
-			displayMessageErro("Erro", e.getMessage());
-			//TODO achar o modo certo de limpar o campo certo!
-		} 
+		} else {
+			try {
+				// soh teste de telar, nao precisa desse metodo.
+				container.getBlog().createProfile(login, password, name, email,
+						sex, dateB, address, interests, whoIAm, movies, musics,
+						books);
+				displayMessageInformation("Informação",
+						"Cadastro feito com sucesso!");
+				closeFrame();
+			} catch (Exception e) {
+				displayMessageErro("Erro", e.getMessage());
+				// TODO achar o modo certo de limpar o campo certo!
+			}
+		}
 	}
 
-	@SuppressWarnings("unused")
 	private void closeFrame() {
 		close();
 		container.getLayout().removeWidget(container.getActualRegisterFrame());
 		container.getLayout().addWidget(container.getNewLoginFrame());
-		
 	}
 
 	@SuppressWarnings("unused")
@@ -243,11 +245,11 @@ public class FrameRegister extends QWidget {
 		registerButton.maximumSize();
 		cancelButton.maximumSize();
 	}
-	
+
 	public void displayMessageErro(String title, String message) {
 		QMessageBox.critical(this, title, message);
 	}
-	
+
 	public void displayMessageInformation(String title, String message) {
 		QMessageBox.information(this, title, message);
 	}
