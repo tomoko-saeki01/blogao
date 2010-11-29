@@ -13,8 +13,7 @@ import com.trolltech.qt.gui.QWidget;
 public class FrameBlogao extends QWidget {
 
 	private QGridLayout layout;
-	private FrameLogin frameLogin;
-	private FrameRegister frameRegister;
+	private FrameContainer container = FrameContainer.getInstance();
 		
 	public FrameBlogao() {
 		setWindowTitle("Blogão");
@@ -24,14 +23,14 @@ public class FrameBlogao extends QWidget {
 	}
 	
 	private void openFrameLogin() {
-		frameLogin = new FrameLogin();
-		layout.addWidget(frameLogin);
+		
+		layout.addWidget(container.getLoginFrame());
 	}
 	
 	@SuppressWarnings("unused")
 	private void openFrameRegister() {
-		frameRegister = new FrameRegister();
-		layout.addWidget(frameRegister);
+		
+		layout.addWidget(container.getRegisterFrame());
 	}
 
 	private void init() {
