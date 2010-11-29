@@ -1,7 +1,6 @@
 package br.edu.ufcg.blogao.GUI;
 
 import com.trolltech.qt.core.QDate;
-import com.trolltech.qt.gui.QApplication;
 import com.trolltech.qt.gui.QCalendarWidget;
 import com.trolltech.qt.gui.QComboBox;
 import com.trolltech.qt.gui.QDateEdit;
@@ -29,8 +28,6 @@ public class FrameRegister extends QWidget {
 	private QPushButton registerButton, cancelButton, calendarButton;
 	private QDateEdit dateBirthday;
 
-	private FrameBlogao frameBlogao;
-
 	public FrameRegister() {
 		resize(1200, 700);
 
@@ -38,6 +35,8 @@ public class FrameRegister extends QWidget {
 		resizeObjects();
 		positionsObjects();
 		actionsObjects();
+		
+		show();
 	}
 
 	private void actionsObjects() {
@@ -66,7 +65,7 @@ public class FrameRegister extends QWidget {
 			sex = "Uninformed";
 		}
 		
-		if (!password.equals(confirmPassword)) {
+		/*if (!password.equals(confirmPassword)) {
 			frameBlogao.displayMessageErro("Erro",
 					"Senhas diferentes. Por favor insere-as novamente!");
 			passwordField.clear();
@@ -77,13 +76,14 @@ public class FrameRegister extends QWidget {
 			loginField.clear();
 		} 
 		try {
-			frameBlogao.registerUser(login, password, name, email, sex, dateB,
-					address, interests, whoIAm, movies, musics, books);
+			//soh teste de telar, nao precisa desse metodo.
+			//frameBlogao.registerUser(login, password, name, email, sex, dateB,
+			//		address, interests, whoIAm, movies, musics, books);
 			frameBlogao.displayMessageInformation("Informação", "Cadastro feito com sucesso!");
 		} catch (Exception e) {
 			frameBlogao.displayMessageErro("Erro", e.getMessage());
 			//TODO achar o modo certo de limpar o campo certo!
-		}
+		} */
 	}
 
 	@SuppressWarnings("unused")
@@ -180,8 +180,6 @@ public class FrameRegister extends QWidget {
 		dateBirthday.setDisplayFormat("dd/MM/yyyy");
 		dateBirthday.setDate(new QCalendarWidget().minimumDate());
 		dateBirthday.setVisible(false);
-		
-		frameBlogao = new FrameBlogao();
 	}
 
 	private void positionsObjects() {
@@ -238,11 +236,5 @@ public class FrameRegister extends QWidget {
 
 		registerButton.maximumSize();
 		cancelButton.maximumSize();
-	}
-
-	public static void main(String[] args) {
-		QApplication.initialize(args);
-		new FrameRegister();
-		QApplication.exec();
 	}
 }
