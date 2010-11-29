@@ -1,5 +1,8 @@
 package br.edu.ufcg.blogao.GUI;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.trolltech.qt.core.QDate;
 import com.trolltech.qt.gui.QCalendarWidget;
 import com.trolltech.qt.gui.QComboBox;
@@ -8,12 +11,11 @@ import com.trolltech.qt.gui.QFont;
 import com.trolltech.qt.gui.QIcon;
 import com.trolltech.qt.gui.QLabel;
 import com.trolltech.qt.gui.QLineEdit;
-import com.trolltech.qt.gui.QMessageBox;
 import com.trolltech.qt.gui.QPushButton;
 import com.trolltech.qt.gui.QTextEdit;
 import com.trolltech.qt.gui.QWidget;
 
-public class FrameRegister extends QWidget {
+public class FrameBlogPage extends QWidget {
 
 	private QLabel loginLabel, passwordLabel, confirmPasswordLabel, nameLabel,
 			addressLabel, emailLabel, interestsLabel, moviesLabel, musicsLabel,
@@ -22,8 +24,11 @@ public class FrameRegister extends QWidget {
 	private QLineEdit loginField, passwordField, confirmPasswordField,
 			nameField, addressField, emailField;
 
+	private List<QTextEdit> posts;
+	
 	private QTextEdit interestsField, moviesField, musicsField, booksField,
-			whoIAmField;
+	whoIAmField;
+
 
 	private QComboBox sexCombo;
 	private QPushButton registerButton, cancelButton, calendarButton;
@@ -31,7 +36,7 @@ public class FrameRegister extends QWidget {
 	
 	private FrameContainer container = FrameContainer.getInstance();
 
-	public FrameRegister() {
+	public FrameBlogPage() {
 		resize(1200, 700);
 
 		initObjects();
@@ -68,25 +73,25 @@ public class FrameRegister extends QWidget {
 			sex = "Uninformed";
 		}
 		
-		if (!password.equals(confirmPassword)) {
-			displayMessageErro("Erro",
+		/*if (!password.equals(confirmPassword)) {
+			frameBlogao.displayMessageErro("Erro",
 					"Senhas diferentes. Por favor insere-as novamente!");
 			passwordField.clear();
 			confirmPasswordField.clear();
 			
 		} else if (login.trim().equals("")){
-			displayMessageErro("Erro", "Um login deve ser inserido.");
+			frameBlogao.displayMessageErro("Erro", "Um login deve ser inserido.");
 			loginField.clear();
 		} 
 		try {
 			//soh teste de telar, nao precisa desse metodo.
-			container.getBlog().createProfile(login, password, name, email, sex, dateB,
-					address, interests, whoIAm, movies, musics, books);
-			displayMessageInformation("Informação", "Cadastro feito com sucesso!");
+			//frameBlogao.registerUser(login, password, name, email, sex, dateB,
+			//		address, interests, whoIAm, movies, musics, books);
+			frameBlogao.displayMessageInformation("Informação", "Cadastro feito com sucesso!");
 		} catch (Exception e) {
-			displayMessageErro("Erro", e.getMessage());
+			frameBlogao.displayMessageErro("Erro", e.getMessage());
 			//TODO achar o modo certo de limpar o campo certo!
-		} 
+		} */
 	}
 
 	@SuppressWarnings("unused")
@@ -143,6 +148,7 @@ public class FrameRegister extends QWidget {
 
 		whoIAmLabel = new QLabel("Quem sou eu", this);
 		whoIAmLabel.setFont(new QFont("Tempus Sans ITC", 11));
+		//whoIAmLabel.setText(container.getBlog().getProfileInformationBySessionId(sessionId, atributo))
 
 		sexLabel = new QLabel("Sexo", this);
 		sexLabel.setFont(new QFont("Tempus Sans ITC", 11));
@@ -162,11 +168,7 @@ public class FrameRegister extends QWidget {
 		addressField = new QLineEdit(this);
 		emailField = new QLineEdit(this);
 
-		interestsField = new QTextEdit(this);
-		moviesField = new QTextEdit(this);
-		musicsField = new QTextEdit(this);
-		booksField = new QTextEdit(this);
-		whoIAmField = new QTextEdit(this);
+		posts = new ArrayList<QTextEdit>();
 
 		sexCombo = new QComboBox(this);
 		sexCombo.addItem("");
@@ -242,13 +244,5 @@ public class FrameRegister extends QWidget {
 
 		registerButton.maximumSize();
 		cancelButton.maximumSize();
-	}
-	
-	public void displayMessageErro(String title, String message) {
-		QMessageBox.critical(this, title, message);
-	}
-	
-	public void displayMessageInformation(String title, String message) {
-		QMessageBox.information(this, title, message);
 	}
 }

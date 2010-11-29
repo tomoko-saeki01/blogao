@@ -1,8 +1,11 @@
 package br.edu.ufcg.blogao.GUI;
 
+import java.awt.Frame;
+
 import com.trolltech.qt.gui.QFont;
 import com.trolltech.qt.gui.QLabel;
 import com.trolltech.qt.gui.QLineEdit;
+import com.trolltech.qt.gui.QMessageBox;
 import com.trolltech.qt.gui.QPushButton;
 import com.trolltech.qt.gui.QWidget;
 
@@ -11,6 +14,7 @@ public class FrameLogin extends QWidget {
 	private QPushButton loginButton, registerButton;
 	private QLineEdit loginField, passwordField;
 	private QLabel loginLabel, passwordLabel;
+	private FrameContainer container = FrameContainer.getInstance();
 		
 	public FrameLogin() {
 		resize(maximumSize());
@@ -23,14 +27,26 @@ public class FrameLogin extends QWidget {
 	
 	private void actionsObjects() {
 		// TODO consertar!
-		// loginButton.clicked.connect(this, "authenticate()");
+		loginButton.clicked.connect(this, "authenticate()");
 		registerButton.clicked.connect(this, "openRegisterFrame()");
 	}
 
 	@SuppressWarnings("unused")
 	private void openRegisterFrame() {
 		
-		close();		
+		close();
+		container.getLayout().removeWidget(container.getActualLoginFrame());
+		container.getLayout().addWidget(container.getNewRegisterFrame());
+	}
+	
+	@SuppressWarnings("unused")
+	private void authenticate() {
+		
+		try {
+			container.getBlog().logon(loginField.text(), passwordField.text());
+		} catch (Exception e) {
+			displayMessageErro("Erro", e.getMessage());
+		}
 	}
 
 	private void initObjects() {
@@ -67,5 +83,9 @@ public class FrameLogin extends QWidget {
 
 		loginField.resize(300, 27);
 		passwordField.resize(300, 27);
+	}
+	
+	public void displayMessageErro(String title, String message) {
+		QMessageBox.critical(this, title, message);
 	}
 }
