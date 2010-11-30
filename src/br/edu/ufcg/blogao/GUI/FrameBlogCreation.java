@@ -23,31 +23,24 @@ public class FrameBlogCreation extends QWidget {
 		resizeObjects();
 		positionsObjects();
 		actionsObjects();
-		//HHAHAHAHAHAHHA teste
 	}
 
 	private void actionsObjects() {
+		registerButton.clicked.connect(this, "createBlog()");
+		cancelButton.clicked.connect(this, "closeFrame()");
 	}
 
 	@SuppressWarnings("unused")
-	private void registerUser() throws Exception {
+	private void createBlog() throws Exception {
 		String title = titleField.text();
 		String description = descriptionField.toPlainText();
-
-		/*
-		 * try { // soh teste de telar, nao precisa desse metodo.
-		 * container.getBlog().createProfile(login, password, name, email, sex,
-		 * dateB, address, interests, whoIAm, movies, musics, books);
-		 * displayMessageInformation("Informação",
-		 * "Cadastro feito com sucesso!"); closeFrame(); } catch (Exception e) {
-		 * displayMessageErro("Erro", e.getMessage()); // TODO achar o modo
-		 * certo de limpar o campo certo! }
-		 */
+		//TODO it.
 	}
 
 	@SuppressWarnings("unused")
 	private void closeFrame() {
 		close();
+		//TODO fix it!
 		container.getLayout().removeWidget(container.getActualRegisterFrame());
 		container.getLayout().addWidget(container.getNewLoginFrame());
 	}
@@ -71,11 +64,16 @@ public class FrameBlogCreation extends QWidget {
 
 		titleField.move(w + 50, h);
 		descriptionField.move(w + 50, h + 35);
+		
+		//registerButton.move();
+		//cancelButton.move();
 	}
 
 	private void resizeObjects() {
 		titleField.resize(329, 25);
 		descriptionField.resize(200, 150);
+		registerButton.minimumSize();
+		cancelButton.minimumSize();
 	}
 
 	public void displayMessageErro(String title, String message) {
