@@ -226,7 +226,7 @@ public class FrameRegister extends QWidget {
 	}
 
 	private void resizeObjects() {
-		loginField.resize(328, 25);
+		loginField.resize(329, 25);
 		passwordField.resize(100, 25);
 		confirmPasswordField.resize(100, 25);
 		nameField.resize(330, 25);
