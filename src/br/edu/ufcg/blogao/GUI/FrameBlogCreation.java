@@ -9,8 +9,8 @@ import com.trolltech.qt.gui.QTextEdit;
 import com.trolltech.qt.gui.QWidget;
 
 public class FrameBlogCreation extends QWidget {
-	private QLabel titleLabel, descriptionLabel;
-	private QLineEdit titleField;
+	private QLabel nameLabel, descriptionLabel;
+	private QLineEdit nameField;
 	private QTextEdit descriptionField;
 	private QPushButton registerButton, cancelButton;
 
@@ -32,9 +32,20 @@ public class FrameBlogCreation extends QWidget {
 
 	@SuppressWarnings("unused")
 	private void createBlog() throws Exception {
-		String title = titleField.text();
+		String title = nameField.text();
 		String description = descriptionField.toPlainText();
-		//TODO it.
+		
+		if (title.trim().equals("")) {
+			displayMessageErro("Erro", "Nome deve ser preenchido.");
+			nameField.clear();
+		} else {
+			try {
+				//TODO it.				
+			} catch (Exception e) {
+				//TODO it.
+				
+			}
+		}
 	}
 
 	@SuppressWarnings("unused")
@@ -46,8 +57,8 @@ public class FrameBlogCreation extends QWidget {
 	}
 
 	private void initObjects() {
-		titleLabel = new QLabel("Título", this);
-		titleLabel.setFont(new QFont("Tempus Sans ITC", 11));
+		nameLabel = new QLabel("Nome", this);
+		nameLabel.setFont(new QFont("Tempus Sans ITC", 11));
 
 		descriptionLabel = new QLabel("Descrição", this);
 		descriptionLabel.setFont(new QFont("Tempus Sans ITC", 11));
@@ -59,10 +70,10 @@ public class FrameBlogCreation extends QWidget {
 	private void positionsObjects() {
 		int w = 100;
 		int h = 100;
-		titleLabel.move(w, h);
+		nameLabel.move(w, h);
 		descriptionLabel.move(w, h + 37);
 
-		titleField.move(w + 50, h);
+		nameField.move(w + 50, h);
 		descriptionField.move(w + 50, h + 35);
 		
 		//registerButton.move();
@@ -70,7 +81,7 @@ public class FrameBlogCreation extends QWidget {
 	}
 
 	private void resizeObjects() {
-		titleField.resize(329, 25);
+		nameField.resize(329, 25);
 		descriptionField.resize(200, 150);
 		registerButton.minimumSize();
 		cancelButton.minimumSize();
