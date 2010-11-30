@@ -27,14 +27,14 @@ public class FrameRegister extends QWidget {
 	private QComboBox sexCombo;
 	private QPushButton registerButton, cancelButton, calendarButton;
 	private QDateEdit dateBirthday;
-    private FrameContainer container = FrameContainer.getInstance();
+	private FrameContainer container = FrameContainer.getInstance();
 
 	public FrameRegister() {
 		resize(1200, 700);
 
-		initObjects();
-		resizeObjects();
-		positionsObjects();
+		init();
+		resize();
+		positions();
 		actionsObjects();
 	}
 
@@ -44,59 +44,18 @@ public class FrameRegister extends QWidget {
 		registerButton.clicked.connect(this, "registerUser()");
 	}
 
-	@SuppressWarnings("unused")
-	private void registerUser() throws Exception {
-		String login = loginField.text();
-		String password = passwordField.text();
-		String confirmPassword = confirmPasswordField.text();
-		String name = nameField.text();
-		String address = addressField.text();
-		String email = emailField.text();
-		String interests = interestsField.toPlainText();
-		String whoIAm = whoIAmField.toPlainText();
-		String movies = moviesField.toPlainText();
-		String musics = musicsField.toPlainText();
-		String books = booksField.toPlainText();
-		String sex = sexCombo.currentText();
-		String dateB = dateBirthday.text();
-
-		if (sex.trim().equals("")) {
-			sex = "Uninformed";
-		}
-
-		if (!password.equals(confirmPassword)) {
-			displayMessageErro("Erro", "Senhas diferentes. Por favor insere-as novamente!");
-			passwordField.clear();
-			confirmPasswordField.clear();
-
-		} else if (login.trim().equals("")) {
-			displayMessageErro("Erro", "Um login deve ser inserido.");
-			loginField.clear();
-		} else {
-			try {
-				//soh teste de telar, nao precisa desse metodo.
-				container.getBlog().createProfile(login, password, name, email,
-						sex, dateB, address, interests, whoIAm, movies, musics,
-						books);
-				displayMessageInformation("Informação",
-						"Cadastro feito com sucesso!");
-				closeFrame();
-			} catch (Exception e) {
-				displayMessageErro("Erro", e.getMessage());
-				// TODO achar o modo certo de limpar o campo certo!
-			}
-		}
-	}
-
 	private void closeFrame() {
 		close();
 		container.getLayout().removeWidget(container.getActualRegisterFrame());
 		container.getLayout().addWidget(container.getNewLoginFrame());
 	}
 
-	@SuppressWarnings("unused")
-	private void openCalendar() {
-		getDate(new CalendarFrame());
+	private void displayMessageErro(String title, String message) {
+		QMessageBox.critical(this, title, message);
+	}
+
+	private void displayMessageInformation(String title, String message) {
+		QMessageBox.information(this, title, message);
 	}
 
 	private void getDate(CalendarFrame c) {
@@ -107,7 +66,7 @@ public class FrameRegister extends QWidget {
 		dateBirthday.setVisible(true);
 	}
 
-	private void initObjects() {
+	private void init() {
 		loginLabel = new QLabel("Login", this);
 		loginLabel.setFont(new QFont("Tempus Sans ITC", 11));
 
@@ -185,7 +144,12 @@ public class FrameRegister extends QWidget {
 		dateBirthday.setVisible(false);
 	}
 
-	private void positionsObjects() {
+	@SuppressWarnings("unused")
+	private void openCalendar() {
+		getDate(new CalendarFrame());
+	}
+
+	private void positions() {
 		int w = 100;
 		int h = 100;
 		loginLabel.move(w, h);
@@ -224,7 +188,7 @@ public class FrameRegister extends QWidget {
 		cancelButton.move(w + 930, h + 500);
 	}
 
-	private void resizeObjects() {
+	private void resize() {
 		loginField.resize(329, 25);
 		passwordField.resize(100, 25);
 		confirmPasswordField.resize(100, 25);
@@ -241,11 +205,49 @@ public class FrameRegister extends QWidget {
 		cancelButton.maximumSize();
 	}
 
-	public void displayMessageErro(String title, String message) {
-		QMessageBox.critical(this, title, message);
+	@SuppressWarnings("unused")
+	private void registerUser() throws Exception {
+		String login = loginField.text();
+		String password = passwordField.text();
+		String confirmPassword = confirmPasswordField.text();
+		String name = nameField.text();
+		String address = addressField.text();
+		String email = emailField.text();
+		String interests = interestsField.toPlainText();
+		String whoIAm = whoIAmField.toPlainText();
+		String movies = moviesField.toPlainText();
+		String musics = musicsField.toPlainText();
+		String books = booksField.toPlainText();
+		String sex = sexCombo.currentText();
+		String dateB = dateBirthday.text();
+
+		if (sex.trim().equals("")) {
+			sex = "Uninformed";
+		}
+
+		if (!password.equals(confirmPassword)) {
+			displayMessageErro("Erro",
+					"Senhas diferentes. Por favor insere-as novamente!");
+			passwordField.clear();
+			confirmPasswordField.clear();
+
+		} else if (login.trim().equals("")) {
+			displayMessageErro("Erro", "Um login deve ser inserido.");
+			loginField.clear();
+		} else {
+			try {
+				// soh teste de telar, nao precisa desse metodo.
+				container.getBlog().createProfile(login, password, name, email,
+						sex, dateB, address, interests, whoIAm, movies, musics,
+						books);
+				displayMessageInformation("Informação",
+						"Cadastro feito com sucesso!");
+				closeFrame();
+			} catch (Exception e) {
+				displayMessageErro("Erro", e.getMessage());
+				// TODO achar o modo certo de limpar o campo certo!
+			}
+		}
 	}
 
-	public void displayMessageInformation(String title, String message) {
-		QMessageBox.information(this, title, message);
-	}
 }

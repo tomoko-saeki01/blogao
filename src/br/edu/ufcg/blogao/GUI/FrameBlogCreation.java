@@ -64,6 +64,9 @@ public class FrameBlogCreation extends QWidget {
 		descriptionLabel = new QLabel("Descrição", this);
 		descriptionLabel.setFont(new QFont("Tempus Sans ITC", 11));
 		
+		nameField = new QLineEdit(this);
+		descriptionField = new QTextEdit(this);
+		
 		registerButton = new QPushButton("Criar");
 		registerButton.setIcon(new QIcon("pictures/right.png"));
 		
@@ -75,28 +78,27 @@ public class FrameBlogCreation extends QWidget {
 		int w = 100;
 		int h = 100;
 		nameLabel.move(w, h);
-		descriptionLabel.move(w, h + 37);
+		descriptionLabel.move(w, h + 40);
 
-		nameField.move(w + 50, h);
-		descriptionField.move(w + 50, h + 35);
+		nameField.move(w + 65, h);
+		descriptionField.move(w + 65, h + 38);
 		
-		//TODO it.
-		//registerButton.move();
-		//cancelButton.move();
+		registerButton.move(w + 70, h + 60);
+		cancelButton.move(w  + 150, h + 60);
 	}
 
 	private void resizeObjects() {
 		nameField.resize(329, 25);
-		descriptionField.resize(200, 150);
-		registerButton.minimumSize();
-		cancelButton.minimumSize();
+		descriptionField.resize(329, 150);
+		registerButton.maximumSize();
+		cancelButton.maximumSize();
 	}
 
-	public void displayMessageErro(String title, String message) {
+	private void displayMessageErro(String title, String message) {
 		QMessageBox.critical(this, title, message);
 	}
 
-	public void displayMessageInformation(String title, String message) {
+	private void displayMessageInformation(String title, String message) {
 		QMessageBox.information(this, title, message);
 	}
 }

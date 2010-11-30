@@ -20,6 +20,10 @@ public class CalendarFrame extends QWidget {
 		show();
 	}
 	
+	public QDate getSelectedDate() {	
+		return calendar.selectedDate();
+	}
+	
 	private void init() {
 		QGridLayout layout = new QGridLayout();
 		layout.addWidget(previewGroupBox, 0, 0);
@@ -33,10 +37,6 @@ public class CalendarFrame extends QWidget {
 		setWindowIcon(new QIcon("pictures/calendar.png"));
 	}
 			
-	public QDate getSelectedDate() {	
-		return calendar.selectedDate();
-	}
-
 	private void createPreviewGroupBox() {
 		previewGroupBox = new QGroupBox(("Calendário"));
 		

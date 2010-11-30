@@ -17,9 +17,9 @@ public class FrameLogin extends QWidget {
 	public FrameLogin() {
 		resize(maximumSize());
 
-		initObjects();
-		resizeObjects();
-		positionsObjects();
+		init();
+		resize();
+		positions();
 		actionsObjects();
 	}
 	
@@ -28,13 +28,6 @@ public class FrameLogin extends QWidget {
 		registerButton.clicked.connect(this, "openRegisterFrame()");
 	}
 
-	@SuppressWarnings("unused")
-	private void openRegisterFrame() {
-		close();
-		container.getLayout().removeWidget(container.getActualLoginFrame());
-		container.getLayout().addWidget(container.getNewRegisterFrame());
-	}
-	
 	@SuppressWarnings("unused")
 	private void authenticate() {
 		try {
@@ -45,14 +38,12 @@ public class FrameLogin extends QWidget {
 			displayMessageErro("Erro", e.getMessage());
 		}
 	}
-
-	private void openUserFrame() {
-		close();
-		container.getLayout().removeWidget(container.getActualLoginFrame());
-		container.getLayout().addWidget(container.getNewUserFrame());
+	
+	private void displayMessageErro(String title, String message) {
+		QMessageBox.critical(this, title, message);
 	}
-
-	private void initObjects() {
+	
+	private void init() {
 		loginButton = new QPushButton("Login", this);
 		registerButton = new QPushButton("Cadastrar", this);
 
@@ -66,8 +57,22 @@ public class FrameLogin extends QWidget {
 		passwordLabel = new QLabel("Senha", this);
 		passwordLabel.setFont(new QFont("Tempus Sans ITC", 11));
 	}
+	
+	@SuppressWarnings("unused")
+	private void openRegisterFrame() {
+		close();
+		container.getLayout().removeWidget(container.getActualLoginFrame());
+		container.getLayout().addWidget(container.getNewRegisterFrame());
+	}
+	
 
-	private void positionsObjects() {
+	private void openUserFrame() {
+		close();
+		container.getLayout().removeWidget(container.getActualLoginFrame());
+		container.getLayout().addWidget(container.getNewUserFrame());
+	}
+
+	private void positions() {
 		int w = 450;
 		int h = 120;
 		loginLabel.move(w, h);
@@ -80,15 +85,11 @@ public class FrameLogin extends QWidget {
 		registerButton.move(w + 280, h + 80);
 	}
 
-	private void resizeObjects() {
+	private void resize() {
 		loginButton.maximumSize();
 		registerButton.maximumSize();
 
 		loginField.resize(300, 27);
 		passwordField.resize(300, 27);
-	}
-	
-	public void displayMessageErro(String title, String message) {
-		QMessageBox.critical(this, title, message);
 	}
 }

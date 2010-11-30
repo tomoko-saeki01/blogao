@@ -43,49 +43,19 @@ public class FrameUserPage extends QWidget {
 	}
 
 	@SuppressWarnings("unused")
-	private void createBlog() {
-		close();
-		container.getLayout().removeWidget(container.getActualUserFrame());
-		container.getLayout().addWidget(container.getNewCreationBlogFrame());
-	}
-
-	@SuppressWarnings("unused")
-	private void registerUser() throws Exception {
-		String name = nameField.text();
-		String address = addressField.text();
-		String email = emailField.text();
-		String interests = interestsField.toPlainText();
-		String whoIAm = whoIAmField.toPlainText();
-		String movies = moviesField.toPlainText();
-		String musics = musicsField.toPlainText();
-		String books = booksField.toPlainText();
-
-		/*
-		 * if (!password.equals(confirmPassword)) {
-		 * frameBlogao.displayMessageErro("Erro",
-		 * "Senhas diferentes. Por favor insere-as novamente!");
-		 * passwordField.clear(); confirmPasswordField.clear();
-		 * 
-		 * } else if (login.trim().equals("")){
-		 * frameBlogao.displayMessageErro("Erro",
-		 * "Um login deve ser inserido."); loginField.clear(); } try { //soh
-		 * teste de telar, nao precisa desse metodo.
-		 * //frameBlogao.registerUser(login, password, name, email, sex, dateB,
-		 * // address, interests, whoIAm, movies, musics, books);
-		 * frameBlogao.displayMessageInformation("Informação",
-		 * "Cadastro feito com sucesso!"); } catch (Exception e) {
-		 * frameBlogao.displayMessageErro("Erro", e.getMessage()); //TODO achar
-		 * o modo certo de limpar o campo certo! }
-		 */
-	}
-
-	@SuppressWarnings("unused")
 	private void closeFrame() {
 		close();
 		container.getLayout().removeWidget(container.getActualRegisterFrame());
 		container.getLayout().addWidget(container.getNewLoginFrame());
 	}
-
+	
+	@SuppressWarnings("unused")
+	private void createBlog() {
+		close();
+		container.getLayout().removeWidget(container.getActualUserFrame());
+		container.getLayout().addWidget(container.getNewCreationBlogFrame());
+	}
+	
 	private void initObjects() {
 		nameLabel = new QLabel("Nome", this);
 		nameLabel.setFont(new QFont("Tempus Sans ITC", 11));
@@ -135,6 +105,50 @@ public class FrameUserPage extends QWidget {
 		cancelButton.setIcon(new QIcon("pictures/wrong.png"));
 	}
 
+	private void resizeObjects() {
+		nameField.resize(330, 25);
+		emailField.resize(328, 25);
+		addressField.resize(307, 25);
+		interestsField.resize(200, 150);
+		moviesField.resize(200, 150);
+		musicsField.resize(200, 150);
+		booksField.resize(200, 150);
+		whoIAmField.resize(320, 300);
+
+		createBlogButton.maximumSize();
+		cancelButton.maximumSize();
+	}
+	
+	@SuppressWarnings("unused")
+	private void registerUser() throws Exception {
+		String name = nameField.text();
+		String address = addressField.text();
+		String email = emailField.text();
+		String interests = interestsField.toPlainText();
+		String whoIAm = whoIAmField.toPlainText();
+		String movies = moviesField.toPlainText();
+		String musics = musicsField.toPlainText();
+		String books = booksField.toPlainText();
+
+		/*
+		 * if (!password.equals(confirmPassword)) {
+		 * frameBlogao.displayMessageErro("Erro",
+		 * "Senhas diferentes. Por favor insere-as novamente!");
+		 * passwordField.clear(); confirmPasswordField.clear();
+		 * 
+		 * } else if (login.trim().equals("")){
+		 * frameBlogao.displayMessageErro("Erro",
+		 * "Um login deve ser inserido."); loginField.clear(); } try { //soh
+		 * teste de telar, nao precisa desse metodo.
+		 * //frameBlogao.registerUser(login, password, name, email, sex, dateB,
+		 * // address, interests, whoIAm, movies, musics, books);
+		 * frameBlogao.displayMessageInformation("Informação",
+		 * "Cadastro feito com sucesso!"); } catch (Exception e) {
+		 * frameBlogao.displayMessageErro("Erro", e.getMessage()); //TODO achar
+		 * o modo certo de limpar o campo certo! }
+		 */
+	}
+
 	private void positionsObjects() {
 		int w = 100;
 		int h = 100;
@@ -166,19 +180,5 @@ public class FrameUserPage extends QWidget {
 
 		createBlogButton.move(w + 850, h + 500);
 		cancelButton.move(w + 930, h + 500);
-	}
-
-	private void resizeObjects() {
-		nameField.resize(330, 25);
-		emailField.resize(328, 25);
-		addressField.resize(307, 25);
-		interestsField.resize(200, 150);
-		moviesField.resize(200, 150);
-		musicsField.resize(200, 150);
-		booksField.resize(200, 150);
-		whoIAmField.resize(320, 300);
-
-		createBlogButton.maximumSize();
-		cancelButton.maximumSize();
 	}
 }
