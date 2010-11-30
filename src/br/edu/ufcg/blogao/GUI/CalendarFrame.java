@@ -16,7 +16,11 @@ public class CalendarFrame extends QWidget {
 
 	public CalendarFrame() {		
 		createPreviewGroupBox();
-		
+		init();
+		show();
+	}
+	
+	private void init() {
 		QGridLayout layout = new QGridLayout();
 		layout.addWidget(previewGroupBox, 0, 0);
 		layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize);
@@ -27,7 +31,6 @@ public class CalendarFrame extends QWidget {
 
 		setWindowTitle("Calendário");
 		setWindowIcon(new QIcon("pictures/calendar.png"));
-		show();
 	}
 			
 	public QDate getSelectedDate() {	

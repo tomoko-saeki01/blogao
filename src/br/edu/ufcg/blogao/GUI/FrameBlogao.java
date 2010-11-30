@@ -19,10 +19,7 @@ public class FrameBlogao extends QWidget {
 		init();
 		setColor();
 		openFrameLogin();
-
-
 	}
-
 
 	@Override
 	public void closeEvent(QCloseEvent event) {
@@ -40,7 +37,6 @@ public class FrameBlogao extends QWidget {
 	
 	private boolean askOnExit()
     {
-        
 		QMessageBox.StandardButton ret = QMessageBox.warning(this, tr("Application"),
 				tr("Deseja realmente sair?"),
 				new QMessageBox.StandardButtons(QMessageBox.StandardButton.Ok,
@@ -48,9 +44,7 @@ public class FrameBlogao extends QWidget {
 		if (ret == QMessageBox.StandardButton.Cancel) {
 			return false;
 		}
-        
         return true;
-
     }
 	
 	private void openFrameLogin() {
