@@ -46,6 +46,11 @@ public class FrameBlogao extends QWidget {
         return true;
     }
 	
+	private void init() {
+		setWindowIcon(new QIcon("pictures/icon.png"));
+		setLayout(container.getLayout());
+	}
+	
 	private void openFrameLogin() {
 		container.getLayout().addWidget(container.getNewLoginFrame());
 	}
@@ -55,10 +60,7 @@ public class FrameBlogao extends QWidget {
 		container.getLayout().addWidget(container.getNewRegisterFrame());
 	}
 
-	private void init() {
-		setWindowIcon(new QIcon("pictures/icon.png"));
-		setLayout(container.getLayout());
-	}
+	
 
 	private void setColor() {
 		QPalette palette = new QPalette();
@@ -67,14 +69,6 @@ public class FrameBlogao extends QWidget {
 		gradient.setColorAt(1.0, new QColor("#334c93"));
 		palette.setBrush(QPalette.ColorRole.Window, new QBrush(gradient));
 		this.setPalette(palette);
-	}
-
-	public void displayMessageErro(String title, String message) {
-		QMessageBox.critical(this, title, message);
-	}
-
-	public void displayMessageInformation(String title, String message) {
-		QMessageBox.information(this, title, message);
 	}
 
 	public static void main(String[] args) {

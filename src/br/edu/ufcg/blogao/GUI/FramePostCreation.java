@@ -29,6 +29,13 @@ public class FramePostCreation extends QWidget {
 		postButton.clicked.connect(this, "createBlog()");
 		cancelButton.clicked.connect(this, "closeFrame()");
 	}
+	
+	private void closeFrame() {
+		close();
+		//TODO fix it!
+		container.getLayout().removeWidget(container.getActualCreationPostFrame());
+		//container.getLayout().addWidget(container.getNewLoginFrame());
+	}
 
 	@SuppressWarnings("unused")
 	private void createBlog() throws Exception {
@@ -49,12 +56,13 @@ public class FramePostCreation extends QWidget {
 			}
 		}
 	}
+	
+	private void displayMessageErro(String title, String message) {
+		QMessageBox.critical(this, title, message);
+	}
 
-	private void closeFrame() {
-		close();
-		//TODO fix it!
-		container.getLayout().removeWidget(container.getActualCreationPostFrame());
-		//container.getLayout().addWidget(container.getNewLoginFrame());
+	private void displayMessageInformation(String title, String message) {
+		QMessageBox.information(this, title, message);
 	}
 
 	private void initObjects() {
@@ -90,13 +98,5 @@ public class FramePostCreation extends QWidget {
 		textField.resize(200, 150);
 		postButton.minimumSize();
 		cancelButton.minimumSize();
-	}
-
-	public void displayMessageErro(String title, String message) {
-		QMessageBox.critical(this, title, message);
-	}
-
-	public void displayMessageInformation(String title, String message) {
-		QMessageBox.information(this, title, message);
 	}
 }
