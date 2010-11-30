@@ -3,7 +3,6 @@ package br.edu.ufcg.blogao.GUI;
 import br.edu.ufcg.blogao.webservice.BlogWS;
 
 import com.trolltech.qt.gui.QGridLayout;
-import com.trolltech.qt.gui.QWidget;
 
 public class FrameContainer {
 	private static FrameContainer singleton;
@@ -71,7 +70,7 @@ public class FrameContainer {
 		return frameCreationBlog;
 	}
 	
-	public FrameEditProfile getNewEditProfileFrame() {
+	public FrameEditProfile getNewEditProfileFrame() throws Exception {
 		frameEditProfile = new FrameEditProfile();
 		return frameEditProfile;
 	}
@@ -86,7 +85,7 @@ public class FrameContainer {
 		return frameRegister;
 	}
 
-	public QWidget getNewUserFrame() {
+	public FrameUserPage getNewUserFrame() {
 		frameUser = new FrameUserPage();
 		return frameUser;
 	}

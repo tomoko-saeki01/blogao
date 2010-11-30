@@ -222,7 +222,7 @@ public class FrameRegister extends QWidget {
 		String dateB = dateBirthday.text();
 
 		if (sex.trim().equals("")) {
-			sex = "Uninformed";
+			sex = "Não informado";
 		}
 
 		if (!password.equals(confirmPassword)) {

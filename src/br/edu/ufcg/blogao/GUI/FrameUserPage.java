@@ -53,7 +53,7 @@ public class FrameUserPage extends QWidget {
 	}
 	
 	@SuppressWarnings("unused")
-	private void openEditProfile() {
+	private void openEditProfile() throws Exception {
 		close();
 		container.getLayout().removeWidget(container.getActualUserFrame());
 		container.getLayout().addWidget(container.getNewEditProfileFrame());
