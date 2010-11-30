@@ -10,6 +10,7 @@ public class FrameContainer {
 	private FrameLogin frameLogin;
 	private FrameRegister frameRegister;
 	private FrameBlogCreation frameCreationBlog;
+	private FrameEditProfile frameEditProfile;
 	private FrameUserPage frameUser;
 	private FramePostCreation frameCreationPost;
 	private QGridLayout layout;
@@ -35,6 +36,10 @@ public class FrameContainer {
 		return frameCreationPost;
 	}
 
+	public FrameEditProfile getActualEditProfielFrame() {
+		return frameEditProfile;
+	}
+	
 	public FrameLogin getActualLoginFrame() {
 		return frameLogin;
 	}
@@ -47,7 +52,7 @@ public class FrameContainer {
 		return sessionId;
 	}
 
-	public QWidget getActualUserFrame() {
+	public FrameUserPage getActualUserFrame() {
 		return frameUser;
 	}
 
@@ -64,6 +69,11 @@ public class FrameContainer {
 	public FrameBlogCreation getNewCreationBlogFrame() {
 		frameCreationBlog = new FrameBlogCreation();
 		return frameCreationBlog;
+	}
+	
+	public FrameEditProfile getNewEditProfileFrame() {
+		frameEditProfile = new FrameEditProfile();
+		return frameEditProfile;
 	}
 
 	public FrameLogin getNewLoginFrame() {
