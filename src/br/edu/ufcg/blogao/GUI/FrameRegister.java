@@ -14,7 +14,6 @@ import com.trolltech.qt.gui.QTextEdit;
 import com.trolltech.qt.gui.QWidget;
 
 public class FrameRegister extends QWidget {
-
 	private QLabel loginLabel, passwordLabel, confirmPasswordLabel, nameLabel,
 			addressLabel, emailLabel, interestsLabel, moviesLabel, musicsLabel,
 			booksLabel, whoIAmLabel, sexLabel, dateBirthdayLabel;

@@ -1,12 +1,6 @@
 package br.edu.ufcg.blogao.GUI;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.trolltech.qt.core.QDate;
-import com.trolltech.qt.gui.QCalendarWidget;
 import com.trolltech.qt.gui.QComboBox;
-import com.trolltech.qt.gui.QDateEdit;
 import com.trolltech.qt.gui.QFont;
 import com.trolltech.qt.gui.QIcon;
 import com.trolltech.qt.gui.QLabel;
@@ -16,43 +10,34 @@ import com.trolltech.qt.gui.QTextEdit;
 import com.trolltech.qt.gui.QWidget;
 
 public class FrameUserPage extends QWidget {
+	private QLabel nameLabel, addressLabel, emailLabel, interestsLabel,
+			moviesLabel, musicsLabel, booksLabel, whoIAmLabel, sexLabel,
+			dateBirthdayLabel;
 
-	private QLabel nameLabel,
-			addressLabel, emailLabel, interestsLabel, moviesLabel, musicsLabel,
-			booksLabel, whoIAmLabel, sexLabel, dateBirthdayLabel;
+	private QLineEdit nameField, addressField, emailField, birthDayField,
+			sexField;
 
-	private QLineEdit 
-			nameField, addressField, emailField, birthDayField, sexField;
-
-	
-	
 	private QTextEdit interestsField, moviesField, musicsField, booksField,
-	whoIAmField;
-
+			whoIAmField;
 
 	private QComboBox blogs;
 	private QPushButton createBlogButton, cancelButton;
-	
-	
+
 	private FrameContainer container = FrameContainer.getInstance();
 
 	public FrameUserPage() {
 		resize(1200, 700);
 		try {
-			
-		
-		initObjects();
-		resizeObjects();
-		positionsObjects();
-		actionsObjects();
+			initObjects();
+			resizeObjects();
+			positionsObjects();
+			actionsObjects();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		//show();
 	}
 
 	private void actionsObjects() {
-		
 		cancelButton.clicked.connect(this, "closeFrame()");
 		createBlogButton.clicked.connect(this, "createBlog()");
 	}
@@ -63,10 +48,9 @@ public class FrameUserPage extends QWidget {
 		container.getLayout().removeWidget(container.getActualUserFrame());
 		container.getLayout().addWidget(container.getNewCreationBlogFrame());
 	}
-	
+
 	@SuppressWarnings("unused")
 	private void registerUser() throws Exception {
-		
 		String name = nameField.text();
 		String address = addressField.text();
 		String email = emailField.text();
@@ -75,29 +59,24 @@ public class FrameUserPage extends QWidget {
 		String movies = moviesField.toPlainText();
 		String musics = musicsField.toPlainText();
 		String books = booksField.toPlainText();
-		
-		
-		
-		
-		/*if (!password.equals(confirmPassword)) {
-			frameBlogao.displayMessageErro("Erro",
-					"Senhas diferentes. Por favor insere-as novamente!");
-			passwordField.clear();
-			confirmPasswordField.clear();
-			
-		} else if (login.trim().equals("")){
-			frameBlogao.displayMessageErro("Erro", "Um login deve ser inserido.");
-			loginField.clear();
-		} 
-		try {
-			//soh teste de telar, nao precisa desse metodo.
-			//frameBlogao.registerUser(login, password, name, email, sex, dateB,
-			//		address, interests, whoIAm, movies, musics, books);
-			frameBlogao.displayMessageInformation("Informação", "Cadastro feito com sucesso!");
-		} catch (Exception e) {
-			frameBlogao.displayMessageErro("Erro", e.getMessage());
-			//TODO achar o modo certo de limpar o campo certo!
-		} */
+
+		/*
+		 * if (!password.equals(confirmPassword)) {
+		 * frameBlogao.displayMessageErro("Erro",
+		 * "Senhas diferentes. Por favor insere-as novamente!");
+		 * passwordField.clear(); confirmPasswordField.clear();
+		 * 
+		 * } else if (login.trim().equals("")){
+		 * frameBlogao.displayMessageErro("Erro",
+		 * "Um login deve ser inserido."); loginField.clear(); } try { //soh
+		 * teste de telar, nao precisa desse metodo.
+		 * //frameBlogao.registerUser(login, password, name, email, sex, dateB,
+		 * // address, interests, whoIAm, movies, musics, books);
+		 * frameBlogao.displayMessageInformation("Informação",
+		 * "Cadastro feito com sucesso!"); } catch (Exception e) {
+		 * frameBlogao.displayMessageErro("Erro", e.getMessage()); //TODO achar
+		 * o modo certo de limpar o campo certo! }
+		 */
 	}
 
 	@SuppressWarnings("unused")
@@ -105,14 +84,9 @@ public class FrameUserPage extends QWidget {
 		close();
 		container.getLayout().removeWidget(container.getActualRegisterFrame());
 		container.getLayout().addWidget(container.getNewLoginFrame());
-		
 	}
 
-	
-
 	private void initObjects() {
-		
-		
 		nameLabel = new QLabel("Nome", this);
 		nameLabel.setFont(new QFont("Tempus Sans ITC", 11));
 
@@ -159,14 +133,12 @@ public class FrameUserPage extends QWidget {
 		createBlogButton.setIcon(new QIcon("pictures/right.png"));
 		cancelButton = new QPushButton("Cancelar", this);
 		cancelButton.setIcon(new QIcon("pictures/wrong.png"));
-
-	
 	}
 
 	private void positionsObjects() {
 		int w = 100;
 		int h = 100;
-	
+
 		nameLabel.move(w, h + 67);
 		dateBirthdayLabel.move(w, h + 100);
 		sexLabel.move(w, h + 127);
@@ -178,11 +150,9 @@ public class FrameUserPage extends QWidget {
 		booksLabel.move(w + 750, h + 8);
 		whoIAmLabel.move(w, h + 250);
 
-		
 		nameField.move(w + 50, h + 67);
 
 		birthDayField.move(w + 140, h + 100);
-		
 
 		sexField.move(w + 50, h + 127);
 
@@ -199,7 +169,6 @@ public class FrameUserPage extends QWidget {
 	}
 
 	private void resizeObjects() {
-		
 		nameField.resize(330, 25);
 		emailField.resize(328, 25);
 		addressField.resize(307, 25);
