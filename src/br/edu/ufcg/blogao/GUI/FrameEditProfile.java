@@ -30,7 +30,6 @@ public class FrameEditProfile extends QWidget {
 		resize(1200, 700);
 
 		init();
-		//fillFields();
 		resize();
 		positions();
 		actionsObjects();
@@ -117,22 +116,6 @@ public class FrameEditProfile extends QWidget {
 		String books = booksField.toPlainText();
 	}
 	
-	@SuppressWarnings("unused")
-	private void fillFields() throws Exception {
-		//TODO fix it!
-		BlogWS blog = container.getBlog();
-		String login = container.getActualSession();
-		nameField.setText(blog.getProfileInformation(login, "nome_exibicao"));
-		addressField.setText(blog.getProfileInformation(login, "endereco"));
-		interestsField.setText(blog.getProfileInformation(login, "interesses"));
-		whoIAmField.setText(blog.getProfileInformation(login, "quem_sou_eu"));
-		moviesField.setText(blog.getProfileInformation(login, "filmes"));
-		musicsField.setText(blog.getProfileInformation(login, "musicas"));
-		booksField.setText(blog.getProfileInformation(login, "livros"));
-		//TODO fix it
-		//dateBirthdayField.setText(blog.getProfileInformation(login, "dataNasc"));
-	}
-
 	private void positions() {
 		int w = 100;
 		int h = 100;
@@ -179,6 +162,7 @@ public class FrameEditProfile extends QWidget {
 		}
 
 		try {
+			//TODO procurar o motivo de nao atualizar e dar sempre erro!
 			BlogWS blog = container.getBlog();
 			String login = container.getActualSession();
 			blog.changeProfileInformation(login, "nome_exibicao", name);
