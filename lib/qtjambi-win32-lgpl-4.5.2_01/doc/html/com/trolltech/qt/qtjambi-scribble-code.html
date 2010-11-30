@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Code for Scribble Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Code for Scribble Example</h1></center><p><pre class="snippet"><html style="white-space:pre-wrap;font-family:courier new"><font color=darkgreen><i>/****************************************************************************
+**
+** Copyright (C) 1992-2009 Nokia Corporation and/or its subsidiary(-ies).
+** All rights reserved.
+**
+** This file is part of Qt Jambi.
+**
+** 
+** Commercial Usage
+** Licensees holding valid Qt Commercial licenses may use this file in
+** accordance with the Qt Commercial License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Nokia.
+** 
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 2.1 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU Lesser General Public License version 2.1 requirements
+** will be met: http:<font color=darkgreen><i>//www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+</i></font>** 
+** In addition, as a special exception, Nokia gives you certain
+** additional rights. These rights are described in the Nokia Qt LGPL
+** Exception version 1.0, included in the file LGPL_EXCEPTION.txt in this
+** package.
+** 
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 3.0 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU General Public License version 3.0 requirements will be
+** met: http:<font color=darkgreen><i>//www.gnu.org/copyleft/gpl.html.
+</i></font>** 
+** If you are unsure which license is appropriate for your use, please
+** contact the sales department at qt-sales@nokia.com.
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/</i></font>
+
+<font color=blue>package</font> com.trolltech.examples;
+
+<font color=blue>import</font> com.trolltech.qt.core.*;
+<font color=blue>import</font> com.trolltech.qt.gui.*;
+<font color=blue>import</font> com.trolltech.qt.*;
+
+<font color=blue>import</font> java.util.*;
+
+@<font color=darkmagenta><i>QtJambiExample</i></font> (name = <font color=darkgreen><i>"Scribble"</i></font>)
+<font color=blue>public</font> <font color=blue>class</font> Scribble <font color=blue>extends</font> <font color=darkmagenta><i>QMainWindow</i></font>
+{
+    <font color=blue>private</font> ScribbleArea scribbleArea;
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QMenu</i></font> saveAsMenu;
+    <font color=blue>private</font> <font color=darkmagenta><i>QMenu</i></font> fileMenu;
+    <font color=blue>private</font> <font color=darkmagenta><i>QMenu</i></font> optionMenu;
+    <font color=blue>private</font> <font color=darkmagenta><i>QMenu</i></font> helpMenu;
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> openAct;
+    <font color=blue>private</font> List&lt;<font color=darkmagenta><i>QAction</i></font>&gt; saveAsActs;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> exitAct;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> penColorAct;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> penWidthAct;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> printAct;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> clearScreenAct;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> aboutAct;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> aboutQtAct;
+
+    <font color=blue>public</font> Scribble()
+    {
+        scribbleArea = <font color=blue>new</font> ScribbleArea();
+        setCentralWidget(scribbleArea);
+
+        createActions();
+        createMenus();
+
+        setWindowTitle(tr(<font color=darkgreen><i>"Scribble"</i></font>));
+        resize(500, 500);
+    }
+
+    @Override
+    <font color=blue>protected</font> <font color=blue>void</font> closeEvent(<font color=darkmagenta><i>QCloseEvent</i></font> event)
+    {
+        <font color=blue>if</font> (maybeSave()) {
+            event.accept();
+        } <font color=blue>else</font> {
+            event.ignore();
+        }
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> open()
+    {
+        <font color=blue>if</font> (maybeSave()) {
+            String fileName = <font color=darkmagenta><i>QFileDialog</i></font>.getOpenFileName(<font color=blue>this</font>,
+                                tr(<font color=darkgreen><i>"Open File"</i></font>), <font color=darkmagenta><i>QDir</i></font>.currentPath());
+        <font color=blue>if</font> (fileName.length() != 0)
+            scribbleArea.openImage(fileName);
+        }
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> save()
+    {
+        <font color=darkmagenta><i>QAction</i></font> action = (<font color=darkmagenta><i>QAction</i></font>) <font color=darkmagenta><i>QSignalEmitter</i></font>.signalSender();
+        <font color=darkmagenta><i>QByteArray</i></font> fileFormat = <font color=darkmagenta><i>QVariant</i></font>.toByteArray(action.data());
+        saveFile(<font color=blue>new</font> String(fileFormat.toByteArray()));
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> penColor()
+    {
+        <font color=darkmagenta><i>QColor</i></font> newColor = <font color=darkmagenta><i>QColorDialog</i></font>.getColor(scribbleArea.penColor());
+        <font color=blue>if</font> (newColor.isValid())
+            scribbleArea.setPenColor(newColor);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> penWidth()
+    {
+
+        Integer newWidth = <font color=darkmagenta><i>QInputDialog</i></font>.getInteger(<font color=blue>this</font>, tr(<font color=darkgreen><i>"Scribble"</i></font>),
+                                            tr(<font color=darkgreen><i>"Select pen width:"</i></font>),
+                                            scribbleArea.penWidth(),
+                                            1, 50, 1);
+        <font color=blue>if</font> (newWidth != null)
+            scribbleArea.setPenWidth(newWidth.intValue());
+    }
+
+    <font color=blue>private</font> <font color=blue>boolean</font> maybeSave()
+    {
+        <font color=blue>if</font> (scribbleArea.isModified()) {
+           <font color=darkmagenta><i>QMessageBox</i></font>.StandardButton ret;
+           ret = <font color=darkmagenta><i>QMessageBox</i></font>.warning(<font color=blue>this</font>, tr(<font color=darkgreen><i>"Scribble"</i></font>),
+                              tr(<font color=darkgreen><i>"The image has been modified.\n"</i></font> +
+                                 <font color=darkgreen><i>"Do you want to save your changes?"</i></font>),
+                              <font color=blue>new</font> <font color=darkmagenta><i>QMessageBox</i></font>.StandardButtons(<font color=darkmagenta><i>QMessageBox</i></font>.StandardButton.Save, <font color=darkmagenta><i>QMessageBox</i></font>.StandardButton.Discard));
+
+            <font color=blue>if</font> (ret == <font color=darkmagenta><i>QMessageBox</i></font>.StandardButton.Save) {
+                <font color=blue>return</font> saveFile(<font color=darkgreen><i>"png"</i></font>);
+            } <font color=blue>else</font> <font color=blue>if</font> (ret == <font color=darkmagenta><i>QMessageBox</i></font>.StandardButton.Cancel) {
+                <font color=blue>return</font> false;
+            }
+        }
+        <font color=blue>return</font> true;
+    }
+
+    <font color=blue>private</font> <font color=blue>boolean</font> saveFile(String fileFormat)
+    {
+        String initialPath = <font color=darkmagenta><i>QDir</i></font>.currentPath() + <font color=darkgreen><i>"/untitled."</i></font> + fileFormat;
+
+        String fileName = <font color=darkmagenta><i>QFileDialog</i></font>.getSaveFileName(<font color=blue>this</font>, tr(<font color=darkgreen><i>"Save As"</i></font>),
+                                    initialPath,
+                                    <font color=blue>new</font> <font color=darkmagenta><i>QFileDialog</i></font>.Filter(fileFormat.toUpperCase() + <font color=darkgreen><i>" Files (*."</i></font>+
+                                    fileFormat + <font color=darkgreen><i>");;All Files (*)"</i></font>));
+        <font color=blue>if</font> (fileName.length() == 0) {
+            <font color=blue>return</font> false;
+        } <font color=blue>else</font> {
+            <font color=blue>return</font> scribbleArea.saveImage(fileName, fileFormat);
+        }
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> about()
+    {
+        <font color=darkmagenta><i>QMessageBox</i></font>.about(<font color=blue>this</font>, tr(<font color=darkgreen><i>"About Scribble"</i></font>),
+            tr(<font color=darkgreen><i>"&lt;p&gt;The &lt;b&gt;Scribble&lt;/b&gt; example shows how to use QMainWindow as the "</i></font>
+               +<font color=darkgreen><i>"base widget for an application, and how to reimplement some of "</i></font>
+               +<font color=darkgreen><i>"QWidget's event handlers to receive the events generated for "</i></font>
+               +<font color=darkgreen><i>"the application's widgets:&lt;/p&gt;&lt;p&gt; We reimplement the mouse event "</i></font>
+               +<font color=darkgreen><i>"handlers to facilitate drawing, the paint event handler to "</i></font>
+               +<font color=darkgreen><i>"update the application and the resize event handler to optimize "</i></font>
+               +<font color=darkgreen><i>"the application's appearance. In addition we reimplement the "</i></font>
+               +<font color=darkgreen><i>"close event handler to intercept the close events before "</i></font>
+               +<font color=darkgreen><i>"terminating the application.&lt;/p&gt;&lt;p&gt; The example also demonstrates "</i></font>
+               +<font color=darkgreen><i>"how to use QPainter to draw an image in real time, as well as "</i></font>
+               +<font color=darkgreen><i>"to repaint widgets.&lt;/p&gt;"</i></font>));
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> createActions()
+    {
+        openAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&Open..."</i></font>), <font color=blue>this</font>);
+        openAct.setShortcut(tr(<font color=darkgreen><i>"Ctrl+O"</i></font>));
+        openAct.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"open()"</i></font>);
+
+        saveAsActs = <font color=blue>new</font> LinkedList&lt;<font color=darkmagenta><i>QAction</i></font>&gt;();
+        <font color=blue>for</font> (<font color=darkmagenta><i>QByteArray</i></font> format : <font color=darkmagenta><i>QImageWriter</i></font>.supportedImageFormats()) {
+            String text = <font color=blue>new</font> String(format.toByteArray()).toUpperCase() + <font color=darkgreen><i>"..."</i></font>;
+
+            <font color=darkmagenta><i>QAction</i></font> action = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(text, <font color=blue>this</font>);
+            action.setData(format);
+            action.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"save()"</i></font>);
+            saveAsActs.add(action);
+        }
+
+        printAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&Print..."</i></font>), <font color=blue>this</font>);
+        printAct.triggered.connect(scribbleArea, <font color=darkgreen><i>"print()"</i></font>);
+
+        exitAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"E&xit"</i></font>), <font color=blue>this</font>);
+        exitAct.setShortcut(tr(<font color=darkgreen><i>"Ctrl+Q"</i></font>));
+        exitAct.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"close()"</i></font>);
+
+        penColorAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&Pen Color..."</i></font>), <font color=blue>this</font>);
+        penColorAct.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"penColor()"</i></font>);
+
+        penWidthAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"Pen &Width..."</i></font>), <font color=blue>this</font>);
+        penWidthAct.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"penWidth()"</i></font>);
+
+        clearScreenAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&Clear Screen"</i></font>), <font color=blue>this</font>);
+        clearScreenAct.setShortcut(tr(<font color=darkgreen><i>"Ctrl+L"</i></font>));
+        clearScreenAct.triggered.connect(scribbleArea, <font color=darkgreen><i>"clearImage()"</i></font>);
+
+        aboutAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&About"</i></font>), <font color=blue>this</font>);
+        aboutAct.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"about()"</i></font>);
+
+        aboutQtAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"About &Qt"</i></font>), <font color=blue>this</font>);
+        aboutQtAct.triggered.connect(<font color=darkmagenta><i>QApplication</i></font>.instance(), <font color=darkgreen><i>"aboutQt()"</i></font>);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> createMenus()
+    {
+        saveAsMenu = <font color=blue>new</font> <font color=darkmagenta><i>QMenu</i></font>(tr(<font color=darkgreen><i>"&Save As"</i></font>), <font color=blue>this</font>);
+        <font color=blue>for</font> (<font color=darkmagenta><i>QAction</i></font> action : saveAsActs)
+            saveAsMenu.addAction(action);
+
+        fileMenu = <font color=blue>new</font> <font color=darkmagenta><i>QMenu</i></font>(tr(<font color=darkgreen><i>"&File"</i></font>), <font color=blue>this</font>);
+        fileMenu.addAction(openAct);
+        fileMenu.addMenu(saveAsMenu);
+        fileMenu.addAction(printAct);
+        fileMenu.addSeparator();
+        fileMenu.addAction(exitAct);
+
+        optionMenu = <font color=blue>new</font> <font color=darkmagenta><i>QMenu</i></font>(tr(<font color=darkgreen><i>"&Options"</i></font>), <font color=blue>this</font>);
+        optionMenu.addAction(penColorAct);
+        optionMenu.addAction(penWidthAct);
+        optionMenu.addSeparator();
+        optionMenu.addAction(clearScreenAct);
+
+        helpMenu = <font color=blue>new</font> <font color=darkmagenta><i>QMenu</i></font>(tr(<font color=darkgreen><i>"&Help"</i></font>), <font color=blue>this</font>);
+        helpMenu.addAction(aboutAct);
+        helpMenu.addAction(aboutQtAct);
+
+        menuBar().addMenu(fileMenu);
+        menuBar().addMenu(optionMenu);
+        menuBar().addMenu(helpMenu);
+    }
+
+    <font color=blue>class</font> ScribbleArea <font color=blue>extends</font> <font color=darkmagenta><i>QWidget</i></font>
+    {
+        <font color=blue>private</font> <font color=blue>boolean</font> modified;
+        <font color=blue>private</font> <font color=blue>boolean</font> scribbling;
+        <font color=blue>private</font> <font color=blue>int</font> myPenWidth;
+        <font color=blue>private</font> <font color=darkmagenta><i>QColor</i></font> myPenColor;
+        <font color=blue>private</font> <font color=darkmagenta><i>QImage</i></font> image;
+        <font color=blue>private</font> <font color=darkmagenta><i>QPoint</i></font> lastPoint;
+
+        <font color=blue>public</font> ScribbleArea()
+        {
+            image = <font color=blue>new</font> <font color=darkmagenta><i>QImage</i></font>();
+            lastPoint = <font color=blue>new</font> <font color=darkmagenta><i>QPoint</i></font>();
+
+            setAttribute(<font color=darkmagenta><i>Qt</i></font>.WidgetAttribute.WA_StaticContents);
+            modified = false;
+            scribbling = false;
+            myPenWidth = 1;
+            myPenColor = <font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(<font color=darkmagenta><i>Qt</i></font>.GlobalColor.blue);
+        }
+
+        <font color=blue>public</font> <font color=blue>boolean</font> isModified()
+        {
+            <font color=blue>return</font> modified;
+        }
+
+        <font color=blue>public</font> <font color=darkmagenta><i>QColor</i></font> penColor()
+        {
+            <font color=blue>return</font> myPenColor;
+        }
+
+        <font color=blue>public</font> <font color=blue>int</font> penWidth()
+        {
+            <font color=blue>return</font> myPenWidth;
+        }
+
+        <font color=blue>public</font> <font color=blue>boolean</font> openImage(String fileName)
+        {
+            <font color=darkmagenta><i>QImage</i></font> loadedImage = <font color=blue>new</font> <font color=darkmagenta><i>QImage</i></font>();
+            <font color=blue>if</font> (!loadedImage.load(fileName))
+                <font color=blue>return</font> false;
+
+            <font color=darkmagenta><i>QSize</i></font> newSize = loadedImage.size().expandedTo(size());
+            loadedImage = resizeImage(loadedImage, newSize);
+            image = loadedImage;
+            modified = false;
+            update();
+            <font color=blue>return</font> true;
+        }
+
+        <font color=blue>public</font> <font color=blue>boolean</font> saveImage(String fileName, String fileFormat)
+        {
+            <font color=darkmagenta><i>QImage</i></font> visibleImage = image;
+            visibleImage = resizeImage(visibleImage, size());
+
+            <font color=blue>if</font> (visibleImage.save(fileName, fileFormat)) {
+                modified = false;
+                <font color=blue>return</font> true;
+            } <font color=blue>else</font> {
+                <font color=blue>return</font> false;
+            }
+        }
+
+        <font color=blue>public</font> <font color=blue>void</font> setPenColor(<font color=darkmagenta><i>QColor</i></font> newColor)
+        {
+            myPenColor = newColor;
+
+        }
+
+        <font color=blue>public</font> <font color=blue>void</font> setPenWidth(<font color=blue>int</font> newWidth)
+        {
+            myPenWidth = newWidth;
+        }
+
+        <font color=blue>public</font> <font color=blue>void</font> clearImage()
+        {
+            image.fill(<font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(<font color=darkmagenta><i>Qt</i></font>.GlobalColor.white).rgb());
+            modified = true;
+            update();
+        }
+
+        @Override
+        <font color=blue>protected</font> <font color=blue>void</font> mousePressEvent(<font color=darkmagenta><i>QMouseEvent</i></font> event)
+        {
+            <font color=blue>if</font> (event.button() == <font color=darkmagenta><i>Qt</i></font>.MouseButton.LeftButton) {
+                lastPoint = event.pos();
+                scribbling = true;
+            }
+        }
+
+        @Override
+        <font color=blue>protected</font> <font color=blue>void</font> mouseMoveEvent(<font color=darkmagenta><i>QMouseEvent</i></font> event)
+        {
+            <font color=blue>if</font> ((event.buttons().isSet(<font color=darkmagenta><i>Qt</i></font>.MouseButton.LeftButton)) && scribbling)
+                drawLineTo(event.pos());
+        }
+
+        @Override
+        <font color=blue>protected</font> <font color=blue>void</font> mouseReleaseEvent(<font color=darkmagenta><i>QMouseEvent</i></font> event)
+        {
+            <font color=blue>if</font> (event.button() == <font color=darkmagenta><i>Qt</i></font>.MouseButton.LeftButton && scribbling) {
+                drawLineTo(event.pos());
+                scribbling = false;
+            }
+        }
+
+        @Override
+        <font color=blue>protected</font> <font color=blue>void</font> paintEvent(<font color=darkmagenta><i>QPaintEvent</i></font> event)
+        {
+            <font color=darkmagenta><i>QPainter</i></font> painter = <font color=blue>new</font> <font color=darkmagenta><i>QPainter</i></font>(<font color=blue>this</font>);
+            painter.save();
+            painter.drawImage(<font color=blue>new</font> <font color=darkmagenta><i>QPoint</i></font>(0, 0), image);
+            painter.restore();
+        }
+
+        @Override
+        <font color=blue>protected</font> <font color=blue>void</font> resizeEvent(<font color=darkmagenta><i>QResizeEvent</i></font> event)
+        {
+            <font color=blue>if</font> (width() &gt; image.width() || height() &gt; image.height()) {
+                <font color=blue>int</font> newWidth = Math.max(width() + 128, image.width());
+                <font color=blue>int</font> newHeight = Math.max(height() + 128, image.height());
+                image = resizeImage(image, <font color=blue>new</font> <font color=darkmagenta><i>QSize</i></font>(newWidth, newHeight));
+                update();
+            }
+            <font color=blue>super</font>.resizeEvent(event);
+        }
+
+        <font color=blue>private</font> <font color=blue>void</font> drawLineTo(<font color=darkmagenta><i>QPoint</i></font> endPoint)
+        {
+            <font color=darkmagenta><i>QPainter</i></font> painter = <font color=blue>new</font> <font color=darkmagenta><i>QPainter</i></font>(image);
+            painter.setPen(<font color=blue>new</font> <font color=darkmagenta><i>QPen</i></font>(myPenColor, myPenWidth, <font color=darkmagenta><i>Qt</i></font>.PenStyle.SolidLine, <font color=darkmagenta><i>Qt</i></font>.PenCapStyle.RoundCap,
+                                <font color=darkmagenta><i>Qt</i></font>.PenJoinStyle.RoundJoin));
+            painter.drawLine(lastPoint, endPoint);
+            modified = true;
+
+            <font color=blue>int</font> rad = (myPenWidth / 2) + 2;
+            update(<font color=blue>new</font> <font color=darkmagenta><i>QRect</i></font>(lastPoint, endPoint).normalized()
+                                             .adjusted(-rad, -rad, +rad, +rad));
+            lastPoint = endPoint;
+
+            painter.end();
+        }
+
+        <font color=blue>public</font> <font color=darkmagenta><i>QImage</i></font> resizeImage(<font color=darkmagenta><i>QImage</i></font> image, <font color=darkmagenta><i>QSize</i></font> newSize)
+        {
+            <font color=blue>if</font> (image.size() == newSize)
+                <font color=blue>return</font> image;
+
+            <font color=darkmagenta><i>QImage</i></font> newImage = <font color=blue>new</font> <font color=darkmagenta><i>QImage</i></font>(newSize, <font color=darkmagenta><i>QImage</i></font>.Format.Format_RGB32);
+            newImage.fill(<font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(<font color=darkmagenta><i>Qt</i></font>.GlobalColor.white).rgb());
+            <font color=darkmagenta><i>QPainter</i></font> painter = <font color=blue>new</font> <font color=darkmagenta><i>QPainter</i></font>(newImage);
+            painter.drawImage(<font color=blue>new</font> <font color=darkmagenta><i>QPoint</i></font>(0, 0), image);
+            painter.end();
+
+            <font color=blue>return</font> newImage;
+        }
+
+        <font color=blue>public</font> <font color=blue>void</font> print()
+        {
+            <font color=darkmagenta><i>QPrinter</i></font> printer = <font color=blue>new</font> <font color=darkmagenta><i>QPrinter</i></font>(<font color=darkmagenta><i>QPrinter</i></font>.PrinterMode.HighResolution);
+
+            <font color=darkmagenta><i>QPrintDialog</i></font> printDialog = <font color=blue>new</font> <font color=darkmagenta><i>QPrintDialog</i></font>(printer, <font color=blue>this</font>);
+            <font color=blue>if</font> (printDialog.exec() == <font color=darkmagenta><i>QDialog</i></font>.DialogCode.Accepted.value()) {
+                <font color=darkmagenta><i>QPainter</i></font> painter = <font color=blue>new</font> <font color=darkmagenta><i>QPainter</i></font>(printer);
+                <font color=darkmagenta><i>QRect</i></font> rect = painter.viewport();
+                <font color=darkmagenta><i>QSize</i></font> size = image.size();
+                size.scale(rect.size(), <font color=darkmagenta><i>Qt</i></font>.AspectRatioMode.KeepAspectRatio);
+                painter.setViewport(rect.x(), rect.y(), size.width(), size.height());
+                painter.setWindow(image.rect());
+                painter.drawImage(0, 0, image);
+                painter.end();
+            }
+        }
+    }
+
+    <font color=blue>public</font> <font color=blue>static</font> <font color=blue>void</font> main(String args[])
+    {
+        <font color=darkmagenta><i>QApplication</i></font>.initialize(args);
+
+        <font color=blue>new</font> Scribble().show();
+
+        <font color=darkmagenta><i>QApplication</i></font>.exec();
+    }
+}
+</html></pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

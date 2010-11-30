@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>The Network Module in Qt 4</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>The Network Module in Qt 4</h1></center><p>[Previous: <a href="qt4-sql.html">The Qt 4 Database GUI Layer</a>][<a href="qt4-intro.html">What's New in Qt 4</a>][Next: <a href="qt4-styles.html">The Qt 4 Style API</a>]<p> The network module in Qt 4 provides some new features, such as support for internationalized domain names, better IPv6 support, and better performance. And since Qt 4 allows us to break binary compatibility with previous releases, we took this opportunity to improve the class names and API to make them more intuitive to use. <ul><li> <a href="#general-overview">General Overview</a></li><li> <a href="#example-code">Example Code</a></li> <ul><li> <a href="#tcp-client">TCP Client</a></li><li> <a href="#tcp-server">TCP Server</a></li><li> <a href="#udp-senders-and-receivers">UDP Senders and Receivers</a></li></ul><li> <a href="#comparison-with-qt-3">Comparison with Qt 3</a></li></ul><a name="general-overview"><h2>General Overview</h2> Compared to Qt 3, the network module in Qt 4 brings the following benefits: <ul><li> The Qt 4 network classes have more intuitive names and APIs. For example, <a href="porting4.html">QServerSocket</a> has been renamed <a href="../../../com/trolltech/qt/network/QTcpServer.html">QTcpServer</a>.</li><li> The entire network module is <a href="qtjambi-threads.html">reentrant</a>, making it possible to use them simultaneously from multiple threads.</li><li> It is now possible to send and receive UDP datagrams and to use synchronous (i.e., blocking) sockets without having to use a low-level API (<a href="porting4.html">QSocketDevice</a> in Qt 3).</li><li> <a href="../../../com/trolltech/qt/network/QHostAddress.html">QHostAddress</a> and <a href="../../../com/trolltech/qt/network/QHostInfo.html">QHostInfo</a> support internationalized domain names (RFC 3492).</li><li> <a href="../../../com/trolltech/qt/core/QUrl.html">QUrl</a> is more lightweight and fully supports the latest URI specification draft.</li><li> UDP broadcasting is now supported.</li></ul> The Qt 4 network module provides fundamental classes for writing TCP and UDP applications, as well as higher-level classes that implement the client side of the HTTP and FTP protocols. <p>Here's an overview of the TCP and UDP classes: <ul><li> <a href="../../../com/trolltech/qt/network/QTcpSocket.html">QTcpSocket</a> encapsulates a TCP socket. It inherits from <a href="../../../com/trolltech/qt/core/QIODevice.html">QIODevice</a>, so you can use <a href="../../../com/trolltech/qt/core/QTextStream.html">QTextStream</a> and <a href="../../../com/trolltech/qt/core/QDataStream.html">QDataStream</a> to read or write data. It is useful for writing both clients and servers.</li><li> <a href="../../../com/trolltech/qt/network/QTcpServer.html">QTcpServer</a> allows you to listen on a certain port on a server. It emits a newConnection() signal every time a client tries to connect to the server. Once the connection is established, you can talk to the client using <a href="../../../com/trolltech/qt/network/QTcpSocket.html">QTcpSocket</a>.</li><li> <a href="../../../com/trolltech/qt/network/QUdpSocket.html">QUdpSocket</a> is an API for sending and receiving UDP datagrams.</li></ul> <a href="../../../com/trolltech/qt/network/QTcpSocket.html">QTcpSocket</a> and <a href="../../../com/trolltech/qt/network/QUdpSocket.html">QUdpSocket</a> inherit most of their functionality from <a href="../../../com/trolltech/qt/network/QAbstractSocket.html">QAbstractSocket</a>. You can also use <a href="../../../com/trolltech/qt/network/QAbstractSocket.html">QAbstractSocket</a> directly as a wrapper around a native socket descriptor. <p>By default, the socket classes work asynchronously (i.e., they are non-blocking), emitting signals to notify when data has arrived or when the peer has closed the connection. In multithreaded applications and in non-GUI applications, you also have the opportunity of using blocking (synchronous) functions on the socket, which often results in a more straightforward style of programming, with the networking logic concentrated in one or two functions instead of spread across multiple slots. <p><a href="../../../com/trolltech/qt/network/QFtp.html">QFtp</a> and <a href="../../../com/trolltech/qt/network/QHttp.html">QHttp</a> use <a href="../../../com/trolltech/qt/network/QTcpSocket.html">QTcpSocket</a> internally to implement the FTP and HTTP protocols. Both classes work asynchronously and can schedule (i.e., queue) requests. <p>The network module contains four helper classes: <a href="../../../com/trolltech/qt/network/QHostAddress.html">QHostAddress</a>, <a href="../../../com/trolltech/qt/network/QHostInfo.html">QHostInfo</a>, <a href="../../../com/trolltech/qt/core/QUrl.html">QUrl</a>, and <a href="../../../com/trolltech/qt/network/QUrlInfo.html">QUrlInfo</a>. <a href="../../../com/trolltech/qt/network/QHostAddress.html">QHostAddress</a> stores an IPv4 or IPv6 address, <a href="../../../com/trolltech/qt/network/QHostInfo.html">QHostInfo</a> resolves host names into addresses, <a href="../../../com/trolltech/qt/core/QUrl.html">QUrl</a> stores a URL, and <a href="../../../com/trolltech/qt/network/QUrlInfo.html">QUrlInfo</a> stores information about a resource pointed to by a URL, such as the file size and modification date. (Because <a href="../../../com/trolltech/qt/core/QUrl.html">QUrl</a> is used by <a href="../../../com/trolltech/qt/gui/QTextBrowser.html">QTextBrowser</a>, it is part of the <a href="qtcore.html">QtCore</a> library and not of <a href="qtnetwork.html">QtNetwork</a>.) <p>See the <a href="qtnetwork.html">QtNetwork</a> module overview for more information.<a name="example-code"><h2>Example Code</h2> All the code snippets presented here are quoted from self-contained, compilable examples located in Qt's <tt>examples/network</tt> directory.<a name="tcp-client"><h3>TCP Client</h3> The first example illustrates how to write a TCP client using <a href="../../../com/trolltech/qt/network/QTcpSocket.html">QTcpSocket</a>. The client talks to a fortune server that provides fortune to the user. Here's how to set up the socket:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    tcpSocket = new QTcpSocket(this);
+<br> 
+    connect(tcpSocket, SIGNAL(readyRead()), this, SLOT(readFortune()));
+
+    connect(tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)),
+
+            this, SLOT(displayError(QAbstractSocket::SocketError)));
+</pre> When the user requests a new fortune, the client establishes a connection to the server:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    tcpSocket-&gt;connectToHost(hostLineEdit-&gt;text(),
+                             portLineEdit-&gt;text().toInt());
+</pre> When the server answers, the following code is executed to read the data from the socket:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QDataStream in(tcpSocket);
+    in.setVersion(QDataStream::Qt_4_0);
+
+    if (blockSize == 0) {
+        if (tcpSocket-&gt;bytesAvailable() &lt; (int)sizeof(quint16))
+            return;
+
+
+
+        in &gt;&gt; blockSize;
+    }
+
+    if (tcpSocket-&gt;bytesAvailable() &lt; blockSize)
+        return;
+ 
+
+    QString nextFortune;
+    in &gt;&gt; nextFortune;
+
+    if (nextFortune == currentFortune) {
+        QTimer::singleShot(0, this, SLOT(requestNewFortune()));
+        return;
+    }
+
+
+
+    currentFortune = nextFortune;
+</pre> The server's answer starts with a size field (which we store in <tt>blockSize</tt>), followed by size bytes of data. If the client hasn't received all the data yet, it waits for the server to send more. <p>An alternative approach is to use a blocking socket. The code can then be concentrated in one function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+        const int Timeout = 5 * 1000;
+
+        QTcpSocket socket;
+        socket.connectToHost(serverName, serverPort);
+ 
+
+        if (!socket.waitForConnected(Timeout)) {
+            emit error(socket.error(), socket.errorString());
+            return;
+        }
+ 
+
+        while (socket.bytesAvailable() &lt; (int)sizeof(quint16)) {
+            if (!socket.waitForReadyRead(Timeout)) {
+                emit error(socket.error(), socket.errorString());
+                return;
+            }
+ 
+        }
+ 
+
+        quint16 blockSize;
+        QDataStream in(&socket);
+        in.setVersion(QDataStream::Qt_4_0);
+        in &gt;&gt; blockSize;
+ 
+
+        while (socket.bytesAvailable() &lt; blockSize) {
+            if (!socket.waitForReadyRead(Timeout)) {
+                emit error(socket.error(), socket.errorString());
+                return;
+            }
+ 
+        }
+ 
+
+        mutex.lock();
+        QString fortune;
+        in &gt;&gt; fortune;
+        emit newFortune(fortune);
+</pre><a name="tcp-server"><h3>TCP Server</h3> The following code snippets illustrate how to write a TCP server using <a href="../../../com/trolltech/qt/network/QTcpServer.html">QTcpServer</a> and <a href="../../../com/trolltech/qt/network/QTcpSocket.html">QTcpSocket</a>. Here's how to set up a TCP server:<br><br>The following code example is written in c++.<br> <pre class="snippet"> 
+    tcpServer = new QTcpServer(this);
+    if (!tcpServer-&gt;listen()) {
+        QMessageBox::critical(this, tr("Fortune Server"),
+                              tr("Unable to start the server: %1.")
+                              .arg(tcpServer-&gt;errorString()));
+        close();
+        return;
+    }
+<br>
+    connect(tcpServer, SIGNAL(newConnection()), this, SLOT(sendFortune()));
+</pre> When a client tries to connect to the server, the following code in the sendFortune() slot is executed:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_4_0);
+ 
+    out &lt;&lt; (quint16)0;
+    out &lt;&lt; fortunes.at(qrand() % fortunes.size());
+    out.device()-&gt;seek(0);
+    out &lt;&lt; (quint16)(block.size() - sizeof(quint16));
+ 
+
+    QTcpSocket *clientConnection = tcpServer-&gt;nextPendingConnection();
+    connect(clientConnection, SIGNAL(disconnected()),
+            clientConnection, SLOT(deleteLater()));
+ 
+
+    clientConnection-&gt;write(block);
+    clientConnection-&gt;disconnectFromHost();
+</pre><a name="udp-senders-and-receivers"><h3>UDP Senders and Receivers</h3> Here's how to broadcast a UDP datagram:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    udpSocket = new QUdpSocket(this);
+
+    QByteArray datagram = "Broadcast message " + QByteArray::number(messageNo);
+    udpSocket-&gt;writeDatagram(datagram.data(), datagram.size(),
+                             QHostAddress::Broadcast, 45454);
+</pre> Here's how to receive a UDP datagram:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    udpSocket = new QUdpSocket(this);
+    udpSocket-&gt;bind(45454);
+<br>
+    connect(udpSocket, SIGNAL(readyRead()),
+            this, SLOT(processPendingDatagrams()));
+</pre> Then in the processPendingDatagrams() slot:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    while (udpSocket-&gt;hasPendingDatagrams()) {
+        QByteArray datagram;
+        datagram.resize(udpSocket-&gt;pendingDatagramSize());
+        udpSocket-&gt;readDatagram(datagram.data(), datagram.size());
+        statusLabel-&gt;setText(tr("Received datagram: \"%1\"")
+                             .arg(datagram.data()));
+    }
+</pre><a name="comparison-with-qt-3"><h2>Comparison with Qt 3</h2> The main difference between Qt 3 and Qt 4 is that the very high level <a href="porting4.html">QNetworkProtocol</a> and <a href="porting4.html">QUrlOperator</a> abstraction has been eliminated. These classes attempted the impossible (unify FTP and HTTP under one roof), and unsurprisingly failed at that. Qt 4 still provides <a href="../../../com/trolltech/qt/network/QFtp.html">QFtp</a> and <a href="../../../com/trolltech/qt/network/QHttp.html">QHttp</a> classes, but only with the more mature API that appeared in Qt 3.1. <p>The <a href="porting4.html">QSocket</a> class in Qt 3 has been renamed <a href="../../../com/trolltech/qt/network/QTcpSocket.html">QTcpSocket</a>. The new class is reentrant and supports blocking. It's also easier to handle closing than with Qt 3, where you had to connect to both the QSocket::connectionClosed() and the QSocket::delayedCloseFinished() signals. <p>The <a href="porting4.html">QServerSocket</a> class in Qt 3 has been renamed <a href="../../../com/trolltech/qt/network/QTcpServer.html">QTcpServer</a>. The API has changed quite a bit. While in Qt 3 it was necessary to subclass <a href="porting4.html">QServerSocket</a> and reimplement the newConnection() pure virtual function, <a href="../../../com/trolltech/qt/network/QTcpServer.html">QTcpServer</a> now emits a newConnection() signal that you can connect to a slot. <p>The <a href="../../../com/trolltech/qt/network/QHostInfo.html">QHostInfo</a> class has been redesigned to use the operating system's getaddrinfo() function instead of implementing the DNS protocol. Internally, <a href="../../../com/trolltech/qt/network/QHostInfo.html">QHostInfo</a> simply starts a thread and calls getaddrinfo() in that thread. This wasn't possible in Qt 3 because getaddrinfo() is a blocking call and Qt 3 could be configured without multithreading support. <p>The <a href="porting4.html">QSocketDevice</a> class in Qt 3 is no longer part of the public Qt API. If you used <a href="porting4.html">QSocketDevice</a> to send or receive UDP datagrams, use <a href="../../../com/trolltech/qt/network/QUdpSocket.html">QUdpSocket</a> instead. If you used <a href="porting4.html">QSocketDevice</a> because it supported blocking sockets, use <a href="../../../com/trolltech/qt/network/QTcpSocket.html">QTcpSocket</a> or <a href="../../../com/trolltech/qt/network/QUdpSocket.html">QUdpSocket</a> instead and use the blocking functions (<a href="../../../com/trolltech/qt/network/QAbstractSocket.html#waitForConnected()">waitForConnected()</a>, <a href="../../../com/trolltech/qt/network/QAbstractSocket.html#waitForConnected()">waitForReadyRead()</a>, etc.). If you used <a href="porting4.html">QSocketDevice</a> from a non-GUI thread because it was the only reentrant networking class in Qt 3, use <a href="../../../com/trolltech/qt/network/QTcpSocket.html">QTcpSocket</a>, <a href="../../../com/trolltech/qt/network/QTcpServer.html">QTcpServer</a>, or <a href="../../../com/trolltech/qt/network/QUdpSocket.html">QUdpSocket</a> instead. <p>Internally, Qt 4 has a class called QSocketLayer that provides a cross-platform low-level socket API. It resembles the old <a href="porting4.html">QSocketDevice</a> class. We might make it public in a later release if users ask for it. <p>As an aid to porting to Qt 4, the <a href="qt3support.html">Qt3Support</a> library includes Q3Dns, Q3ServerSocket, Q3Socket, and Q3SocketDevice classes.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

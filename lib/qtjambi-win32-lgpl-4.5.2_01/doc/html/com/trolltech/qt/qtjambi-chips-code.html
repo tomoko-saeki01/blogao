@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Code for 40000 Chips</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Code for 40000 Chips</h1></center><p><pre class="snippet"><html style="white-space:pre-wrap;font-family:courier new"><font color=darkgreen><i>/****************************************************************************
+**
+** Copyright (C) 1992-2009 Nokia Corporation and/or its subsidiary(-ies).
+** All rights reserved.
+**
+** This file is part of Qt Jambi.
+**
+** 
+** Commercial Usage
+** Licensees holding valid Qt Commercial licenses may use this file in
+** accordance with the Qt Commercial License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Nokia.
+** 
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 2.1 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU Lesser General Public License version 2.1 requirements
+** will be met: http:<font color=darkgreen><i>//www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+</i></font>** 
+** In addition, as a special exception, Nokia gives you certain
+** additional rights. These rights are described in the Nokia Qt LGPL
+** Exception version 1.0, included in the file LGPL_EXCEPTION.txt in this
+** package.
+** 
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 3.0 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU General Public License version 3.0 requirements will be
+** met: http:<font color=darkgreen><i>//www.gnu.org/copyleft/gpl.html.
+</i></font>** 
+** If you are unsure which license is appropriate for your use, please
+** contact the sales department at qt-sales@nokia.com.
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/</i></font>
+
+<font color=blue>package</font> com.trolltech.demos;
+
+<font color=blue>import</font> java.util.List;
+<font color=blue>import</font> java.util.Vector;
+
+<font color=blue>import</font> com.trolltech.examples.<font color=darkmagenta><i>QtJambiExample</i></font>;
+<font color=blue>import</font> com.trolltech.qt.core.*;
+<font color=blue>import</font> com.trolltech.qt.core.<font color=darkmagenta><i>Qt</i></font>.ConnectionType;
+<font color=blue>import</font> com.trolltech.qt.gui.*;
+<font color=blue>import</font> com.trolltech.qt.opengl.*;
+
+@<font color=darkmagenta><i>QtJambiExample</i></font>(name = <font color=darkgreen><i>"40000 Chips"</i></font>)
+<font color=blue>public</font> <font color=blue>class</font> Chips <font color=blue>extends</font> <font color=darkmagenta><i>QWidget</i></font> {
+
+    <font color=darkmagenta><i>QGraphicsScene</i></font> scene;
+    <font color=darkmagenta><i>QSplitter</i></font> h1Splitter;
+    <font color=darkmagenta><i>QSplitter</i></font> h2Splitter;
+    Signal0 populateScene = <font color=blue>new</font> Signal0();
+
+    <font color=blue>public</font> Chips(<font color=darkmagenta><i>QWidget</i></font> parent) {
+        scene = <font color=blue>new</font> <font color=darkmagenta><i>QGraphicsScene</i></font>();
+
+        h1Splitter = <font color=blue>new</font> <font color=darkmagenta><i>QSplitter</i></font>();
+        h2Splitter = <font color=blue>new</font> <font color=darkmagenta><i>QSplitter</i></font>();
+
+        <font color=darkmagenta><i>QSplitter</i></font> vSplitter = <font color=blue>new</font> <font color=darkmagenta><i>QSplitter</i></font>();
+        vSplitter.setOrientation(<font color=darkmagenta><i>Qt</i></font>.Orientation.Vertical);
+        vSplitter.addWidget(h1Splitter);
+        vSplitter.addWidget(h2Splitter);
+
+        View view = <font color=blue>new</font> View(<font color=darkgreen><i>"Top left view"</i></font>);
+        view.view().setScene(scene);
+        h1Splitter.addWidget(view);
+
+        view = <font color=blue>new</font> View(<font color=darkgreen><i>"Top right view"</i></font>);
+        view.view().setScene(scene);
+        h1Splitter.addWidget(view);
+
+        view = <font color=blue>new</font> View(<font color=darkgreen><i>"Bottom left view"</i></font>);
+        view.view().setScene(scene);
+        h2Splitter.addWidget(view);
+
+        view = <font color=blue>new</font> View(<font color=darkgreen><i>"Bottom right view"</i></font>);
+        view.view().setScene(scene);
+        h2Splitter.addWidget(view);
+
+        <font color=darkmagenta><i>QHBoxLayout</i></font> layout = <font color=blue>new</font> <font color=darkmagenta><i>QHBoxLayout</i></font>();
+        layout.addWidget(vSplitter);
+        setLayout(layout);
+
+        setWindowTitle(tr(<font color=darkgreen><i>"Chip Demo"</i></font>));
+        setWindowIcon(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(<font color=darkgreen><i>"classpath:com/trolltech/images/qt-logo.png"</i></font>));
+
+        populateScene.connect(<font color=blue>this</font>, <font color=darkgreen><i>"populateScene()"</i></font>, ConnectionType.<font color=darkmagenta><i>QueuedConnection</i></font>);
+        populateScene.emit();
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> populateScene() {
+        <font color=darkmagenta><i>QImage</i></font> image = <font color=blue>new</font> <font color=darkmagenta><i>QImage</i></font>(<font color=darkgreen><i>"classpath:/com/trolltech/images/qt4logo.png"</i></font>);
+
+        <font color=darkgreen><i>// Populate scene
+</i></font>        <font color=blue>int</font> xx = 0;
+        <font color=blue>int</font> nitems = 0;
+        <font color=blue>for</font> (<font color=blue>int</font> i = -11000; i &lt; 11000; i += 110) {
+            ++xx;
+            <font color=blue>int</font> yy = 0;
+            <font color=blue>for</font> (<font color=blue>int</font> j = -7000; j &lt; 7000; j += 70) {
+                ++yy;
+                <font color=blue>double</font> x = (i + 11000) / 22000.0;
+                <font color=blue>double</font> y = (j + 7000) / 14000.0;
+
+                <font color=darkmagenta><i>QColor</i></font> color = <font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(image.pixel((<font color=blue>int</font>) (image.width() * x), (<font color=blue>int</font>) (image.height() * y)));
+                <font color=darkmagenta><i>QGraphicsItem</i></font> item = <font color=blue>new</font> Chip(color, xx, yy);
+                item.setPos(<font color=blue>new</font> <font color=darkmagenta><i>QPointF</i></font>(i, j));
+                scene.addItem(item);
+
+                ++nitems;
+            }
+            <font color=darkmagenta><i>QApplication</i></font>.processEvents();
+        }
+    }
+
+    <font color=blue>public</font> <font color=blue>static</font> <font color=blue>void</font> main(String args[]) {
+        <font color=darkmagenta><i>QApplication</i></font>.initialize(args);
+
+        Chips w = <font color=blue>new</font> Chips(null);
+        w.show();
+
+        <font color=darkmagenta><i>QApplication</i></font>.exec();
+    }
+
+    <font color=blue>class</font> Chip <font color=blue>extends</font> <font color=darkmagenta><i>QGraphicsItem</i></font> {
+
+        <font color=blue>int</font> x, y;
+        <font color=darkmagenta><i>QColor</i></font> color;
+        List&lt;<font color=darkmagenta><i>QPointF</i></font>&gt; stuff = <font color=blue>new</font> Vector&lt;<font color=darkmagenta><i>QPointF</i></font>&gt;();
+
+        Chip(<font color=blue>final</font> <font color=darkmagenta><i>QColor</i></font> color, <font color=blue>int</font> x, <font color=blue>int</font> y) {
+            <font color=blue>this</font>.x = x;
+            <font color=blue>this</font>.y = y;
+            <font color=blue>this</font>.color = color;
+            setZValue((x + y) % 2);
+
+            setFlags(<font color=blue>new</font> GraphicsItemFlags(GraphicsItemFlag.ItemIsSelectable, GraphicsItemFlag.ItemIsMovable));
+            setAcceptsHoverEvents(true);
+        }
+
+        @Override
+        <font color=blue>public</font> <font color=darkmagenta><i>QRectF</i></font> boundingRect() {
+            <font color=blue>return</font> <font color=blue>new</font> <font color=darkmagenta><i>QRectF</i></font>(0, 0, 110, 70);
+        }
+
+        @Override
+        <font color=blue>public</font> <font color=darkmagenta><i>QPainterPath</i></font> shape() {
+            <font color=darkmagenta><i>QPainterPath</i></font> path = <font color=blue>new</font> <font color=darkmagenta><i>QPainterPath</i></font>();
+            path.addRect(14, 14, 82, 42);
+            <font color=blue>return</font> path;
+        }
+
+        @Override
+        <font color=blue>public</font> <font color=blue>void</font> paint(<font color=darkmagenta><i>QPainter</i></font> painter, <font color=blue>final</font> <font color=darkmagenta><i>QStyleOptionGraphicsItem</i></font> option, <font color=darkmagenta><i>QWidget</i></font> widget) {
+
+            <font color=darkmagenta><i>QColor</i></font> fillColor = (option.state().isSet(<font color=darkmagenta><i>QStyle</i></font>.StateFlag.State_Selected)) ? color.darker(150) : color;
+            <font color=blue>if</font> (option.state().isSet(<font color=darkmagenta><i>QStyle</i></font>.StateFlag.State_MouseOver))
+                fillColor = fillColor.lighter(125);
+
+            <font color=blue>if</font> (option.levelOfDetail() &lt; 0.2) {
+                <font color=blue>if</font> (option.levelOfDetail() &lt; 0.125) {
+                    painter.fillRect(<font color=blue>new</font> <font color=darkmagenta><i>QRectF</i></font>(0, 0, 110, 70), <font color=blue>new</font> <font color=darkmagenta><i>QBrush</i></font>(fillColor));
+                    <font color=blue>return</font>;
+                }
+
+                painter.setPen(<font color=blue>new</font> <font color=darkmagenta><i>QPen</i></font>(<font color=darkmagenta><i>QColor</i></font>.black, 0));
+                painter.setBrush(fillColor);
+                painter.drawRect(13, 13, 97, 57);
+                <font color=blue>return</font>;
+            }
+
+            <font color=darkmagenta><i>QPen</i></font> oldPen = painter.pen();
+            <font color=darkmagenta><i>QPen</i></font> pen = oldPen;
+            <font color=blue>int</font> width = 0;
+            <font color=blue>if</font> (option.state().isSet(<font color=darkmagenta><i>QStyle</i></font>.StateFlag.State_Selected))
+                width += 2;
+
+            pen.setWidth(width);
+            painter.setBrush(<font color=blue>new</font> <font color=darkmagenta><i>QBrush</i></font>(fillColor.darker(option.state().isSet(<font color=darkmagenta><i>QStyle</i></font>.StateFlag.State_Sunken) ? 120 : 100)));
+
+            painter.drawRect(<font color=blue>new</font> <font color=darkmagenta><i>QRect</i></font>(14, 14, 79, 39));
+            <font color=blue>if</font> (option.levelOfDetail() &gt;= 1) {
+                painter.setPen(<font color=blue>new</font> <font color=darkmagenta><i>QPen</i></font>(<font color=darkmagenta><i>QColor</i></font>.gray, 1));
+                painter.drawLine(15, 54, 94, 54);
+                painter.drawLine(94, 53, 94, 15);
+                painter.setPen(<font color=blue>new</font> <font color=darkmagenta><i>QPen</i></font>(<font color=darkmagenta><i>QColor</i></font>.black, 0));
+            }
+
+            <font color=darkgreen><i>// Draw text
+</i></font>            <font color=blue>if</font> (option.levelOfDetail() &gt;= 2) {
+                <font color=darkmagenta><i>QFont</i></font> font = <font color=blue>new</font> <font color=darkmagenta><i>QFont</i></font>(<font color=darkgreen><i>"Times"</i></font>, 10);
+                font.setStyleStrategy(<font color=darkmagenta><i>QFont</i></font>.StyleStrategy.ForceOutline);
+                painter.setFont(font);
+                painter.setRenderHint(<font color=darkmagenta><i>QPainter</i></font>.RenderHint.TextAntialiasing, false);
+                painter.save();
+                painter.scale(0.1, 0.1);
+                painter.drawText(170, 180, String.format(<font color=darkgreen><i>"Model: VSC-2000 (Very Small Chip) at %1$s %2$s"</i></font>, x, y));
+                painter.drawText(170, 200, String.format(<font color=darkgreen><i>"Serial number: DLWR-WEER-123L-ZZ33-SDSJ"</i></font>, x, y));
+                painter.drawText(170, 220, String.format(<font color=darkgreen><i>"Manufacturer: Chip Manufacturer"</i></font>, x, y));
+                painter.restore();
+            }
+
+            <font color=darkgreen><i>// Draw lines
+</i></font>            List&lt;<font color=darkmagenta><i>QLineF</i></font>&gt; lines = <font color=blue>new</font> Vector&lt;<font color=darkmagenta><i>QLineF</i></font>&gt;(36);
+            <font color=blue>if</font> (option.levelOfDetail() &gt;= 0.5) {
+                <font color=blue>for</font> (<font color=blue>int</font> i = 0; i &lt;= 10; i += (option.levelOfDetail() &gt; 0.5 ? 1 : 2)) {
+                    lines.add(<font color=blue>new</font> <font color=darkmagenta><i>QLineF</i></font>(18 + 7 * i, 13, 18 + 7 * i, 5));
+                    lines.add(<font color=blue>new</font> <font color=darkmagenta><i>QLineF</i></font>(18 + 7 * i, 54, 18 + 7 * i, 62));
+                }
+                <font color=blue>for</font> (<font color=blue>int</font> i = 0; i &lt;= 6; i += (option.levelOfDetail() &gt; 0.5 ? 1 : 2)) {
+                    lines.add(<font color=blue>new</font> <font color=darkmagenta><i>QLineF</i></font>(5, 18 + i * 5, 13, 18 + i * 5));
+                    lines.add(<font color=blue>new</font> <font color=darkmagenta><i>QLineF</i></font>(94, 18 + i * 5, 102, 18 + i * 5));
+                }
+            }
+            <font color=blue>if</font> (option.levelOfDetail() &gt;= 0.4) {
+                lines.add(<font color=blue>new</font> <font color=darkmagenta><i>QLineF</i></font>(25, 35, 35, 35));
+                lines.add(<font color=blue>new</font> <font color=darkmagenta><i>QLineF</i></font>(35, 30, 35, 40));
+                lines.add(<font color=blue>new</font> <font color=darkmagenta><i>QLineF</i></font>(35, 30, 45, 35));
+                lines.add(<font color=blue>new</font> <font color=darkmagenta><i>QLineF</i></font>(35, 40, 45, 35));
+                lines.add(<font color=blue>new</font> <font color=darkmagenta><i>QLineF</i></font>(45, 30, 45, 40));
+                lines.add(<font color=blue>new</font> <font color=darkmagenta><i>QLineF</i></font>(45, 35, 55, 35));
+            }
+            painter.drawLinesF(lines);
+
+            <font color=darkgreen><i>// Draw red ink
+</i></font>            <font color=blue>if</font> (stuff.size() &gt; 1) {
+                painter.setPen(<font color=blue>new</font> <font color=darkmagenta><i>QPen</i></font>(<font color=darkmagenta><i>QColor</i></font>.red, 1, <font color=darkmagenta><i>Qt</i></font>.PenStyle.SolidLine, <font color=darkmagenta><i>Qt</i></font>.PenCapStyle.RoundCap, <font color=darkmagenta><i>Qt</i></font>.PenJoinStyle.RoundJoin));
+                painter.setBrush(<font color=darkmagenta><i>QBrush</i></font>.NoBrush);
+                <font color=darkmagenta><i>QPainterPath</i></font> path = <font color=blue>new</font> <font color=darkmagenta><i>QPainterPath</i></font>();
+                path.moveTo(stuff.get(0));
+                <font color=blue>for</font> (<font color=blue>int</font> i = 1; i &lt; stuff.size(); ++i)
+                    path.lineTo(stuff.get(i));
+                painter.drawPath(path);
+            }
+        }
+
+        @Override
+        <font color=blue>public</font> <font color=blue>void</font> mousePressEvent(<font color=darkmagenta><i>QGraphicsSceneMouseEvent</i></font> event) {
+            <font color=blue>super</font>.mousePressEvent(event);
+            update();
+        }
+
+        @Override
+        <font color=blue>public</font> <font color=blue>void</font> mouseMoveEvent(<font color=darkmagenta><i>QGraphicsSceneMouseEvent</i></font> event) {
+            <font color=blue>if</font> (event.modifiers().isSet(<font color=darkmagenta><i>Qt</i></font>.KeyboardModifier.ShiftModifier)) {
+                stuff.add(event.pos());
+                update();
+                <font color=blue>return</font>;
+            }
+            <font color=blue>super</font>.mouseMoveEvent(event);
+        }
+
+        @Override
+        <font color=blue>public</font> <font color=blue>void</font> mouseReleaseEvent(<font color=darkmagenta><i>QGraphicsSceneMouseEvent</i></font> event) {
+            <font color=blue>super</font>.mouseReleaseEvent(event);
+            update();
+        }
+    }
+
+    <font color=blue>class</font> View <font color=blue>extends</font> <font color=darkmagenta><i>QFrame</i></font> {
+
+        <font color=darkmagenta><i>QGraphicsView</i></font> graphicsView;
+        <font color=darkmagenta><i>QLabel</i></font> label;
+        <font color=darkmagenta><i>QToolButton</i></font> openGlButton;
+        <font color=darkmagenta><i>QToolButton</i></font> antialiasButton;
+        <font color=darkmagenta><i>QToolButton</i></font> printButton;
+        <font color=darkmagenta><i>QToolButton</i></font> resetButton;
+        <font color=darkmagenta><i>QSlider</i></font> zoomSlider;
+        <font color=darkmagenta><i>QSlider</i></font> rotateSlider;
+
+        View(<font color=blue>final</font> String name) {
+            <font color=blue>this</font>(name, null);
+        }
+
+        View(<font color=blue>final</font> String name, <font color=darkmagenta><i>QWidget</i></font> parent)
+
+        {
+            <font color=blue>super</font>(parent);
+            setFrameStyle(<font color=darkmagenta><i>QFrame</i></font>.Shadow.Sunken.value() | <font color=darkmagenta><i>QFrame</i></font>.Shape.StyledPanel.value());
+            graphicsView = <font color=blue>new</font> <font color=darkmagenta><i>QGraphicsView</i></font>();
+            graphicsView.setRenderHint(<font color=darkmagenta><i>QPainter</i></font>.RenderHint.Antialiasing, false);
+            graphicsView.setDragMode(<font color=darkmagenta><i>QGraphicsView</i></font>.DragMode.RubberBandDrag);
+            graphicsView.setViewportUpdateMode(<font color=darkmagenta><i>QGraphicsView</i></font>.ViewportUpdateMode.SmartViewportUpdate);
+
+            <font color=blue>int</font> size = style().pixelMetric(<font color=darkmagenta><i>QStyle</i></font>.PixelMetric.PM_ToolBarIconSize);
+            <font color=darkmagenta><i>QSize</i></font> iconSize = <font color=blue>new</font> <font color=darkmagenta><i>QSize</i></font>(size, size);
+
+            <font color=darkmagenta><i>QToolButton</i></font> zoomInIcon = <font color=blue>new</font> <font color=darkmagenta><i>QToolButton</i></font>();
+            zoomInIcon.setAutoRepeat(true);
+            zoomInIcon.setAutoRepeatInterval(33);
+            zoomInIcon.setAutoRepeatDelay(0);
+            zoomInIcon.setIcon(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(<font color=blue>new</font> <font color=darkmagenta><i>QPixmap</i></font>(<font color=darkgreen><i>"classpath:/com/trolltech/images/zoomin.png"</i></font>)));
+            zoomInIcon.setIconSize(iconSize);
+            <font color=darkmagenta><i>QToolButton</i></font> zoomOutIcon = <font color=blue>new</font> <font color=darkmagenta><i>QToolButton</i></font>();
+            zoomOutIcon.setAutoRepeat(true);
+            zoomOutIcon.setAutoRepeatInterval(33);
+            zoomOutIcon.setAutoRepeatDelay(0);
+            zoomOutIcon.setIcon(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(<font color=blue>new</font> <font color=darkmagenta><i>QPixmap</i></font>(<font color=darkgreen><i>"classpath:/com/trolltech/images/zoomout.png"</i></font>)));
+            zoomOutIcon.setIconSize(iconSize);
+            zoomSlider = <font color=blue>new</font> <font color=darkmagenta><i>QSlider</i></font>();
+            zoomSlider.setMinimum(0);
+            zoomSlider.setMaximum(500);
+            zoomSlider.setValue(250);
+            zoomSlider.setTickPosition(<font color=darkmagenta><i>QSlider</i></font>.TickPosition.TicksBelow);
+
+            <font color=darkgreen><i>// Zoom slider layout
+</i></font>            <font color=darkmagenta><i>QVBoxLayout</i></font> zoomSliderLayout = <font color=blue>new</font> <font color=darkmagenta><i>QVBoxLayout</i></font>();
+            zoomSliderLayout.addWidget(zoomInIcon);
+            zoomSliderLayout.addWidget(zoomSlider);
+            zoomSliderLayout.addWidget(zoomOutIcon);
+
+            <font color=darkmagenta><i>QToolButton</i></font> rotateLeftIcon = <font color=blue>new</font> <font color=darkmagenta><i>QToolButton</i></font>();
+            rotateLeftIcon.setIcon(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(<font color=blue>new</font> <font color=darkmagenta><i>QPixmap</i></font>(<font color=darkgreen><i>"classpath:/com/trolltech/images/rotateleft.png"</i></font>)));
+            rotateLeftIcon.setIconSize(iconSize);
+            <font color=darkmagenta><i>QToolButton</i></font> rotateRightIcon = <font color=blue>new</font> <font color=darkmagenta><i>QToolButton</i></font>();
+            rotateRightIcon.setIcon(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(<font color=blue>new</font> <font color=darkmagenta><i>QPixmap</i></font>(<font color=darkgreen><i>"classpath:/com/trolltech/images/rotateright.png"</i></font>)));
+            rotateRightIcon.setIconSize(iconSize);
+            rotateSlider = <font color=blue>new</font> <font color=darkmagenta><i>QSlider</i></font>();
+            rotateSlider.setOrientation(<font color=darkmagenta><i>Qt</i></font>.Orientation.Horizontal);
+            rotateSlider.setMinimum(-360);
+            rotateSlider.setMaximum(360);
+            rotateSlider.setValue(0);
+            rotateSlider.setTickPosition(<font color=darkmagenta><i>QSlider</i></font>.TickPosition.TicksBelow);
+
+            <font color=darkgreen><i>// Rotate slider layout
+</i></font>            <font color=darkmagenta><i>QHBoxLayout</i></font> rotateSliderLayout = <font color=blue>new</font> <font color=darkmagenta><i>QHBoxLayout</i></font>();
+            rotateSliderLayout.addWidget(rotateLeftIcon);
+            rotateSliderLayout.addWidget(rotateSlider);
+            rotateSliderLayout.addWidget(rotateRightIcon);
+
+            resetButton = <font color=blue>new</font> <font color=darkmagenta><i>QToolButton</i></font>();
+            resetButton.setText(tr(<font color=darkgreen><i>"0"</i></font>));
+            resetButton.setEnabled(false);
+
+            <font color=darkgreen><i>// Label layout
+</i></font>            <font color=darkmagenta><i>QHBoxLayout</i></font> labelLayout = <font color=blue>new</font> <font color=darkmagenta><i>QHBoxLayout</i></font>();
+            label = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(name);
+            antialiasButton = <font color=blue>new</font> <font color=darkmagenta><i>QToolButton</i></font>();
+            antialiasButton.setText(tr(<font color=darkgreen><i>"Antialiasing"</i></font>));
+            antialiasButton.setCheckable(true);
+            antialiasButton.setChecked(false);
+            openGlButton = <font color=blue>new</font> <font color=darkmagenta><i>QToolButton</i></font>();
+            openGlButton.setText(tr(<font color=darkgreen><i>"OpenGL"</i></font>));
+            openGlButton.setCheckable(true);
+            openGlButton.setEnabled(<font color=darkmagenta><i>QGLFormat</i></font>.hasOpenGL());
+
+            printButton = <font color=blue>new</font> <font color=darkmagenta><i>QToolButton</i></font>();
+            printButton.setIcon(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(<font color=blue>new</font> <font color=darkmagenta><i>QPixmap</i></font>(<font color=darkgreen><i>"classpath:/com/trolltech/images/"</i></font> + <font color=darkgreen><i>"fileprint.png"</i></font>)));
+
+            labelLayout.addWidget(label);
+            labelLayout.addStretch();
+            labelLayout.addWidget(antialiasButton);
+            labelLayout.addWidget(openGlButton);
+            labelLayout.addWidget(printButton);
+
+            <font color=darkmagenta><i>QGridLayout</i></font> topLayout = <font color=blue>new</font> <font color=darkmagenta><i>QGridLayout</i></font>();
+            topLayout.addLayout(labelLayout, 0, 0);
+            topLayout.addWidget(graphicsView, 1, 0);
+            topLayout.addLayout(zoomSliderLayout, 1, 1);
+            topLayout.addLayout(rotateSliderLayout, 2, 0);
+            topLayout.addWidget(resetButton, 2, 1);
+            setLayout(topLayout);
+
+            resetButton.clicked.connect(<font color=blue>this</font>, <font color=darkgreen><i>"resetView()"</i></font>);
+            zoomSlider.valueChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"setupMatrix()"</i></font>);
+            rotateSlider.valueChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"setupMatrix()"</i></font>);
+            graphicsView.verticalScrollBar().valueChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"setResetButtonEnabled()"</i></font>);
+            graphicsView.horizontalScrollBar().valueChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"setResetButtonEnabled()"</i></font>);
+            antialiasButton.toggled.connect(<font color=blue>this</font>, <font color=darkgreen><i>"toggleAntialiasing()"</i></font>);
+            openGlButton.toggled.connect(<font color=blue>this</font>, <font color=darkgreen><i>"toggleOpenGL()"</i></font>);
+            rotateLeftIcon.clicked.connect(<font color=blue>this</font>, <font color=darkgreen><i>"rotateLeft()"</i></font>);
+            rotateRightIcon.clicked.connect(<font color=blue>this</font>, <font color=darkgreen><i>"rotateRight()"</i></font>);
+            zoomInIcon.clicked.connect(<font color=blue>this</font>, <font color=darkgreen><i>"zoomIn()"</i></font>);
+            zoomOutIcon.clicked.connect(<font color=blue>this</font>, <font color=darkgreen><i>"zoomOut()"</i></font>);
+            printButton.clicked.connect(<font color=blue>this</font>, <font color=darkgreen><i>"print()"</i></font>);
+
+            setupMatrix();
+        }
+
+        <font color=darkmagenta><i>QGraphicsView</i></font> view() {
+            <font color=blue>return</font> graphicsView;
+        }
+
+        <font color=blue>void</font> resetView() {
+            zoomSlider.setValue(250);
+            rotateSlider.setValue(0);
+            setupMatrix();
+            graphicsView.ensureVisible(<font color=blue>new</font> <font color=darkmagenta><i>QRectF</i></font>(0, 0, 0, 0));
+
+            resetButton.setEnabled(false);
+        }
+
+        <font color=blue>void</font> setResetButtonEnabled() {
+            resetButton.setEnabled(true);
+        }
+
+        <font color=blue>void</font> setupMatrix() {
+            <font color=blue>double</font> scale = Math.pow(2.0, (zoomSlider.value() - 250) / 50.0);
+
+            <font color=darkmagenta><i>QMatrix</i></font> matrix = <font color=blue>new</font> <font color=darkmagenta><i>QMatrix</i></font>();
+            matrix.scale(scale, scale);
+            matrix.rotate(rotateSlider.value());
+
+            graphicsView.setMatrix(matrix);
+            setResetButtonEnabled();
+        }
+
+        <font color=blue>void</font> toggleOpenGL() {
+            graphicsView.setViewport(openGlButton.isChecked() ? <font color=blue>new</font> <font color=darkmagenta><i>QGLWidget</i></font>(<font color=blue>new</font> <font color=darkmagenta><i>QGLFormat</i></font>(<font color=blue>new</font> <font color=darkmagenta><i>QGL</i></font>.FormatOptions(<font color=darkmagenta><i>QGL</i></font>.FormatOption.SampleBuffers)))
+                    : <font color=blue>new</font> <font color=darkmagenta><i>QWidget</i></font>());
+
+        }
+
+        <font color=blue>void</font> toggleAntialiasing() {
+            graphicsView.setRenderHint(<font color=darkmagenta><i>QPainter</i></font>.RenderHint.Antialiasing, antialiasButton.isChecked());
+        }
+
+        <font color=blue>void</font> print() {
+            <font color=darkmagenta><i>QPrinter</i></font> printer = <font color=blue>new</font> <font color=darkmagenta><i>QPrinter</i></font>();
+            <font color=darkmagenta><i>QPrintDialog</i></font> dialog = <font color=blue>new</font> <font color=darkmagenta><i>QPrintDialog</i></font>(printer, <font color=blue>this</font>);
+            <font color=blue>if</font> (dialog.exec() == <font color=darkmagenta><i>QDialog</i></font>.DialogCode.Accepted.value()) {
+                <font color=darkmagenta><i>QPainter</i></font> painter = <font color=blue>new</font> <font color=darkmagenta><i>QPainter</i></font>(printer);
+                graphicsView.render(painter);
+                painter.end();
+            }
+        }
+
+        <font color=blue>void</font> zoomIn() {
+            zoomSlider.setValue(zoomSlider.value() + 1);
+        }
+
+        <font color=blue>void</font> zoomOut() {
+            zoomSlider.setValue(zoomSlider.value() - 1);
+        }
+
+        <font color=blue>void</font> rotateLeft() {
+            rotateSlider.setValue(rotateSlider.value() - 10);
+        }
+
+        <font color=blue>void</font> rotateRight() {
+            rotateSlider.setValue(rotateSlider.value() + 10);
+        }
+    }
+}
+</html></pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

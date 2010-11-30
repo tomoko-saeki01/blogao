@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>System Tray Icon Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>System Tray Icon Example</h1></center><p> <b>Code</b>: <ul><li> <a href="qtjambi-systemtrayexample-code.html">SystemTrayExample.java</a></li></ul> The System Tray Icon example shows how to add an icon with a menu and popup messages, to a desktop environment's system tray. <br><center><img src="images/systemtray-example.png"></center><br> Modern operating systems usually provide a special area on the desktop, called the system tray or notification area, where long-running applications can display icons and short messages.<a name="systemtrayexample-class-implementation"><h2>SystemTrayExample Class Implementation</h2> The SystemTrayExample class extends <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> and provides an editor for the system tray icon. <pre class="snippet">
+public class SystemTrayExample extends QWidget {
+
+    private QSystemTrayIcon trayIcon;
+    private QMenu trayIconMenu;
+
+    private QLineEdit titleEdit;
+    private QTextEdit messageEdit;
+    private QComboBox typeCombo;
+
+    private QTextEdit infoDisplay;
+    private QComboBox iconCombo;
+</pre> The editor enables the user to modify the message title, edit the actual message and choose the message type. The information display will contain status messages for the icon. In addition, the user can select an icon of the preferred size. <br><center><img src="images/systemtray-editor.png"></center><br> When constructing the editor widget, we first check if the system tray is available on the user's desktop. If it is not, we show a message to the user: <pre class="snippet">
+    public SystemTrayExample() {
+        this(null);
+    }
+
+    public SystemTrayExample(QWidget parent) {
+        super(parent);
+        if (!QSystemTrayIcon.isSystemTrayAvailable())
+            QMessageBox.warning(this, tr("System tray is unavailable"),
+
+                                      tr("System tray unavailable"));
+</pre> The <a href="../../../com/trolltech/qt/gui/QMessageBox.html">QMessageBox</a> class provides a modal dialog with a short message, an icon, and buttons laid out depending on the current style. It supports four severity levels: "Question", "Information", "Warning" and "Critical". The easiest way to pop up a message box in Qt is to call one of the associated static methods, e.g. <a href="../../../com/trolltech/qt/gui/QMessageBox.html#warning(com.trolltech.qt.gui.QWidget, java.lang.String, java.lang.String, com.trolltech.qt.gui.QMessageBox.StandardButtons)">QMessageBox.warning()</a>. <pre class="snippet">
+        trayIconMenu = new QMenu(this);
+        trayIconMenu.aboutToShow.connect(this, "updateMenu()");
+</pre> Then we create the menu that will appear when right-clicking over the icon in the system tray. The <a href="../../../com/trolltech/qt/gui/QMenu.html">QMenu</a> class provides a menu widget for use in menu bars, context menus, and other popup menus. We use the menu's aboutToShow() signal to ensure that the menu is updated when it is shown. We will come back to the editor's <tt>updateMenu()</tt> method later on. <p>A menu consists of a list of action items, i.e., a collection of <a href="../../../com/trolltech/qt/gui/QAction.html">QAction</a> objects: <pre class="snippet">
+        toggleVisibilityAction = new QAction("Show/Hide", this);
+        toggleVisibilityAction.triggered.connect(this, "toggleVisibility()");
+        trayIconMenu.addAction(toggleVisibilityAction);
+
+        QAction restoreAction = new QAction("Restore", this);
+        restoreAction.triggered.connect(this, "showNormal()");
+        trayIconMenu.addAction(restoreAction);
+
+        QAction minimizeAction = new QAction("Minimize", this);
+        minimizeAction.triggered.connect(this, "showMinimized()");
+        trayIconMenu.addAction(minimizeAction);
+
+        QAction maximizeAction = new QAction("Maximize", this);
+        maximizeAction.triggered.connect(this, "showMaximized()");
+        trayIconMenu.addAction(maximizeAction);
+
+        trayIconMenu.addSeparator();
+
+        QAction quitAction = new QAction("&Quit", this);
+        quitAction.triggered.connect(this, "close()");
+        trayIconMenu.addAction(quitAction);
+</pre> The purpose of the various actions in our menu, is to control the appearance of the editor widget: Before we add each action to the menu, we connect their triggered() signal to the appropiate methods of the editor widget. The <a href="../../../com/trolltech/qt/gui/QWidget.html#showNormal()">showNormal()</a>, <a href="../../../com/trolltech/qt/gui/QWidget.html#showMinimized()">showMinimized()</a>, <a href="../../../com/trolltech/qt/gui/QWidget.html#showMaximized()">showMaximized()</a> and <a href="../../../com/trolltech/qt/gui/QWidget.html#close()">close()</a> methods are inherited from <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>, while the <tt>toggleVisibility()</tt> method is specific to this example and simply hides or shows the editor depending on its current state. <pre class="snippet">
+        trayIcon = new QSystemTrayIcon(this);
+        trayIcon.setToolTip("System trayIcon example");
+        trayIcon.setContextMenu(trayIconMenu);
+
+        trayIcon.activated.connect(this, "activated(com.trolltech.qt.gui.QSystemTrayIcon$ActivationReason)");
+        trayIcon.messageClicked.connect(this, "balloonClicked()");
+
+        changeIcon(0);
+        trayIcon.show();
+</pre> It is the <a href="../../../com/trolltech/qt/gui/QSystemTrayIcon.html">QSystemTrayIcon</a> class that actually provides the icon in the system tray. When we create our icon, we first set its tooltip to be the message title and ensure that our newly created menu appears as the icon's context menu. <p>To provide respons to user interaction, we then connect the icon's activated() and messageClicked() signals to the editor's <tt>activated()</tt> and <tt>balloonClicked()</tt> methods, respectively. Before we show the icon, we also choose its initial size using the editor's <tt>changeIcon()</tt> method. We will take a look at the editor's methods shortly. <pre class="snippet">
+        QLabel titleLabel = new QLabel(tr("Message Title"));
+        titleEdit = new QLineEdit(tr("Message Title"));
+
+        QLabel messageLabel = new QLabel(tr("Message Contents"));
+        messageEdit = new QTextEdit(tr("Man is more ape than many of the apes"));
+        messageEdit.setAcceptRichText(false);
+
+        QLabel typeLabel = new QLabel(tr("Message Type"));
+        typeCombo = new QComboBox();
+        Vector&lt;String&gt; types = new Vector&lt;String&gt;();
+        types.add("NoIcon");
+        types.add("Information");
+        types.add("Warning");
+        types.add("Critical");
+        typeCombo.addItems(types);
+        typeCombo.setCurrentIndex(2);
+
+        QPushButton balloonButton = new QPushButton(tr("Balloon message"));
+        balloonButton.setToolTip(tr("Click here to balloon the message"));
+        balloonButton.clicked.connect(this, "showMessage()");
+
+        infoDisplay = new QTextEdit(tr("Status messages will be visible here"));
+        infoDisplay.setMaximumHeight(100);
+
+        QCheckBox toggleIconCheckBox = new QCheckBox(tr("Show system tray icon"));
+        toggleIconCheckBox.setChecked(true);
+        toggleIconCheckBox.clicked.connect(trayIcon, "setVisible(boolean)");
+
+        QLabel iconLabel = new QLabel("Select icon");
+        iconCombo = new QComboBox();
+        Vector&lt;String&gt; icons = new Vector&lt;String&gt;();
+        icons.add("16x16 icon");
+        icons.add("22x22 icon");
+        icons.add("32x32 icon");
+        iconCombo.addItems(icons);
+        iconCombo.activatedIndex.connect(this, "changeIcon(int)");
+<br>
+        QGridLayout layout = new QGridLayout();
+        layout.addWidget(titleLabel, 0, 0);
+        layout.addWidget(titleEdit, 0, 1);
+        layout.addWidget(messageLabel, 1, 0);
+        layout.addWidget(messageEdit, 1, 1);
+        layout.addWidget(typeLabel, 2, 0);
+        layout.addWidget(typeCombo, 2, 1);
+        layout.addWidget(balloonButton, 4, 1);
+        layout.addWidget(infoDisplay, 5, 0, 1, 2);
+        layout.addWidget(toggleIconCheckBox, 6, 0);
+        layout.addWidget(iconLabel, 7, 0);
+        layout.addWidget(iconCombo, 7, 1);
+        setLayout(layout);
+
+        setWindowTitle(tr("System Tray Example"));
+        setWindowIcon(new QIcon("classpath:com/trolltech/images/qt-logo.png"));
+    }
+</pre> Finally, we create the editor's various window elements and use a <a href="../../../com/trolltech/qt/gui/QGridLayout.html">QGridLayout</a> to organize them. The <a href="../../../com/trolltech/qt/gui/QGridLayout.html">QGridLayout</a> class takes the space made available to it, divides it up into rows and columns, and puts each widget it manages into the correct cell. <pre class="snippet">
+    public void closeEvent(QCloseEvent e) {
+
+    }
+</pre> It is important to note that <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> subclasses normally have a lifetime beyond what is visible to the garbage collector. To ensure that such a object is deleted, you must either assign the object to a parent (child widgets are automatically disposed of by their parents upon destruction) or call the <tt>dispose()</tt> method explicitly. <p>Since we use the <a href="../../../com/trolltech/qt/gui/QSystemTrayIcon.html">QSystemTrayIcon</a> class (which is a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> subclass) without giving our icon a parent, we must reimplement <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>'s <a href="../../../com/trolltech/qt/gui/QWidget.html#closeEvent(com.trolltech.qt.gui.QCloseEvent)">closeEvent()</a> method to dispose the icon when the application is terminated. <pre class="snippet">
+    protected void updateMenu() {
+        toggleVisibilityAction.setText(isVisible() ? tr("Hide") : tr("Show"));
+    }
+</pre> The <tt>updateMenu()</tt> method is called whenever the system tray icon's context menu is about to be shown, i.e. when the user right-clicks the icon in the system tray. The method simply checks whether the editor widget is currently visible or not, and update the menu accordingly. <pre class="snippet">
+    protected void toggleVisibility() {
+        if (isVisible())
+            hide();
+        else
+            show();
+    }
+</pre> The <tt>toggleVisibility()</tt> method is called whenever the user chooses <b>Hide</b> or <b>Show</b> in the context menu, and use the <a href="../../../com/trolltech/qt/gui/QWidget.html#hide()">hide()</a> and <a href="../../../com/trolltech/qt/gui/QWidget.html#show()">show()</a> methods inherited from <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> to control the appearance of the editor widget. <pre class="snippet">
+    protected void showMessage() {
+
+        if (QSysInfo.macVersion() != 0) {
+            QMessageBox.information(this, tr("System tray example"),
+                    tr("Balloon tips are not supported on Mac OS X"));
+        } else {
+
+            QSystemTrayIcon.MessageIcon icon;
+            icon = QSystemTrayIcon.MessageIcon.resolve(typeCombo.currentIndex());
+            trayIcon.showMessage(titleEdit.text(), messageEdit.toPlainText(),
+                                 icon, 10000);
+            trayIcon.setToolTip(titleEdit.text());
+        }
+
+    }
+</pre> The <tt>showMessage()</tt> method is called whenever the user presses the <b>Balloon message</b> button. Note that balloon tips are not supported on Mac OS X. On any other platform, we create a message icon (i.e., the icon that is shown next to the message title when a balloon message is displayed), show the message and update the icon's tooltip. <pre class="snippet">
+    protected void balloonClicked() {
+        infoDisplay.append(tr("Balloon message was clicked"));
+    }
+</pre> The <tt>balloonClicked()</tt> method is called whenever the user clicks the system tray icon's message, and simply append a status message to the information display in the editor. <pre class="snippet">
+    public void activated(QSystemTrayIcon.ActivationReason reason) {
+        String name = QSystemTrayIcon.MessageIcon.resolve(reason.value()).name();
+        if (name != null)
+            infoDisplay.append("Activated - Reason " + name);
+    }
+</pre> Whenever the user activates the system tray icon, e.g., by clicking it, the icon's activated() signal is emitted and the editor's <tt>activated()</tt> method is called (due to the connection we created in the constructor). The <tt>activated()</tt> method determines the reason the icon was activated and derives a corresponding message that it append to the information display in the editor. <pre class="snippet">
+    protected void changeIcon(int index) {
+        String iconName;
+        switch (index) {
+        default:
+        case 0:
+            iconName = "classpath:com/trolltech/examples/images/icon_16x16.png";
+            break;
+
+        case 1:
+            iconName = "classpath:com/trolltech/examples/images/icon_22x22.png";
+            break;
+
+        case 2:
+            iconName = "classpath:com/trolltech/examples/images/icon_32x32.png";
+            break;
+        }
+
+        QPixmap pixmap = new QPixmap(iconName);
+        trayIcon.setIcon(new QIcon(pixmap));
+    }
+</pre> The <tt>changeIcon()</tt> method is used to change the icon pixmap, and is called whenever the user select a different size for the system tray icon. <pre class="snippet">
+    public static void main(String[] args) {
+        QApplication.initialize(args);
+
+        SystemTrayExample editor = new SystemTrayExample();
+        editor.show();
+
+        QApplication.exec();
+    }
+
+}
+</pre> Finally, we provide a <tt>main()</tt> method to create and show the editor widget when the example is run.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

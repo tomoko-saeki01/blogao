@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Simple Decoration Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Simple Decoration Example</h1></center><p> The Simple Decoration example shows how to create a custom window decoration for embedded applications. <br><center><img src="images/embedded-simpledecoration-example.png"></center><br> By default, Qt for Embedded Linux applications display windows with one of the standard window decorations provided by Qt which are perfectly suitable for many situations. Nonetheless, for certain applications and devices, it is necessary to provide custom window decorations. <p>In this document, we examine the fundamental features of custom window decorations, and create a simple decoration as an example.<a name="styles-and-window-decorations"><h2>Styles and Window Decorations</h2> On many platforms, the style used for the contents of a window (including scroll bars) and the style used for the window decorations (the title bar, window borders, close, maximize and other buttons) are handled differently. This is usually because each application is responsible for rendering the contents of its own windows and the window manager renders the window decorations. <p>Although the situation is not quite like this on Qt for Embedded Linux because <a href="../../../com/trolltech/qt/gui/QApplication.html">QApplication</a> automatically handles window decorations as well, there are still two style mechanisms at work: <a href="../../../com/trolltech/qt/gui/QStyle.html">QStyle</a> and its associated classes are responsible for rendering widgets and subclasses of QDecoration are responsible for rendering window decorations. <br><center><img src="images/embedded-simpledecoration-example-styles.png"></center><br> Three decorations are provided with Qt for Embedded Linux: default is a basic style, windows resembles the classic Windows look and feel, and styled uses the <a href="../../../com/trolltech/qt/gui/QStyle.html">QStyle</a> classes for <a href="../../../com/trolltech/qt/gui/QMdiSubWindow.html">QMdiSubWindow</a> to draw window decorations. Of these, styled is the most useful if you want to impose a consistent look and feel, but the window decorations may be too large for some use cases. <p>If none of these built-in decorations are suitable, a custom style can easily be created and used. To do this, we simply need to create a subclass of QDecorationDefault and apply it to a <a href="../../../com/trolltech/qt/gui/QApplication.html">QApplication</a> instance in a running application.<a name="mydecoration-class-definition"><h2>MyDecoration Class Definition</h2> The <tt>MyDecoration</tt> class is a subclass of QDecorationDefault, a subclass of QDecoration that provides reasonable default behavior for a decoration: <pre class="snippet">
+class MyDecoration : public QDecorationDefault
+{
+public:
+    MyDecoration();
+    QRegion region(const QWidget *widget, const QRect &insideRect, int decorationRegion);
+    bool paint(QPainter *painter, const QWidget *widget, int decorationRegion, DecorationState state);
+
+private:
+    int border;
+    int buttonHeight;
+    int buttonMargin;
+    int buttonWidth;
+    int titleHeight;
+    QHash&lt;Qt::WindowType, DecorationRegion&gt; buttonHintMap;
+    QHash&lt;DecorationRegion, QPixmap&gt; normalButtonPixmaps;
+    QHash&lt;DecorationRegion, QPixmap&gt; maximizedButtonPixmaps;
+    QVector&lt;Qt::WindowType&gt; buttonHints;
+    QVector&lt;DecorationRegion&gt; stateRegions;
+};
+</pre> We only need to implement a constructor and reimplement the region() and paint() functions to provide our own custom appearance for window decorations. <p>To make things fairly general, we provide a number of private variables to hold parameters which control certain aspects of the decoration's appearance. We also define some data structures that we will use to relate buttons in the window decorations to regions.<a name="mydecoration-class-implementation"><h2>MyDecoration Class Implementation</h2> In the constructor of the <tt>MyDecoration</tt> class, we set up some default values for the decoration, specifying a thin window border, a title bar that is just taller than the buttons it will hold, and we create a list of buttons that we support:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+MyDecoration::MyDecoration()
+    : QDecorationDefault()
+{
+    border = 4;
+    titleHeight = 24;
+    buttonWidth = 20;
+    buttonHeight = 20;
+    buttonMargin = 2;
+    buttonHints &lt;&lt; Qt::Window
+                &lt;&lt; Qt::WindowMaximizeButtonHint
+                &lt;&lt; Qt::WindowContextHelpButtonHint;
+    </pre> We map each of these Qt::WindowFlags to QDecoration::DecorationRegion enum values to help with the implementation of the <a href="qws-simpledecoration.html#finding-regions">region() function implementation</a>.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    buttonHintMap[Qt::Window] = Close;
+    buttonHintMap[Qt::WindowMaximizeButtonHint] = Maximize;
+    buttonHintMap[Qt::WindowContextHelpButtonHint] = Help;
+    </pre> In this decoration, we implement the buttons used in the decoration as pixmaps. To help us relate regions of the window to these, we define mappings between each DecorationRegion and its corresponding pixmap for two situations: when a window is shown normally and when it has been maximized. This is purely for cosmetic purposes.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    normalButtonPixmaps[Close] = QPixmap(_close_button);
+    normalButtonPixmaps[Maximize] = QPixmap(_maximize_button);
+    normalButtonPixmaps[Normalize] = QPixmap(_normalize_button);
+    normalButtonPixmaps[Help] = QPixmap(_help_button);
+
+    maximizedButtonPixmaps[Close] = QPixmap(_close_button);
+    maximizedButtonPixmaps[Maximize] = QPixmap(_normalize_button);
+    maximizedButtonPixmaps[Normalize] = QPixmap(_normalize_button);
+    maximizedButtonPixmaps[Help] = QPixmap(_help_button);
+    </pre> We finish the constructor by defining the regions for buttons that we understand. This will be useful when we are asked to give regions for window decoration buttons.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    stateRegions &lt;&lt; Close &lt;&lt; Maximize &lt;&lt; Help;
+}
+</pre><a name="finding-regions"><h3>Finding Regions</h3> Each decoration needs to be able to describe the regions used for parts of the window furniture, such as the close button, window borders and title bar. We reimplement the region() function to do this for our decoration. This function returns a <a href="../../../com/trolltech/qt/gui/QRegion.html">QRegion</a> object that describes an arbitrarily-shaped region of the screen that can itself be made up of several distinct areas.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QRegion MyDecoration::region(const QWidget *widget, const QRect &insideRect,
+                             int decorationRegion)
+{
+    </pre> The function is called for a given widget, occupying a region specified by insideRect, and is expected to return a region for the collection of DecorationRegion enum values supplied in the decorationRegion parameter. <p>We begin by figuring out how much space in the decoration we will need to allocate for buttons, and where to place them:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QHash&lt;DecorationRegion, int&gt; buttons;
+    Qt::WindowFlags flags = widget-&gt;windowFlags();
+    int dx = -buttonMargin - buttonWidth;
+
+    foreach (Qt::WindowType button, buttonHints) {
+        if (flags & button) {
+            int x = (buttons.size() + 1) * dx;
+            buttons[buttonHintMap[button]] = x;
+        }
+    }
+    </pre> In a more sophisticated implementation, we might test the decorationRegion supplied for regions related to buttons and the title bar, and only perform this space allocation if asked for regions related to these. <p>We also use the information about the area occupied by buttons to determine how large an area we can use for the window title:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    int titleRightMargin = buttons.size() * dx;
+
+    QRect outsideRect(insideRect.left() - border,
+                      insideRect.top() - titleHeight - border,
+                      insideRect.width() + 2 * border,
+                      insideRect.height() + titleHeight + 2 * border);
+    </pre> With these basic calculations done, we can start to compose a region, first checking whether we have been asked for all of the window, and we return immediately if so.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QRegion region;
+
+    if (decorationRegion == All) {
+        region += QRegion(outsideRect) - QRegion(insideRect);
+        return region;
+    }
+    </pre> We examine each decoration region in turn, adding the corresponding region to the <tt>region</tt> object created earlier. We take care to avoid "off by one" errors in the coordinate calculations.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    if (decorationRegion & Title) {
+        QRect rect = outsideRect.adjusted(border, border, -border, 0);
+        rect.setHeight(titleHeight);
+
+        // Adjust the width to accommodate buttons.
+        rect.setWidth(qMax(0, rect.width() + titleRightMargin));
+        region += rect;
+    }
+    if (decorationRegion & Top) {
+        QRect rect = outsideRect.adjusted(border, 0, -border, 0);
+        rect.setHeight(border);
+        region += rect;
+    }
+    if (decorationRegion & Left) {
+        QRect rect = outsideRect.adjusted(0, border, 0, -border);
+        rect.setWidth(border);
+        region += rect;
+    }
+    if (decorationRegion & Right) {
+        QRect rect = outsideRect.adjusted(0, border, 0, -border);
+        rect.setLeft(rect.right() + 1 - border);
+        region += rect;
+    }
+    if (decorationRegion & Bottom) {
+        QRect rect = outsideRect.adjusted(border, 0, -border, 0);
+        rect.setTop(rect.bottom() + 1 - border);
+        region += rect;
+    }
+    if (decorationRegion & TopLeft) {
+        QRect rect = outsideRect;
+        rect.setWidth(border);
+        rect.setHeight(border);
+        region += rect;
+    }
+    if (decorationRegion & TopRight) {
+        QRect rect = outsideRect;
+        rect.setLeft(rect.right() + 1 - border);
+        rect.setHeight(border);
+        region += rect;
+    }
+    if (decorationRegion & BottomLeft) {
+        QRect rect = outsideRect;
+        rect.setWidth(border);
+        rect.setTop(rect.bottom() + 1 - border);
+        region += rect;
+    }
+    if (decorationRegion & BottomRight) {
+        QRect rect = outsideRect;
+        rect.setLeft(rect.right() + 1 - border);
+        rect.setTop(rect.bottom() + 1 - border);
+        region += rect;
+    }
+    </pre> Unlike the window borders and title bar, the regions occupied by buttons many of the window decorations do not occupy fixed places in the window. Instead, their locations depend on which other buttons are present. We only add regions for buttons we can handle (defined in the <tt>stateRegions</tt>) member variable, and only for those that are present (defined in the <tt>buttons</tt> hash).<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    foreach (QDecoration::DecorationRegion testRegion, stateRegions) {
+        if (decorationRegion & testRegion and buttons.contains(testRegion)) {
+            // Inside the title rectangle
+            QRect rect = outsideRect.adjusted(border, border, -border, 0);
+            rect.setHeight(titleHeight);
+
+            dx = buttons[testRegion];
+            rect.setLeft(rect.right() + 1 + dx);
+            rect.setWidth(buttonWidth + buttonMargin);
+            region += rect;
+        }
+    }
+    </pre> The fully composed region can then be returned:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    return region;
+}
+</pre> The information returned by this function is used when the decoration is painted. Ideally, this function should be implemented to perform all the calculations necessary to place elements of the decoration; this makes the implementation of the <tt>paint()</tt> function much easier.<a name="painting-the-decoration"><h3>Painting the Decoration</h3> The <tt>paint()</tt> function is responsible for drawing each window element for a given widget. Information about the decoration region, its state and the widget itself is provided along with a <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a> object to use. <p>The first check we make is for a call with no regions:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+bool MyDecoration::paint(QPainter *painter, const QWidget *widget,
+                         int decorationRegion, DecorationState state)
+{
+    if (decorationRegion == None)
+        return false;
+    </pre> We return false to indicate that we have not painted anything. If we paint something, we must return true so that the window can be composed, if necessary. <p>Just as with the <tt>region()</tt> function, we test the decoration region to determine which elements need to be drawn. If we paint anything, we set the <tt>handled</tt> variable to true so that we can return the correct value when we have finished.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    bool handled = false;
+
+    QPalette palette = QApplication::palette();
+    QHash&lt;DecorationRegion, QPixmap&gt; buttonPixmaps;
+
+    if (widget-&gt;windowState() == Qt::WindowMaximized)
+        buttonPixmaps = maximizedButtonPixmaps;
+    else
+        buttonPixmaps = normalButtonPixmaps;
+
+    if (decorationRegion & Title) {
+        QRect rect = QDecoration::region(widget, Title).boundingRect();
+        painter-&gt;fillRect(rect, palette.brush(QPalette::Base));
+        painter-&gt;save();
+        painter-&gt;setPen(QPen(palette.color(QPalette::Text)));
+        painter-&gt;drawText(rect, Qt::AlignCenter, widget-&gt;windowTitle());
+        painter-&gt;restore();
+        handled = true;
+    }
+    if (decorationRegion & Top) {
+        QRect rect = QDecoration::region(widget, Top).boundingRect();
+        painter-&gt;fillRect(rect, palette.brush(QPalette::Dark));
+        handled = true;
+    }
+    if (decorationRegion & Left) {
+        QRect rect = QDecoration::region(widget, Left).boundingRect();
+        painter-&gt;fillRect(rect, palette.brush(QPalette::Dark));
+        handled = true;
+    }
+    if (decorationRegion & Right) {
+        QRect rect = QDecoration::region(widget, Right).boundingRect();
+        painter-&gt;fillRect(rect, palette.brush(QPalette::Dark));
+        handled = true;
+    }
+    if (decorationRegion & Bottom) {
+        QRect rect = QDecoration::region(widget, Bottom).boundingRect();
+        painter-&gt;fillRect(rect, palette.brush(QPalette::Dark));
+        handled = true;
+    }
+    if (decorationRegion & TopLeft) {
+        QRect rect = QDecoration::region(widget, TopLeft).boundingRect();
+        painter-&gt;fillRect(rect, palette.brush(QPalette::Dark));
+        handled = true;
+    }
+    if (decorationRegion & TopRight) {
+        QRect rect = QDecoration::region(widget, TopRight).boundingRect();
+        painter-&gt;fillRect(rect, palette.brush(QPalette::Dark));
+        handled = true;
+    }
+    if (decorationRegion & BottomLeft) {
+        QRect rect = QDecoration::region(widget, BottomLeft).boundingRect();
+        painter-&gt;fillRect(rect, palette.brush(QPalette::Dark));
+        handled = true;
+    }
+    if (decorationRegion & BottomRight) {
+        QRect rect = QDecoration::region(widget, BottomRight).boundingRect();
+        painter-&gt;fillRect(rect, palette.brush(QPalette::Dark));
+        handled = true;
+    }
+    </pre> Note that we use our own <tt>region()</tt> implementation to determine where to draw decorations. <p>Since the <tt>region()</tt> function performs calculations to place buttons, we can simply test the window flags against the buttons we support (using the <tt>buttonHintMap</tt> defined in the constructor), and draw each button in the relevant region:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    int margin = (titleHeight - 16) / 2;
+    Qt::WindowFlags flags = widget-&gt;windowFlags();
+
+    foreach (DecorationRegion testRegion, stateRegions) {
+        if (decorationRegion & testRegion && flags & buttonHintMap.key(testRegion)) {
+            QRect rect = QDecoration::region(
+                widget, testRegion).boundingRect();
+            painter-&gt;fillRect(rect, palette.brush(QPalette::Base));
+
+            QRect buttonRect = rect.adjusted(0, margin, -buttonMargin - margin,
+                                             -buttonMargin);
+            painter-&gt;drawPixmap(buttonRect.topLeft(), buttonPixmaps[testRegion]);
+            handled = true;
+        }
+    }
+    </pre> Finally, we return the value of <tt>handled</tt> to indicate whether any painting was performed:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    return handled;
+}
+</pre> We now have a decoration class that we can use in an application.<a name="using-the-decoration"><h2>Using the Decoration</h2> In the <tt>main.cpp</tt> file, we set up the application as usual, but we also create an instance of our decoration and set it as the standard decoration for the application:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    MyDecoration *decoration = new MyDecoration();
+    app.qwsSetDecoration(decoration);
+</pre> This causes all windows opened by this application to use our decoration. To demonstrate this, we show the analog clock widget from the <a href="qtjambi-analogclock.html">Analog Clock Example</a>, which we build into the application:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    AnalogClock clock;
+    clock.show();
+
+    return app.exec();
+}
+</pre> The application can be run either <a href="qt-embedded-running.html">as a server or a client application</a>. In both cases, it will use our decoration rather than the default one provided with Qt.<a name="notes"><h2>Notes</h2> This example does not cache any information about the state or buttons used for each window. This means that the <tt>region()</tt> function calculates the locations and regions of buttons in cases where it could re-use existing information. <p>If you run the application as a window server, you may expect client applications to use our decoration in preference to the default Qt decoration. However, it is up to each application to draw its own decoration, so this will not happen automatically. One way to achieve this is to compile the decoration with each application that needs it; another way is to build the decoration as a plugin, using the QDecorationPlugin class, and load it into the server and client applications.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

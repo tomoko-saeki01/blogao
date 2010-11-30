@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>The QTextCursor Interface</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>The QTextCursor Interface</h1></center><p>[Previous: <a href="richtext-structure.html">Rich Text Document Structure</a>][<a href="richtext.html">Rich Text Processing</a>][Next: <a href="richtext-common-tasks.html">Common Rich Text Editing Tasks</a>]<p> <ul><li> <a href="#cursor-based-editing">Cursor-Based Editing</a></li> <ul><li> <a href="#using-a-cursor">Using a Cursor</a></li><li> <a href="#grouping-cursor-operations">Grouping Cursor Operations</a></li><li> <a href="#multiple-cursors">Multiple Cursors</a></li></ul><li> <a href="#inserting-document-elements">Inserting Document Elements</a></li> <ul><li> <a href="#text-and-text-fragments">Text and Text Fragments</a></li><li> <a href="#blocks">Blocks</a></li><li> <a href="#frames">Frames</a></li><li> <a href="#tables">Tables</a></li><li> <a href="#lists">Lists</a></li><li> <a href="#images">Images</a></li></ul></ul> The <a href="../../../com/trolltech/qt/gui/QTextCursor.html">QTextCursor</a> interface allows documents and their structure to be edited in a way that should be familiar to most users of text editors and document editing software. Rich text documents can have multiple cursors associated with them, and each of these contains information about their position in the document and any selections that they may hold. This cursor-based paradigm makes common operations, such as cutting and pasting text, simple to implement programmatically, yet it also allows more complex editing operations to be performed on the document. <p>This chapter describes most of the common editing operations that you will need to perform using a cursor, from basic insertion of text and document elements to more complex manipulation of document structures.<a name="cursor-based-editing"><h2>Cursor-Based Editing</h2> At the simplest level, text documents are made up of a string of characters, marked up in some way to represent the block structure of the text within the document. <a href="../../../com/trolltech/qt/gui/QTextCursor.html">QTextCursor</a> provides a cursor-based interface that allows the contents of a <a href="../../../com/trolltech/qt/gui/QTextDocument.html">QTextDocument</a> to be manipulated at the character level. Since the elements (blocks, frames, tables, etc.) are also encoded in the character stream, the document structure can itself be changed by the cursor. <p>The cursor keeps track of its location within its parent document, and can report information about the surrounding structure, such as the enclosing text block, frame, table, or list. The formats of the enclosing structures can also be directly obtained through the cursor.<a name="using-a-cursor"><h3>Using a Cursor</h3> The main use of a cursor is to insert or modify text within a block. We can use a text editor's cursor to do this: <pre class="snippet">
+        QTextEdit editor = new QTextEdit();
+        QTextCursor cursor = new QTextCursor(editor.textCursor());
+    </pre> Alternatively, we can obtain a cursor directly from a document: <pre class="snippet">
+        QTextDocument document = new QTextDocument(editor);
+        QTextCursor cursor = new QTextCursor(document);
+    </pre> The cursor is positioned at the start of the document so that we can write into the first (empty) block in the document.<a name="grouping-cursor-operations"><h3>Grouping Cursor Operations</h3> A series of editing operations can be packaged together so that they can be replayed, or undone together in a single action. This is achieved by using the <tt>beginEditBlock()</tt> and <tt>endEditBlock()</tt> functions in the following way, as in the following example where we select the word that contains the cursor: <pre class="snippet">
+    cursor.beginEditBlock();
+
+    cursor.movePosition(QTextCursor.MoveOperation.StartOfWord);
+    cursor.movePosition(QTextCursor.MoveOperation.EndOfWord,
+                        QTextCursor.MoveMode.KeepAnchor);
+
+    cursor.endEditBlock();
+</pre> If editing operations are not grouped, the document automatically records the individual operations so that they can be undone later. Grouping operations into larger packages can make editing more efficient both for the user and for the application, but care has to be taken not to group too many operations together as the user may want find-grained control over the undo process.<a name="multiple-cursors"><h3>Multiple Cursors</h3> Multiple cursors can be used to simultaneously edit the same document, although only one will be visible to the user in a <a href="../../../com/trolltech/qt/gui/QTextEdit.html">QTextEdit</a> widget. The <a href="../../../com/trolltech/qt/gui/QTextDocument.html">QTextDocument</a> ensures that each cursor writes text correctly and does not interfere with any of the others.<a name="inserting-document-elements"><h2>Inserting Document Elements</h2> <a href="../../../com/trolltech/qt/gui/QTextCursor.html">QTextCursor</a> provides several functions that can be used to change the structure of a rich text document. Generally, these functions allow document elements to be created with relevant formatting information, and they are inserted into the document at the cursor's position. <p>The first group of functions insert block-level elements, and update the cursor position, but they do not return the element that was inserted: <ul><li> <a href="../../../com/trolltech/qt/gui/QTextCursor.html#insertBlock()">insertBlock()</a> inserts a new text block (paragraph) into a document at the cursor's position, and moves the cursor to the start of the new block.</li><li> <a href="../../../com/trolltech/qt/gui/QTextCursor.html#insertFragment(com.trolltech.qt.gui.QTextDocumentFragment)">insertFragment()</a> inserts an existing text fragment into a document at the cursor's position.</li><li> <a href="../../../com/trolltech/qt/gui/QTextCursor.html#insertImage(com.trolltech.qt.gui.QImage)">insertImage()</a> inserts an image into a document at the cursor's position.</li><li> <a href="../../../com/trolltech/qt/gui/QTextCursor.html#insertText(java.lang.String)">insertText()</a> inserts text into the document at the cursor's position.</li></ul> You can examine the contents of the element that was inserted through the cursor interface. <p>The second group of functions insert elements that provide structure to the document, and return the structure that was inserted: <ul><li> <a href="../../../com/trolltech/qt/gui/QTextCursor.html#insertFrame(com.trolltech.qt.gui.QTextFrameFormat)">insertFrame()</a> inserts a frame into the document after the cursor's current block, and moves the cursor to the start of the empty block in the new frame.</li><li> <a href="../../../com/trolltech/qt/gui/QTextCursor.html#insertList(com.trolltech.qt.gui.QTextListFormat.Style)">insertList()</a> inserts a list into the document at the cursor's position, and moves the cursor to the start of the first item in the list.</li><li> <a href="../../../com/trolltech/qt/gui/QTextCursor.html#insertTable(int, int)">insertTable()</a> inserts a table into the document after the cursor's current block, and moves the cursor to the start of the block following the table.</li></ul> These elements either contain or group together other elements in the document.<a name="text-and-text-fragments"><h3>Text and Text Fragments</h3> Text can be inserted into the current block in the current character format, or in a custom format that is specified with the text: <pre class="snippet">
+        cursor.insertText(tr("Character formats"),
+                          headingFormat);
+
+        cursor.insertBlock();
+
+        cursor.insertText(tr("Text can be displayed in a variety of " +
+                             "different character formats. "), plainFormat);
+        cursor.insertText(tr("We can emphasize text by "));
+        cursor.insertText(tr("making it italic"), emphasisFormat);
+    </pre> Once the character format has been used with a cursor, that format becomes the default format for any text inserted with that cursor until another character format is specified. <p>If a cursor is used to insert text without specifying a character format, the text will be given the character format used at that position in the document.<a name="blocks"><h3>Blocks</h3> Text blocks are inserted into the document with the <a href="../../../com/trolltech/qt/gui/QTextCursor.html#insertBlock()">insertBlock()</a> function. <pre class="snippet">
+        QTextBlockFormat backgroundFormat = blockFormat;
+        backgroundFormat.setBackground(new QBrush(new QColor("lightGray")));
+
+        cursor.setBlockFormat(backgroundFormat);
+    </pre> The cursor is positioned at the start of the new block.<a name="frames"><h3>Frames</h3> Frames are inserted into a document using the cursor, and will be placed within the cursor's current frame after the current block. The following code shows how a frame can be inserted between two text blocks in a document's root frame. We begin by finding the cursor's current frame: <pre class="snippet">
+        QTextFrame mainFrame = cursor.currentFrame();
+        cursor.insertText("...");
+    </pre> We insert some text in this frame then set up a frame format for the child frame: <pre class="snippet">
+        QTextFrameFormat frameFormat = new QTextFrameFormat();
+        frameFormat.setMargin(32);
+        frameFormat.setPadding(8);
+        frameFormat.setBorder(4);
+    </pre> The frame format will give the frame an external margin of 32 pixels, internal padding of 8 pixels, and a border that is 4 pixels wide. See the <a href="../../../com/trolltech/qt/gui/QTextFrameFormat.html">QTextFrameFormat</a> documentation for more information about frame formats. <p>The frame is inserted into the document after the preceding text: <pre class="snippet">
+        cursor.insertFrame(frameFormat);
+        cursor.insertText("...");
+    </pre> We add some text to the document immediately after we insert the frame. Since the text cursor is positioned inside the frame when it is inserted into the document, this text will also be inserted inside the frame. <p>Finally, we position the cursor outside the frame by taking the last available cursor position inside the frame we recorded earlier: <pre class="snippet">
+        cursor = mainFrame.lastCursorPosition();
+        cursor.insertText("...");
+    </pre> The text that we add last is inserted after the child frame in the document. Since each frame is padded with text blocks, this ensures that more elements can always be inserted with a cursor.<a name="tables"><h3>Tables</h3> Tables are inserted into the document using the cursor, and will be placed within the cursor's current frame after the current block: <pre class="snippet"> 
+        QTextCursor cursor = new QTextCursor(editor.textCursor());
+    
+        QTextTable table = cursor.insertTable(rows, columns, tableFormat);
+     </pre> Tables can be created with a specific format that defines the overall properties of the table, such as its alignment, background color, and the cell spacing used. It can also determine the constraints on each column, allowing each of them to have a fixed width, or resize according to the available space. <pre class="snippet">
+        QTextTableFormat tableFormat = new QTextTableFormat();
+        tableFormat.setBackground(new QColor("#e0e0e0"));
+        List&lt;QTextLength&gt; raints = new Vector&lt;QTextLength&gt;();
+
+       raints.add(new QTextLength(QTextLength.Type.PercentageLength, 16));
+       raints.add(new QTextLength(QTextLength.Type.PercentageLength, 28));
+       raints.add(new QTextLength(QTextLength.Type.PercentageLength, 28));
+       raints.add(new QTextLength(QTextLength.Type.PercentageLength, 28));
+       tableFormat.setColumnWidthConstraints(raints);
+    
+        QTextTable table = cursor.insertTable(rows, columns, tableFormat);
+    </pre> The columns in the table created above will each take up a certain percentage of the available width. Note that the table format is optional; if you insert a table without a format, some sensible default values will be used for the table's properties. <p>Since cells can contain other document elements, they too can be formatted and styled as necessary. <p>Text can be added to the table by navigating to each cell with the cursor and inserting text. <pre class="snippet">
+        cell = table.cellAt(0, 0);
+        cellCursor = cell.firstCursorPosition();
+        cellCursor.insertText(tr("Week"), charFormat);
+    </pre> We can create a simple timetable by following this approach: <pre class="snippet">
+        for (column = 1; column &lt; columns; ++column) {
+            cell = table.cellAt(0, column);
+            cellCursor = cell.firstCursorPosition();
+            cellCursor.insertText(tr("Team") + String.valueOf(column), charFormat);
+        }
+
+        for (row = 1; row &lt; rows; ++row) {
+            cell = table.cellAt(row, 0);
+            cellCursor = cell.firstCursorPosition();
+            cellCursor.insertText(String.valueOf(row), charFormat);
+
+            for (column = 1; column &lt; columns; ++column) {
+                if ((row - 1) % 3 == column - 1) {
+    
+                    cell = table.cellAt(row, column);
+                    QTextCursor cellCursor = cell.firstCursorPosition();
+                    cellCursor.insertText(tr("On duty"), charFormat);
+                }
+    
+            }
+    
+        }
+    </pre><a name="lists"><h3>Lists</h3> Lists of block elements can be automatically created and inserted into the document at the current cursor position. Each list that is created in this way requires a list format to be specified: <pre class="snippet">
+    QTextListFormat listFormat = new QTextListFormat();
+    if (list != null) {
+        listFormat = list.format();
+        listFormat.setIndent(listFormat.indent() + 1);
+    }
+
+    listFormat.setStyle(QTextListFormat.Style.ListDisc);
+    cursor.insertList(listFormat);
+</pre> The above code first checks whether the cursor is within an existing list and, if so, gives the list format for the new list a suitable level of indentation. This allows nested lists to be created with increasing levels of indentation. A more sophisticated implementation would also use different kinds of symbol for the bullet points in each level of the list.<a name="images"><h3>Images</h3> Inline images are added to documents through the cursor in the usual manner. Unlike many other elements, all of the image properties are specified by the image's format. This means that a <a href="../../../com/trolltech/qt/gui/QTextImageFormat.html">QTextImageFormat</a> object has to be created before an image can be inserted: <pre class="snippet">
+        QTextImageFormat imageFormat = new QTextImageFormat();
+        imageFormat.setName("classpath:images/advert.png");
+        cursor.insertImage(imageFormat);
+    </pre> The image name refers to an entry in the application's resource file. The method used to derive this name is described in <a href="resources.html">The Qt Resource System</a>.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

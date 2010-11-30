@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Advanced Rich Text Processing</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Advanced Rich Text Processing</h1></center><p>[Previous: <a href="richtext-common-tasks.html">Common Rich Text Editing Tasks</a>][<a href="richtext.html">Rich Text Processing</a>][Next: <a href="richtext-html-subset.html">Supported HTML Subset</a>]<p><a name="handling-large-files"><h2>Handling Large Files</h2> Qt does not limit the size of files that are used for text processing. In most cases, this will not present a problem. For especially large files, however, you might experience that your application will become unresponsive or that you will run out of memory. The size of the files you can load depends on your hardware and on Qt's and your own application's implementation. <p>If you are faced with this problem, we recommend that you address the following issues: <ul><li> You should consider breaking up large paragraphs into smaller ones as Qt handles small paragraphs better. You could also insert line breaks at regular intervals, which will look the same as one large paragraph in a <a href="../../../com/trolltech/qt/gui/QTextEdit.html">QTextEdit</a>.</li><li> You can reduce the amount of blocks in a <a href="../../../com/trolltech/qt/gui/QTextDocument.html">QTextDocument</a> with <a href="../../../com/trolltech/qt/gui/QTextDocument.html#maximumBlockCount()">maximumBlockCount()</a>. The document is only as large as the number of blocks as far as <a href="../../../com/trolltech/qt/gui/QTextEdit.html">QTextEdit</a> is concerned.</li><li> When adding text to a text edit, it is an advantage to add it in an edit block (see example below). The result is that the text edit does not need to build the entire document structure at once.</li></ul> We give an example of the latter technique in the list. We assume that the text edit is visible. <pre class="snippet">
+textEdit.show();
+
+textCursor.beginEditBlock();
+
+for (int i = 0; i &lt; 1000; ++i) {
+    textCursor.insertBlock();
+    textCursor.insertText(paragraphText.at(i));
+}
+
+textCursor.endEditBlock(); 
+</pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

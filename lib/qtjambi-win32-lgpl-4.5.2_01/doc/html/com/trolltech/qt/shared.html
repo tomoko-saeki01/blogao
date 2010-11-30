@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Implicitly Shared Classes</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Implicitly Shared Classes</h1></center><p>Classes that use reference counting for fast copying.<a name="implicit-data-sharing"><a name="implicit-sharing"><a name="implicitly-shared"><a name="reference-counting"><a name="shared-implicitly"><a name="shared-classes"> Many C++ classes in Qt use implicit data sharing to maximize resource usage and minimize copying. Implicitly shared classes are both safe and efficient when passed as arguments, because only a pointer to the data is passed around, and the data is copied only if and when a function writes to it, i.e., copy-on-write. <ul><li> <a href="#overview">Overview</a></li><li> <a href="#implicit-sharing-in-detail">Implicit Sharing in Detail</a></li><li> <a href="#list-of-classes">List of Classes</a></li></ul><a name="overview"><h2>Overview</h2> A shared class consists of a pointer to a shared data block that contains a reference count and the data. <p>When a shared object is created, it sets the reference count to 1. The reference count is incremented whenever a new object references the shared data, and decremented when the object dereferences the shared data. The shared data is deleted when the reference count becomes zero.<a name="deep-copy"><a name="shallow-copy"> When dealing with shared objects, there are two ways of copying an object. We usually speak about deep and shallow copies. A deep copy implies duplicating an object. A shallow copy is a reference copy, i.e. just a pointer to a shared data block. Making a deep copy can be expensive in terms of memory and CPU. Making a shallow copy is very fast, because it only involves setting a pointer and incrementing the reference count. <p>Object assignment (with operator=()) for implicitly shared objects is implemented using shallow copies. <p>The benefit of sharing is that a program does not need to duplicate data unnecessarily, which results in lower memory use and less copying of data. Objects can easily be assigned, sent as function arguments, and returned from functions. <p>Implicit sharing takes place behind the scenes; the programmer does not need to worry about it. Even in multithreaded applications, implicit sharing takes place, as explained in <a href="qtjambi-threads.html">Threads and Implicit Sharing</a>.<a name="implicit-sharing-in-detail"><h2>Implicit Sharing in Detail</h2> Implicit sharing automatically detaches the object from a shared block if the object is about to change and the reference count is greater than one. (This is often called copy-on-write or value semantics.) <p>An implicitly shared class has total control of its internal data. In any member functions that modify its data, it automatically detaches before modifying the data. <p>The <a href="../../../com/trolltech/qt/gui/QPen.html">QPen</a> class, which uses implicit sharing, detaches from the shared data in all member functions that change the internal data. <p>Code fragment: <pre class="snippet">
+void QPen::setStyle(Qt::PenStyle style)
+{
+    detach();           // detach from common data
+    d-&gt;style = style;   // set the style member
+}
+
+void QPen::detach()
+{
+    if (d-&gt;ref != 1) {
+        ...             // perform a deep copy
+    }
+}
+</pre><a name="list-of-classes"><h2>List of Classes</h2> The classes listed below automatically detach from common data if an object is about to be changed. The programmer will not even notice that the objects are shared. Thus you should treat separate instances of them as separate objects. They will always behave as separate objects but with the added benefit of sharing data whenever possible. For this reason, you can pass instances of these classes as arguments to functions by value without concern for the copying overhead. <p>Example: <pre class="snippet">
+QPixmap p1, p2;
+p1.load("image.bmp");
+p2 = p1;                        // p1 and p2 share data
+
+QPainter paint;
+paint.begin(&p2);               // cuts p2 loose from p1
+paint.drawText(0,50, "Hi");
+paint.end();
+</pre> In this example, <tt>p1</tt> and <tt>p2</tt> share data until <a href="../../../com/trolltech/qt/gui/QPainter.html#begin(com.trolltech.qt.gui.QPaintDeviceInterface)">QPainter::begin()</a> is called for <tt>p2</tt>, because painting a pixmap will modify it. <p><b>Warning:</b> Do not copy an implicitly shared container (QMap, QVector, etc.) while you are iterating over it using an non-const <a href="containers.html">STL-style iterator</a>.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

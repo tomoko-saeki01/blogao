@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Handling Selections in Item Views</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Handling Selections in Item Views</h1></center><p>[Previous: <a href="model-view-view.html">View Classes</a>][<a href="model-view-programming.html">Model/View Programming</a>][Next: <a href="model-view-delegate.html">Delegate Classes</a>]<p> <ul><li> <a href="#concepts">Concepts</a></li><li> <a href="#using-a-selection-model">Using a Selection Model</a></li> <ul><li> <a href="#selecting-items">Selecting Items</a></li><li> <a href="#reading-the-selection-state">Reading the Selection State</a></li><li> <a href="#updating-a-selection">Updating a Selection</a></li><li> <a href="#selecting-all-items-in-a-model">Selecting All Items in a Model</a></li></ul></ul><a name="concepts"><h2>Concepts</h2> The selection model used in the new item view classes offers many improvements over the selection model used in Qt 3. It provides a more general description of selections based on the facilities of the model/view architecture. Although the standard classes for manipulating selections are sufficient for the item views provided, the selection model allows you to create specialized selection models to suit the requirements for your own item models and views. <p>Information about the items selected in a view is stored in an instance of the <a href="../../../com/trolltech/qt/gui/QItemSelectionModel.html">QItemSelectionModel</a> class. This maintains model indexes for items in a single model, and is independent of any views. Since there can be many views onto a model, it is possible to share selections between views, allowing applications to show multiple views in a consistent way. <p>Selections are made up of selection ranges. These efficiently maintain information about large selections of items by recording only the starting and ending model indexes for each range of selected items. Non-contiguous selections of items are constructed by using more than one selection range to describe the selection. <p>Selections are applied to a collection of model indexes held by a selection model. The most recent selection of items applied is known as the current selection. The effects of this selection can be modified even after its application through the use of certain types of selection commands. These are discussed later in this section. <p>When manipulating selections, it is often helpful to think of <a href="../../../com/trolltech/qt/gui/QItemSelectionModel.html">QItemSelectionModel</a> as a record of the selection state of all the items in an item model. Once a selection model is set up, collections of items can be selected, deselected, or their selection states can be toggled without the need to know which items are already selected. The indexes of all selected items can be retrieved at any time, and other components can be informed of changes to the selection model via the signals and slots mechanism.<a name="using-a-selection-model"><h2>Using a Selection Model</h2> The standard view classes provide default selection models that can be used in most applications. A selection model belonging to one view can be obtained using the view's <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html#selectionModel()">selectionModel()</a> function, and shared between many views with <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html#setSelectionModel(com.trolltech.qt.gui.QItemSelectionModel)">setSelectionModel()</a>, so the construction of new selection models is generally not required. <p>A selection is created by specifying a model, and a pair of model indexes to a <a href="../../../com/trolltech/qt/gui/QItemSelection.html">QItemSelection</a>. This uses the indexes to refer to items in the given model, and interprets them as the top-left and bottom-right items in a block of selected items. To apply the selection to items in a model requires the selection to be submitted to a selection model; this can be achieved in a number of ways, each having a different effect on the selections already present in the selection model.<a name="selecting-items"><h3>Selecting Items</h3> To demonstrate some of the principal features of selections, we construct an instance of a custom table model with 32 items in total, and open a table view onto its data: <pre class="snippet">
+        TableModel model = new TableModel(8, 4, app);
+
+
+        QTableView table = new QTableView();
+        table.setModel(model);
+
+        QItemSelectionModel selectionModel = table.selectionModel();
+    </pre> The table view's default selection model is retrieved for later use. We do not modify any items in the model, but instead select a few items that the view will display at the top-left of the table. To do this, we need to retrieve the model indexes corresponding to the top-left and bottom-right items in the region to be selected: <pre class="snippet">
+        QModelIndex topLeft;
+        QModelIndex bottomRight;
+
+        topLeft = model.index(0, 0, null);
+        bottomRight = model.index(5, 2, null);
+    </pre> To select these items in the model, and see the corresponding change in the table view, we need to construct a selection object then apply it to the selection model: <pre class="snippet">
+        QItemSelection selection = new QItemSelection(topLeft, bottomRight);
+        selectionModel.select(selection, QItemSelectionModel.SelectionFlag.Select);
+    </pre> The selection is applied to the selection model using a command defined by a combination of <a href="../../../com/trolltech/qt/gui/QItemSelectionModel.SelectionFlag.html">selection flags</a>. In this case, the flags used cause the items recorded in the selection object to be included in the selection model, regardless of their previous state. The resulting selection is shown by the view. <br><center><img src="images/selected-items1.png"></center><br> The selection of items can be modified using various operations that are defined by the selection flags. The selection that results from these operations may have a complex structure, but will be represented efficiently by the selection model. The use of different selection flags to manipulate the selected items is described when we examine how to update a selection.<a name="reading-the-selection-state"><h3>Reading the Selection State</h3> The model indexes stored in the selection model can be read using the <a href="../../../com/trolltech/qt/gui/QItemSelectionModel.html#selectedIndexes()">selectedIndexes()</a> function. This returns an unsorted list of model indexes that we can iterate over as long as we know which model they are for: <pre class="snippet">
+        List&lt;QModelIndex&gt; indexes = selectionModel.selectedIndexes();
+
+        for (QModelIndex index : indexes) {
+            String text = "(" + index.row() + ", " + index.column() + ")";
+            model.setData(index, text);
+        }
+    </pre> The above code uses Qt's convenient <a href="containers.html">foreach keyword</a> to iterate over, and modify, the items corresponding to the indexes returned by the selection model. <p>The selection model emits signals to indicate changes in the selection. These notify other components about changes to both the selection as a whole and the currently focused item in the item model. We can connect the selectionChanged() signal to a slot, and examine the items in the model that are selected or deselected when the selection changes. The slot is called with two <a href="../../../com/trolltech/qt/gui/QItemSelection.html">QItemSelection</a> objects: one contains a list of indexes that correspond to newly selected items; the other contains indexes that correspond to newly deselected items. <p>In the following code, we provide a slot that receives the selectionChanged() signal, fills in the selected items with a string, and clears the contents of the deselected items. <pre class="snippet">
+    public void updateSelection(QItemSelection selected,
+        QItemSelection deselected)
+    {
+        List&lt;QModelIndex&gt; items = selected.indexes();
+
+        for (QModelIndex index : items) {
+            String text = "(" + index.row() + ", " + index.column() +")";
+            model.setData(index, text);
+    
+        }
+    <br>
+        items = deselected.indexes();
+
+        for (QModelIndex index : items)
+            model.setData(index, "");
+    }
+    </pre> We can keep track of the currently focused item by connecting the currentChanged() signal to a slot that is called with two model indexes. These correspond to the previously focused item, and the currently focused item. <p>In the following code, we provide a slot that receives the currentChanged() signal, and uses the information provided to update the status bar of a <a href="../../../com/trolltech/qt/gui/QMainWindow.html">QMainWindow</a>: <pre class="snippet">
+    public void changeCurrent(QModelIndex current, QModelIndex previous)
+    {
+        statusBar().showMessage(
+            "Moved from (" + previous.row() + ", " +previous.column() + " to "
+            + "(" + current.row() + ", " +current.column() +")");
+    }
+    </pre> Monitoring selections made by the user is straightforward with these signals, but we can also update the selection model directly.<a name="updating-a-selection"><h3>Updating a Selection</h3> Selection commands are provided by a combination of selection flags, defined by <a href="../../../com/trolltech/qt/gui/QItemSelectionModel.SelectionFlag.html">QItemSelectionModel::SelectionFlag</a>. Each selection flag tells the selection model how to update its internal record of selected items when either of the <a href="../../../com/trolltech/qt/gui/QItemSelection.html#select(com.trolltech.qt.core.QModelIndex, com.trolltech.qt.core.QModelIndex)">select()</a> functions are called. The most commonly used flag is the <a href="../../../com/trolltech/qt/gui/QItemSelectionModel.SelectionFlag.html">Select</a> flag which instructs the selection model to record the specified items as being selected. The <a href="../../../com/trolltech/qt/gui/QItemSelectionModel.SelectionFlag.html">Toggle</a> flag causes the selection model to invert the state of the specified items, selecting any deselected items given, and deselecting any currently selected items. The <a href="../../../com/trolltech/qt/gui/QItemSelectionModel.SelectionFlag.html">Deselect</a> flag deselects all the specified items. <p>Individual items in the selection model are updated by creating a selection of items, and applying them to the selection model. In the following code, we apply a second selection of items to the table model shown above, using the <a href="../../../com/trolltech/qt/gui/QItemSelectionModel.SelectionFlag.html">Toggle</a> command to invert the selection state of the items given. <pre class="snippet">
+        QItemSelection toggleSelection = new QItemSelection();
+
+        topLeft = model.index(2, 1, null);
+        bottomRight = model.index(7, 3, null);
+        toggleSelection.select(topLeft, bottomRight);
+
+        selectionModel.select(toggleSelection, QItemSelectionModel.SelectionFlag.Toggle);
+    </pre> The results of this operation are displayed in the table view, providing a convenient way of visualizing what we have achieved: <br><center><img src="images/selected-items2.png"></center><br> By default, the selection commands only operate on the individual items specified by the model indexes. However, the flag used to describe the selection command can be combined with additional flags to change entire rows and columns. For example if you call <a href="../../../com/trolltech/qt/gui/QItemSelectionModel.html#select(com.trolltech.qt.gui.QItemSelection, com.trolltech.qt.gui.QItemSelectionModel.SelectionFlag[])">select()</a> with only one index, but with a command that is a combination of <a href="../../../com/trolltech/qt/gui/QItemSelectionModel.SelectionFlag.html">Select</a> and <a href="../../../com/trolltech/qt/gui/QItemSelectionModel.SelectionFlag.html">Rows</a>, the entire row containing the item referred to will be selected. The following code demonstrates the use of the <a href="../../../com/trolltech/qt/gui/QItemSelectionModel.SelectionFlag.html">Rows</a> and <a href="../../../com/trolltech/qt/gui/QItemSelectionModel.SelectionFlag.html">Columns</a> flags: <pre class="snippet">
+        QItemSelection columnSelection = new QItemSelection();
+
+        topLeft = model.index(0, 1, null);
+        bottomRight = model.index(0, 2, null);
+
+        columnSelection.select(topLeft, bottomRight);
+
+        selectionModel.select(columnSelection,
+                              QItemSelectionModel.SelectionFlag.Select,
+                              QItemSelectionModel.SelectionFlag.Columns);
+
+        QItemSelection rowSelection = new QItemSelection();
+
+        topLeft = model.index(0, 0, null);
+        bottomRight = model.index(1, 0, null);
+
+        rowSelection.select(topLeft, bottomRight);
+
+        selectionModel.select(rowSelection,
+            QItemSelectionModel.SelectionFlag.Select, QItemSelectionModel.SelectionFlag.Rows);
+    </pre> Although only four indexes are supplied to the selection model, the use of the <a href="../../../com/trolltech/qt/gui/QItemSelectionModel.SelectionFlag.html">Columns</a> and <a href="../../../com/trolltech/qt/gui/QItemSelectionModel.SelectionFlag.html">Rows</a> selection flags means that two columns and two rows are selected. The following image shows the result of these two selections: <br><center><img src="images/selected-items3.png"></center><br> The commands performed on the example model have all involved accumulating a selection of items in the model. It is also possible to clear the selection, or to replace the current selection with a new one. <p>To replace the current selection with a new selection, combine the other selection flags with the <a href="../../../com/trolltech/qt/gui/QItemSelectionModel.SelectionFlag.html">Current</a> flag. A command using this flag instructs the selection model to replace its current collection of model indexes with those specified in a call to <a href="../../../com/trolltech/qt/gui/QItemSelectionModel.html#select(com.trolltech.qt.gui.QItemSelection, com.trolltech.qt.gui.QItemSelectionModel.SelectionFlag[])">select()</a>. To clear all selections before you start adding new ones, combine the other selection flags with the <a href="../../../com/trolltech/qt/gui/QItemSelectionModel.SelectionFlag.html">Clear</a> flag. This has the effect of resetting the selection model's collection of model indexes.<a name="selecting-all-items-in-a-model"><h3>Selecting All Items in a Model</h3> To select all items in a model, it is necessary to create a selection for each level of the model that covers all items in that level. We do this by retrieving the indexes corresponding to the top-left and bottom-right items with a given parent index: <pre class="snippet">
+        QModelIndex topLeft = model.index(0, 0, parent);
+        QModelIndex bottomRight = model.index(model.rowCount(parent) - 1,
+            model.columnCount(parent) - 1, parent);
+    </pre> A selection is constructed with these indexes and the model. The corresponding items are then selected in the selection model: <pre class="snippet">
+        QItemSelection selection = new QItemSelection(topLeft, bottomRight);
+        selectionModel.select(selection, QItemSelectionModel.SelectionFlag.Select);
+    </pre> This needs to be performed for all levels in the model. For top-level items, we would define the parent index in the usual way: <pre class="snippet">
+        QModelIndex parent = null;
+    </pre> For hierarchical models, the <a href="../../../com/trolltech/qt/core/QAbstractItemModel.html#hasChildren()">hasChildren()</a> function is used to determine whether any given item is the parent of another level of items.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

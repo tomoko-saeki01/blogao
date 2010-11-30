@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Pixelator Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Pixelator Example</h1></center><p> The Pixelator example shows how delegates can be used to customize the way that items are rendered in standard item views. <br><center><img src="images/pixelator-example.png"></center><br> By default, <a href="../../../com/trolltech/qt/gui/QTreeView.html">QTreeView</a>, <a href="../../../com/trolltech/qt/gui/QTableView.html">QTableView</a>, and <a href="../../../com/trolltech/qt/gui/QListView.html">QListView</a> use a standard item delegate to display and edit a set of common data types that are sufficient for many applications. However, an application may need to represent items of data in a particular way, or provide support for rendering more specialized data types, and this often requires the use of a custom delegate. <p>In this example, we show how to use custom delegates to modify the appearance of standard views. To do this, we implement the following components: <ul><li> A model which represents each pixel in an image as an item of data, where each item contains a value for the brightness of the corresponding pixel.</li><li> A custom delegate that uses the information supplied by the model to represent each pixel as a black circle on a white background, where the radius of the circle corresponds to the darkness of the pixel.</li></ul> This example may be useful for developers who want to implement their own table models or custom delegates. The process of creating custom delegates for editing item data is covered in the <a href="itemviews-spinboxdelegate.html">Spin Box Delegate</a> example.<a name="imagemodel-class-definition"><h2>ImageModel Class Definition</h2> The <tt>ImageModel</tt> class is defined as follows: <pre class="snippet">
+class ImageModel : public QAbstractTableModel
+{
+    Q_OBJECT
+
+public:
+    ImageModel(QObject *parent = 0);
+
+    void setImage(const QImage &image);
+
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
+
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+
+private:
+    QImage modelImage;
+};
+</pre> Since we only require a simple, read-only table model, we only need to implement functions to indicate the dimensions of the image and supply data to other components. <p>For convenience, the image to be used is passed in the constructor.<a name="imagemodel-class-implementation"><h2>ImageModel Class Implementation</h2> The constructor is trivial:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+ImageModel::ImageModel(QObject *parent)
+    : QAbstractTableModel(parent)
+{
+}
+</pre> The <tt>setImage()</tt> function sets the image that will be used by the model:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void ImageModel::setImage(const QImage &image)
+{
+    modelImage = image;
+    reset();
+}
+</pre> The <a href="../../../com/trolltech/qt/core/QAbstractItemModel.html#reset()">QAbstractItemModel::reset()</a> call tells the view(s) that the model has changed. <p>The <tt>rowCount()</tt> and <tt>columnCount()</tt> functions return the height and width of the image respectively:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+int ImageModel::rowCount(const QModelIndex &  parent ) const
+{
+    return modelImage.height();
+}
+
+int ImageModel::columnCount(const QModelIndex &  parent ) const
+
+{
+    return modelImage.width();
+}
+</pre> Since the image is a simple two-dimensional structure, the <tt>parent</tt> arguments to these functions are unused. They both simply return the relevant size from the underlying image object. <p>The <tt>data()</tt> function returns data for the item that corresponds to a given model index in a format that is suitable for a particular role:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QVariant ImageModel::data(const QModelIndex &index, int role) const
+{
+    if (!index.isValid() || role != Qt::DisplayRole)
+        return QVariant();
+    return qGray(modelImage.pixel(index.column(), index.row()));
+}
+</pre> In this implementation, we only check that the model index is valid, and that the role requested is the <a href="../../../com/trolltech/qt/core/Qt.ItemDataRole.html">DisplayRole</a>. If so, the function returns the grayscale value of the relevant pixel in the image; otherwise, a null model index is returned. <p>This model can be used with <a href="../../../com/trolltech/qt/gui/QTableView.html">QTableView</a> to display the integer brightness values for the pixels in the image. However, we will implement a custom delegate to display this information in a more artistic way. <p>The <tt>headerData()</tt> function is also reimplemented:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QVariant ImageModel::headerData(int  section ,
+                                Qt::Orientation  orientation ,
+                                int role) const
+{
+    if (role == Qt::SizeHintRole)
+        return QSize(1, 1);
+    return QVariant();
+}
+</pre> We return (1, 1) as the size hint for a header item. If we didn't, the headers would default to a larger size, preventing us from displaying really small items (which can be specified using the <b>Pixel size</b> combobox).<a name="pixeldelegate-class-definition"><h2>PixelDelegate Class Definition</h2> The <tt>PixelDelegate</tt> class is defined as follows: <pre class="snippet">
+class PixelDelegate : public QAbstractItemDelegate
+{
+    Q_OBJECT
+
+public:
+    PixelDelegate(QObject *parent = 0);
+
+    void paint(QPainter *painter, const QStyleOptionViewItem &option,
+               const QModelIndex &index) const;
+
+    QSize sizeHint(const QStyleOptionViewItem &option,
+                   const QModelIndex &index ) const;
+
+public slots:
+    void setPixelSize(int size);
+
+private:
+    int pixelSize;
+};
+</pre> This class provides only basic features for a delegate so, unlike the <a href="itemviews-spinboxdelegate.html">Spin Box Delegate</a> example, we subclass <a href="../../../com/trolltech/qt/gui/QAbstractItemDelegate.html">QAbstractItemDelegate</a> instead of <a href="../../../com/trolltech/qt/gui/QItemDelegate.html">QItemDelegate</a>. <p>We only need to reimplement <a href="../../../com/trolltech/qt/gui/QAbstractItemDelegate.html#paint(com.trolltech.qt.gui.QPainter, com.trolltech.qt.gui.QStyleOptionViewItem, com.trolltech.qt.core.QModelIndex)">paint()</a> and <a href="../../../com/trolltech/qt/gui/QAbstractItemDelegate.html#sizeHint(com.trolltech.qt.gui.QStyleOptionViewItem, com.trolltech.qt.core.QModelIndex)">sizeHint()</a> in this class. However, we also provide a delegate-specific <tt>setPixelSize()</tt> function so that we can change the delegate's behavior via the signals and slots mechanism.<a name="pixeldelegate-class-implementation"><h2>PixelDelegate Class Implementation</h2> The <tt>PixelDelegate</tt> constructor is used to set up a default value for the size of each "pixel" that it renders. The base class constructor is also called to ensure that the delegate is set up with a parent object, if one is supplied:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+PixelDelegate::PixelDelegate(QObject *parent)
+    : QAbstractItemDelegate(parent)
+{
+    pixelSize = 12;
+}
+</pre> Each item is rendered by the delegate's <a href="../../../com/trolltech/qt/gui/QAbstractItemDelegate.html#paint(com.trolltech.qt.gui.QPainter, com.trolltech.qt.gui.QStyleOptionViewItem, com.trolltech.qt.core.QModelIndex)">paint()</a> function. The view calls this function with a ready-to-use <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a> object, style information that the delegate should use to correctly draw the item, and an index to the item in the model:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void PixelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
+                          const QModelIndex &index) const
+{
+
+    if (option.state & QStyle::State_Selected)
+        painter-&gt;fillRect(option.rect, option.palette.highlight());
+</pre> The first task the delegate has to perform is to draw the item's background correctly. Usually, selected items appear differently to non-selected items, so we begin by testing the state passed in the style option and filling the background if necessary. <p>The radius of each circle is calculated in the following lines of code:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    int size = qMin(option.rect.width(), option.rect.height());
+
+    int brightness = index.model()-&gt;data(index, Qt::DisplayRole).toInt();
+    double radius = (size/2.0) - (brightness/255.0 * size/2.0);
+    if (radius == 0.0)
+        return;
+</pre> First, the largest possible radius of the circle is determined by taking the smallest dimension of the style option's <tt>rect</tt> attribute. Using the model index supplied, we obtain a value for the brightness of the relevant pixel in the image. The radius of the circle is calculated by scaling the brightness to fit within the item and subtracting it from the largest possible radius.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    painter-&gt;save();
+
+    painter-&gt;setRenderHint(QPainter::Antialiasing, true);
+
+    painter-&gt;setPen(Qt::NoPen);
+</pre> We save the painter's state, turn on antialiasing (to obtain smoother curves), and turn off the pen.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    if (option.state & QStyle::State_Selected)
+
+        painter-&gt;setBrush(option.palette.highlightedText());
+    else
+
+        painter-&gt;setBrush(QBrush(Qt::black));
+</pre> The foreground of the item (the circle representing a pixel) must be rendered using an appropriate brush. For unselected items, we will use a solid black brush; selected items are drawn using a predefined brush from the style option's palette.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    painter-&gt;drawEllipse(QRectF(option.rect.x() + option.rect.width()/2 - radius,
+                                option.rect.y() + option.rect.height()/2 - radius,
+                                2*radius, 2*radius));
+    painter-&gt;restore();
+}
+</pre> Finally, we paint the circle within the rectangle specified by the style option and we call <a href="../../../com/trolltech/qt/gui/QPainter.html#restore()">restore()</a> on the painter. <p>The <tt>paint()</tt> function does not have to be particularly complicated; it is only necessary to ensure that the state of the painter when the function returns is the same as it was when it was called. This usually means that any transformations applied to the painter must be preceded by a call to <a href="../../../com/trolltech/qt/gui/QPainter.html#save()">QPainter::save()</a> and followed by a call to <a href="../../../com/trolltech/qt/gui/QPainter.html#restore()">QPainter::restore()</a>. <p>The delegate's <a href="../../../com/trolltech/qt/gui/QAbstractItemDelegate.html#sizeHint(com.trolltech.qt.gui.QStyleOptionViewItem, com.trolltech.qt.core.QModelIndex)">sizeHint()</a> function returns a size for the item based on the predefined pixel size, initially set up in the constructor:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QSize PixelDelegate::sizeHint(const QStyleOptionViewItem &  option ,
+                              const QModelIndex &  index ) const
+{
+    return QSize(pixelSize, pixelSize);
+}
+</pre> The delegate's size is updated whenever the pixel size is changed. We provide a custom slot to do this:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void PixelDelegate::setPixelSize(int size)
+{
+    pixelSize = size;
+}
+</pre><a name="using-the-custom-delegate"><h2>Using The Custom Delegate</h2> In this example, we use a main window to display a table of data, using the custom delegate to render each cell in a particular way. Much of the <tt>MainWindow</tt> class performs tasks that are not related to item views. Here, we only quote the parts that are relevant. You can look at the rest of the implementation by following the links to the code at the top of this document. <p>In the constructor, we set up a table view, turn off its grid, and hide its headers:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+MainWindow::MainWindow()
+{
+...
+    view = new QTableView;
+    view-&gt;setShowGrid(false);
+    view-&gt;horizontalHeader()-&gt;hide();
+    view-&gt;verticalHeader()-&gt;hide();
+    view-&gt;horizontalHeader()-&gt;setMinimumSectionSize(1);
+    view-&gt;verticalHeader()-&gt;setMinimumSectionSize(1);
+    view-&gt;setModel(model);
+</pre> This enables the items to be drawn without any gaps between them. Removing the headers also prevents the user from adjusting the sizes of individual rows and columns. <p>We also set the minimum section size to 1 on the headers. If we didn't, the headers would default to a larger size, preventing us from displaying really small items (which can be specified using the <b>Pixel size</b> combobox). <p>The custom delegate is constructed with the main window as its parent, so that it will be deleted correctly later, and we set it on the table view.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    PixelDelegate *delegate = new PixelDelegate(this);
+    view-&gt;setItemDelegate(delegate);
+</pre> Each item in the table view will be rendered by the <tt>PixelDelegate</tt> instance. <p>We construct a spin box to allow the user to change the size of each "pixel" drawn by the delegate:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QLabel *pixelSizeLabel = new QLabel(tr("Pixel size:"));
+    QSpinBox *pixelSizeSpinBox = new QSpinBox;
+    pixelSizeSpinBox-&gt;setMinimum(4);
+    pixelSizeSpinBox-&gt;setMaximum(32);
+    pixelSizeSpinBox-&gt;setValue(12);
+</pre> This spin box is connected to the custom slot we implemented in the <tt>PixelDelegate</tt> class. This ensures that the delegate always draws each pixel at the currently specified size:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    connect(pixelSizeSpinBox, SIGNAL(valueChanged(int)),
+            delegate, SLOT(setPixelSize(int)));
+    connect(pixelSizeSpinBox, SIGNAL(valueChanged(int)),
+            this, SLOT(updateView()));
+...
+}
+</pre> We also connect the spin box to a slot in the <tt>MainWindow</tt> class. This forces the view to take into account the new size hints for each item; these are provided by the delegate in its <tt>sizeHint()</tt> function.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::updateView()
+{
+    view-&gt;resizeColumnsToContents();
+    view-&gt;resizeRowsToContents();
+}
+</pre> We explicitly resize the columns and rows to match the <b>Pixel size</b> combobox.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

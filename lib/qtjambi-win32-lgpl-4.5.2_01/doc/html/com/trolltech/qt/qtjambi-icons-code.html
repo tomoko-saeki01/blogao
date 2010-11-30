@@ -1,0 +1,638 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Code for Icons Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Code for Icons Example</h1></center><p><pre class="snippet"><html style="white-space:pre-wrap;font-family:courier new"><font color=darkgreen><i>/****************************************************************************
+**
+** Copyright (C) 1992-2009 Nokia Corporation and/or its subsidiary(-ies).
+** All rights reserved.
+**
+** This file is part of Qt Jambi.
+**
+** 
+** Commercial Usage
+** Licensees holding valid Qt Commercial licenses may use this file in
+** accordance with the Qt Commercial License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Nokia.
+** 
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 2.1 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU Lesser General Public License version 2.1 requirements
+** will be met: http:<font color=darkgreen><i>//www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+</i></font>** 
+** In addition, as a special exception, Nokia gives you certain
+** additional rights. These rights are described in the Nokia Qt LGPL
+** Exception version 1.0, included in the file LGPL_EXCEPTION.txt in this
+** package.
+** 
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 3.0 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU General Public License version 3.0 requirements will be
+** met: http:<font color=darkgreen><i>//www.gnu.org/copyleft/gpl.html.
+</i></font>** 
+** If you are unsure which license is appropriate for your use, please
+** contact the sales department at qt-sales@nokia.com.
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/</i></font>
+
+<font color=blue>package</font> com.trolltech.examples;
+
+<font color=blue>import</font> com.trolltech.qt.*;
+<font color=blue>import</font> com.trolltech.qt.core.*;
+<font color=blue>import</font> com.trolltech.qt.gui.*;
+
+<font color=blue>import</font> java.util.*;
+
+@<font color=darkmagenta><i>QtJambiExample</i></font> (name = <font color=darkgreen><i>"Icons"</i></font>)
+<font color=blue>public</font> <font color=blue>class</font> Icons <font color=blue>extends</font> <font color=darkmagenta><i>QMainWindow</i></font>
+{
+    <font color=darkmagenta><i>QWidget</i></font> centralWidget;
+
+    <font color=darkmagenta><i>QGroupBox</i></font> previewGroupBox;
+    IconPreviewArea previewArea;
+
+    <font color=darkmagenta><i>QGroupBox</i></font> imagesGroupBox;
+    <font color=darkmagenta><i>QTableWidget</i></font> imagesTable;
+
+    <font color=darkmagenta><i>QGroupBox</i></font> iconSizeGroupBox;
+    <font color=darkmagenta><i>QRadioButton</i></font> smallRadioButton;
+    <font color=darkmagenta><i>QRadioButton</i></font> largeRadioButton;
+    <font color=darkmagenta><i>QRadioButton</i></font> toolBarRadioButton;
+    <font color=darkmagenta><i>QRadioButton</i></font> listViewRadioButton;
+    <font color=darkmagenta><i>QRadioButton</i></font> iconViewRadioButton;
+    <font color=darkmagenta><i>QRadioButton</i></font> tabBarRadioButton;
+    <font color=darkmagenta><i>QRadioButton</i></font> otherRadioButton;
+    IconSizeSpinBox otherSpinBox;
+
+    <font color=darkmagenta><i>QMenu</i></font> fileMenu;
+    <font color=darkmagenta><i>QMenu</i></font> viewMenu;
+    <font color=darkmagenta><i>QMenu</i></font> helpMenu;
+    <font color=darkmagenta><i>QAction</i></font> addImagesAct;
+    <font color=darkmagenta><i>QAction</i></font> removeAllImagesAct;
+    <font color=darkmagenta><i>QAction</i></font> exitAct;
+    <font color=darkmagenta><i>QAction</i></font> guessModeStateAct;
+    <font color=darkmagenta><i>QActionGroup</i></font> styleActionGroup;
+    <font color=darkmagenta><i>QAction</i></font> aboutAct;
+    <font color=darkmagenta><i>QAction</i></font> aboutQtAct;
+
+    <font color=blue>public</font> Icons()
+    {
+        centralWidget = <font color=blue>new</font> <font color=darkmagenta><i>QWidget</i></font>();
+        setCentralWidget(centralWidget);
+
+        createPreviewGroupBox();
+        createImagesGroupBox();
+        createIconSizeGroupBox();
+
+        createActions();
+        createMenus();
+        createContextMenu();
+
+        <font color=darkmagenta><i>QGridLayout</i></font> mainLayout = <font color=blue>new</font> <font color=darkmagenta><i>QGridLayout</i></font>();
+        mainLayout.addWidget(previewGroupBox, 0, 0, 1, 2);
+        mainLayout.addWidget(imagesGroupBox, 1, 0);
+        mainLayout.addWidget(iconSizeGroupBox, 1, 1);
+        centralWidget.setLayout(mainLayout);
+
+        setWindowTitle(tr(<font color=darkgreen><i>"Icons"</i></font>));
+        otherRadioButton.click();
+
+        setTextOnRadioButtons();
+
+        resize(minimumSizeHint());
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> about()
+    {
+        <font color=darkmagenta><i>QMessageBox</i></font>.about(<font color=blue>this</font>, tr(<font color=darkgreen><i>"About Icons"</i></font>),
+            tr(<font color=darkgreen><i>"The &lt;b&gt;Icons&lt;/b&gt; example illustrates how Qt renders an icon in "</i></font>+
+               <font color=darkgreen><i>"different modes (active, normal, disabled, and selected) and "</i></font>+
+               <font color=darkgreen><i>"states (on and off) based on a set of images."</i></font>));
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> changeStyle(<font color=blue>boolean</font> checked)
+    {
+        <font color=blue>if</font> (!checked)
+            <font color=blue>return</font>;
+
+        <font color=darkmagenta><i>QAction</i></font> action = (<font color=darkmagenta><i>QAction</i></font>) <font color=darkmagenta><i>QSignalEmitter</i></font>.signalSender();
+        <font color=darkmagenta><i>QStyle</i></font> style = <font color=darkmagenta><i>QStyleFactory</i></font>.create((String) action.data());
+
+        <font color=blue>if</font> (style != null) {
+            <font color=darkmagenta><i>QApplication</i></font>.setStyle(style);
+            <font color=darkmagenta><i>QApplication</i></font>.setPalette(style.standardPalette());
+        }
+
+        setTextOnRadioButtons();
+
+        changeSize(true);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> setTextOnRadioButtons() {
+        <font color=darkmagenta><i>QStyle</i></font> style = <font color=darkmagenta><i>QApplication</i></font>.style();
+
+        <font color=blue>int</font> smallIconSize = style.pixelMetric(<font color=darkmagenta><i>QStyle</i></font>.PixelMetric.PM_SmallIconSize);
+        smallRadioButton.setText(<font color=darkgreen><i>"Small ("</i></font> + smallIconSize + <font color=darkgreen><i>" x "</i></font> + smallIconSize + <font color=darkgreen><i>")"</i></font>);
+
+        <font color=blue>int</font> largeIconSize = style.pixelMetric(<font color=darkmagenta><i>QStyle</i></font>.PixelMetric.PM_LargeIconSize);
+        largeRadioButton.setText(<font color=darkgreen><i>"Large ("</i></font> + largeIconSize + <font color=darkgreen><i>" x "</i></font> + largeIconSize + <font color=darkgreen><i>")"</i></font>);
+
+        <font color=blue>int</font> toolBarIconSize = style.pixelMetric(<font color=darkmagenta><i>QStyle</i></font>.PixelMetric.PM_ToolBarIconSize);
+        toolBarRadioButton.setText(<font color=darkgreen><i>"Toolbars ("</i></font> + toolBarIconSize + <font color=darkgreen><i>" x "</i></font> + toolBarIconSize + <font color=darkgreen><i>")"</i></font>);
+
+        <font color=blue>int</font> listViewIconSize = style.pixelMetric(<font color=darkmagenta><i>QStyle</i></font>.PixelMetric.PM_ListViewIconSize);
+        listViewRadioButton.setText(<font color=darkgreen><i>"List views ("</i></font> + listViewIconSize + <font color=darkgreen><i>" x "</i></font> + listViewIconSize + <font color=darkgreen><i>")"</i></font>);
+
+        <font color=blue>int</font> iconViewIconSize = style.pixelMetric(<font color=darkmagenta><i>QStyle</i></font>.PixelMetric.PM_IconViewIconSize);
+        iconViewRadioButton.setText(<font color=darkgreen><i>"Icon views ("</i></font> + iconViewIconSize + <font color=darkgreen><i>" x "</i></font> + iconViewIconSize + <font color=darkgreen><i>")"</i></font>);
+
+        <font color=blue>int</font> tabBarIconSize = style.pixelMetric(<font color=darkmagenta><i>QStyle</i></font>.PixelMetric.PM_TabBarIconSize);
+        tabBarRadioButton.setText(<font color=darkgreen><i>"Tab bars ("</i></font> + tabBarIconSize + <font color=darkgreen><i>" x "</i></font> + tabBarIconSize + <font color=darkgreen><i>")"</i></font>);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> changeSize(<font color=blue>int</font> value)
+    {
+        changeSize(true);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> changeSize(<font color=blue>boolean</font> checked)
+    {
+        <font color=blue>if</font> (!checked)
+            <font color=blue>return</font>;
+
+        <font color=blue>int</font> extent;
+
+        <font color=blue>if</font> (otherRadioButton.isChecked()) {
+            extent = otherSpinBox.value();
+        } <font color=blue>else</font> {
+            <font color=darkmagenta><i>QStyle</i></font>.PixelMetric metric;
+
+            <font color=blue>if</font> (smallRadioButton.isChecked()) {
+                metric = <font color=darkmagenta><i>QStyle</i></font>.PixelMetric.PM_SmallIconSize;
+            } <font color=blue>else</font> <font color=blue>if</font> (largeRadioButton.isChecked()) {
+                metric = <font color=darkmagenta><i>QStyle</i></font>.PixelMetric.PM_LargeIconSize;
+            } <font color=blue>else</font> <font color=blue>if</font> (toolBarRadioButton.isChecked()) {
+                metric = <font color=darkmagenta><i>QStyle</i></font>.PixelMetric.PM_ToolBarIconSize;
+            } <font color=blue>else</font> <font color=blue>if</font> (listViewRadioButton.isChecked()) {
+                metric = <font color=darkmagenta><i>QStyle</i></font>.PixelMetric.PM_ListViewIconSize;
+            } <font color=blue>else</font> <font color=blue>if</font> (iconViewRadioButton.isChecked()) {
+                metric = <font color=darkmagenta><i>QStyle</i></font>.PixelMetric.PM_IconViewIconSize;
+            } <font color=blue>else</font> {
+                metric = <font color=darkmagenta><i>QStyle</i></font>.PixelMetric.PM_TabBarIconSize;
+            }
+            extent = <font color=darkmagenta><i>QApplication</i></font>.style().pixelMetric(metric);
+        }
+        previewArea.setSize(<font color=blue>new</font> <font color=darkmagenta><i>QSize</i></font>(extent, extent));
+        otherSpinBox.setEnabled(otherRadioButton.isChecked());
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> changeIcon()
+    {
+        <font color=darkmagenta><i>QIcon</i></font> icon = <font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>();
+
+        <font color=blue>for</font> (<font color=blue>int</font> row = 0; row &lt; imagesTable.rowCount(); ++row) {
+            <font color=darkmagenta><i>QTableWidgetItem</i></font> item0 = imagesTable.item(row, 0);
+            <font color=darkmagenta><i>QTableWidgetItem</i></font> item1 = imagesTable.item(row, 1);
+            <font color=darkmagenta><i>QTableWidgetItem</i></font> item2 = imagesTable.item(row, 2);
+
+            <font color=blue>if</font> (item0.checkState() == <font color=darkmagenta><i>Qt</i></font>.CheckState.Checked) {
+                <font color=darkmagenta><i>QIcon</i></font>.Mode mode;
+                <font color=blue>if</font> (item1.text().equals(tr(<font color=darkgreen><i>"Normal"</i></font>))) {
+                    mode = <font color=darkmagenta><i>QIcon</i></font>.Mode.Normal;
+                } <font color=blue>else</font> <font color=blue>if</font> (item1.text().equals(tr(<font color=darkgreen><i>"Active"</i></font>))) {
+                    mode = <font color=darkmagenta><i>QIcon</i></font>.Mode.Active;
+                } <font color=blue>else</font> <font color=blue>if</font> (item1.text().equals(tr(<font color=darkgreen><i>"Disabled"</i></font>))) {
+                    mode = <font color=darkmagenta><i>QIcon</i></font>.Mode.Disabled;
+                } <font color=blue>else</font> {
+                    mode = <font color=darkmagenta><i>QIcon</i></font>.Mode.Selected;
+                }
+
+                <font color=darkmagenta><i>QIcon</i></font>.State state;
+                <font color=blue>if</font> (item2.text().equals(tr(<font color=darkgreen><i>"On"</i></font>))) {
+                    state = <font color=darkmagenta><i>QIcon</i></font>.State.On;
+                } <font color=blue>else</font> {
+                    state = <font color=darkmagenta><i>QIcon</i></font>.State.Off;
+                }
+
+                String fileName = (String) item0.data(<font color=darkmagenta><i>Qt</i></font>.ItemDataRole.UserRole);
+                <font color=darkmagenta><i>QImage</i></font> image = <font color=blue>new</font> <font color=darkmagenta><i>QImage</i></font>(fileName);
+                <font color=blue>if</font> (!image.isNull())
+                    icon.addPixmap(<font color=darkmagenta><i>QPixmap</i></font>.fromImage(image), mode, state);
+            }
+        }
+
+        previewArea.setIcon(icon);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> addImages()
+    {
+        List&lt;String&gt; fileNames = <font color=darkmagenta><i>QFileDialog</i></font>.getOpenFileNames(<font color=blue>this</font>,
+                                    tr(<font color=darkgreen><i>"Open Images"</i></font>), <font color=darkgreen><i>""</i></font>,
+                                    <font color=blue>new</font> <font color=darkmagenta><i>QFileDialog</i></font>.Filter(tr(<font color=darkgreen><i>"Images (*.png *.xpm *.jpg);;"</i></font>+
+                                       <font color=darkgreen><i>"All Files (*)"</i></font>)));
+        <font color=blue>if</font> (!fileNames.isEmpty()) {
+            <font color=blue>for</font> (String fileName : fileNames) {
+                <font color=blue>int</font> row = imagesTable.rowCount();
+                imagesTable.setRowCount(row + 1);
+
+                String imageName = <font color=blue>new</font> <font color=darkmagenta><i>QFileInfo</i></font>(fileName).baseName();
+                <font color=darkmagenta><i>QTableWidgetItem</i></font> item0 = <font color=blue>new</font> <font color=darkmagenta><i>QTableWidgetItem</i></font>(imageName);
+                item0.setData(<font color=darkmagenta><i>Qt</i></font>.ItemDataRole.UserRole, fileName);
+                <font color=darkmagenta><i>Qt</i></font>.ItemFlags flags = item0.flags();
+                flags.clear(<font color=darkmagenta><i>Qt</i></font>.ItemFlag.ItemIsEditable);
+                item0.setFlags(flags);
+
+                <font color=darkmagenta><i>QTableWidgetItem</i></font> item1 = <font color=blue>new</font> <font color=darkmagenta><i>QTableWidgetItem</i></font>(tr(<font color=darkgreen><i>"Normal"</i></font>));
+                <font color=darkmagenta><i>QTableWidgetItem</i></font> item2 = <font color=blue>new</font> <font color=darkmagenta><i>QTableWidgetItem</i></font>(tr(<font color=darkgreen><i>"Off"</i></font>));
+
+                <font color=blue>if</font> (guessModeStateAct.isChecked()) {
+                    <font color=blue>if</font> (fileName.contains(<font color=darkgreen><i>"_act"</i></font>)) {
+                        item1.setText(tr(<font color=darkgreen><i>"Active"</i></font>));
+                    } <font color=blue>else</font> <font color=blue>if</font> (fileName.contains(<font color=darkgreen><i>"_dis"</i></font>)) {
+                        item1.setText(tr(<font color=darkgreen><i>"Disabled"</i></font>));
+                    } <font color=blue>else</font> <font color=blue>if</font> (fileName.contains(<font color=darkgreen><i>"_sel"</i></font>)) {
+                        item1.setText(tr(<font color=darkgreen><i>"Selected"</i></font>));
+                    }
+
+                    <font color=blue>if</font> (fileName.contains(<font color=darkgreen><i>"_on"</i></font>))
+                        item2.setText(tr(<font color=darkgreen><i>"On"</i></font>));
+                }
+
+                imagesTable.setItem(row, 0, item0);
+                imagesTable.setItem(row, 1, item1);
+                imagesTable.setItem(row, 2, item2);
+                imagesTable.openPersistentEditor(item1);
+                imagesTable.openPersistentEditor(item2);
+
+                item0.setCheckState(<font color=darkmagenta><i>Qt</i></font>.CheckState.Checked);
+            }
+        }
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> removeAllImages()
+    {
+        imagesTable.setRowCount(0);
+        changeIcon();
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> createPreviewGroupBox()
+    {
+        previewGroupBox = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(tr(<font color=darkgreen><i>"Preview"</i></font>));
+
+        previewArea = <font color=blue>new</font> IconPreviewArea();
+
+        <font color=darkmagenta><i>QVBoxLayout</i></font> layout = <font color=blue>new</font> <font color=darkmagenta><i>QVBoxLayout</i></font>();
+        layout.addWidget(previewArea);
+        previewGroupBox.setLayout(layout);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> createImagesGroupBox()
+    {
+        imagesGroupBox = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(tr(<font color=darkgreen><i>"Images"</i></font>));
+
+        imagesTable = <font color=blue>new</font> <font color=darkmagenta><i>QTableWidget</i></font>();
+        imagesTable.setSelectionMode(<font color=darkmagenta><i>QAbstractItemView</i></font>.SelectionMode.NoSelection);
+        imagesTable.setItemDelegate(<font color=blue>new</font> ImageDelegate(<font color=blue>this</font>));
+
+        List&lt;String&gt; labels = <font color=blue>new</font> LinkedList&lt;String&gt;();
+        labels.add(tr(<font color=darkgreen><i>"Image"</i></font>));
+        labels.add(tr(<font color=darkgreen><i>"Mode"</i></font>));
+        labels.add(tr(<font color=darkgreen><i>"State"</i></font>));
+
+        imagesTable.horizontalHeader().setDefaultSectionSize(90);
+        imagesTable.setColumnCount(3);
+        imagesTable.setHorizontalHeaderLabels(labels);
+        imagesTable.horizontalHeader().setResizeMode(0, <font color=darkmagenta><i>QHeaderView</i></font>.ResizeMode.Stretch);
+        imagesTable.horizontalHeader().setResizeMode(1, <font color=darkmagenta><i>QHeaderView</i></font>.ResizeMode.Fixed);
+        imagesTable.horizontalHeader().setResizeMode(2, <font color=darkmagenta><i>QHeaderView</i></font>.ResizeMode.Fixed);
+        imagesTable.verticalHeader().hide();
+
+        imagesTable.itemChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"changeIcon()"</i></font>);
+
+        <font color=darkmagenta><i>QVBoxLayout</i></font> layout = <font color=blue>new</font> <font color=darkmagenta><i>QVBoxLayout</i></font>();
+        layout.addWidget(imagesTable);
+        imagesGroupBox.setLayout(layout);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> createIconSizeGroupBox()
+    {
+        iconSizeGroupBox = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(tr(<font color=darkgreen><i>"Icon Size"</i></font>));
+
+        smallRadioButton = <font color=blue>new</font> <font color=darkmagenta><i>QRadioButton</i></font>();
+        largeRadioButton = <font color=blue>new</font> <font color=darkmagenta><i>QRadioButton</i></font>();
+        toolBarRadioButton = <font color=blue>new</font> <font color=darkmagenta><i>QRadioButton</i></font>();
+        listViewRadioButton = <font color=blue>new</font> <font color=darkmagenta><i>QRadioButton</i></font>();
+        iconViewRadioButton = <font color=blue>new</font> <font color=darkmagenta><i>QRadioButton</i></font>();
+        tabBarRadioButton = <font color=blue>new</font> <font color=darkmagenta><i>QRadioButton</i></font>();
+        otherRadioButton = <font color=blue>new</font> <font color=darkmagenta><i>QRadioButton</i></font>(tr(<font color=darkgreen><i>"Other:"</i></font>));
+
+        otherSpinBox = <font color=blue>new</font> IconSizeSpinBox();
+        otherSpinBox.setRange(8, 128);
+        otherSpinBox.setValue(64);
+
+        smallRadioButton.toggled.connect(<font color=blue>this</font>, <font color=darkgreen><i>"changeSize(boolean)"</i></font>);
+        largeRadioButton.toggled.connect(<font color=blue>this</font>, <font color=darkgreen><i>"changeSize(boolean)"</i></font>);
+        toolBarRadioButton.toggled.connect(<font color=blue>this</font>, <font color=darkgreen><i>"changeSize(boolean)"</i></font>);
+        listViewRadioButton.toggled.connect(<font color=blue>this</font>, <font color=darkgreen><i>"changeSize(boolean)"</i></font>);
+        iconViewRadioButton.toggled.connect(<font color=blue>this</font>, <font color=darkgreen><i>"changeSize(boolean)"</i></font>);
+        tabBarRadioButton.toggled.connect(<font color=blue>this</font>, <font color=darkgreen><i>"changeSize(boolean)"</i></font>);
+        otherRadioButton.toggled.connect(<font color=blue>this</font>, <font color=darkgreen><i>"changeSize(boolean)"</i></font>);
+        otherSpinBox.valueChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"changeSize(int)"</i></font>);
+
+        <font color=darkmagenta><i>QHBoxLayout</i></font> otherSizeLayout = <font color=blue>new</font> <font color=darkmagenta><i>QHBoxLayout</i></font>();
+        otherSizeLayout.addWidget(otherRadioButton);
+        otherSizeLayout.addWidget(otherSpinBox);
+        otherSizeLayout.addStretch();
+
+        <font color=darkmagenta><i>QGridLayout</i></font> layout = <font color=blue>new</font> <font color=darkmagenta><i>QGridLayout</i></font>();
+        layout.addWidget(smallRadioButton, 0, 0);
+        layout.addWidget(largeRadioButton, 1, 0);
+        layout.addWidget(toolBarRadioButton, 2, 0);
+        layout.addWidget(listViewRadioButton, 0, 1);
+        layout.addWidget(iconViewRadioButton, 1, 1);
+        layout.addWidget(tabBarRadioButton, 2, 1);
+        layout.addLayout(otherSizeLayout, 3, 0, 1, 2);
+        layout.setRowStretch(4, 1);
+        iconSizeGroupBox.setLayout(layout);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> createActions()
+    {
+        addImagesAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&Add Images..."</i></font>), <font color=blue>this</font>);
+        addImagesAct.setShortcut(tr(<font color=darkgreen><i>"Ctrl+A"</i></font>));
+        addImagesAct.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"addImages()"</i></font>);
+
+        removeAllImagesAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&Remove All Images"</i></font>), <font color=blue>this</font>);
+        removeAllImagesAct.setShortcut(tr(<font color=darkgreen><i>"Ctrl+R"</i></font>));
+        removeAllImagesAct.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"removeAllImages()"</i></font>);
+
+        exitAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&Quit"</i></font>), <font color=blue>this</font>);
+        exitAct.setShortcut(tr(<font color=darkgreen><i>"Ctrl+Q"</i></font>));
+        exitAct.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"close()"</i></font>);
+
+        styleActionGroup = <font color=blue>new</font> <font color=darkmagenta><i>QActionGroup</i></font>(<font color=blue>this</font>);
+        <font color=blue>for</font> (String styleName : <font color=darkmagenta><i>QStyleFactory</i></font>.keys()) {
+            <font color=darkmagenta><i>QAction</i></font> action = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(styleActionGroup);
+            action.setText(styleName + <font color=darkgreen><i>" Style"</i></font>);
+            action.setData(styleName);
+            action.setCheckable(true);
+            action.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"changeStyle(boolean)"</i></font>);
+        }
+
+        guessModeStateAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&Guess Image Mode/State"</i></font>), <font color=blue>this</font>);
+        guessModeStateAct.setCheckable(true);
+        guessModeStateAct.setChecked(true);
+
+        aboutAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&About"</i></font>), <font color=blue>this</font>);
+        aboutAct.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"about()"</i></font>);
+
+        aboutQtAct = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"About &Qt"</i></font>), <font color=blue>this</font>);
+        aboutQtAct.triggered.connect(<font color=darkmagenta><i>QApplication</i></font>.instance(), <font color=darkgreen><i>"aboutQt()"</i></font>);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> createMenus()
+    {
+        fileMenu = menuBar().addMenu(tr(<font color=darkgreen><i>"&File"</i></font>));
+        fileMenu.addAction(addImagesAct);
+        fileMenu.addAction(removeAllImagesAct);
+        fileMenu.addSeparator();
+        fileMenu.addAction(exitAct);
+
+        viewMenu = menuBar().addMenu(tr(<font color=darkgreen><i>"&View"</i></font>));
+        <font color=blue>for</font> (<font color=darkmagenta><i>QAction</i></font> action : styleActionGroup.actions())
+            viewMenu.addAction(action);
+        viewMenu.addSeparator();
+        viewMenu.addAction(guessModeStateAct);
+
+        menuBar().addSeparator();
+
+        helpMenu = menuBar().addMenu(tr(<font color=darkgreen><i>"&Help"</i></font>));
+        helpMenu.addAction(aboutAct);
+        helpMenu.addAction(aboutQtAct);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> createContextMenu()
+    {
+        imagesTable.setContextMenuPolicy(<font color=darkmagenta><i>Qt</i></font>.ContextMenuPolicy.ActionsContextMenu);
+        imagesTable.addAction(addImagesAct);
+        imagesTable.addAction(removeAllImagesAct);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> checkCurrentStyle()
+    {
+        <font color=blue>for</font> (<font color=darkmagenta><i>QAction</i></font> action : styleActionGroup.actions()) {
+            String styleName = action.data().toString();
+            <font color=darkmagenta><i>QStyle</i></font> candidate = <font color=darkmagenta><i>QStyleFactory</i></font>.create(styleName);
+
+            <font color=blue>if</font> (candidate.objectName().equals(
+                    <font color=darkmagenta><i>QApplication</i></font>.style().objectName())) {
+                action.trigger();
+                <font color=blue>return</font>;
+            }
+        }
+    }
+
+    <font color=blue>class</font> IconSizeSpinBox <font color=blue>extends</font> <font color=darkmagenta><i>QSpinBox</i></font>
+    {
+        @Override
+        <font color=blue>public</font> <font color=blue>int</font> valueFromText(String text)
+        {
+            <font color=darkmagenta><i>QRegExp</i></font> regExp = <font color=blue>new</font> <font color=darkmagenta><i>QRegExp</i></font>(tr(<font color=darkgreen><i>"(\\d+)(\\s*[xx]\\s*\\d+)?"</i></font>));
+
+            <font color=blue>if</font> (regExp.exactMatch(text)) {
+                <font color=blue>return</font> Integer.parseInt(regExp.cap(1));
+            } <font color=blue>else</font> {
+                <font color=blue>return</font> 0;
+            }
+        }
+
+        @Override
+        <font color=blue>public</font> String textFromValue(<font color=blue>int</font> value)
+        {
+            <font color=blue>return</font> <font color=darkgreen><i>""</i></font> + value +<font color=darkgreen><i>" x "</i></font> + value;
+        }
+    }
+
+    <font color=blue>class</font> ImageDelegate <font color=blue>extends</font> <font color=darkmagenta><i>QItemDelegate</i></font>
+    {
+        <font color=blue>public</font> ImageDelegate(<font color=darkmagenta><i>QWidget</i></font> widget)
+        {
+            <font color=blue>super</font>(widget);
+        }
+
+        @Override
+        <font color=blue>public</font> <font color=darkmagenta><i>QWidget</i></font> createEditor(<font color=darkmagenta><i>QWidget</i></font> parent, <font color=darkmagenta><i>QStyleOptionViewItem</i></font> option,
+                                    <font color=darkmagenta><i>QModelIndex</i></font> index)
+        {
+            <font color=darkmagenta><i>QComboBox</i></font> comboBox = <font color=blue>new</font> <font color=darkmagenta><i>QComboBox</i></font>(parent);
+            <font color=blue>if</font> (index.column() == 1) {
+                comboBox.addItem(tr(<font color=darkgreen><i>"Normal"</i></font>));
+                comboBox.addItem(tr(<font color=darkgreen><i>"Active"</i></font>));
+                comboBox.addItem(tr(<font color=darkgreen><i>"Disabled"</i></font>));
+                comboBox.addItem(tr(<font color=darkgreen><i>"Selected"</i></font>));
+            } <font color=blue>else</font> <font color=blue>if</font> (index.column() == 2) {
+                comboBox.addItem(tr(<font color=darkgreen><i>"Off"</i></font>));
+                comboBox.addItem(tr(<font color=darkgreen><i>"On"</i></font>));
+            }
+
+            comboBox.activated.connect(<font color=blue>this</font>, <font color=darkgreen><i>"emitCommitData()"</i></font>);
+
+            <font color=blue>return</font> comboBox;
+        }
+
+        @Override
+        <font color=blue>public</font> <font color=blue>void</font> setEditorData(<font color=darkmagenta><i>QWidget</i></font> editor, <font color=darkmagenta><i>QModelIndex</i></font> index)
+        {
+            <font color=darkmagenta><i>QComboBox</i></font> comboBox = (<font color=darkmagenta><i>QComboBox</i></font>) editor;
+            <font color=blue>if</font> (comboBox == null)
+                <font color=blue>return</font>;
+
+            <font color=blue>int</font> pos = comboBox.findText((String) index.model().data(index),
+                                         <font color=darkmagenta><i>Qt</i></font>.MatchFlag.MatchExactly);
+            comboBox.setCurrentIndex(pos);
+        }
+
+        @Override
+        <font color=blue>public</font> <font color=blue>void</font> setModelData(<font color=darkmagenta><i>QWidget</i></font> editor, <font color=darkmagenta><i>QAbstractItemModel</i></font> model,
+                                 <font color=darkmagenta><i>QModelIndex</i></font> index)
+        {
+            <font color=darkmagenta><i>QComboBox</i></font> comboBox = (<font color=darkmagenta><i>QComboBox</i></font>) editor;
+            <font color=blue>if</font> (comboBox == null)
+                <font color=blue>return</font>;
+
+            model.setData(index, comboBox.currentText());
+        }
+
+        <font color=blue>private</font> <font color=blue>void</font> emitCommitData()
+        {
+            commitData.emit((<font color=darkmagenta><i>QWidget</i></font>) <font color=darkmagenta><i>QSignalEmitter</i></font>.signalSender());
+        }
+    }
+
+    <font color=blue>class</font> IconPreviewArea <font color=blue>extends</font> <font color=darkmagenta><i>QWidget</i></font>
+    {
+        <font color=blue>private</font> <font color=darkmagenta><i>QIcon</i></font> icon;
+        <font color=blue>private</font> <font color=darkmagenta><i>QSize</i></font> size;
+        <font color=blue>private</font> <font color=darkmagenta><i>QLabel</i></font> stateLabels[] = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>[NumStates];
+        <font color=blue>private</font> <font color=darkmagenta><i>QLabel</i></font> modeLabels[] = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>[NumModes];
+        <font color=blue>private</font> <font color=darkmagenta><i>QLabel</i></font> pixmapLabels[][] = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>[NumModes][NumStates];
+
+        <font color=blue>public</font> <font color=blue>static</font> <font color=blue>final</font> <font color=blue>int</font> NumModes = 4, NumStates = 2;
+
+        <font color=blue>public</font> IconPreviewArea()
+        {
+            <font color=darkmagenta><i>QGridLayout</i></font> mainLayout = <font color=blue>new</font> <font color=darkmagenta><i>QGridLayout</i></font>();
+            setLayout(mainLayout);
+
+            icon = <font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>();
+
+            stateLabels[0] = createHeaderLabel(tr(<font color=darkgreen><i>"Off"</i></font>));
+            stateLabels[1] = createHeaderLabel(tr(<font color=darkgreen><i>"On"</i></font>));
+
+            modeLabels[0] = createHeaderLabel(tr(<font color=darkgreen><i>"Normal"</i></font>));
+            modeLabels[1] = createHeaderLabel(tr(<font color=darkgreen><i>"Active"</i></font>));
+            modeLabels[2] = createHeaderLabel(tr(<font color=darkgreen><i>"Disabled"</i></font>));
+            modeLabels[3] = createHeaderLabel(tr(<font color=darkgreen><i>"Selected"</i></font>));
+
+            <font color=blue>for</font> (<font color=blue>int</font> j = 0; j &lt; NumStates; ++j)
+                mainLayout.addWidget(stateLabels[j], j + 1, 0);
+
+            <font color=blue>for</font> (<font color=blue>int</font> i = 0; i &lt; NumModes; ++i) {
+                mainLayout.addWidget(modeLabels[i], 0, i + 1);
+
+                <font color=blue>for</font> (<font color=blue>int</font> j = 0; j &lt; NumStates; ++j) {
+                    pixmapLabels[i][j] = createPixmapLabel();
+                    mainLayout.addWidget(pixmapLabels[i][j], j + 1, i + 1);
+                }
+            }
+        }
+
+        <font color=blue>public</font> <font color=blue>void</font> setIcon(<font color=darkmagenta><i>QIcon</i></font> icon)
+        {
+            <font color=blue>this</font>.icon = icon;
+            updatePixmapLabels();
+        }
+
+        <font color=blue>public</font> <font color=blue>void</font> setSize(<font color=darkmagenta><i>QSize</i></font> size)
+        {
+            <font color=blue>if</font> (size != <font color=blue>this</font>.size) {
+                <font color=blue>this</font>.size = size;
+                updatePixmapLabels();
+            }
+        }
+
+        <font color=blue>private</font> <font color=darkmagenta><i>QLabel</i></font> createHeaderLabel(String text)
+        {
+            <font color=darkmagenta><i>QLabel</i></font> label = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"&lt;b&gt;"</i></font>+text+<font color=darkgreen><i>"&lt;/b&gt;"</i></font>));
+            label.setAlignment(<font color=darkmagenta><i>Qt</i></font>.AlignmentFlag.AlignCenter);
+            <font color=blue>return</font> label;
+        }
+
+        <font color=blue>private</font> <font color=darkmagenta><i>QLabel</i></font> createPixmapLabel()
+        {
+            <font color=darkmagenta><i>QLabel</i></font> label = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>();
+            label.setEnabled(false);
+            label.setAlignment(<font color=darkmagenta><i>Qt</i></font>.AlignmentFlag.AlignCenter);
+            label.setFrameShape(<font color=darkmagenta><i>QFrame</i></font>.Shape.Box);
+            label.setSizePolicy(<font color=darkmagenta><i>QSizePolicy</i></font>.Policy.Expanding,
+                                <font color=darkmagenta><i>QSizePolicy</i></font>.Policy.Expanding);
+            label.setBackgroundRole(<font color=darkmagenta><i>QPalette</i></font>.ColorRole.Base);
+            label.setAutoFillBackground(true);
+            label.setMinimumSize(132, 132);
+            <font color=blue>return</font> label;
+        }
+
+        <font color=blue>private</font> <font color=blue>void</font> updatePixmapLabels()
+        {
+            <font color=blue>for</font> (<font color=blue>int</font> i = 0; i &lt; NumModes; ++i) {
+                <font color=darkmagenta><i>QIcon</i></font>.Mode mode;
+                <font color=blue>if</font> (i == 0) {
+                    mode = <font color=darkmagenta><i>QIcon</i></font>.Mode.Normal;
+                } <font color=blue>else</font> <font color=blue>if</font> (i == 1) {
+                    mode = <font color=darkmagenta><i>QIcon</i></font>.Mode.Active;
+                } <font color=blue>else</font> <font color=blue>if</font> (i == 2) {
+                    mode = <font color=darkmagenta><i>QIcon</i></font>.Mode.Disabled;
+                } <font color=blue>else</font> {
+                    mode = <font color=darkmagenta><i>QIcon</i></font>.Mode.Selected;
+                }
+
+                <font color=blue>for</font> (<font color=blue>int</font> j = 0; j &lt; NumStates; ++j) {
+                    <font color=darkmagenta><i>QIcon</i></font>.State state = (j == 0) ? <font color=darkmagenta><i>QIcon</i></font>.State.Off : <font color=darkmagenta><i>QIcon</i></font>.State.On;
+                    <font color=darkmagenta><i>QPixmap</i></font> pixmap = icon.pixmap(size, mode, state);
+                    pixmapLabels[i][j].setPixmap(pixmap);
+                    pixmapLabels[i][j].setEnabled(!pixmap.isNull());
+                }
+            }
+        }
+    }
+
+    <font color=blue>public</font> <font color=blue>static</font> <font color=blue>void</font> main(String args[])
+    {
+        <font color=darkmagenta><i>QApplication</i></font>.initialize(args);
+
+        <font color=blue>new</font> Icons().show();
+
+        <font color=darkmagenta><i>QApplication</i></font>.exec();
+    }
+}
+</html></pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

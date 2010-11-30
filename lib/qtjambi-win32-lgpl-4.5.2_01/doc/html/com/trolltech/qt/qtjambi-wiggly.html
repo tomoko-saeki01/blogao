@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Wiggly Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Wiggly Example</h1></center><p> <b>Code</b>: <ul><li> <a href="qtjambi-wiggly-code.html">Wiggly.java</a></li></ul> The Wiggly example shows how to animate a widget using <a href="../../../com/trolltech/qt/core/QBasicTimer.html">QBasicTimer</a> and <a href="../../../com/trolltech/qt/core/QObject.html#timerEvent(com.trolltech.qt.core.QTimerEvent)">timerEvent()</a>. In addition, the example demonstrates how to use <a href="../../../com/trolltech/qt/gui/QFontMetrics.html">QFontMetrics</a> to determine the size of text on screen. <br><center><img src="images/wiggly-example.png"></center><br> <a href="../../../com/trolltech/qt/core/QBasicTimer.html">QBasicTimer</a> is a low-level class for timers. Unlike <a href="../../../com/trolltech/qt/core/QTimer.html">QTimer</a>, <a href="../../../com/trolltech/qt/core/QBasicTimer.html">QBasicTimer</a> doesn't inherit from <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>; instead of emitting a timeout() signal when a certain amount of time has passed, it sends a <a href="../../../com/trolltech/qt/core/QTimerEvent.html">QTimerEvent</a> to a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> of our choice. This makes <a href="../../../com/trolltech/qt/core/QBasicTimer.html">QBasicTimer</a> a more lightweight alternative to <a href="../../../com/trolltech/qt/core/QTimer.html">QTimer</a>. Qt's built-in widgets use it internally, and it is provided in Qt's API for highly-optimized applications (e.g., Qtopia Core applications). <p>The example consists of two classes: <ul><li> <tt>WigglyWidget</tt> is the custom widget displaying the text in a wiggly line.</li><li> <tt>Wiggly</tt> is the dialog widget allowing the user to enter a text. It combines a <tt>WigglyWidget</tt> and a <tt>QLineEdit</tt>.</li></ul> We will first take a quick look at the <tt>Wiggly</tt> class, then we will review the <tt>WigglyWidget</tt> class.<a name="wiggly-class-implementation"><h2>Wiggly Class Implementation</h2> <pre class="snippet">
+public class Wiggly extends QDialog {
+</pre> The <tt>Wiggly</tt> class provides a dialog widget that allows the user to enter a text. The text is then rendered by <tt>WigglyWidget</tt>. <pre class="snippet">
+    public Wiggly(QWidget parent) {
+        super(parent);
+
+        WigglyWidget wigglyWidget = new WigglyWidget(null);
+        QLineEdit lineEdit = new QLineEdit();
+
+        QVBoxLayout layout = new QVBoxLayout();
+        layout.addWidget(wigglyWidget);
+        layout.addWidget(lineEdit);
+        setLayout(layout);
+
+        lineEdit.textChanged.connect(wigglyWidget, "setText(String)");
+
+        lineEdit.setText("Hello world!");
+
+        setWindowTitle("Wiggly");
+        setWindowIcon(new QIcon("classpath:com/trolltech/images/qt-logo.png"));
+        resize(360, 145);
+    }
+</pre> In the constructor we create a wiggly widget along with a <a href="../../../com/trolltech/qt/gui/QLineEdit.html">line edit</a>, and we put the two widgets in a vertical layout. We connect the line edit's textChanged() signal to the wiggly widget's <tt>setText()</tt> slot to obtain the real time interaction with the wiggly widget. The widget's default text is "Hello world!". <pre class="snippet">
+    public static void main(String args[]) {
+        QApplication.initialize(args);
+
+        Wiggly d = new Wiggly(null);
+        d.show();
+
+        QApplication.exec();
+    }
+
+}
+</pre> We also provide a <tt>main()</tt> method to create and show the dialog widget when the example is run.<a name="wigglywidget-class-implementation"><h2>WigglyWidget Class Implementation</h2> <pre class="snippet">
+class WigglyWidget extends QWidget {
+    static final int sineTable[] = { 0, 38, 71, 92, 100, 92, 71, 38, 0, -38, -71, -92, -100, -92, -71, -38 };
+
+    private QBasicTimer timer;
+    private String text;
+    private int step;
+</pre> The <tt>WigglyWidget</tt> class provides the wiggly line displaying the text. We subclass <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> and reimplement some standard event handling methods (shown later) to draw and update the widget. <p>The <tt>sineTable</tt> represents y-values of the sine curve, multiplied by 100. It is used to make the wiggly widget move along the sine curve. <pre class="snippet">
+    WigglyWidget(QWidget parent) {
+        super(parent);
+        setBackgroundRole(QPalette.ColorRole.Midlight);
+
+        QFont newFont = font();
+        newFont.setPointSize(newFont.pointSize() + 20);
+        setFont(newFont);
+</pre> The <tt>timer</tt> variable, of type <a href="../../../com/trolltech/qt/core/QBasicTimer.html">QBasicTimer</a>, is used to update the widget at regular intervals, making the widget move. The <tt>text</tt> variable is used to store the currently displayed text, and <tt>step</tt> to calculate position and color for each character on the wiggly line. <p>In the constructor, we make the widget's background slightly lighter than the usual background using the <a href="../../../com/trolltech/qt/gui/QPalette.ColorRole.html">QPalette::Midlight</a> color role. The background role defines the brush from the widget's palette that Qt uses to paint the background. Then we enlarge the widget's font with 20 points. <pre class="snippet">
+        step = 0;
+
+        timer = new QBasicTimer();
+        timer.start(60, this);
+    }
+</pre> Finally we start the timer; the call to <a href="../../../com/trolltech/qt/core/QBasicTimer.html#start(int, com.trolltech.qt.core.QObject)">QBasicTimer::start()</a> makes sure that this particular wiggly widget will receive the timer events generated when the timer times out (every 60 milliseconds). <p>We implement a public <tt>setText()</tt> slot that sets the widget's text. <pre class="snippet">
+    public void setText(String s) {
+        text = s;
+    }
+</pre> The <tt>paintEvent()</tt> method is called whenever a <a href="../../../com/trolltech/qt/gui/QPaintEvent.html">QPaintEvent</a> is sent to the widget. Paint events are sent to widgets that need to update themselves, for instance when part of a widget is exposed because a covering widget was moved. For the wiggly widget, a paint event will also be generated every 60 milliseconds from the <tt>timerEvent()</tt> slot. <pre class="snippet">
+    protected void paintEvent(QPaintEvent e) {
+        QFontMetrics metrics = new QFontMetrics(font());
+        int x = (width() - metrics.width(text)) / 2;
+        int y = (height() + metrics.ascent() - metrics.descent()) / 2;
+        QColor color = new QColor();
+</pre> The <a href="../../../com/trolltech/qt/gui/QFontMetrics.html">QFontMetrics</a> object provides information about the widget's font. The <tt>x</tt> variable is the horizontal position where we start drawing the text. The <tt>y</tt> variable is the vertical position of the text's base line. Both variables are computed so that the text is horizontally and vertically centered. To compute the base line, we take into account the font's ascent (the height of the font above the base line) and font's descent (the height of the font below the base line). If the descent equals the ascent, they cancel out each other and the base line is at <tt>height()</tt> / 2. <pre class="snippet">
+        QPainter painter = new QPainter();
+        painter.begin(this);
+        for (int i = 0; i &lt; text.length(); ++i) {
+            int index = (step + i) % 16;
+            color.setHsv((15 - index) * 16, 255, 191);
+            painter.setPen(color);
+            painter.drawText(x, y - ((sineTable[index] * metrics.height()) / 400), text.substring(i, i + 1));
+            x += metrics.width(text.substring(i, i + 1));
+        }
+        painter.end();
+
+    }
+</pre> Each time the <tt>paintEvent()</tt> method is called, we create a <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a> object <tt>painter</tt> to draw the contents of the widget. For each character in <tt>text</tt>, we determine the color and the position on the wiggly line based on <tt>step</tt>. In addition, <tt>x</tt> is incremented by the character's width. <p>For simplicity, we assume that QFontMetrics::width(<tt>text</tt>) returns the sum of the individual character widths (QFontMetrics::width(<tt>text[i]</tt>)). In practice, this is not always the case because QFontMetrics::width(<tt>text</tt>) also takes into account the kerning between certain letters (e.g., 'A' and 'V'). The result is that the text isn't perfectly centered. You can verify this by typing "AVAVAVAVAVAV" in the line edit. <pre class="snippet">
+    protected void timerEvent(QTimerEvent event) {
+        if (event.timerId() == timer.timerId()) {
+            ++step;
+            update();
+        } else {
+            super.timerEvent(event);
+
+        }
+
+    }
+
+}
+</pre> The <tt>timerEvent()</tt> method receives all the timer events that are generated for this widget. If a timer event is sent from the widget's <a href="../../../com/trolltech/qt/core/QBasicTimer.html">QBasicTimer</a>, we increment <tt>step</tt> to make the text move, and call <a href="../../../com/trolltech/qt/gui/QWidget.html#update()">QWidget::update()</a> to refresh the display. Any other timer event is passed on to the base class's implementation of the <a href="../../../com/trolltech/qt/core/QObject.html#timerEvent(com.trolltech.qt.core.QTimerEvent)">timerEvent()</a> method. <p>The <a href="../../../com/trolltech/qt/gui/QWidget.html#update()">QWidget::update()</a> slot does not cause an immediate repaint; instead the slot schedules a paint event for processing when Qt returns to the main event loop. The paint events are then handled by <tt>WigglyWidget</tt>'s <tt>paintEvent()</tt> method.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Porting to Qt 4 - Drag and Drop</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Porting to Qt 4 - Drag and Drop</h1></center><p>[Previous: <a href="porting4-virtual-functions.html">Porting to Qt 4 - Virtual Functions</a>][<a href="porting.html">Porting Guides</a>][Next: <a href="porting4-designer.html">Porting .ui Files to Qt 4</a>]<p>An overview of the porting process for applications that use drag and drop. Qt 4 introduces a new set of classes to handle drag and drop operations that aim to be easier to use than their counterparts in Qt 3. As a result, the way that drag and drop is performed is quite different to the way developers of Qt 3 applications have come to expect. In this guide, we show the differences between the old and new APIs and indicate where applications need to be changed when they are ported to Qt 4. <ul><li> <a href="#dragging">Dragging</a></li><li> <a href="#dropping">Dropping</a></li><li> <a href="#mime-types-and-data">MIME Types and Data</a></li></ul><a name="dragging"><h2>Dragging</h2> In Qt 3, drag operations are encapsulated by <tt>QDragObject</tt> (see Q3DragObject) and its subclasses. These objects are typically constructed on the heap in response to mouse click or mouse move events, and ownership of them is transferred to Qt so that they can be deleted when the corresponding drag and drop operations have been completed. The drag source has no control over how the drag and drop operation is performed once the object's drag() function is called, and it receives no information about how the operation ended. <pre class="snippet">
+void MyQt3Widget::customStartDragFunction()
+{
+    QDragObject *d = new QTextDrag( myHighlightedText(), this );
+    d-&gt;dragCopy();
+    // do NOT delete d.
+}
+</pre> Similarly, in Qt 4, drag operations are also initiated when a <a href="../../../com/trolltech/qt/gui/QDrag.html">QDrag</a> object is constructed and its <a href="../../../com/trolltech/qt/gui/QDrag.html#exec(com.trolltech.qt.core.Qt.DropAction[])">exec()</a> function is called. In contrast, these objects are typically constructed on the stack rather than the heap since each drag and drop operation is performed synchronously as far as the drag source is concerned. One key benefit of this is that the drag source can receive information about how the operation ended from the value returned by <a href="../../../com/trolltech/qt/gui/QDrag.html#exec(com.trolltech.qt.core.Qt.DropAction[])">exec()</a>. <pre class="snippet">
+    protected void mousePressEvent(QMouseEvent event)
+    {
+    
+        if (event.button().equals(Qt.MouseButton.LeftButton)) {
+            QDrag drag = new QDrag(this);
+            QMimeData mimeData = new QMimeData();
+
+            mimeData.setText(text);
+            mimeData.setImageData(image);
+            drag.setMimeData(mimeData);
+            drag.setPixmap(iconPixmap);
+
+            Qt.DropAction dropAction = drag.exec();
+    ...
+            event.accept();
+        }
+    
+    }
+    </pre> A key difference in the above code is the use of the <a href="../../../com/trolltech/qt/core/QMimeData.html">QMimeData</a> class to hold information about the data that is transferred. Qt 3 relies on subclasses of <tt>QDragObject</tt> to provide support for specific MIME types; in Qt 4, the use of <a href="../../../com/trolltech/qt/core/QMimeData.html">QMimeData</a> as a generic container for data makes the relationship between MIME type and data more tranparent. <a href="../../../com/trolltech/qt/core/QMimeData.html">QMimeData</a> is described in more detail later in this document.<a name="dropping"><h2>Dropping</h2> In both Qt 3 and Qt 4, it is possible to prepare a custom widget to accept dropped data by enabling the <a href="../../../QWidget.html#acceptDrops()">acceptDrops</a> property of a widget, usually in the widget's constructor. As a result, the widget will receive drag enter events that can be handled by its <a href="../../../com/trolltech/qt/gui/QWidget.html#dragEnterEvent(com.trolltech.qt.gui.QDragEnterEvent)">dragEnterEvent()</a> function. As in Qt 3, custom widgets in Qt 4 handle these events by determining whether the data supplied by the drag and drop operation can be dropped onto the widget. Since the classes used to encapsulate MIME data are different in Qt 3 and Qt 4, the exact implementations differ. <p>In Qt 3, the drag enter event is handled by checking whether each of the standard <tt>QDragObject</tt> subclasses can decode the data supplied, and indicating success or failure of these checks via the event's <a href="../../../com/trolltech/qt/gui/QDragMoveEvent.html#accept(com.trolltech.qt.core.QRect)">accept()</a> function, as shown in this simple example: <pre class="snippet">
+void MyQt3Widget::dragEnterEvent(QDragEnterEvent* event)
+{
+    event-&gt;accept(
+        QTextDrag::canDecode(event) ||
+        QImageDrag::canDecode(event)
+    );
+}
+</pre> In Qt 4, you can examine the MIME type describing the data to determine whether the widget should accept the event or, for common data types, you can use convenience functions: <pre class="snippet">
+    protected void dragEnterEvent(QDragEnterEvent event)
+    {
+        if (event.mimeData().hasText() || event.mimeData().hasImage())
+            event.acceptProposedAction();
+    }
+    </pre> The widget has some control over the type of drag and drop operation to be performed. In the above code, the action proposed by the drag source is accepted, but <a href="dnd.html#overriding-proposed-actions">this can be overridden</a> if required. <p>In both Qt 3 and Qt 4, it is necessary to accept a given drag event in order to receive the corresponding drop event. A custom widget in Qt 3 that can accept dropped data in the form of text or images might provide an implementation of <a href="../../../com/trolltech/qt/gui/QWidget.html#dropEvent(com.trolltech.qt.gui.QDropEvent)">dropEvent()</a> that looks like the following: <pre class="snippet">
+void MyQt3Widget::dropEvent(QDropEvent* event)
+{
+    QImage image;
+    QString text;
+
+    if ( QImageDrag::decode(event, image) ) {
+        insertImageAt(image, event-&gt;pos());
+    } else if ( QTextDrag::decode(event, text) ) {
+        insertTextAt(text, event-&gt;pos());
+    }
+}
+</pre> In Qt 4, the event is handled in a similar way: <pre class="snippet">
+    protected void dropEvent(QDropEvent event)
+    {
+        if (event.mimeData().hasText())
+            dataLabel.setText(event.mimeData().text());
+        else if (event.mimeData().hasImage()) {
+            Object imageData = event.mimeData().imageData();
+            dataLabel.setPixmap((QPixmap) imageData);
+        }
+        event.acceptProposedAction();
+    }
+    </pre> It is also possible to extract data stored for a particular MIME type if it was specified by the drag source.<a name="mime-types-and-data"><h2>MIME Types and Data</h2> In Qt 3, data to be transferred in drag and drop operations is encapsulated in instances of <tt>QDragObject</tt> and its subclasses, representing specific data formats related to common MIME type and subtypes. <p>In Qt 4, only the <a href="../../../com/trolltech/qt/core/QMimeData.html">QMimeData</a> class is used to represent data, providing a container for data stored in multiple formats, each associated with a relevant MIME type. Since arbitrary MIME types can be specified, there is no need for an extensive class hierarchy to represent different kinds of information. Additionally, <a href="../../../com/trolltech/qt/core/QMimeData.html">QMimeData</a> it provides some convenience functions to allow the most common data formats to be stored and retrieved with less effort than for arbitrary MIME types.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Code for Sliders Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Code for Sliders Example</h1></center><p><pre class="snippet"><html style="white-space:pre-wrap;font-family:courier new"><font color=darkgreen><i>/****************************************************************************
+**
+** Copyright (C) 1992-2009 Nokia Corporation and/or its subsidiary(-ies).
+** All rights reserved.
+**
+** This file is part of Qt Jambi.
+**
+** 
+** Commercial Usage
+** Licensees holding valid Qt Commercial licenses may use this file in
+** accordance with the Qt Commercial License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Nokia.
+** 
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 2.1 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU Lesser General Public License version 2.1 requirements
+** will be met: http:<font color=darkgreen><i>//www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+</i></font>** 
+** In addition, as a special exception, Nokia gives you certain
+** additional rights. These rights are described in the Nokia Qt LGPL
+** Exception version 1.0, included in the file LGPL_EXCEPTION.txt in this
+** package.
+** 
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 3.0 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU General Public License version 3.0 requirements will be
+** met: http:<font color=darkgreen><i>//www.gnu.org/copyleft/gpl.html.
+</i></font>** 
+** If you are unsure which license is appropriate for your use, please
+** contact the sales department at qt-sales@nokia.com.
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/</i></font>
+
+<font color=blue>package</font> com.trolltech.examples;
+
+<font color=blue>import</font> com.trolltech.qt.core.*;
+<font color=blue>import</font> com.trolltech.qt.gui.*;
+
+@<font color=darkmagenta><i>QtJambiExample</i></font>(name = <font color=darkgreen><i>"Sliders"</i></font>)
+<font color=blue>public</font> <font color=blue>class</font> Sliders <font color=blue>extends</font> <font color=darkmagenta><i>QWidget</i></font>
+{
+    <font color=blue>private</font> SlidersGroup horizontalSliders;
+    <font color=blue>private</font> SlidersGroup verticalSliders;
+    <font color=blue>private</font> <font color=darkmagenta><i>QStackedWidget</i></font> stackedWidget;
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QGroupBox</i></font> controlsGroup;
+    <font color=blue>private</font> <font color=darkmagenta><i>QLabel</i></font> minimumLabel;
+    <font color=blue>private</font> <font color=darkmagenta><i>QLabel</i></font> maximumLabel;
+    <font color=blue>private</font> <font color=darkmagenta><i>QLabel</i></font> valueLabel;
+    <font color=blue>private</font> <font color=darkmagenta><i>QCheckBox</i></font> invertedAppearance;
+    <font color=blue>private</font> <font color=darkmagenta><i>QCheckBox</i></font> invertedKeyBindings;
+    <font color=blue>private</font> <font color=darkmagenta><i>QSpinBox</i></font> minimumSpinBox;
+    <font color=blue>private</font> <font color=darkmagenta><i>QSpinBox</i></font> maximumSpinBox;
+    <font color=blue>private</font> <font color=darkmagenta><i>QSpinBox</i></font> valueSpinBox;
+    <font color=blue>private</font> <font color=darkmagenta><i>QComboBox</i></font> orientationCombo;
+
+
+    <font color=blue>public</font> Sliders()
+    {
+        horizontalSliders = <font color=blue>new</font> SlidersGroup(<font color=darkmagenta><i>Qt</i></font>.Orientation.Horizontal, tr(<font color=darkgreen><i>"Horizontal"</i></font>));
+        verticalSliders = <font color=blue>new</font> SlidersGroup(<font color=darkmagenta><i>Qt</i></font>.Orientation.Vertical, tr(<font color=darkgreen><i>"Vertical"</i></font>));
+
+        stackedWidget = <font color=blue>new</font> <font color=darkmagenta><i>QStackedWidget</i></font>();
+        stackedWidget.addWidget(horizontalSliders);
+        stackedWidget.addWidget(verticalSliders);
+
+        createControls(tr(<font color=darkgreen><i>"Controls"</i></font>));
+
+        horizontalSliders.valueChanged.connect(verticalSliders, <font color=darkgreen><i>"setValue(int)"</i></font>);
+        verticalSliders.valueChanged.connect(valueSpinBox, <font color=darkgreen><i>"setValue(int)"</i></font>);
+        valueSpinBox.valueChanged.connect(horizontalSliders, <font color=darkgreen><i>"setValue(int)"</i></font>);
+
+        <font color=darkmagenta><i>QHBoxLayout</i></font> layout = <font color=blue>new</font> <font color=darkmagenta><i>QHBoxLayout</i></font>();
+        layout.addWidget(controlsGroup);
+        layout.addWidget(stackedWidget);
+        setLayout(layout);
+
+        minimumSpinBox.setValue(0);
+        maximumSpinBox.setValue(20);
+        valueSpinBox.setValue(5);
+
+        setWindowTitle(tr(<font color=darkgreen><i>"Sliders"</i></font>));
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> createControls(String title)
+    {
+        controlsGroup = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(title);
+
+        minimumLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"Minimum value:"</i></font>));
+        maximumLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"Maximum value:"</i></font>));
+        valueLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"Current value:"</i></font>));
+
+        invertedAppearance = <font color=blue>new</font> <font color=darkmagenta><i>QCheckBox</i></font>(tr(<font color=darkgreen><i>"Inverted appearance"</i></font>));
+        invertedKeyBindings = <font color=blue>new</font> <font color=darkmagenta><i>QCheckBox</i></font>(tr(<font color=darkgreen><i>"Inverted key bindings"</i></font>));
+
+        minimumSpinBox = <font color=blue>new</font> <font color=darkmagenta><i>QSpinBox</i></font>();
+        minimumSpinBox.setRange(-100, 100);
+        minimumSpinBox.setSingleStep(1);
+
+        maximumSpinBox = <font color=blue>new</font> <font color=darkmagenta><i>QSpinBox</i></font>();
+        maximumSpinBox.setRange(-100, 100);
+        maximumSpinBox.setSingleStep(1);
+
+        valueSpinBox = <font color=blue>new</font> <font color=darkmagenta><i>QSpinBox</i></font>();
+        valueSpinBox.setRange(-100, 100);
+        valueSpinBox.setSingleStep(1);
+
+        orientationCombo = <font color=blue>new</font> <font color=darkmagenta><i>QComboBox</i></font>();
+        orientationCombo.addItem(tr(<font color=darkgreen><i>"Horizontal slider-like widgets"</i></font>));
+        orientationCombo.addItem(tr(<font color=darkgreen><i>"Vertical slider-like widgets"</i></font>));
+
+        orientationCombo.activatedIndex.connect(stackedWidget, <font color=darkgreen><i>"setCurrentIndex(int)"</i></font>);
+        minimumSpinBox.valueChanged.connect(horizontalSliders, <font color=darkgreen><i>"setMinimum(int)"</i></font>);
+        minimumSpinBox.valueChanged.connect(verticalSliders, <font color=darkgreen><i>"setMinimum(int)"</i></font>);
+        maximumSpinBox.valueChanged.connect(horizontalSliders, <font color=darkgreen><i>"setMaximum(int)"</i></font>);
+        maximumSpinBox.valueChanged.connect(verticalSliders, <font color=darkgreen><i>"setMaximum(int)"</i></font>);
+        invertedAppearance.toggled.connect(horizontalSliders, <font color=darkgreen><i>"invertAppearance(boolean)"</i></font>);
+        invertedAppearance.toggled.connect(verticalSliders, <font color=darkgreen><i>"invertAppearance(boolean)"</i></font>);
+        invertedKeyBindings.toggled.connect(horizontalSliders, <font color=darkgreen><i>"invertedKeyBindings(boolean)"</i></font>);
+        invertedKeyBindings.toggled.connect(verticalSliders, <font color=darkgreen><i>"invertedKeyBindings(boolean)"</i></font>);
+
+        <font color=darkmagenta><i>QGridLayout</i></font> controlsLayout = <font color=blue>new</font> <font color=darkmagenta><i>QGridLayout</i></font>();
+        controlsLayout.addWidget(minimumLabel, 0, 0);
+        controlsLayout.addWidget(maximumLabel, 1, 0);
+        controlsLayout.addWidget(valueLabel, 2, 0);
+        controlsLayout.addWidget(minimumSpinBox, 0, 1);
+        controlsLayout.addWidget(maximumSpinBox, 1, 1);
+        controlsLayout.addWidget(valueSpinBox, 2, 1);
+        controlsLayout.addWidget(invertedAppearance, 0, 2);
+        controlsLayout.addWidget(invertedKeyBindings, 1, 2);
+        controlsLayout.addWidget(orientationCombo, 3, 0, 1, 3);
+        controlsGroup.setLayout(controlsLayout);
+    }
+
+    <font color=blue>public</font> <font color=blue>static</font> <font color=blue>void</font> main(String args[])
+    {
+        <font color=darkmagenta><i>QApplication</i></font>.initialize(args);
+
+        <font color=blue>new</font> Sliders().show();
+
+        <font color=darkmagenta><i>QApplication</i></font>.exec();
+    }
+}
+
+<font color=blue>class</font> SlidersGroup <font color=blue>extends</font> <font color=darkmagenta><i>QGroupBox</i></font>
+{
+    <font color=blue>private</font> <font color=darkmagenta><i>QSlider</i></font> slider;
+    <font color=blue>private</font> <font color=darkmagenta><i>QScrollBar</i></font> scrollBar;
+    <font color=blue>private</font> <font color=darkmagenta><i>QDial</i></font> dial;
+
+    <font color=blue>public</font> Signal1&lt;Integer&gt; valueChanged = <font color=blue>new</font> Signal1&lt;Integer&gt;();
+
+    <font color=blue>public</font> SlidersGroup(<font color=darkmagenta><i>Qt</i></font>.Orientation orientation, String title)
+    {
+        slider = <font color=blue>new</font> <font color=darkmagenta><i>QSlider</i></font>(orientation);
+        slider.setFocusPolicy(<font color=darkmagenta><i>Qt</i></font>.FocusPolicy.StrongFocus);
+        slider.setTickPosition(<font color=darkmagenta><i>QSlider</i></font>.TickPosition.TicksBothSides);
+        slider.setTickInterval(10);
+        slider.setSingleStep(1);
+
+        scrollBar = <font color=blue>new</font> <font color=darkmagenta><i>QScrollBar</i></font>(orientation);
+        scrollBar.setFocusPolicy(<font color=darkmagenta><i>Qt</i></font>.FocusPolicy.StrongFocus);
+
+        dial = <font color=blue>new</font> <font color=darkmagenta><i>QDial</i></font>();
+        dial.setFocusPolicy(<font color=darkmagenta><i>Qt</i></font>.FocusPolicy.StrongFocus);
+
+        slider.valueChanged.connect(scrollBar, <font color=darkgreen><i>"setValue(int)"</i></font>);
+        scrollBar.valueChanged.connect(dial, <font color=darkgreen><i>"setValue(int)"</i></font>);
+        dial.valueChanged.connect(slider, <font color=darkgreen><i>"setValue(int)"</i></font>);
+        dial.valueChanged.connect(valueChanged);
+
+        <font color=darkmagenta><i>QBoxLayout</i></font>.Direction direction;
+
+        <font color=blue>if</font> (orientation == <font color=darkmagenta><i>Qt</i></font>.Orientation.Horizontal)
+            direction = <font color=darkmagenta><i>QBoxLayout</i></font>.Direction.TopToBottom;
+        <font color=blue>else</font>
+            direction = <font color=darkmagenta><i>QBoxLayout</i></font>.Direction.LeftToRight;
+
+        <font color=darkmagenta><i>QBoxLayout</i></font> slidersLayout = <font color=blue>new</font> <font color=darkmagenta><i>QBoxLayout</i></font>(direction);
+        slidersLayout.addWidget(slider);
+        slidersLayout.addWidget(scrollBar);
+        slidersLayout.addWidget(dial);
+        setLayout(slidersLayout);
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> setValue(<font color=blue>int</font> value)
+    {
+        slider.setValue(value);
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> setMinimum(<font color=blue>int</font> value)
+    {
+        slider.setMinimum(value);
+        scrollBar.setMinimum(value);
+        dial.setMinimum(value);
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> setMaximum(<font color=blue>int</font> value)
+    {
+        slider.setMaximum(value);
+        scrollBar.setMaximum(value);
+        dial.setMaximum(value);
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> invertAppearance(<font color=blue>boolean</font> invert)
+    {
+        slider.setInvertedAppearance(invert);
+        scrollBar.setInvertedAppearance(invert);
+        dial.setInvertedAppearance(invert);
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> invertedKeyBindings(<font color=blue>boolean</font> invert)
+    {
+        slider.setInvertedControls(invert);
+        scrollBar.setInvertedControls(invert);
+        dial.setInvertedControls(invert);
+    }
+}
+</html></pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

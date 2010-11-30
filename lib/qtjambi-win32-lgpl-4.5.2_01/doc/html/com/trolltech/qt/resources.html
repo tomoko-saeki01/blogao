@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>The Qt Resource System</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>The Qt Resource System</h1></center><p><a name="resource-system"> The Qt resource system is a platform-independent mechanism for storing binary files in the application's executable. This is useful if your application always needs a certain set of files (icons, translation files, etc.) and you don't want to run the risk of losing the files. <p>The resource system is based on tight cooperation between <a href="qmake-manual.html">qmake</a>, <a href="rcc.html">rcc</a> (Qt's resource compiler), and <a href="../../../com/trolltech/qt/core/QFile.html">QFile</a>. It obsoletes Qt 3's <tt>qembed</tt> tool and the image collection mechanism.<a name="resource-collection-files"><h2>Resource Collection Files (.qrc)</h2><tt>.qrc</tt> The resources associated with an application are specified in a <tt>.qrc</tt> file, an XML-based file format that lists files on the disk and optionally assigns them a resource name that the application must use to access the resource. <p>Here's an example <tt>.qrc</tt> file:<pre class="snippet">&lt;!DOCTYPE RCC&gt;&lt;RCC version="1.0"&gt;
+&lt;qresource&gt;
+    &lt;file&gt;images/copy.png&lt;/file&gt;
+    &lt;file&gt;images/cut.png&lt;/file&gt;
+    &lt;file&gt;images/new.png&lt;/file&gt;
+    &lt;file&gt;images/open.png&lt;/file&gt;
+    &lt;file&gt;images/paste.png&lt;/file&gt;
+    &lt;file&gt;images/save.png&lt;/file&gt;
+&lt;/qresource&gt;
+&lt;/RCC&gt;
+</pre> The resource files listed in the <tt>.qrc</tt> file are files that are part of the application's source tree. The specified paths are relative to the directory containing the <tt>.qrc</tt> file. Note that the listed resource files must be located in the same directory as the <tt>.qrc</tt> file, or one of its subdirectories. <p>Resource data can either be compiled into the binary and thus accessed immediately in application code, or a binary resource can be created and at a later point in application code registered with the resource system. <p>By default, resources are accessible in the application under the same name as they have in the source tree, with a <tt>:/</tt> prefix. For example, the path <tt>:/images/cut.png</tt> would give access to the <tt>cut.png</tt> file, whose location in the application's source tree is <tt>images/cut.png</tt>. This can be changed using the <tt>file</tt> tag's <tt>alias</tt> attribute: <pre class="snippet">
+&lt;file alias="cut-img.png"&gt;images/cut.png&lt;/file&gt;
+</pre> The file is then accessible as <tt>:/cut-img.png</tt> from the application. It is also possible to specify a path prefix for all files in the <tt>.qrc</tt> file using the <tt>qresource</tt> tag's <tt>prefix</tt> attribute: <pre class="snippet">
+&lt;qresource prefix="/myresources"&gt;
+    &lt;file alias="cut-img.png"&gt;images/cut.png&lt;/file&gt;
+&lt;/qresource&gt;
+</pre> In this case, the file is accessible as <tt>:/myresources/cut-img.png</tt>. <p>Some resources, such as translation files and icons, many need to change based on the user's locale. This is done by adding a <tt>lang</tt> attribute to the <tt>qresource</tt> tag, specifying a suitable locale string. For example: <pre class="snippet">
+&lt;qresource&gt;
+    &lt;file&gt;cut.jpg&lt;/file&gt;
+&lt;/qresource&gt;
+&lt;qresource lang="fr"&gt;
+    &lt;file alias="cut.jpg"&gt;cut_fr.jpg&lt;/file&gt;
+&lt;/qresource&gt;
+</pre> If the user's locale is French (i.e., <a href="../../../com/trolltech/qt/core/QLocale.html#system()">QLocale::system()</a>.name() returns "fr_FR"), <tt>:/cut.jpg</tt> becomes a reference to the <tt>cut_fr.jpg</tt> image. For other locales, <tt>cut.jpg</tt> is used. <p>See the <a href="../../../com/trolltech/qt/core/QLocale.html">QLocale</a> documentation for a description of the format to use for locale strings.<a name="external-binary-resources"><h3>External Binary Resources</h3> For an external binary resource to be created you must create the resource data (commonly given the <tt>.rcc</tt> extension) by passing the -binary switch to <a href="rcc.html">rcc</a>. Once the binary resource is created you can register the resource with the QResource API. <p>For example, a set of resource data specified in a <tt>.qrc</tt> file can be compiled in the following way: <pre class="snippet">
+rcc -binary myresource.qrc -o myresource.rcc
+</pre> In the application, this resource would be registered with code like this: <pre class="snippet">
+QResource::registerResource("/path/to/myresource.rcc");
+</pre><a name="compiled-in-resources"><h3>Compiled-In Resources</h3> For a resource to be compiled into the binary the <tt>.qrc</tt> file must be mentioned in the application's <tt>.pro</tt> file so that <tt>qmake</tt> knows about it. For example:Error parsing snippet.</pre> <tt>qmake</tt> will produce make rules to generate a file called <tt>qrc_application.cpp</tt> that is linked into the application. This file contains all the data for the images and other resources as static C++ arrays of compressed binary data. The <tt>qrc_application.cpp</tt> file is automatically regenerated whenever the <tt>.qrc</tt> file changes or one of the files that it refers to changes. If you don't use <tt>.pro</tt> files, you can either invoke <tt>rcc</tt> manually or add build rules to your build system. <br><center><img src="images/resources.png"></center><br> Currently, Qt always stores the data directly in the executable, even on Windows and Mac OS X, where the operating system provides native support for resources. This might change in a future Qt release.<a name="using-resources-in-the-application"><h2>Using Resources in the Application</h2> In the application, resource paths can be used in most places instead of ordinary file system paths. In particular, you can pass a resource path instead of a file name to the <a href="../../../com/trolltech/qt/gui/QIcon.html">QIcon</a>, <a href="../../../com/trolltech/qt/gui/QImage.html">QImage</a>, or <a href="../../../com/trolltech/qt/gui/QPixmap.html">QPixmap</a> constructor:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    cutAct = new QAction(QIcon(":/images/cut.png"), tr("Cu&t"), this);
+</pre> See the <a href="qtjambi-application.html">Application</a> example for an actual application that uses Qt's resource system to store its icons. <p>In memory, resources are represented by a tree of resource objects. The tree is automatically built at startup and used by <a href="../../../com/trolltech/qt/core/QFile.html">QFile</a> for resolving paths to resources. You can use a <a href="../../../com/trolltech/qt/core/QDir.html">QDir</a> initialized with ":/" to navigate through the resource tree from the root. <p>Qt's resources support the concept of a search path list. If you then refer to a resource with <tt>:</tt> instead of <tt>:/</tt> as the prefix, the resource will be looked up using the search path list. The search path list is empty at startup; call QDir::addResourceSearchPath() to add paths to it. <p>If you have resources in a static library, you might need to force initialization of your resources by calling Q_INIT_RESOURCE() with the base name of the <tt>.qrc</tt> file. For example: <pre class="snippet">
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    Q_INIT_RESOURCE(graphlib);
+    ...
+    return app.exec();
+}
+</pre> Similarly, if you must unload a set of resources explicitly (because a plugin is being unloaded or the resources are not valid any longer), you can force removal of your resources by calling Q_CLEANUP_RESOURCE() with the same base name as above.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

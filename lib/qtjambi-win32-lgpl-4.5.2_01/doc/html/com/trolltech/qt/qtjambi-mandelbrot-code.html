@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Code for Mandelbrot Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Code for Mandelbrot Example</h1></center><p><pre class="snippet"><html style="white-space:pre-wrap;font-family:courier new"><font color=darkgreen><i>/****************************************************************************
+ **
+ ** Copyright (C) 1992-2009 Nokia Corporation and/or its subsidiary(-ies).
+** All rights reserved.
+ **
+ ** This file is part of Qt Jambi.
+ **
+ ** 
+** Commercial Usage
+** Licensees holding valid Qt Commercial licenses may use this file in
+** accordance with the Qt Commercial License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Nokia.
+** 
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 2.1 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU Lesser General Public License version 2.1 requirements
+** will be met: http:<font color=darkgreen><i>//www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+</i></font>** 
+** In addition, as a special exception, Nokia gives you certain
+** additional rights. These rights are described in the Nokia Qt LGPL
+** Exception version 1.0, included in the file LGPL_EXCEPTION.txt in this
+** package.
+** 
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 3.0 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU General Public License version 3.0 requirements will be
+** met: http:<font color=darkgreen><i>//www.gnu.org/copyleft/gpl.html.
+</i></font>** 
+** If you are unsure which license is appropriate for your use, please
+** contact the sales department at qt-sales@nokia.com.
+ **
+ ** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+ ** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ **
+ ****************************************************************************/</i></font>
+
+<font color=blue>package</font> com.trolltech.examples;
+
+<font color=blue>import</font> com.trolltech.qt.core.*;
+<font color=blue>import</font> com.trolltech.qt.gui.*;
+<font color=blue>import</font> com.trolltech.qt.gui.<font color=darkmagenta><i>QPainter</i></font>.RenderHint;
+
+@<font color=darkmagenta><i>QtJambiExample</i></font>(name = <font color=darkgreen><i>"Mandelbrot"</i></font>)
+<font color=blue>public</font> <font color=blue>class</font> Mandelbrot <font color=blue>extends</font> <font color=darkmagenta><i>QWidget</i></font> {
+
+    <font color=blue>private</font> RenderThread thread = <font color=blue>new</font> RenderThread();
+    <font color=blue>private</font> <font color=darkmagenta><i>QImage</i></font> pixmap = <font color=blue>new</font> <font color=darkmagenta><i>QImage</i></font>();
+    <font color=blue>private</font> <font color=darkmagenta><i>QPoint</i></font> pixmapOffset = <font color=blue>new</font> <font color=darkmagenta><i>QPoint</i></font>();
+    <font color=blue>private</font> <font color=darkmagenta><i>QPoint</i></font> lastDragPosition = <font color=blue>new</font> <font color=darkmagenta><i>QPoint</i></font>();
+    <font color=blue>private</font> <font color=blue>double</font> centerX;
+    <font color=blue>private</font> <font color=blue>double</font> centerY;
+    <font color=blue>private</font> <font color=blue>double</font> pixmapScale;
+    <font color=blue>private</font> <font color=blue>double</font> currentScale;
+
+    <font color=blue>private</font> <font color=blue>boolean</font> abort = false;
+
+    <font color=blue>final</font> <font color=blue>double</font> DefaultCenterX = -0.637011f;
+    <font color=blue>final</font> <font color=blue>double</font> DefaultCenterY = -0.0395159f;
+    <font color=blue>final</font> <font color=blue>double</font> DefaultScale = 0.00403897f;
+
+    <font color=blue>final</font> <font color=blue>double</font> ZoomInFactor = 0.8f;
+    <font color=blue>final</font> <font color=blue>double</font> ZoomOutFactor = 1 / ZoomInFactor;
+    <font color=blue>final</font> <font color=blue>int</font> ScrollStep = 20;
+
+    <font color=blue>private</font> Signal2&lt;<font color=darkmagenta><i>QImage</i></font>, Double&gt; renderedImage =
+            <font color=blue>new</font> Signal2&lt;<font color=darkmagenta><i>QImage</i></font>, Double&gt;();
+
+    <font color=blue>public</font> <font color=blue>static</font> <font color=blue>void</font> main(String args[]) {
+        <font color=darkmagenta><i>QApplication</i></font>.initialize(args);
+        Mandelbrot mainWindow = <font color=blue>new</font> Mandelbrot();
+        mainWindow.show();
+        <font color=darkmagenta><i>QApplication</i></font>.exec();
+    }
+
+    <font color=blue>public</font> Mandelbrot() {
+        <font color=blue>this</font>(null);
+    }
+
+    @Override
+    <font color=blue>protected</font> <font color=blue>void</font> disposed() {
+        <font color=blue>synchronized</font> (thread) {
+            abort = true;
+            <font color=blue>try</font> {
+                thread.join();
+            } <font color=blue>catch</font> (InterruptedException e) { }
+        }
+    }
+
+    <font color=blue>public</font> Mandelbrot(<font color=darkmagenta><i>QWidget</i></font> widget) {
+        <font color=blue>super</font>(widget);
+        centerX = DefaultCenterX;
+        centerY = DefaultCenterY;
+        pixmapScale = DefaultScale;
+        currentScale = DefaultScale;
+
+        renderedImage.connect(<font color=blue>this</font>, <font color=darkgreen><i>"updatePixmap(QImage, Double)"</i></font>);
+
+        setWindowTitle(tr(<font color=darkgreen><i>"Mandelbrot"</i></font>));
+        setWindowIcon(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(<font color=darkgreen><i>"classpath:com/trolltech/images/qt-logo.png"</i></font>));
+        setCursor(<font color=blue>new</font> <font color=darkmagenta><i>QCursor</i></font>(<font color=darkmagenta><i>Qt</i></font>.CursorShape.CrossCursor));
+        resize(550, 400);
+    }
+
+    @Override
+    <font color=blue>public</font> <font color=blue>void</font> paintEvent(<font color=darkmagenta><i>QPaintEvent</i></font> event) {
+        <font color=darkmagenta><i>QPainter</i></font> painter = <font color=blue>new</font> <font color=darkmagenta><i>QPainter</i></font>();
+        painter.begin(<font color=blue>this</font>);
+        painter.setRenderHint(RenderHint.SmoothPixmapTransform);
+        painter.fillRect(rect(), <font color=blue>new</font> <font color=darkmagenta><i>QBrush</i></font>(<font color=darkmagenta><i>QColor</i></font>.black));
+
+        <font color=blue>if</font> (pixmap.isNull()) {
+            String message = tr(<font color=darkgreen><i>"Rendering initial image, please wait..."</i></font>);
+            painter.setPen(<font color=darkmagenta><i>QColor</i></font>.white);
+            painter.drawText(rect(), <font color=darkmagenta><i>Qt</i></font>.AlignmentFlag.AlignCenter.value(),
+                             message);
+            painter.end();
+
+            <font color=blue>return</font>;
+        }
+        <font color=blue>if</font> (currentScale == pixmapScale) {
+            painter.drawImage(pixmapOffset, pixmap);
+        } <font color=blue>else</font> {
+            <font color=blue>double</font> scaleFactor = pixmapScale / currentScale;
+            <font color=blue>int</font> newWidth = (<font color=blue>int</font>) (pixmap.width() * scaleFactor);
+            <font color=blue>int</font> newHeight = (<font color=blue>int</font>) (pixmap.height() * scaleFactor);
+
+            <font color=blue>int</font> newX = pixmapOffset.x() + (pixmap.width() - newWidth) / 2;
+            <font color=blue>int</font> newY = pixmapOffset.y() + (pixmap.height() - newHeight) / 2;
+
+            painter.save();
+            painter.translate(newX, newY);
+            painter.scale(scaleFactor, scaleFactor);
+
+            <font color=darkmagenta><i>QMatrix</i></font> invertedMatrix = painter.worldMatrix().inverted();
+            <font color=darkmagenta><i>QRect</i></font> exposed = invertedMatrix.mapRect(rect());
+            exposed = exposed.adjusted(-1, -1, 1, 1);
+
+            <font color=blue>if</font>(scaleFactor&gt;=0)
+                painter.drawImage(pixmapOffset, pixmap);
+            <font color=blue>else</font>
+                painter.drawImage(exposed, pixmap, exposed);
+
+            painter.restore();
+        }
+
+        String text = tr(<font color=darkgreen><i>"Use mouse wheel to zoom."</i></font>)
+                      + tr(<font color=darkgreen><i>"Press and hold left mouse button to scroll."</i></font>);
+        <font color=darkmagenta><i>QFontMetrics</i></font> metrics = painter.fontMetrics();
+        <font color=blue>int</font> textWidth = metrics.width(text);
+        <font color=blue>int</font> offset = (width() - textWidth) / 2;
+
+        painter.setPen(<font color=darkmagenta><i>QPen</i></font>.NoPen);
+        painter.setBrush(<font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(0, 0, 0, 127));
+        painter.drawRect(offset - 5, 0, textWidth + 10, metrics.lineSpacing() + 5);
+        painter.setPen(<font color=darkmagenta><i>QColor</i></font>.white);
+        painter.drawText(offset, metrics.leading() + metrics.ascent(), text);
+        painter.end();
+    }
+
+    @Override
+    <font color=blue>public</font> <font color=blue>void</font> resizeEvent(<font color=darkmagenta><i>QResizeEvent</i></font> event) {
+        thread.render(centerX, centerY, currentScale, size());
+    }
+
+    @Override
+    <font color=blue>protected</font> <font color=blue>void</font> closeEvent(<font color=darkmagenta><i>QCloseEvent</i></font> event) {
+        <font color=blue>synchronized</font> (thread) {
+            abort = true;
+            thread.notify();
+        }
+        <font color=blue>super</font>.closeEvent(event);
+    }
+
+    @Override
+    <font color=blue>public</font> <font color=blue>void</font> keyPressEvent(<font color=darkmagenta><i>QKeyEvent</i></font> event) {
+        <font color=darkmagenta><i>Qt</i></font>.Key key = <font color=darkmagenta><i>Qt</i></font>.Key.resolve(event.key());
+        <font color=blue>switch</font> (key) {
+        <font color=blue>case</font> Key_Plus:
+            zoom(ZoomInFactor);
+            <font color=blue>break</font>;
+        <font color=blue>case</font> Key_Minus:
+            zoom(ZoomOutFactor);
+            <font color=blue>break</font>;
+        <font color=blue>case</font> Key_Left:
+            scroll(-ScrollStep, 0);
+            <font color=blue>break</font>;
+        <font color=blue>case</font> Key_Right:
+            scroll(+ScrollStep, 0);
+            <font color=blue>break</font>;
+        <font color=blue>case</font> Key_Down:
+            scroll(0, -ScrollStep);
+            <font color=blue>break</font>;
+        <font color=blue>case</font> Key_Up:
+            scroll(0, +ScrollStep);
+            <font color=blue>break</font>;
+        <font color=blue>default</font>:
+            <font color=blue>super</font>.keyPressEvent(event);
+        }
+    }
+
+    @Override
+    <font color=blue>public</font> <font color=blue>void</font> wheelEvent(<font color=darkmagenta><i>QWheelEvent</i></font> event) {
+        <font color=blue>int</font> numDegrees = event.delta() / 8;
+        <font color=blue>double</font> numSteps = numDegrees / 15.0f;
+        zoom(Math.pow(ZoomInFactor, numSteps));
+    }
+
+    @Override
+    <font color=blue>public</font> <font color=blue>void</font> mousePressEvent(<font color=darkmagenta><i>QMouseEvent</i></font> event) {
+        <font color=blue>if</font> (event.button() == <font color=darkmagenta><i>Qt</i></font>.MouseButton.LeftButton)
+            lastDragPosition = event.pos();
+    }
+
+    @Override
+    <font color=blue>public</font> <font color=blue>void</font> mouseMoveEvent(<font color=darkmagenta><i>QMouseEvent</i></font> event) {
+        <font color=blue>if</font> (event.buttons().isSet(<font color=darkmagenta><i>Qt</i></font>.MouseButton.LeftButton)) {
+            pixmapOffset.add(event.pos());
+            pixmapOffset.subtract(lastDragPosition);
+
+            lastDragPosition = event.pos();
+            update();
+        }
+    }
+
+    @Override
+    <font color=blue>public</font> <font color=blue>void</font> mouseReleaseEvent(<font color=darkmagenta><i>QMouseEvent</i></font> event) {
+        <font color=blue>if</font> (event.button() == <font color=darkmagenta><i>Qt</i></font>.MouseButton.LeftButton) {
+            pixmapOffset.add(event.pos());
+            pixmapOffset.subtract(lastDragPosition);
+            lastDragPosition = <font color=blue>new</font> <font color=darkmagenta><i>QPoint</i></font>();
+
+            <font color=blue>int</font> deltaX = (width() - pixmap.width()) / 2 - pixmapOffset.x();
+            <font color=blue>int</font> deltaY = (height() - pixmap.height()) / 2 - pixmapOffset.y();
+            scrollImage(deltaX, deltaY);
+        }
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> updatePixmap(<font color=darkmagenta><i>QImage</i></font> image, Double scaleFactor) {
+        <font color=blue>if</font> (!lastDragPosition.isNull())
+            <font color=blue>return</font>;
+        pixmap = image;
+        pixmapOffset = <font color=blue>new</font> <font color=darkmagenta><i>QPoint</i></font>();
+        lastDragPosition = <font color=blue>new</font> <font color=darkmagenta><i>QPoint</i></font>();
+        pixmapScale = scaleFactor;
+
+        <font color=darkmagenta><i>QApplication</i></font>.invokeLater(<font color=blue>new</font> Runnable() {
+            <font color=blue>public</font> <font color=blue>void</font> run() {
+                <font color=blue>synchronized</font> (thread) {
+                    <font color=blue>if</font>(!abort)
+                        update();
+                }
+            }
+        });
+    }
+
+    <font color=blue>protected</font> <font color=blue>void</font> zoom(<font color=blue>double</font> zoomFactor) {
+        currentScale *= zoomFactor;
+        update();
+        thread.render(centerX, centerY, currentScale, size());
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> scrollImage(<font color=blue>int</font> deltaX, <font color=blue>int</font> deltaY) {
+        centerX += deltaX * currentScale;
+        centerY += deltaY * currentScale;
+        update();
+        thread.render(centerX, centerY, currentScale, size());
+    }
+
+    <font color=blue>private</font> <font color=blue>class</font> RenderThread <font color=blue>extends</font> Thread {
+        <font color=blue>private</font> <font color=blue>double</font> centerX;
+        <font color=blue>private</font> <font color=blue>double</font> centerY;
+        <font color=blue>private</font> <font color=blue>double</font> scaleFactor;
+        <font color=blue>private</font> <font color=darkmagenta><i>QSize</i></font> resultSize;
+        <font color=blue>private</font> <font color=blue>boolean</font> restart;
+
+        <font color=blue>final</font> <font color=blue>int</font> ColormapSize = 512;
+        <font color=blue>int</font>[] colormap = <font color=blue>new</font> <font color=blue>int</font>[ColormapSize];
+
+        RenderThread() {
+            restart = false;
+
+            <font color=blue>for</font> (<font color=blue>int</font> i = 0; i &lt; ColormapSize; ++i) {
+                <font color=blue>double</font> wave = 380.0 + (i * 400.0 / ColormapSize);
+                colormap[i] = rgbFromWaveLength(wave);
+            }
+        }
+
+        <font color=blue>synchronized</font> <font color=blue>void</font> render(<font color=blue>double</font> centerX, <font color=blue>double</font> centerY,
+                                 <font color=blue>double</font> scaleFactor, <font color=darkmagenta><i>QSize</i></font> resultSize) {
+
+            <font color=blue>this</font>.centerX = centerX;
+            <font color=blue>this</font>.centerY = centerY;
+            <font color=blue>this</font>.scaleFactor = scaleFactor;
+            <font color=blue>this</font>.resultSize = resultSize;
+
+            <font color=blue>if</font> (!isAlive()) {
+                start();
+            } <font color=blue>else</font> {
+                restart = true;
+                notify();
+            }
+        }
+
+        @Override
+        <font color=blue>public</font> <font color=blue>void</font> run() {
+            <font color=darkmagenta><i>QSize</i></font> resultSize;
+            <font color=blue>double</font> scaleFactor;
+            <font color=blue>double</font> centerX;
+            <font color=blue>double</font> centerY;
+
+            <font color=blue>while</font> (true) {
+                <font color=blue>synchronized</font> (<font color=blue>this</font>) {
+                    resultSize = <font color=blue>this</font>.resultSize;
+                    scaleFactor = <font color=blue>this</font>.scaleFactor;
+                    centerX = <font color=blue>this</font>.centerX;
+                    centerY = <font color=blue>this</font>.centerY;
+                }
+
+                <font color=blue>int</font> halfWidth = resultSize.width() / 2;
+                <font color=blue>int</font> halfHeight = resultSize.height() / 2;
+                <font color=darkmagenta><i>QImage</i></font>.Format format = <font color=darkmagenta><i>QImage</i></font>.Format.Format_RGB32;
+                <font color=darkmagenta><i>QImage</i></font> image = <font color=blue>new</font> <font color=darkmagenta><i>QImage</i></font>(resultSize, format);
+
+                <font color=blue>final</font> <font color=blue>int</font> NumPasses = 8;
+                <font color=blue>int</font> pass = 0;
+                <font color=blue>while</font> (pass &lt; NumPasses) {
+                    <font color=blue>final</font> <font color=blue>int</font> MaxIterations = (1 &lt;&lt; (2 * pass + 6)) + 32;
+                    <font color=blue>final</font> <font color=blue>int</font> Limit = 4;
+                    <font color=blue>boolean</font> allBlack = true;
+
+                    <font color=blue>for</font> (<font color=blue>int</font> y = -halfHeight; y &lt; halfHeight; ++y) {
+                        <font color=blue>if</font> (restart)
+                            <font color=blue>break</font>;
+                        <font color=blue>if</font> (abort)
+                            <font color=blue>return</font>;
+
+                        <font color=blue>double</font> ay = centerY + (y * scaleFactor);
+
+                        <font color=blue>for</font> (<font color=blue>int</font> x = -halfWidth; x &lt; halfWidth; ++x) {
+                            <font color=blue>double</font> ax = centerX + (x * scaleFactor);
+                            <font color=blue>double</font> a1 = ax;
+                            <font color=blue>double</font> b1 = ay;
+                            <font color=blue>int</font> numIterations = 0;
+
+                            <font color=blue>do</font> {
+                                ++numIterations;
+                                <font color=blue>double</font> a2 = (a1 * a1) - (b1 * b1) + ax;
+                                <font color=blue>double</font> b2 = (2 * a1 * b1) + ay;
+                                <font color=blue>if</font> ((a2 * a2) + (b2 * b2) &gt; Limit)
+                                    <font color=blue>break</font>;
+
+                                ++numIterations;
+                                a1 = (a2 * a2) - (b2 * b2) + ax;
+                                b1 = (2 * a2 * b2) + ay;
+                                <font color=blue>if</font> ((a1 * a1) + (b1 * b1) &gt; Limit)
+                                    <font color=blue>break</font>;
+                            } <font color=blue>while</font> (numIterations &lt; MaxIterations);
+
+                            <font color=blue>if</font> (numIterations &lt; MaxIterations) {
+                                <font color=blue>int</font> index = numIterations % ColormapSize;
+                                image.setPixel(x + halfWidth, y + halfHeight,
+                                               colormap[index]);
+
+                                allBlack = false;
+                            } <font color=blue>else</font> {
+                                image.setPixel(x + halfWidth, y + halfHeight,
+                                               0xff000000);
+                            }
+                        }
+                    }
+                    <font color=blue>if</font> (allBlack && pass == 0) {
+                        pass = 4;
+                    } <font color=blue>else</font> {
+                        <font color=blue>synchronized</font> (<font color=blue>this</font>) {
+                        <font color=blue>if</font> (!restart) {
+                            <font color=darkgreen><i>//renderedImage.emit(image, scaleFactor);
+</i></font>                            updatePixmap(image, scaleFactor);
+                        }
+                        }
+                        ++pass;
+                    }
+                }
+                <font color=blue>synchronized</font> (<font color=blue>this</font>) {
+                    <font color=blue>if</font> (!restart)
+                        <font color=blue>try</font> {
+                            wait();
+                        } <font color=blue>catch</font> (InterruptedException event) {
+                            event.printStackTrace();
+                        }
+                    restart = false;
+                }
+            }
+        }
+
+        <font color=blue>int</font> rgbFromWaveLength(<font color=blue>double</font> wave) {
+            <font color=blue>double</font> red= 0.0;
+            <font color=blue>double</font> green = 0.0;
+            <font color=blue>double</font> blue = 0.0;
+
+            <font color=blue>if</font> (wave &gt;= 380.0 && wave &lt;= 440.0) {
+                red = -1.0 * (wave - 440.0) / (440.0 - 380.0);
+                blue = 1.0;
+            } <font color=blue>else</font> <font color=blue>if</font> (wave &gt;= 440.0 && wave &lt;= 490.0) {
+                green = (wave - 440.0) / (490.0 - 440.0);
+                blue = 1.0;
+            } <font color=blue>else</font> <font color=blue>if</font> (wave &gt;= 490.0 && wave &lt;= 510.0) {
+                green = 1.0;
+                blue = -1.0 * (wave - 510.0) / (510.0 - 490.0);
+            } <font color=blue>else</font> <font color=blue>if</font> (wave &gt;= 510.0 && wave &lt;= 580.0) {
+                red = (wave - 510.0) / (580.0 - 510.0);
+                green = 1.0;
+            } <font color=blue>else</font> <font color=blue>if</font> (wave &gt;= 580.0 && wave &lt;= 645.0) {
+                red = 1.0;
+                green = -1.0 * (wave - 645.0) / (645.0 - 580.0);
+            } <font color=blue>else</font> <font color=blue>if</font> (wave &gt;= 645.0 && wave &lt;= 780.0) {
+                red= 1.0;
+            }
+
+            <font color=blue>double</font> s = 1.0;
+            <font color=blue>if</font> (wave &gt; 700.0)
+                s = 0.3 + 0.7 * (780.0 - wave) / (780.0 - 700.0);
+            <font color=blue>else</font> <font color=blue>if</font> (wave &lt; 420.0)
+                s = 0.3 + 0.7 * (wave - 380.0) / (420.0 - 380.0);
+
+            red = Math.pow(red * s, 0.8) * 255;
+            green = Math.pow(green * s, 0.8) * 255;
+            blue = Math.pow(blue * s, 0.8) * 255;
+
+            <font color=darkmagenta><i>QColor</i></font> color = <font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>((<font color=blue>int</font>) red, (<font color=blue>int</font>) green, (<font color=blue>int</font>) blue);
+
+            <font color=blue>return</font> color.rgb();
+        }
+    }
+}
+</html></pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

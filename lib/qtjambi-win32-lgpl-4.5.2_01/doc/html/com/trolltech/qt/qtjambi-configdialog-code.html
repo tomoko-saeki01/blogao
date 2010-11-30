@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Code for Config Dialog Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Code for Config Dialog Example</h1></center><p><pre class="snippet"><html style="white-space:pre-wrap;font-family:courier new"><font color=darkgreen><i>/****************************************************************************
+**
+** Copyright (C) 1992-2009 Nokia Corporation and/or its subsidiary(-ies).
+** All rights reserved.
+**
+** This file is part of Qt Jambi.
+**
+** 
+** Commercial Usage
+** Licensees holding valid Qt Commercial licenses may use this file in
+** accordance with the Qt Commercial License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Nokia.
+** 
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 2.1 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU Lesser General Public License version 2.1 requirements
+** will be met: http:<font color=darkgreen><i>//www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+</i></font>** 
+** In addition, as a special exception, Nokia gives you certain
+** additional rights. These rights are described in the Nokia Qt LGPL
+** Exception version 1.0, included in the file LGPL_EXCEPTION.txt in this
+** package.
+** 
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 3.0 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU General Public License version 3.0 requirements will be
+** met: http:<font color=darkgreen><i>//www.gnu.org/copyleft/gpl.html.
+</i></font>** 
+** If you are unsure which license is appropriate for your use, please
+** contact the sales department at qt-sales@nokia.com.
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/</i></font>
+
+<font color=blue>package</font> com.trolltech.examples;
+
+<font color=blue>import</font> com.trolltech.qt.core.<font color=darkmagenta><i>QDate</i></font>;
+<font color=blue>import</font> com.trolltech.qt.core.<font color=darkmagenta><i>QSize</i></font>;
+<font color=blue>import</font> com.trolltech.qt.core.<font color=darkmagenta><i>Qt</i></font>.AlignmentFlag;
+<font color=blue>import</font> com.trolltech.qt.core.<font color=darkmagenta><i>Qt</i></font>.ItemFlag;
+<font color=blue>import</font> com.trolltech.qt.gui.*;
+
+@<font color=darkmagenta><i>QtJambiExample</i></font>(name = <font color=darkgreen><i>"Config Dialog"</i></font>)
+<font color=blue>public</font> <font color=blue>class</font> ConfigDialog <font color=blue>extends</font> <font color=darkmagenta><i>QDialog</i></font> {
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QListWidget</i></font> contentsWidget;
+    <font color=blue>private</font> <font color=darkmagenta><i>QStackedWidget</i></font> pagesWidget;
+
+    <font color=blue>public</font> <font color=blue>static</font> <font color=blue>void</font> main(String args[]) {
+        <font color=darkmagenta><i>QApplication</i></font>.initialize(args);
+
+        ConfigDialog dialog = <font color=blue>new</font> ConfigDialog(null);
+        dialog.show();
+
+        <font color=darkmagenta><i>QApplication</i></font>.exec();
+    }
+
+    <font color=blue>public</font> ConfigDialog(<font color=darkmagenta><i>QWidget</i></font> parent) {
+        <font color=blue>super</font>(parent);
+        contentsWidget = <font color=blue>new</font> <font color=darkmagenta><i>QListWidget</i></font>(<font color=blue>this</font>);
+        contentsWidget.setViewMode(<font color=darkmagenta><i>QListView</i></font>.ViewMode.IconMode);
+        contentsWidget.setIconSize(<font color=blue>new</font> <font color=darkmagenta><i>QSize</i></font>(96, 84));
+        contentsWidget.setMovement(<font color=darkmagenta><i>QListView</i></font>.Movement.Static);
+        contentsWidget.setMaximumWidth(128);
+        contentsWidget.setSpacing(12);
+
+        pagesWidget = <font color=blue>new</font> <font color=darkmagenta><i>QStackedWidget</i></font>(<font color=blue>this</font>);
+        pagesWidget.addWidget(<font color=blue>new</font> ConfigurationPage(<font color=blue>this</font>));
+        pagesWidget.addWidget(<font color=blue>new</font> UpdatePage(<font color=blue>this</font>));
+        pagesWidget.addWidget(<font color=blue>new</font> <font color=darkmagenta><i>QueryPage</i></font>(<font color=blue>this</font>));
+
+        <font color=darkmagenta><i>QPushButton</i></font> closeButton = <font color=blue>new</font> <font color=darkmagenta><i>QPushButton</i></font>(tr(<font color=darkgreen><i>"Close"</i></font>));
+
+        createIcons();
+        contentsWidget.setCurrentRow(0);
+
+        closeButton.clicked.connect(<font color=blue>this</font>, <font color=darkgreen><i>"close()"</i></font>);
+
+        <font color=darkmagenta><i>QHBoxLayout</i></font> horizontalLayout = <font color=blue>new</font> <font color=darkmagenta><i>QHBoxLayout</i></font>();
+        horizontalLayout.addWidget(contentsWidget);
+        horizontalLayout.addWidget(pagesWidget, 1);
+
+        <font color=darkmagenta><i>QHBoxLayout</i></font> buttonsLayout = <font color=blue>new</font> <font color=darkmagenta><i>QHBoxLayout</i></font>();
+        buttonsLayout.addStretch(1);
+        buttonsLayout.addWidget(closeButton);
+
+        <font color=darkmagenta><i>QVBoxLayout</i></font> mainLayout = <font color=blue>new</font> <font color=darkmagenta><i>QVBoxLayout</i></font>();
+        mainLayout.addLayout(horizontalLayout);
+        mainLayout.addStretch(1);
+        mainLayout.addSpacing(12);
+        mainLayout.addLayout(buttonsLayout);
+        setLayout(mainLayout);
+
+        setWindowTitle(tr(<font color=darkgreen><i>"Config Dialog"</i></font>));
+        setWindowIcon(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(<font color=darkgreen><i>"classpath:com/trolltech/images/qt-logo.png"</i></font>));
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> createIcons() {
+        <font color=darkmagenta><i>QListWidgetItem</i></font> configButton = <font color=blue>new</font> <font color=darkmagenta><i>QListWidgetItem</i></font>(contentsWidget);
+        configButton.setIcon(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(<font color=darkgreen><i>"classpath:com/trolltech/examples/images/config.png"</i></font>));
+        configButton.setText(tr(<font color=darkgreen><i>"Configuration"</i></font>));
+        configButton.setTextAlignment(AlignmentFlag.AlignHCenter.value());
+        configButton
+                .setFlags(ItemFlag.ItemIsSelectable, ItemFlag.ItemIsEnabled);
+
+        <font color=darkmagenta><i>QListWidgetItem</i></font> updateButton = <font color=blue>new</font> <font color=darkmagenta><i>QListWidgetItem</i></font>(contentsWidget);
+        updateButton.setIcon(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(<font color=darkgreen><i>"classpath:com/trolltech/examples/images/update.png"</i></font>));
+        updateButton.setText(tr(<font color=darkgreen><i>"Update"</i></font>));
+        updateButton.setTextAlignment(AlignmentFlag.AlignHCenter.value());
+        updateButton
+                .setFlags(ItemFlag.ItemIsSelectable, ItemFlag.ItemIsEnabled);
+
+        <font color=darkmagenta><i>QListWidgetItem</i></font> queryButton = <font color=blue>new</font> <font color=darkmagenta><i>QListWidgetItem</i></font>(contentsWidget);
+        queryButton.setIcon(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(<font color=darkgreen><i>"classpath:com/trolltech/examples/images/query.png"</i></font>));
+        queryButton.setText(tr(<font color=darkgreen><i>"Query"</i></font>));
+        queryButton.setTextAlignment(AlignmentFlag.AlignHCenter.value());
+        queryButton.setFlags(ItemFlag.ItemIsSelectable, ItemFlag.ItemIsEnabled);
+
+        contentsWidget.currentItemChanged.connect(<font color=blue>this</font>,
+                <font color=darkgreen><i>"changePage(QListWidgetItem , QListWidgetItem)"</i></font>);
+
+    }
+
+    <font color=blue>protected</font> <font color=blue>void</font> changePage(<font color=darkmagenta><i>QListWidgetItem</i></font> current, <font color=darkmagenta><i>QListWidgetItem</i></font> previous) {
+        pagesWidget.setCurrentIndex(contentsWidget.row(current));
+    }
+
+    <font color=blue>private</font> <font color=blue>class</font> ConfigurationPage <font color=blue>extends</font> <font color=darkmagenta><i>QWidget</i></font> {
+
+        <font color=blue>public</font> ConfigurationPage(<font color=darkmagenta><i>QWidget</i></font> parent) {
+            <font color=blue>super</font>(parent);
+            <font color=darkmagenta><i>QGroupBox</i></font> configGroup = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(tr(<font color=darkgreen><i>"Server configuration"</i></font>));
+
+            <font color=darkmagenta><i>QLabel</i></font> serverLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"Server:"</i></font>));
+            <font color=darkmagenta><i>QComboBox</i></font> serverCombo = <font color=blue>new</font> <font color=darkmagenta><i>QComboBox</i></font>();
+            serverCombo.addItem(tr(<font color=darkgreen><i>"Qt Software (Australia)"</i></font>));
+            serverCombo.addItem(tr(<font color=darkgreen><i>"Qt Software (Germany)"</i></font>));
+            serverCombo.addItem(tr(<font color=darkgreen><i>"Qt Software (Norway)"</i></font>));
+            serverCombo.addItem(tr(<font color=darkgreen><i>"Qt Software (People's Republic of China)"</i></font>));
+            serverCombo.addItem(tr(<font color=darkgreen><i>"Qt Software (USA)"</i></font>));
+
+            <font color=darkmagenta><i>QHBoxLayout</i></font> serverLayout = <font color=blue>new</font> <font color=darkmagenta><i>QHBoxLayout</i></font>();
+            serverLayout.addWidget(serverLabel);
+            serverLayout.addWidget(serverCombo);
+
+            <font color=darkmagenta><i>QVBoxLayout</i></font> configLayout = <font color=blue>new</font> <font color=darkmagenta><i>QVBoxLayout</i></font>();
+            configLayout.addLayout(serverLayout);
+            configGroup.setLayout(configLayout);
+
+            <font color=darkmagenta><i>QVBoxLayout</i></font> mainLayout = <font color=blue>new</font> <font color=darkmagenta><i>QVBoxLayout</i></font>();
+            mainLayout.addWidget(configGroup);
+            mainLayout.addStretch(1);
+            setLayout(mainLayout);
+        }
+    }
+
+    <font color=blue>private</font> <font color=blue>class</font> UpdatePage <font color=blue>extends</font> <font color=darkmagenta><i>QWidget</i></font> {
+
+        <font color=blue>public</font> UpdatePage(<font color=darkmagenta><i>QWidget</i></font> parent) {
+            <font color=blue>super</font>(parent);
+            <font color=darkmagenta><i>QGroupBox</i></font> updateGroup = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(tr(<font color=darkgreen><i>"Package selection"</i></font>));
+            <font color=darkmagenta><i>QCheckBox</i></font> systemCheckBox = <font color=blue>new</font> <font color=darkmagenta><i>QCheckBox</i></font>(tr(<font color=darkgreen><i>"Update system"</i></font>));
+            <font color=darkmagenta><i>QCheckBox</i></font> appsCheckBox = <font color=blue>new</font> <font color=darkmagenta><i>QCheckBox</i></font>(tr(<font color=darkgreen><i>"Update applications"</i></font>));
+            <font color=darkmagenta><i>QCheckBox</i></font> docsCheckBox = <font color=blue>new</font> <font color=darkmagenta><i>QCheckBox</i></font>(tr(<font color=darkgreen><i>"Update documentation"</i></font>));
+
+            <font color=darkmagenta><i>QGroupBox</i></font> packageGroup = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(tr(<font color=darkgreen><i>"Existing packages"</i></font>));
+
+            <font color=darkmagenta><i>QListWidget</i></font> packageList = <font color=blue>new</font> <font color=darkmagenta><i>QListWidget</i></font>();
+            <font color=darkmagenta><i>QListWidgetItem</i></font> qtItem = <font color=blue>new</font> <font color=darkmagenta><i>QListWidgetItem</i></font>(packageList);
+            qtItem.setText(tr(<font color=darkgreen><i>"Qt"</i></font>));
+            <font color=darkmagenta><i>QListWidgetItem</i></font> qsaItem = <font color=blue>new</font> <font color=darkmagenta><i>QListWidgetItem</i></font>(packageList);
+            qsaItem.setText(tr(<font color=darkgreen><i>"QSA"</i></font>));
+            <font color=darkmagenta><i>QListWidgetItem</i></font> teamBuilderItem = <font color=blue>new</font> <font color=darkmagenta><i>QListWidgetItem</i></font>(packageList);
+            teamBuilderItem.setText(tr(<font color=darkgreen><i>"Teambuilder"</i></font>));
+
+            <font color=darkmagenta><i>QPushButton</i></font> startUpdateButton = <font color=blue>new</font> <font color=darkmagenta><i>QPushButton</i></font>(tr(<font color=darkgreen><i>"Start update"</i></font>));
+
+            <font color=darkmagenta><i>QVBoxLayout</i></font> updateLayout = <font color=blue>new</font> <font color=darkmagenta><i>QVBoxLayout</i></font>();
+            updateLayout.addWidget(systemCheckBox);
+            updateLayout.addWidget(appsCheckBox);
+            updateLayout.addWidget(docsCheckBox);
+            updateGroup.setLayout(updateLayout);
+
+            <font color=darkmagenta><i>QVBoxLayout</i></font> packageLayout = <font color=blue>new</font> <font color=darkmagenta><i>QVBoxLayout</i></font>();
+            packageLayout.addWidget(packageList);
+            packageGroup.setLayout(packageLayout);
+
+            <font color=darkmagenta><i>QVBoxLayout</i></font> mainLayout = <font color=blue>new</font> <font color=darkmagenta><i>QVBoxLayout</i></font>();
+            mainLayout.addWidget(updateGroup);
+            mainLayout.addWidget(packageGroup);
+            mainLayout.addSpacing(12);
+            mainLayout.addWidget(startUpdateButton);
+            mainLayout.addStretch(1);
+            setLayout(mainLayout);
+        }
+    }
+
+    <font color=blue>private</font> <font color=blue>class</font> <font color=darkmagenta><i>QueryPage</i></font> <font color=blue>extends</font> <font color=darkmagenta><i>QWidget</i></font> {
+
+        <font color=blue>public</font> <font color=darkmagenta><i>QueryPage</i></font>(<font color=darkmagenta><i>QWidget</i></font> parent) {
+            <font color=blue>super</font>(parent);
+            <font color=darkmagenta><i>QGroupBox</i></font> packagesGroup = <font color=blue>new</font> <font color=darkmagenta><i>QGroupBox</i></font>(tr(<font color=darkgreen><i>"Look for packages"</i></font>));
+
+            <font color=darkmagenta><i>QLabel</i></font> nameLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"Name:"</i></font>));
+            <font color=darkmagenta><i>QLineEdit</i></font> nameEdit = <font color=blue>new</font> <font color=darkmagenta><i>QLineEdit</i></font>();
+
+            <font color=darkmagenta><i>QLabel</i></font> dateLabel = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>(tr(<font color=darkgreen><i>"Released after:"</i></font>));
+            <font color=darkmagenta><i>QDateTimeEdit</i></font> dateEdit = <font color=blue>new</font> <font color=darkmagenta><i>QDateTimeEdit</i></font>(<font color=darkmagenta><i>QDate</i></font>.currentDate());
+
+            <font color=darkmagenta><i>QCheckBox</i></font> releasesCheckBox = <font color=blue>new</font> <font color=darkmagenta><i>QCheckBox</i></font>(tr(<font color=darkgreen><i>"Releases"</i></font>));
+            <font color=darkmagenta><i>QCheckBox</i></font> upgradesCheckBox = <font color=blue>new</font> <font color=darkmagenta><i>QCheckBox</i></font>(tr(<font color=darkgreen><i>"Upgrades"</i></font>));
+
+            <font color=darkmagenta><i>QSpinBox</i></font> hitsSpinBox = <font color=blue>new</font> <font color=darkmagenta><i>QSpinBox</i></font>();
+            hitsSpinBox.setPrefix(tr(<font color=darkgreen><i>"Return up to"</i></font>) + <font color=darkgreen><i>" "</i></font>);
+            hitsSpinBox.setSuffix(<font color=darkgreen><i>" "</i></font> + tr(<font color=darkgreen><i>"results"</i></font>));
+            hitsSpinBox.setSpecialValueText(tr(<font color=darkgreen><i>"Return only the first result"</i></font>));
+            hitsSpinBox.setMinimum(1);
+            hitsSpinBox.setMaximum(100);
+            hitsSpinBox.setSingleStep(10);
+
+            <font color=darkmagenta><i>QPushButton</i></font> startQueryButton = <font color=blue>new</font> <font color=darkmagenta><i>QPushButton</i></font>(tr(<font color=darkgreen><i>"Start query"</i></font>));
+
+            <font color=darkmagenta><i>QGridLayout</i></font> packagesLayout = <font color=blue>new</font> <font color=darkmagenta><i>QGridLayout</i></font>();
+            packagesLayout.addWidget(nameLabel, 0, 0);
+            packagesLayout.addWidget(nameEdit, 0, 1);
+            packagesLayout.addWidget(dateLabel, 1, 0);
+            packagesLayout.addWidget(dateEdit, 1, 1);
+            packagesLayout.addWidget(releasesCheckBox, 2, 0);
+            packagesLayout.addWidget(upgradesCheckBox, 3, 0);
+            packagesLayout.addWidget(hitsSpinBox, 4, 0, 1, 2);
+            packagesGroup.setLayout(packagesLayout);
+
+            <font color=darkmagenta><i>QVBoxLayout</i></font> mainLayout = <font color=blue>new</font> <font color=darkmagenta><i>QVBoxLayout</i></font>();
+            mainLayout.addWidget(packagesGroup);
+            mainLayout.addSpacing(12);
+            mainLayout.addWidget(startQueryButton);
+            mainLayout.addStretch(1);
+            setLayout(mainLayout);
+        }
+    }
+}
+</html></pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Qt Jambi Tutorial 3 - Family Values</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Qt Jambi Tutorial 3 - Family Values</h1></center><p>[Previous: <a href="qtjambi-tutorial2.html">Qt Jambi Tutorial 2 - Calling it Quits</a>][<a href="qtjambi-tutorial.html">Qt Jambi Tutorial</a>][Next: <a href="qtjambi-tutorial4.html">Qt Jambi Tutorial 4 - Let There Be Widgets</a>]<p> <b>Code</b>: <ul><li> <a href="qtjambi-tutorial3-code.html">FamilyValues.java</a></li></ul> <br><center><img src="images/tutorial3-example.png"></center><br> This example shows how to create parent and child widgets. <p>We'll keep it simple and use just a single parent and a lone child. <pre class="snippet">
+public class FamilyValues
+{
+    public static void main(String args[])
+    {
+        QApplication.initialize(args);
+
+
+        QWidget window = new QWidget();
+ 
+        window.resize(200, 120);
+
+
+
+        QPushButton quit = new QPushButton("Quit", window);
+
+        quit.setFont(new QFont("Times", 18, QFont.Weight.Bold.value()));
+
+        quit.setGeometry(10, 40, 180, 40);
+
+
+        quit.clicked.connect(QApplication.instance(), "quit()");
+
+        window.setWindowTitle("FamilyValues");
+
+        window.show();
+
+        QApplication.exec();
+    }
+}
+</pre><a name="line-by-line-walkthrough"><h2>Line by Line Walkthrough</h2> <pre class="snippet">
+        QWidget window = new QWidget();
+</pre> Here we simply create a plain widget object. The <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> class is the base class of all user interface objects. The widget is the atom of the user interface: It receives mouse, keyboard and other events from the window system, and paints a representation of itself on the screen. A widget is clipped by its parent and by the widgets in front of it. <p>A widget that isn't embedded in a parent widget, like this particular widget, is called a window. Usually, windows have their own window frame and taskbar entry, provided by the window system. A widget without a parent widget is always an independent window. Its initial position on the screen is controlled by the window system. <pre class="snippet">
+        window.resize(200, 120);
+</pre> We set the window's width to 200 pixels and its height to 120 pixels. <pre class="snippet">
+        QPushButton quit = new QPushButton("Quit", window);
+</pre> A child is born. This <a href="../../../com/trolltech/qt/gui/QPushButton.html">QPushButton</a> is created with a parent widget <tt>(window)</tt>. A child widget is always displayed within its parent's area. When displayed, it is clipped by its parent's bounds. By default, it is rooted at the top-left corner of its parent, at position (0, 0). <pre class="snippet">
+        quit.setGeometry(10, 40, 180, 40);
+</pre> The <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>.setGeometry() method takes four arguments: The first two arguments are the x and y coordinates of the button's top-left corner. The coordinates are relative to the parent widget. The last two arguments are the button's width and height. The result is a button that extends from position (10, 40) to position (190, 80). <pre class="snippet">
+        window.show();
+</pre> When a parent widget is shown, it will call show for all its children (except those that were explicitly hidden using <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>.hide()).<a name="running-the-application"><h2>Running the Application</h2> The button no longer fills the entire window. Instead, it stays at position (10, 40) within the window and with a size of (180, 40), because of the <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>.setGeometry() call.<a name="exercises"><h2>Exercises</h2> Try resizing the window. How does the button change? What happens to the button's height if you run the program with a bigger font? What happens if you try to make the window really small?<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

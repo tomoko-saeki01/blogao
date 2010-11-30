@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Music Player Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Music Player Example</h1></center><p> <b>Code</b>: <ul><li> <a href="qtjambi-musicplayer-code.html">MusicPlayer.java</a></li></ul> The Music Player Example shows how to use Phonon - the multimedia framework that comes with Qt - to create a simple music player. The player can play music files, and provides simple playback control, such as pausing, stopping, and resuming the music. <br><center><img src="images/musicplayer.png"></center><br> The player has a button group with the play, pause, and stop buttons familiar from most music players. The top-most slider controls the position in the media stream, and the bottom slider allows adjusting the sound volume. <p>The user can use a file dialog to add music files to a table, which displays meta information about the music - such as the title, album, and artist. Each row contains information about a single music file; to play it, the user selects that row and presses the play button. Also, when a row is selected, the files in the table are queued for playback. <p>Phonon offers playback of sound using an available audio device, e.g., a sound card or an USB headset. For the implementation, we use two objects: a <a href="../../../com/trolltech/qt/phonon/MediaObject.html">MediaObject</a>, which controls the playback, and an <a href="../../../com/trolltech/qt/phonon/AudioOutput.html">AudioOutput</a>, which can output the audio to a sound device. We will explain how they cooperate when we encounter them in the code. For a high-level introduction to Phonon, see its <a href="phonon-overview.html">overview</a>. <p>The API of Phonon is implemented through an intermediate technology on each supported platform: DirectShow, QuickTime, and GStreamer. The sound formats supported may therefore vary from system to system. We do not in this example try to determine which formats are supported, but let Phonon report an error if the user tries to play an unsupported sound file. <p>Our player consists of one class, <tt>MusicPlayer</tt>, which both constructs the GUI and handles the playback. We will now go through the parts of its implementation that concerns Phonon.<a name="musicplayer-class"><h2>MusicPlayer Class</h2> The <tt>MusicPlayer</tt> class handles both the user interface and Phonon. We will now take a look at the code relevant for Phonon. The code required for setting up the GUI is explained elsewhere. <p>Let's start by examining the variables of <tt>MusicPlayer</tt>: <pre class="snippet">
+    private SeekSlider seekSlider;
+    private MediaObject mediaObject;
+    private MediaObject metaInformationResolver;
+    private AudioOutput audioOutput;
+    private VolumeSlider volumeSlider;
+    private List&lt;MediaSource&gt; sources =
+        new Vector&lt;MediaSource&gt;();
+</pre> We use the <a href="../../../com/trolltech/qt/phonon/SeekSlider.html">SeekSlider</a> to move the current playback position in the media stream, and the <a href="../../../com/trolltech/qt/phonon/VolumeSlider.html">VolumeSlider</a> controls the sound volume. Both of these widgets come ready made with Phonon. We use another <a href="../../../com/trolltech/qt/phonon/MediaObject.html">MediaObject</a>, metaInformationProvider, to get the meta information from the music files. More on this later. <pre class="snippet">
+    public MusicPlayer()
+    {
+        audioOutput = new AudioOutput(Phonon.Category.MusicCategory);
+        mediaObject = new MediaObject(this);
+        metaInformationResolver = new MediaObject(this);
+
+        Phonon.createPath(mediaObject, audioOutput);
+
+        mediaObject.setTickInterval(1000);
+</pre> We start by instantiating our media and audio output objects. As mentioned, the media object knows how to playback multimedia (in our case sound files) while the audio output can send it to a sound device. <p>For the playback to work, the media and audio output objects need to get in contact with each other, so that the media object can send the sound to the audio output. Phonon is a graph based framework, i.e., its objects are nodes that can be connected by paths. Objects are connected using the <tt>createPath()</tt> function in the Phonon class. <pre class="snippet">
+        mediaObject.tick.connect(this, "tick(long)");
+        mediaObject.stateChanged.connect(this, "stateChanged(Phonon$State,Phonon$State)");
+        metaInformationResolver.stateChanged.
+                connect(this, "metaStateChanged(Phonon$State,Phonon$State)");
+        mediaObject.currentSourceChanged.connect(this, "sourceChanged(MediaSource)");
+        mediaObject.aboutToFinish.connect(this, "aboutToFinish()");
+</pre> The <a href="../../../com/trolltech/qt/phonon/MediaObject.html">MediaObject</a> informs us of the state of the playback and properties of the media it is playing back through a series of signals. We connect the signals we need to slots in <tt>MusicPlayer</tt>. <pre class="snippet">
+        setupActions();
+        setupMenus();
+        setupUi();
+        timeLcd.display("00:00"); 
+    }
+</pre> Finally, we call private helper functions to set up the GUI. The <tt>setupUi()</tt> function contains code for setting up the seek, and volume slider. We move on to <tt>setupUi()</tt>: <pre class="snippet">
+    private void setupUi()
+    {
+...
+        seekSlider = new SeekSlider(this);
+        seekSlider.setMediaObject(mediaObject);
+
+        volumeSlider = new VolumeSlider(this);
+        volumeSlider.setAudioOutput(audioOutput);
+</pre> After creating the widgets, they must be supplied with the <a href="../../../com/trolltech/qt/phonon/MediaObject.html">MediaObject</a> and <a href="../../../com/trolltech/qt/phonon/AudioOutput.html">AudioOutput</a> objects they should control. <p>In <tt>setupActions()</tt>, we connect the actions for the play, pause, and stop tool buttons, to slots of the media object. <pre class="snippet">
+        playAction.triggered.connect(mediaObject, "play()");
+        pauseAction.triggered.connect(mediaObject, "pause()");
+        stopAction.triggered.connect(mediaObject, "stop()");
+</pre> We move on to the the slots of <tt>MusicPlayer</tt>, starting with <tt>addFiles()</tt>: <pre class="snippet">
+    private void addFiles()
+    {
+        List&lt;String&gt; files = QFileDialog.getOpenFileNames(this,
+                            tr("Select Music Files"), ".");
+
+        if (files.isEmpty())
+            return;
+
+        int index = sources.size();
+        for (String string : files) {
+            MediaSource source = new MediaSource(string);
+        
+            sources.add(source);
+        } 
+        if (!sources.isEmpty())
+            metaInformationResolver.setCurrentSource(sources.get(index));
+    }
+</pre> In the <tt>addFiles()</tt> slot, we add files selected by the user to the <tt>sources</tt> list. We then set the first source selected on the <tt>metaInformationProvider</tt><a href="../../../com/trolltech/qt/phonon/MediaObject.html">MediaObject</a>, which will send a state changed signal when the meta information is resolved; we have this signal connected to the <tt>metaStateChanged()</tt> slot. <p>The media object informs us of state changes by sending the <tt>stateChanged</tt> signal. The <tt>stateChanged()</tt> slot is connected to this signal. <pre class="snippet">
+    private void stateChanged(Phonon.State newState, Phonon.State oldState)
+    {
+        switch (newState) {
+            case ErrorState:
+                if (mediaObject.errorType().equals(Phonon.ErrorType.FatalError)) {
+                    QMessageBox.warning(this, tr("Fatal Error"),
+                    mediaObject.errorString());
+                } else {
+                    QMessageBox.warning(this, tr("Error"),
+                    mediaObject.errorString());
+                }
+                break;
+</pre> The <a href="../../../com/trolltech/qt/phonon/MediaObject.html#errorString()">errorString()</a> function gives a description of the error that is suitable for users of a Phonon application. The two values of the <a href="../../../com/trolltech/qt/phonon/Phonon.State.html">ErrorState</a> enum helps us determine whether it is possible to try to play the same file again. <pre class="snippet">
+            case PlayingState:
+                playAction.setEnabled(false);
+                pauseAction.setEnabled(true);
+                stopAction.setEnabled(true);
+                break;
+            case StoppedState:
+                stopAction.setEnabled(false);
+                playAction.setEnabled(true);
+                pauseAction.setEnabled(false);
+                timeLcd.display("00:00");
+                break;
+            case PausedState:
+                pauseAction.setEnabled(false);
+                stopAction.setEnabled(true);
+                playAction.setEnabled(true);
+                break;
+</pre> We update the GUI when the playback state changes, i.e., when it starts, pauses, stops, or resumes. <p>The media object will report other state changes, as defined by the <a href="../../../com/trolltech/qt/phonon/Phonon.State.html">State</a> enum. <p>The <tt>tick()</tt> slot is connected to a <a href="../../../com/trolltech/qt/phonon/MediaObject.html">MediaObject</a> signal which is emitted when the playback position changes: <pre class="snippet">
+    private void tick(long time)
+    {
+        QTime displayTime = new QTime(0, (int) (time / 60000) % 60, (int) (time / 1000) % 60);
+
+        timeLcd.display(displayTime.toString("mm:ss"));
+    }
+</pre> The <tt>time</tt> is given in milliseconds. <p>When the table is clicked on with the mouse, <tt>tableClick()</tt> is invoked: <pre class="snippet">
+    private void tableClicked(int row, int column)
+    {
+        boolean wasPlaying = mediaObject.state().equals(Phonon.State.PlayingState);
+
+        mediaObject.stop();
+        mediaObject.clearQueue();
+
+        mediaObject.setCurrentSource(sources.get(row));
+
+        if (wasPlaying) 
+            mediaObject.play();
+        else
+            mediaObject.stop();
+    }
+</pre> Since we stop the media object, we first check whether it is currently playing. <tt>row</tt> contains the row in the table that was clicked upon; the indices of <tt>sources</tt> follows the table, so we can simply use <tt>row</tt> to find the new source. <pre class="snippet">
+    private void sourceChanged(MediaSource source)
+    {
+        musicTable.selectRow(sources.indexOf(source));
+
+        timeLcd.display("00:00");
+    }
+</pre> When the media source changes, we simply need to select the corresponding row in the table. <pre class="snippet">
+    private void metaStateChanged(Phonon.State newState, Phonon.State oldState)
+    {
+        if (newState.equals(Phonon.State.ErrorState)) {
+            QMessageBox.warning(this, tr("Error opening files"),
+                metaInformationResolver.errorString());
+            while (!sources.isEmpty() &&
+                   !(sources.remove(sources.size() - 1).equals(metaInformationResolver.currentSource())));
+            return;
+        }
+
+        if (!newState.equals(Phonon.State.StoppedState))
+            return;
+
+        if (metaInformationResolver.currentSource().type().equals(MediaSource.Type.Invalid))
+                return;
+
+        Map&lt;String, List&lt;String&gt;&gt; metaData = metaInformationResolver.metaData();
+
+
+        String title = "";
+        if (metaData.get("TITLE") != null)
+            title = metaData.get("TITLE").get(0);
+
+        if (title.equals(""))
+            title = metaInformationResolver.currentSource().fileName();
+
+        String artist = "";
+        if (metaData.get("ARTIST") != null)
+            artist = metaData.get("ARTIST").get(0);
+
+        String album = "";
+        if (metaData.get("ALBUM") != null)
+            album = metaData.get("ALBUM").get(0);
+
+        String year = "";
+        if (metaData.get("DATE") != null)
+            year = metaData.get("DATE").get(0);
+
+        QTableWidgetItem titleItem = new QTableWidgetItem(title);
+        QTableWidgetItem artistItem = new QTableWidgetItem(artist);
+        QTableWidgetItem albumItem = new QTableWidgetItem(album);
+        QTableWidgetItem yearItem = new QTableWidgetItem(year);
+</pre> When <tt>metaStateChanged()</tt> is invoked, <tt>metaInformationProvider</tt> has resolved the meta data for its current source. A <a href="../../../com/trolltech/qt/phonon/MediaObject.html">MediaObject</a> will do this before leaving the <a href="../../../com/trolltech/qt/phonon/Phonon.State.html">LoadingState</a>. Note that we could also have used the metaDataChanged() signal for this purpose. <p>Some of the meta data is then chosen to be displayed in the music table. A file might not contain the meta data requested, in which case an empty string is returned. <pre class="snippet">
+        if (musicTable.selectedItems().isEmpty()) {
+            musicTable.selectRow(0);
+            mediaObject.setCurrentSource(metaInformationResolver.currentSource());
+        }
+
+        MediaSource source = metaInformationResolver.currentSource();
+        int index = sources.indexOf(metaInformationResolver.currentSource()) + 1;
+        if (sources.size() &gt; index) {
+            metaInformationResolver.setCurrentSource(sources.get(index));
+        }
+        else {
+            musicTable.resizeColumnsToContents();
+            if (musicTable.columnWidth(0) &gt; 300)
+                musicTable.setColumnWidth(0, 300);
+        }
+    }
+</pre> If we have media sources in <tt>sources</tt> of which meta information is not resolved, we set a new source on the <tt>metaInformationProvider</tt>, which will invoke <tt>metaStateChanged()</tt> again. <p>We move on to the <tt>aboutToFinish()</tt> slot: <pre class="snippet">
+    private void aboutToFinish()
+    {
+        int index = sources.indexOf(mediaObject.currentSource()) + 1;
+        if (sources.size() &gt; index) {
+            mediaObject.enqueue(sources.get(index));
+            musicTable.selectRow(index);
+        }
+    }
+</pre> When a file is finished playing, the Music Player will move on and play the next file in the table. This slot is connected to the <a href="../../../com/trolltech/qt/phonon/MediaObject.html">MediaObject</a>'s aboutToFinish() signal, which is guaranteed to be emitted while there is still time to enqueue another file for playback.<a name="the-main-function"><h2>The main() function.</h2> Phonon requires that the application has a name; it is set with <a href="../../../com/trolltech/qt/core/QCoreApplication.html#setApplicationName(java.lang.String)">setApplicationName()</a>. This is because D-Bus, which is used by Phonon on Linux systems, demands this. <pre class="snippet">
+    public static void main(String args[])
+    {
+            QApplication.initialize(args);
+            QApplication.setApplicationName("Music Player");
+
+            new MusicPlayer().show();
+
+            QApplication.exec();
+    }
+</pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
