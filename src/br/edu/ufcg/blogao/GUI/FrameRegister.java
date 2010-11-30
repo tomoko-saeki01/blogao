@@ -38,8 +38,6 @@ public class FrameRegister extends QWidget {
 		resizeObjects();
 		positionsObjects();
 		actionsObjects();
-
-		// show();
 	}
 
 	private void actionsObjects() {
@@ -69,8 +67,7 @@ public class FrameRegister extends QWidget {
 		}
 
 		if (!password.equals(confirmPassword)) {
-			displayMessageErro("Erro",
-					"Senhas diferentes. Por favor insere-as novamente!");
+			displayMessageErro("Erro", "Senhas diferentes. Por favor insere-as novamente!");
 			passwordField.clear();
 			confirmPasswordField.clear();
 
@@ -79,7 +76,7 @@ public class FrameRegister extends QWidget {
 			loginField.clear();
 		} else {
 			try {
-				// soh teste de telar, nao precisa desse metodo.
+				//soh teste de telar, nao precisa desse metodo.
 				container.getBlog().createProfile(login, password, name, email,
 						sex, dateB, address, interests, whoIAm, movies, musics,
 						books);

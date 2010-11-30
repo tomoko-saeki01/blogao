@@ -5,6 +5,7 @@ import com.trolltech.qt.core.Qt;
 import com.trolltech.qt.gui.QCalendarWidget;
 import com.trolltech.qt.gui.QGridLayout;
 import com.trolltech.qt.gui.QGroupBox;
+import com.trolltech.qt.gui.QIcon;
 import com.trolltech.qt.gui.QLayout;
 import com.trolltech.qt.gui.QWidget;
 
@@ -25,6 +26,7 @@ public class CalendarFrame extends QWidget {
 		previewLayout.setColumnMinimumWidth(0, calendar.sizeHint().width());
 
 		setWindowTitle("Calendário");
+		setWindowIcon(new QIcon("pictures/calendar.png"));
 		show();
 	}
 			
