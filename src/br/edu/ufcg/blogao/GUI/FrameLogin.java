@@ -40,9 +40,16 @@ public class FrameLogin extends QWidget {
 		try {
 			String session = container.getBlog().logon(loginField.text(), passwordField.text());
 			container.setActualSession(session);
+			openUserFrame();
 		} catch (Exception e) {
 			displayMessageErro("Erro", e.getMessage());
 		}
+	}
+
+	private void openUserFrame() {
+		close();
+		container.getLayout().removeWidget(container.getActualLoginFrame());
+		container.getLayout().addWidget(container.getNewUserFrame());
 	}
 
 	private void initObjects() {
