@@ -35,8 +35,7 @@ public class FrameBlogao extends QWidget {
 		}
 	}
 	
-	private boolean askOnExit()
-    {
+	private boolean askOnExit() {
 		QMessageBox.StandardButton ret = QMessageBox.warning(this, tr("Application"),
 				tr("Deseja realmente sair?"),
 				new QMessageBox.StandardButtons(QMessageBox.StandardButton.Ok,

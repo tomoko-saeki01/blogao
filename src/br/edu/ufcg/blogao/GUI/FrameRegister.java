@@ -28,8 +28,7 @@ public class FrameRegister extends QWidget {
 	private QComboBox sexCombo;
 	private QPushButton registerButton, cancelButton, calendarButton;
 	private QDateEdit dateBirthday;
-
-	private FrameContainer container = FrameContainer.getInstance();
+    private FrameContainer container = FrameContainer.getInstance();
 
 	public FrameRegister() {
 		resize(1200, 700);

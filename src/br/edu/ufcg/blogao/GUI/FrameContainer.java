@@ -16,7 +16,6 @@ public class FrameContainer {
 	
 	private FrameContainer() {
 		
-		
 	}
 	
 	public static FrameContainer getInstance() {
