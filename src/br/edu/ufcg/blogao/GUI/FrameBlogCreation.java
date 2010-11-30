@@ -13,7 +13,7 @@ public class FrameBlogCreation extends QWidget {
 	private QLabel nameLabel, descriptionLabel;
 	private QLineEdit nameField;
 	private QTextEdit descriptionField;
-	private QPushButton registerButton, cancelButton;
+	private QPushButton createButton, cancelButton;
 	private FrameContainer container = FrameContainer.getInstance();
 
 	public FrameBlogCreation() {
@@ -26,7 +26,7 @@ public class FrameBlogCreation extends QWidget {
 	}
 
 	private void actionsObjects() {
-		registerButton.clicked.connect(this, "createBlog()");
+		createButton.clicked.connect(this, "createBlog()");
 		cancelButton.clicked.connect(this, "closeFrame()");
 	}
 
@@ -41,7 +41,7 @@ public class FrameBlogCreation extends QWidget {
 		} else {
 			try {
 				//TODO it.
-				//container.getBlog().createBlog(sessionId, name, description);
+				container.getBlog().createBlog(container.getActualSession(), name, description);
 				displayMessageInformation("Informação", "Blog criado com sucesso!");
 				closeFrame();
 			} catch (Exception e) {
@@ -54,7 +54,7 @@ public class FrameBlogCreation extends QWidget {
 		close();
 		//TODO fix it!
 		container.getLayout().removeWidget(container.getActualCreationBlogFrame());
-		//container.getLayout().addWidget(container.getNewLoginFrame());
+		container.getLayout().addWidget(container.getNewUserFrame());
 	}
 
 	private void initObjects() {
@@ -67,10 +67,10 @@ public class FrameBlogCreation extends QWidget {
 		nameField = new QLineEdit(this);
 		descriptionField = new QTextEdit(this);
 		
-		registerButton = new QPushButton("Criar");
-		registerButton.setIcon(new QIcon("pictures/right.png"));
+		createButton = new QPushButton("Criar", this);
+		createButton.setIcon(new QIcon("pictures/right.png"));
 		
-		cancelButton = new QPushButton("Cancelar");
+		cancelButton = new QPushButton("Cancelar", this);
 		cancelButton.setIcon(new QIcon("pictures/wrong.png"));
 	}
 
@@ -83,14 +83,14 @@ public class FrameBlogCreation extends QWidget {
 		nameField.move(w + 65, h);
 		descriptionField.move(w + 65, h + 38);
 		
-		registerButton.move(w + 70, h + 60);
-		cancelButton.move(w  + 150, h + 60);
+		createButton.move(w + 70, h + 200);
+		cancelButton.move(w  + 150, h + 200);
 	}
 
 	private void resizeObjects() {
 		nameField.resize(329, 25);
 		descriptionField.resize(329, 150);
-		registerButton.maximumSize();
+		createButton.maximumSize();
 		cancelButton.maximumSize();
 	}
 
