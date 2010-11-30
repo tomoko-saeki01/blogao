@@ -23,6 +23,7 @@ public class FrameBlogCreation extends QWidget {
 		resizeObjects();
 		positionsObjects();
 		actionsObjects();
+		//HHAHAHAHAHAHHA teste
 	}
 
 	private void actionsObjects() {
