@@ -7,18 +7,17 @@ import com.trolltech.qt.gui.QWidget;
 
 
 public class FrameContainer {
-	
 	private static FrameContainer singleton;
 	private FrameLogin frameLogin;
 	private FrameRegister frameRegister;
 	private FrameBlogCreation frameCreationBlog;
 	private FrameUserPage frameUser;
+	private FramePostCreation frameCreationPost;
 	private QGridLayout layout;
 	private BlogWS blog = HelperClient.getInstance("http://localhost:8080/blogao");
 	private String sessionId;
 	
-	private FrameContainer() {
-	}
+	private FrameContainer() {}
 	
 	public static FrameContainer getInstance() {
 		if (singleton == null) {
@@ -38,12 +37,10 @@ public class FrameContainer {
 	}
 	
 	public FrameLogin getActualLoginFrame() {
-		
 		return frameLogin;
 	}
 	
 	public FrameRegister getActualRegisterFrame() {
-		
 		return frameRegister;
 	}
 	
@@ -81,5 +78,9 @@ public class FrameContainer {
 	public QWidget getNewUserFrame() {
 		frameUser = new FrameUserPage();
 		return frameUser;
+	}
+
+	public FramePostCreation getActualCreationPostFrame() {
+		return frameCreationPost;
 	}
 }

@@ -9,14 +9,14 @@ import com.trolltech.qt.gui.QPushButton;
 import com.trolltech.qt.gui.QTextEdit;
 import com.trolltech.qt.gui.QWidget;
 
-public class FrameBlogCreation extends QWidget {
-	private QLabel nameLabel, descriptionLabel;
-	private QLineEdit nameField;
-	private QTextEdit descriptionField;
-	private QPushButton registerButton, cancelButton;
+public class FramePostCreation extends QWidget {
+	private QLabel titleLabel, textLabel;
+	private QLineEdit titleField;
+	private QTextEdit textField;
+	private QPushButton postButton, cancelButton;
 	private FrameContainer container = FrameContainer.getInstance();
 
-	public FrameBlogCreation() {
+	public FramePostCreation() {
 		resize(1200, 700);
 
 		initObjects();
@@ -26,23 +26,23 @@ public class FrameBlogCreation extends QWidget {
 	}
 
 	private void actionsObjects() {
-		registerButton.clicked.connect(this, "createBlog()");
+		postButton.clicked.connect(this, "createBlog()");
 		cancelButton.clicked.connect(this, "closeFrame()");
 	}
 
 	@SuppressWarnings("unused")
 	private void createBlog() throws Exception {
-		String name = nameField.text();
-		String description = descriptionField.toPlainText();
+		String title = titleField.text();
+		String text = textField.toPlainText();
 		
-		if (name.trim().equals("")) {
-			displayMessageErro("Erro", "Nome deve ser preenchido.");
-			nameField.clear();
+		if (title.trim().equals("")) {
+			displayMessageErro("Erro", "Título deve ser preenchido.");
+			titleField.clear();
 		} else {
 			try {
 				//TODO it.
-				//container.getBlog().createBlog(sessionId, name, description);
-				displayMessageInformation("Informação", "Blog criado com sucesso!");
+				//container.getBlog().createPost(sessionId, name, description);
+				displayMessageInformation("Informação", "Post criado com sucesso!");
 				closeFrame();
 			} catch (Exception e) {
 				//TODO it.
@@ -53,19 +53,19 @@ public class FrameBlogCreation extends QWidget {
 	private void closeFrame() {
 		close();
 		//TODO fix it!
-		container.getLayout().removeWidget(container.getActualCreationBlogFrame());
+		container.getLayout().removeWidget(container.getActualCreationPostFrame());
 		//container.getLayout().addWidget(container.getNewLoginFrame());
 	}
 
 	private void initObjects() {
-		nameLabel = new QLabel("Nome", this);
-		nameLabel.setFont(new QFont("Tempus Sans ITC", 11));
+		titleLabel = new QLabel("Título", this);
+		titleLabel.setFont(new QFont("Tempus Sans ITC", 11));
 
-		descriptionLabel = new QLabel("Descrição", this);
-		descriptionLabel.setFont(new QFont("Tempus Sans ITC", 11));
+		textLabel = new QLabel("Descrição", this);
+		textLabel.setFont(new QFont("Tempus Sans ITC", 11));
 		
-		registerButton = new QPushButton("Criar");
-		registerButton.setIcon(new QIcon("pictures/right.png"));
+		postButton = new QPushButton("Postar");
+		postButton.setIcon(new QIcon("pictures/right.png"));
 		
 		cancelButton = new QPushButton("Cancelar");
 		cancelButton.setIcon(new QIcon("pictures/wrong.png"));
@@ -74,21 +74,21 @@ public class FrameBlogCreation extends QWidget {
 	private void positionsObjects() {
 		int w = 100;
 		int h = 100;
-		nameLabel.move(w, h);
-		descriptionLabel.move(w, h + 37);
+		titleLabel.move(w, h);
+		textLabel.move(w, h + 37);
 
-		nameField.move(w + 50, h);
-		descriptionField.move(w + 50, h + 35);
+		titleField.move(w + 50, h);
+		textField.move(w + 50, h + 35);
 		
 		//TODO it.
-		//registerButton.move();
+		//postButton.move();
 		//cancelButton.move();
 	}
 
 	private void resizeObjects() {
-		nameField.resize(329, 25);
-		descriptionField.resize(200, 150);
-		registerButton.minimumSize();
+		titleField.resize(329, 25);
+		textField.resize(200, 150);
+		postButton.minimumSize();
 		cancelButton.minimumSize();
 	}
 
