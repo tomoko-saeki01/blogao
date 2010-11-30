@@ -10,12 +10,12 @@ public class FrameContainer {
 	private static FrameContainer singleton;
 	private FrameLogin frameLogin;
 	private FrameRegister frameRegister;
+	private FrameBlogCreation frameCreationBlog;
 	private QGridLayout layout;
 	private BlogWS blog = HelperClient.getInstance("http://localhost:8080/blogao");
 	private String sessionId;
 	
 	private FrameContainer() {
-		
 	}
 	
 	public static FrameContainer getInstance() {
@@ -45,6 +45,15 @@ public class FrameContainer {
 		return frameRegister;
 	}
 	
+	public FrameBlogCreation getNewCreationBlogFrame() {
+		frameCreationBlog = new FrameBlogCreation();
+		return frameCreationBlog;
+	}
+	
+	public FrameBlogCreation getActualCreationBlogFrame() {
+		return frameCreationBlog;
+	}
+	
 	public QGridLayout getLayout() {
 		if (layout == null)
 			layout = new QGridLayout();
@@ -62,5 +71,4 @@ public class FrameContainer {
 	public String getActualSession() {
 		return sessionId;
 	}
-
 }
