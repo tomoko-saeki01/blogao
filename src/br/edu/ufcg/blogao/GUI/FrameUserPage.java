@@ -15,49 +15,58 @@ import com.trolltech.qt.gui.QPushButton;
 import com.trolltech.qt.gui.QTextEdit;
 import com.trolltech.qt.gui.QWidget;
 
-public class FrameBlogPage extends QWidget {
+public class FrameUserPage extends QWidget {
 
-	private QLabel loginLabel, passwordLabel, confirmPasswordLabel, nameLabel,
+	private QLabel nameLabel,
 			addressLabel, emailLabel, interestsLabel, moviesLabel, musicsLabel,
 			booksLabel, whoIAmLabel, sexLabel, dateBirthdayLabel;
 
-	private QLineEdit loginField, passwordField, confirmPasswordField,
-			nameField, addressField, emailField;
+	private QLineEdit 
+			nameField, addressField, emailField, birthDayField, sexField;
 
-	private List<QTextEdit> posts;
+	
 	
 	private QTextEdit interestsField, moviesField, musicsField, booksField,
 	whoIAmField;
 
 
-	private QComboBox sexCombo;
-	private QPushButton registerButton, cancelButton, calendarButton;
-	private QDateEdit dateBirthday;
+	private QComboBox blogs;
+	private QPushButton createBlogButton, cancelButton;
+	
 	
 	private FrameContainer container = FrameContainer.getInstance();
 
-	public FrameBlogPage() {
+	public FrameUserPage() {
 		resize(1200, 700);
-
+		try {
+			
+		
 		initObjects();
 		resizeObjects();
 		positionsObjects();
 		actionsObjects();
-		
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		//show();
 	}
 
 	private void actionsObjects() {
-		calendarButton.clicked.connect(this, "openCalendar()");
+		
 		cancelButton.clicked.connect(this, "closeFrame()");
-		registerButton.clicked.connect(this, "registerUser()");
+		createBlogButton.clicked.connect(this, "createBlog()");
 	}
 
 	@SuppressWarnings("unused")
+	private void createBlog() {
+		close();
+		container.getLayout().removeWidget(container.getActualUserFrame());
+		container.getLayout().addWidget(container.getNewCreationBlogFrame());
+	}
+	
+	@SuppressWarnings("unused")
 	private void registerUser() throws Exception {
-		String login = loginField.text();
-		String password = passwordField.text();
-		String confirmPassword = confirmPasswordField.text();
+		
 		String name = nameField.text();
 		String address = addressField.text();
 		String email = emailField.text();
@@ -66,12 +75,9 @@ public class FrameBlogPage extends QWidget {
 		String movies = moviesField.toPlainText();
 		String musics = musicsField.toPlainText();
 		String books = booksField.toPlainText();
-		String sex = sexCombo.currentText();
-		String dateB = dateBirthday.text();
 		
-		if (sex.trim().equals("")) {
-			sex = "Uninformed";
-		}
+		
+		
 		
 		/*if (!password.equals(confirmPassword)) {
 			frameBlogao.displayMessageErro("Erro",
@@ -102,29 +108,11 @@ public class FrameBlogPage extends QWidget {
 		
 	}
 
-	@SuppressWarnings("unused")
-	private void openCalendar() {
-		getDate(new CalendarFrame());
-	}
-
-	private void getDate(CalendarFrame c) {
-		// TODO fazer uma forma dele ficar sempre atualizando enquanto
-		// a janela estiver aberta.
-		QDate d = c.getSelectedDate();
-		dateBirthday.setDate(d);
-		dateBirthday.setVisible(true);
-	}
+	
 
 	private void initObjects() {
-		loginLabel = new QLabel("Login", this);
-		loginLabel.setFont(new QFont("Tempus Sans ITC", 11));
-
-		passwordLabel = new QLabel("Senha", this);
-		passwordLabel.setFont(new QFont("Tempus Sans ITC", 11));
-
-		confirmPasswordLabel = new QLabel("Confirme a senha", this);
-		confirmPasswordLabel.setFont(new QFont("Tempus Sans ITC", 11));
-
+		
+		
 		nameLabel = new QLabel("Nome", this);
 		nameLabel.setFont(new QFont("Tempus Sans ITC", 11));
 
@@ -148,12 +136,6 @@ public class FrameBlogPage extends QWidget {
 
 		whoIAmLabel = new QLabel("Quem sou eu", this);
 		whoIAmLabel.setFont(new QFont("Tempus Sans ITC", 11));
-		try {
-			whoIAmLabel.setText(container.getBlog().getProfileInformationBySessionId(container.getActualSession(), "interesses"));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
 
 		sexLabel = new QLabel("Sexo", this);
 		sexLabel.setFont(new QFont("Tempus Sans ITC", 11));
@@ -161,46 +143,30 @@ public class FrameBlogPage extends QWidget {
 		dateBirthdayLabel = new QLabel("Data de Nascimento", this);
 		dateBirthdayLabel.setFont(new QFont("Tempus Sans ITC", 11));
 
-		loginField = new QLineEdit(this);
-
-		passwordField = new QLineEdit(this);
-		passwordField.setEchoMode(QLineEdit.EchoMode.Password);
-
-		confirmPasswordField = new QLineEdit(this);
-		confirmPasswordField.setEchoMode(QLineEdit.EchoMode.Password);
-
+		birthDayField = new QLineEdit(this);
+		sexField = new QLineEdit(this);
 		nameField = new QLineEdit(this);
 		addressField = new QLineEdit(this);
 		emailField = new QLineEdit(this);
 
-		posts = new ArrayList<QTextEdit>();
+		interestsField = new QTextEdit(this);
+		moviesField = new QTextEdit(this);
+		musicsField = new QTextEdit(this);
+		booksField = new QTextEdit(this);
+		whoIAmField = new QTextEdit(this);
 
-		sexCombo = new QComboBox(this);
-		sexCombo.addItem("");
-		sexCombo.addItem("Feminino");
-		sexCombo.addItem("Masculino");
-
-		registerButton = new QPushButton("Cadastrar", this);
-		registerButton.setIcon(new QIcon("pictures/right.png"));
-
+		createBlogButton = new QPushButton("Criar Blog", this);
+		createBlogButton.setIcon(new QIcon("pictures/right.png"));
 		cancelButton = new QPushButton("Cancelar", this);
 		cancelButton.setIcon(new QIcon("pictures/wrong.png"));
 
-		calendarButton = new QPushButton(this);
-		calendarButton.setIcon(new QIcon("pictures/calendar.png"));
-
-		dateBirthday = new QDateEdit(this);
-		dateBirthday.setDisplayFormat("dd/MM/yyyy");
-		dateBirthday.setDate(new QCalendarWidget().minimumDate());
-		dateBirthday.setVisible(false);
+	
 	}
 
 	private void positionsObjects() {
 		int w = 100;
 		int h = 100;
-		loginLabel.move(w, h);
-		passwordLabel.move(w, h + 37);
-		confirmPasswordLabel.move(w + 160, h + 37);
+	
 		nameLabel.move(w, h + 67);
 		dateBirthdayLabel.move(w, h + 100);
 		sexLabel.move(w, h + 127);
@@ -212,15 +178,13 @@ public class FrameBlogPage extends QWidget {
 		booksLabel.move(w + 750, h + 8);
 		whoIAmLabel.move(w, h + 250);
 
-		loginField.move(w + 50, h);
-		passwordField.move(w + 50, h + 35);
-		confirmPasswordField.move(w + 280, h + 35);
+		
 		nameField.move(w + 50, h + 67);
 
-		dateBirthday.move(w + 140, h + 100);
-		calendarButton.move(w + 233, h + 98);
+		birthDayField.move(w + 140, h + 100);
+		
 
-		sexCombo.move(w + 50, h + 127);
+		sexField.move(w + 50, h + 127);
 
 		emailField.move(w + 50, h + 160);
 		addressField.move(w + 70, h + 192);
@@ -230,14 +194,12 @@ public class FrameBlogPage extends QWidget {
 		booksField.move(w + 800, h + 33);
 		whoIAmField.move(w + 50, h + 275);
 
-		registerButton.move(w + 850, h + 500);
+		createBlogButton.move(w + 850, h + 500);
 		cancelButton.move(w + 930, h + 500);
 	}
 
 	private void resizeObjects() {
-		loginField.resize(328, 25);
-		passwordField.resize(100, 25);
-		confirmPasswordField.resize(100, 25);
+		
 		nameField.resize(330, 25);
 		emailField.resize(328, 25);
 		addressField.resize(307, 25);
@@ -247,7 +209,7 @@ public class FrameBlogPage extends QWidget {
 		booksField.resize(200, 150);
 		whoIAmField.resize(320, 300);
 
-		registerButton.maximumSize();
+		createBlogButton.maximumSize();
 		cancelButton.maximumSize();
 	}
 }

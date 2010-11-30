@@ -3,6 +3,7 @@ package br.edu.ufcg.blogao.GUI;
 import br.edu.ufcg.blogao.webservice.BlogWS;
 
 import com.trolltech.qt.gui.QGridLayout;
+import com.trolltech.qt.gui.QWidget;
 
 
 public class FrameContainer {
@@ -11,6 +12,7 @@ public class FrameContainer {
 	private FrameLogin frameLogin;
 	private FrameRegister frameRegister;
 	private FrameBlogCreation frameCreationBlog;
+	private FrameUserPage frameUser;
 	private QGridLayout layout;
 	private BlogWS blog = HelperClient.getInstance("http://localhost:8080/blogao");
 	private String sessionId;
@@ -70,5 +72,14 @@ public class FrameContainer {
 	
 	public String getActualSession() {
 		return sessionId;
+	}
+
+	public QWidget getActualUserFrame() {
+		return frameUser;
+	}
+	
+	public QWidget getNewUserFrame() {
+		frameUser = new FrameUserPage();
+		return frameUser;
 	}
 }
