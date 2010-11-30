@@ -55,6 +55,43 @@ public class FrameEditProfile extends QWidget {
 		QMessageBox.information(this, title, message);
 	}
 
+	private void getUserData() {
+		try {
+			String interests = container.getBlog().getProfileInformationBySessionId(container.getActualSession(), container.INTERESTS);
+			String movies = container.getBlog().getProfileInformationBySessionId(container.getActualSession(), container.MOVIES);
+			String musics = container.getBlog().getProfileInformationBySessionId(container.getActualSession(), container.MUSICS);
+			String books = container.getBlog().getProfileInformationBySessionId(container.getActualSession(), container.BOOKS);
+			String name = container.getBlog().getProfileInformationBySessionId(container.getActualSession(), container.NAME);
+			String birthDate = container.getBlog().getProfileInformationBySessionId(container.getActualSession(), container.DATE_BIRTHDAY);
+			String address = container.getBlog().getProfileInformationBySessionId(container.getActualSession(), container.ADDRESS);
+			String whoIAm = container.getBlog().getProfileInformationBySessionId(container.getActualSession(), container.WHO_I_AM);
+			String sex = container.getBlog().getProfileInformationBySessionId(container.getActualSession(), container.SEX);
+			
+			interestsField.setText(interests);
+			moviesField.setText(movies);
+			musicsField.setText(musics);
+			booksField.setText(books);
+			nameField.setText(name);
+			dateBirthdayField.setText(birthDate);
+			addressField.setText(address);
+			whoIAmField.setText(whoIAm);
+			
+			if (sex.equalsIgnoreCase(container.MALE)) {
+				sexCombo.setCurrentIndex(2);
+			} else if (sex.equalsIgnoreCase(container.FEMALE)) {
+				sexCombo.setCurrentIndex(1);
+			} else {
+				sexCombo.setCurrentIndex(0);
+			}
+			
+			
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
+	}
+	
 	private void init() {
 		nameLabel = new QLabel("Nome", this);
 		nameLabel.setFont(new QFont("Tempus Sans ITC", 11));
@@ -103,6 +140,8 @@ public class FrameEditProfile extends QWidget {
 
 		cancelButton = new QPushButton("Cancelar ", this);
 		cancelButton.setIcon(new QIcon("pictures/wrong.png"));
+		
+		getUserData();
 	}
 
 	@SuppressWarnings("unused")
@@ -165,14 +204,14 @@ public class FrameEditProfile extends QWidget {
 			//TODO procurar o motivo de nao atualizar e dar sempre erro!
 			BlogWS blog = container.getBlog();
 			String login = container.getActualSession();
-			blog.changeProfileInformation(login, "nome_exibicao", name);
-			blog.changeProfileInformation(login, "endereco", address);
-			blog.changeProfileInformation(login, "intereses", interests);
-			blog.changeProfileInformation(login, "quem_sou_eu", whoIAm);
-			blog.changeProfileInformation(login, "filmes", movies);
-			blog.changeProfileInformation(login, "musicas", musics);
-			blog.changeProfileInformation(login, "livros", books);
-			blog.changeProfileInformation(login, "sexo", sex);
+			blog.changeProfileInformation(login, container.NAME, name);
+			blog.changeProfileInformation(login, container.ADDRESS, address);
+			blog.changeProfileInformation(login, container.INTERESTS, interests);
+			blog.changeProfileInformation(login, container.WHO_I_AM, whoIAm);
+			blog.changeProfileInformation(login, container.MOVIES, movies);
+			blog.changeProfileInformation(login, container.MUSICS, musics);
+			blog.changeProfileInformation(login, container.BOOKS, books);
+			blog.changeProfileInformation(login, container.SEX, sex);
 			
 			//TODO
 			//blog.changeProfileInformation(login, "dataNasc", dateB);

@@ -6,7 +6,7 @@ import com.trolltech.qt.gui.QPushButton;
 import com.trolltech.qt.gui.QWidget;
 
 public class FrameUserPage extends QWidget {
-	@SuppressWarnings("unused")
+
 	private QComboBox blogs;
 	private QPushButton createBlogButton, cancelButton, editProfileButton;
 
@@ -50,6 +50,23 @@ public class FrameUserPage extends QWidget {
 
 		editProfileButton = new QPushButton("Editar Perfil ", this);
 		editProfileButton.setIcon(new QIcon("pictures/edit.png"));
+		
+		blogs = new QComboBox(this);
+		
+	}
+	
+	private void getUserData() {
+		try {
+			int numberOfBlogs = container.getBlog().getNumberOfBlogsBySessionId(container.getActualSession());
+			for (int i = 0; i < numberOfBlogs; i++) {
+				String blogId = container.getBlog().getBlogBySessionId(container.getActualSession(), i).toString();
+				String blogName = container.getBlog().getBlogInformation(blogId, container.TITLE);
+				blogs.addItem(blogName);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
 	}
 	
 	@SuppressWarnings("unused")

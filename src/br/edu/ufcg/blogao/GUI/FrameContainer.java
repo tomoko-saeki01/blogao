@@ -15,7 +15,27 @@ public class FrameContainer {
 	private QGridLayout layout;
 	private BlogWS blog = HelperClient
 			.getInstance("http://localhost:8080/blogao");
-	private String sessionId;
+	public String sessionId;
+	public final String PASSWORD = "senha";
+	public final String LOGIN = "login";
+	public final String NAME = "nome_exibicao";
+	public final String EMAIL = "email";
+	public final String SEX = "sexo";
+	public final String DATE_BIRTHDAY = "dataNasc";
+	public final String ADDRESS = "endereco";
+	public final String INTERESTS = "interesses";
+	public final String WHO_I_AM = "quem_sou_eu";
+	public final String MOVIES = "filmes";
+	public final String MUSICS = "musicas";
+	public final String BOOKS = "livros";
+	
+	public final String TITLE = "titulo";
+	public final String AUTHOR = "dono";
+	public final String DESCRIPTION = "descricao";
+	
+	public final String MALE = "Masculino";
+	public final String FEMALE = "Feminino";
+	public final String UNINFORMED = "Não informado";
 
 	private FrameContainer() {
 	}
