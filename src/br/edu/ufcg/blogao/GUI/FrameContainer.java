@@ -12,10 +12,13 @@ public class FrameContainer {
 	private FrameEditProfile frameEditProfile;
 	private FrameUserPage frameUser;
 	private FramePostCreation frameCreationPost;
+	private FrameEditBlog frameEditBlog;
 	private QGridLayout layout;
 	private BlogWS blog = HelperClient
-			.getInstance("http://localhost:8080/blogao");
-	public String sessionId;
+			.getInstance("http://150.165.75.129:9913/blogao");
+	private String sessionId;
+	private String currentBlogId;
+	
 	public final String PASSWORD = "senha";
 	public final String LOGIN = "login";
 	public final String NAME = "nome_exibicao";
@@ -55,6 +58,10 @@ public class FrameContainer {
 		return frameCreationPost;
 	}
 
+	public FrameEditBlog getActualEditBlogFrame() {
+		return frameEditBlog;
+	}
+	
 	public FrameEditProfile getActualEditProfielFrame() {
 		return frameEditProfile;
 	}
@@ -79,6 +86,10 @@ public class FrameContainer {
 		return blog;
 	}
 
+	public String getCurrentBlogId() {
+		return currentBlogId;
+	}
+	
 	public QGridLayout getLayout() {
 		if (layout == null)
 			layout = new QGridLayout();
@@ -88,6 +99,11 @@ public class FrameContainer {
 	public FrameBlogCreation getNewCreationBlogFrame() {
 		frameCreationBlog = new FrameBlogCreation();
 		return frameCreationBlog;
+	}
+	
+	public FrameEditBlog getNewEditBlogFrame() {
+		frameEditBlog = new FrameEditBlog();
+		return frameEditBlog;
 	}
 	
 	public FrameEditProfile getNewEditProfileFrame() throws Exception {
@@ -112,5 +128,9 @@ public class FrameContainer {
 
 	public void setActualSession(String id) {
 		this.sessionId = id;
+	}
+	
+	public void setCurrentBlogId(String id) {
+		this.currentBlogId = id;
 	}
 }
