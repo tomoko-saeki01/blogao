@@ -10,9 +10,10 @@ import com.trolltech.qt.gui.QWidget;
 public class FrameUserPage extends QWidget {
 
 	private QComboBox blogs;
-	private QPushButton createBlogButton, cancelButton, editProfileButton, goToBlog, deleteBlog;
+	private QPushButton createBlogButton, cancelButton, editProfileButton,
+			goToBlog, deleteBlog, deleteProfileButton;
 	private QLabel blogsLabel, dataLabel;
-	
+
 	private FrameContainer container = FrameContainer.getInstance();
 
 	public FrameUserPage() {
@@ -29,9 +30,9 @@ public class FrameUserPage extends QWidget {
 		createBlogButton.clicked.connect(this, "createBlog()");
 		editProfileButton.clicked.connect(this, "openEditProfile()");
 		deleteBlog.clicked.connect(this, "deleteBlog()");
+		deleteProfileButton.clicked.connect(this, "deleteProfile()");
 	}
 
-	@SuppressWarnings("unused")
 	private void closeFrame() {
 		try {
 			container.getBlog().logoff(container.getActualSession());
@@ -52,25 +53,46 @@ public class FrameUserPage extends QWidget {
 
 	@SuppressWarnings("unused")
 	private void deleteBlog() {
-		QMessageBox.StandardButton ret = QMessageBox.warning(this, tr("Application"),
-				tr("Deseja realmente remover?"),
+		QMessageBox.StandardButton ret = QMessageBox.warning(this,
+				tr("Application"), tr("Deseja realmente remover?"),
 				new QMessageBox.StandardButtons(QMessageBox.StandardButton.Ok,
 						QMessageBox.StandardButton.Cancel));
 		if (ret == QMessageBox.StandardButton.Cancel) {
 			return;
 		}
 		try {
-			String blogId = container.getBlog().getBlogBySessionId(container.getActualSession(), blogs.currentIndex()).toString();
-			container.getBlog().deleteBlog(container.getActualSession(), blogId);
+			String blogId = container
+					.getBlog()
+					.getBlogBySessionId(container.getActualSession(),
+							blogs.currentIndex()).toString();
+			container.getBlog()
+					.deleteBlog(container.getActualSession(), blogId);
 			blogs.clear();
 			getUserData();
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
-		
-        
+	}
+
+	@SuppressWarnings("unused")
+	private void deleteProfile() throws Exception {
+		try {
+			container.getBlog().deleteProfile(container.getActualSession());
+			closeFrame();
+			displayMessageInformation("Informação", "Perfil deletado com sucesso.");
+		} catch (Exception e) {
+			displayMessageErro("Erro", "Perfil não pôde ser deletado.");
+		}
 	}
 	
+	private void displayMessageErro(String title, String message) {
+		QMessageBox.critical(this, title, message);
+	}
+
+	private void displayMessageInformation(String title, String message) {
+		QMessageBox.information(this, title, message);
+	}
+
 	private void init() {
 		createBlogButton = new QPushButton("Criar Blog", this);
 		createBlogButton.setIcon(new QIcon("pictures/create.png"));
@@ -80,35 +102,42 @@ public class FrameUserPage extends QWidget {
 
 		editProfileButton = new QPushButton("Editar Perfil ", this);
 		editProfileButton.setIcon(new QIcon("pictures/edit.png"));
-		
+
 		goToBlog = new QPushButton("Ir", this);
-		
+
 		deleteBlog = new QPushButton("Deletar", this);
 		deleteBlog.setIcon(new QIcon("pictures/wrong.png"));
-		
+
 		blogsLabel = new QLabel("Blogs:", this);
 		dataLabel = new QLabel("Dados", this);
-		
+
 		blogs = new QComboBox(this);
-		
+
+		deleteProfileButton = new QPushButton("Excluir Perfil", this);
+		deleteProfileButton.setIcon(new QIcon("pictures/wrong.png"));
+
 		getUserData();
-		
+
 	}
-	
+
 	private void getUserData() {
 		try {
-			int numberOfBlogs = container.getBlog().getNumberOfBlogsBySessionId(container.getActualSession());
+			int numberOfBlogs = container.getBlog()
+					.getNumberOfBlogsBySessionId(container.getActualSession());
 			for (int i = 0; i < numberOfBlogs; i++) {
-				String blogId = container.getBlog().getBlogBySessionId(container.getActualSession(), i).toString();
-				String blogName = container.getBlog().getBlogInformation(blogId, container.TITLE);
+				String blogId = container.getBlog()
+						.getBlogBySessionId(container.getActualSession(), i)
+						.toString();
+				String blogName = container.getBlog().getBlogInformation(
+						blogId, container.TITLE);
 				blogs.addItem(blogName);
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
-		
+
 	}
-	
+
 	@SuppressWarnings("unused")
 	private void openEditProfile() throws Exception {
 		close();
@@ -123,6 +152,7 @@ public class FrameUserPage extends QWidget {
 		deleteBlog.maximumSize();
 		goToBlog.maximumSize();
 		blogs.resize(150, 20);
+		deleteProfileButton.maximumSize();
 	}
 
 	private void positions() {
@@ -130,6 +160,7 @@ public class FrameUserPage extends QWidget {
 		int h = 100;
 
 		editProfileButton.move(w + 100, h + 50);
+		deleteProfileButton.move(w + 200, h + 50);
 		createBlogButton.move(w + 263, h + 150);
 		cancelButton.move(w + 930, h + 500);
 		blogs.move(w + 100, h + 150);
