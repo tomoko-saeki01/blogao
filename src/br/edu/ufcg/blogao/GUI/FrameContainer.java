@@ -68,10 +68,6 @@ public class FrameContainer {
 		return frameCreationBlog;
 	}
 
-	public FramePostCreation getActualCreationPostFrame() {
-		return frameCreationPost;
-	}
-
 	public FrameEditBlog getActualEditBlogFrame() {
 		return frameEditBlog;
 	}

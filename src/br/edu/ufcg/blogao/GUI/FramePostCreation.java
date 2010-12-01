@@ -33,8 +33,13 @@ public class FramePostCreation extends QWidget {
 	private void closeFrame() {
 		close();
 		//TODO fix it!
-		container.getLayout().removeWidget(container.getActualCreationPostFrame());
-		container.getLayout().addWidget(container.getNewBlogFrame());
+		try {
+
+			container.getLayout().removeWidget(container.getActualPostCreationFrame());
+			container.getLayout().addWidget(container.getNewBlogFrame());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@SuppressWarnings("unused")

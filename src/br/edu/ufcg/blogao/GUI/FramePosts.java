@@ -1,8 +1,10 @@
 package br.edu.ufcg.blogao.GUI;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import com.sun.xml.xsom.impl.scd.Iterators.Map;
 import com.trolltech.qt.gui.QFont;
 import com.trolltech.qt.gui.QIcon;
 import com.trolltech.qt.gui.QLabel;
@@ -17,11 +19,12 @@ public class FramePosts extends QWidget {
 	
 	private FrameContainer container = FrameContainer.getInstance();
 	
-	private List<QTextEdit> posts;
+	private HashMap<QTextEdit, QLabel> posts;
+	
 	
 
 	public FramePosts() {
-		resize(1200, 700);
+		resize(600, 1200);
 
 		initObjects();
 		resizeObjects();
@@ -34,7 +37,7 @@ public class FramePosts extends QWidget {
 
 	private void initObjects() {
 		
-		posts = new ArrayList<QTextEdit>();
+		posts = new HashMap<QTextEdit,QLabel>();
 		
 		
 		
@@ -42,15 +45,19 @@ public class FramePosts extends QWidget {
 	}
 
 	private void positionsObjects() {
-		int w = 100;
-		int h = 100;
-		
+		int i = 0;
+		for (QTextEdit post : posts.keySet()) {
+			post.move(120, 50 + i* 140);
+			posts.get(post).move(120, 30 + i*140);
+			i++;
+			
+		}
 	}
 
 	private void resizeObjects() {
 		
-		for (int i = 0; i < posts.size(); i++) {
-			posts.get(i).resize(200, 100);
+		for (QTextEdit post : posts.keySet()) {
+			post.resize(400, 100);
 		}
 	}
 
@@ -59,10 +66,14 @@ public class FramePosts extends QWidget {
 			int numberOfPosts = container.getBlog().getNumberOfPosts(container.getCurrentBlogId());
 			for (int i = 0; i < numberOfPosts; i++) {
 				String postId = container.getBlog().getPost(container.getCurrentBlogId(), i).toString();
+				
 				String postContent = container.getBlog().getPostInformation(postId, container.TEXT);
+				String postTitle = container.getBlog().getPostInformation(postId, container.TITLE);
 				QTextEdit post = new QTextEdit(this);
+				QLabel title = new QLabel(postTitle, this);
 				post.setText(postContent);
-				posts.add(post);
+				post.setEnabled(false);
+				posts.put(post, title);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
