@@ -32,7 +32,7 @@ public class FrameUserPage extends QWidget {
 		createBlogButton.clicked.connect(this, "createBlog()");
 		editProfileButton.clicked.connect(this, "openEditProfile()");
 		deleteBlog.clicked.connect(this, "deleteBlog()");
-
+		goToBlog.clicked.connect(this, "goToBlog()");
 		editBlog.clicked.connect(this, "editBlog()");
 
 		deleteProfileButton.clicked.connect(this, "deleteProfile()");
@@ -48,6 +48,19 @@ public class FrameUserPage extends QWidget {
 		close();
 		container.getLayout().removeWidget(container.getActualUserFrame());
 		container.getLayout().addWidget(container.getNewLoginFrame());
+	}
+	
+	@SuppressWarnings("unused")
+	private void goToBlog() {
+		close();
+		try {
+			String blogId = container.getBlog().getBlogBySessionId(container.getActualSession(), blogs.currentIndex()).toString();
+			container.setCurrentBlogId(blogId);
+			container.getLayout().removeWidget(container.getActualUserFrame());
+			container.getLayout().addWidget(container.getNewBlogFrame());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@SuppressWarnings("unused")
