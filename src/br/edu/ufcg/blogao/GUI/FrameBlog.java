@@ -3,8 +3,6 @@ package br.edu.ufcg.blogao.GUI;
 import com.trolltech.qt.gui.QFont;
 import com.trolltech.qt.gui.QIcon;
 import com.trolltech.qt.gui.QLabel;
-import com.trolltech.qt.gui.QLineEdit;
-import com.trolltech.qt.gui.QMessageBox;
 import com.trolltech.qt.gui.QPushButton;
 import com.trolltech.qt.gui.QScrollArea;
 import com.trolltech.qt.gui.QTextEdit;
@@ -105,13 +103,5 @@ public class FrameBlog extends QWidget {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-	
-	private void displayMessageErro(String title, String message) {
-		QMessageBox.critical(this, title, message);
-	}
-
-	private void displayMessageInformation(String title, String message) {
-		QMessageBox.information(this, title, message);
 	}
 }

@@ -1,17 +1,9 @@
 package br.edu.ufcg.blogao.GUI;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-import com.sun.xml.xsom.impl.scd.Iterators.Map;
-import com.trolltech.qt.gui.QFont;
-import com.trolltech.qt.gui.QIcon;
 import com.trolltech.qt.gui.QLabel;
-import com.trolltech.qt.gui.QLineEdit;
 import com.trolltech.qt.gui.QMessageBox;
-import com.trolltech.qt.gui.QPushButton;
-import com.trolltech.qt.gui.QScrollArea;
 import com.trolltech.qt.gui.QTextEdit;
 import com.trolltech.qt.gui.QWidget;
 
@@ -20,8 +12,6 @@ public class FramePosts extends QWidget {
 	private FrameContainer container = FrameContainer.getInstance();
 	
 	private HashMap<QTextEdit, QLabel> posts;
-	
-	
 
 	public FramePosts() {
 		resize(600, 1200);
@@ -32,15 +22,8 @@ public class FramePosts extends QWidget {
 		
 	}
 
-	
-
-
 	private void initObjects() {
-		
 		posts = new HashMap<QTextEdit,QLabel>();
-		
-		
-		
 		getUserData();
 	}
 

@@ -1,9 +1,7 @@
 package br.edu.ufcg.blogao.GUI;
 
 import com.trolltech.qt.core.QDate;
-import com.trolltech.qt.gui.QCalendarWidget;
 import com.trolltech.qt.gui.QComboBox;
-import com.trolltech.qt.gui.QDateEdit;
 import com.trolltech.qt.gui.QFont;
 import com.trolltech.qt.gui.QIcon;
 import com.trolltech.qt.gui.QLabel;
@@ -24,9 +22,8 @@ public class FrameRegister extends QWidget {
 	private QTextEdit interestsField, moviesField, musicsField, booksField,
 			whoIAmField;
 
-	private QComboBox sexCombo;
-	private QPushButton registerButton, cancelButton, calendarButton;
-	private QDateEdit dateBirthday;
+	private QComboBox sexCombo, dayCombo, monthCombo, yearCombo;
+	private QPushButton registerButton, cancelButton;
 	private FrameContainer container = FrameContainer.getInstance();
 
 	public FrameRegister() {
@@ -39,9 +36,27 @@ public class FrameRegister extends QWidget {
 	}
 
 	private void actionsObjects() {
-		calendarButton.clicked.connect(this, "openCalendar()");
 		cancelButton.clicked.connect(this, "closeFrame()");
-		registerButton.clicked.connect(this, "registerUser()");
+		registerButton.clicked.connect(this, "registerUser()");	
+	}
+
+	private void createComboDay() {
+		for (int i = 1; i <= 31; i++) {
+			dayCombo.addItem("" + i);
+		}
+	}
+
+	private void createComboMonth() {
+		for (int i = 1; i <= 12; i++) {
+			monthCombo.addItem("" + i);
+		}
+	}
+
+	private void createComboYear() {
+		int currentYear = QDate.currentDate().year();
+		for (int i = currentYear; i >= 1960; i--) {
+			yearCombo.addItem("" + i);
+		}
 	}
 
 	private void closeFrame() {
@@ -56,14 +71,6 @@ public class FrameRegister extends QWidget {
 
 	private void displayMessageInformation(String title, String message) {
 		QMessageBox.information(this, title, message);
-	}
-
-	private void getDate(CalendarFrame c) {
-		// TODO fazer uma forma dele ficar sempre atualizando enquanto
-		// a janela estiver aberta.
-		QDate d = c.getSelectedDate();
-		dateBirthday.setDate(d);
-		dateBirthday.setVisible(true);
 	}
 
 	private void init() {
@@ -129,24 +136,20 @@ public class FrameRegister extends QWidget {
 		sexCombo.addItem("Feminino");
 		sexCombo.addItem("Masculino");
 
+		dayCombo = new QComboBox(this);
+		createComboDay();
+
+		monthCombo = new QComboBox(this);
+		createComboMonth();
+
+		yearCombo = new QComboBox(this);
+		createComboYear();
+
 		registerButton = new QPushButton("Cadastrar", this);
 		registerButton.setIcon(new QIcon("pictures/right.png"));
 
 		cancelButton = new QPushButton("Cancelar", this);
 		cancelButton.setIcon(new QIcon("pictures/wrong.png"));
-
-		calendarButton = new QPushButton(this);
-		calendarButton.setIcon(new QIcon("pictures/calendar.png"));
-
-		dateBirthday = new QDateEdit(this);
-		dateBirthday.setDisplayFormat("dd/MM/yyyy");
-		dateBirthday.setDate(new QCalendarWidget().minimumDate());
-		dateBirthday.setVisible(false);
-	}
-
-	@SuppressWarnings("unused")
-	private void openCalendar() {
-		getDate(new CalendarFrame());
 	}
 
 	private void positions() {
@@ -171,8 +174,9 @@ public class FrameRegister extends QWidget {
 		confirmPasswordField.move(w + 280, h + 35);
 		nameField.move(w + 50, h + 67);
 
-		dateBirthday.move(w + 140, h + 100);
-		calendarButton.move(w + 233, h + 98);
+		dayCombo.move(w + 140, h + 100);
+		monthCombo.move(w + 180, h + 100);
+		yearCombo.move(w + 220, h + 100);
 
 		sexCombo.move(w + 50, h + 127);
 
@@ -219,8 +223,13 @@ public class FrameRegister extends QWidget {
 		String musics = musicsField.toPlainText();
 		String books = booksField.toPlainText();
 		String sex = sexCombo.currentText();
-		String dateB = dateBirthday.text();
+		String dateB = dayCombo.currentText() + "/" +
+					   monthCombo.currentText() + "/" + 
+					   yearCombo.currentText();
 
+		System.out.println(dateB);
+		
+		
 		if (sex.trim().equals("")) {
 			sex = "Não informado";
 		}
@@ -249,5 +258,4 @@ public class FrameRegister extends QWidget {
 			}
 		}
 	}
-
 }
