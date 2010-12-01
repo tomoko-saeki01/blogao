@@ -26,7 +26,7 @@ public class FramePostCreation extends QWidget {
 	}
 
 	private void actionsObjects() {
-		postButton.clicked.connect(this, "createBlog()");
+		postButton.clicked.connect(this, "createPost()");
 		cancelButton.clicked.connect(this, "closeFrame()");
 	}
 	
@@ -34,11 +34,11 @@ public class FramePostCreation extends QWidget {
 		close();
 		//TODO fix it!
 		container.getLayout().removeWidget(container.getActualCreationPostFrame());
-		//container.getLayout().addWidget(container.getNewLoginFrame());
+		container.getLayout().addWidget(container.getNewBlogFrame());
 	}
 
 	@SuppressWarnings("unused")
-	private void createBlog() throws Exception {
+	private void createPost() throws Exception {
 		String title = titleField.text();
 		String text = textField.toPlainText();
 		
@@ -48,7 +48,8 @@ public class FramePostCreation extends QWidget {
 		} else {
 			try {
 				//TODO it.
-				//container.getBlog().createPost(sessionId, name, description);
+				container.getBlog().createPost(container.getActualSession(), container.getCurrentBlogId(), title,
+						text);
 				displayMessageInformation("Informação", "Post criado com sucesso!");
 				closeFrame();
 			} catch (Exception e) {
@@ -72,10 +73,14 @@ public class FramePostCreation extends QWidget {
 		textLabel = new QLabel("Descrição", this);
 		textLabel.setFont(new QFont("Tempus Sans ITC", 11));
 		
-		postButton = new QPushButton("Postar");
+		titleField = new QLineEdit(this);
+		
+		textField = new QTextEdit(this);
+		
+		postButton = new QPushButton("Postar", this);
 		postButton.setIcon(new QIcon("pictures/right.png"));
 		
-		cancelButton = new QPushButton("Cancelar");
+		cancelButton = new QPushButton("Cancelar", this);
 		cancelButton.setIcon(new QIcon("pictures/wrong.png"));
 	}
 
@@ -85,18 +90,18 @@ public class FramePostCreation extends QWidget {
 		titleLabel.move(w, h);
 		textLabel.move(w, h + 37);
 
-		titleField.move(w + 50, h);
-		textField.move(w + 50, h + 35);
+		titleField.move(w + 100, h);
+		textField.move(w + 100, h + 35);
 		
 		//TODO it.
-		//postButton.move();
-		//cancelButton.move();
+		postButton.move(w + 100, h + 200);
+		cancelButton.move(w + 180, h + 200);
 	}
 
 	private void resizeObjects() {
 		titleField.resize(329, 25);
 		textField.resize(200, 150);
-		postButton.minimumSize();
-		cancelButton.minimumSize();
+		postButton.maximumSize();
+		cancelButton.maximumSize();
 	}
 }

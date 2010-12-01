@@ -3,6 +3,7 @@ package br.edu.ufcg.blogao.GUI;
 import br.edu.ufcg.blogao.webservice.BlogWS;
 
 import com.trolltech.qt.gui.QGridLayout;
+import com.trolltech.qt.gui.QWidget;
 
 public class FrameContainer {
 	private static FrameContainer singleton;
@@ -35,10 +36,18 @@ public class FrameContainer {
 	public final String TITLE = "titulo";
 	public final String AUTHOR = "dono";
 	public final String DESCRIPTION = "descricao";
+	public final String CREATION_DATE = "data_criacao";
+	public final String TEXT = "texto";
+	
 	
 	public final String MALE = "Masculino";
 	public final String FEMALE = "Feminino";
 	public final String UNINFORMED = "Não informado";
+	
+	
+	
+	private FrameBlog frameBlog;
+	private FramePostCreation framePostCreation;
 
 	private FrameContainer() {
 	}
@@ -50,6 +59,11 @@ public class FrameContainer {
 		return singleton;
 	}
 
+	public FrameBlog getActualBlogFrame() {
+
+		return frameBlog;
+	}
+	
 	public FrameBlogCreation getActualCreationBlogFrame() {
 		return frameCreationBlog;
 	}
@@ -81,6 +95,10 @@ public class FrameContainer {
 	public FrameUserPage getActualUserFrame() {
 		return frameUser;
 	}
+	
+	public FramePostCreation getActualPostCreationFrame() {
+		return framePostCreation;
+	}
 
 	public BlogWS getBlog() {
 		return blog;
@@ -94,6 +112,11 @@ public class FrameContainer {
 		if (layout == null)
 			layout = new QGridLayout();
 		return layout;
+	}
+	
+	public FrameBlog getNewBlogFrame() {
+		frameBlog = new FrameBlog();
+		return frameBlog;
 	}
 
 	public FrameBlogCreation getNewCreationBlogFrame() {
@@ -133,4 +156,11 @@ public class FrameContainer {
 	public void setCurrentBlogId(String id) {
 		this.currentBlogId = id;
 	}
+
+	public FramePostCreation getNewPostCreationFrame() {
+		framePostCreation = new FramePostCreation();
+		return framePostCreation;
+	}
+
+	
 }
