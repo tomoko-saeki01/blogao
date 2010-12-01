@@ -3,7 +3,6 @@ package br.edu.ufcg.blogao.GUI;
 import br.edu.ufcg.blogao.webservice.BlogWS;
 
 import com.trolltech.qt.gui.QGridLayout;
-import com.trolltech.qt.gui.QWidget;
 
 public class FrameContainer {
 	private static FrameContainer singleton;
@@ -15,9 +14,9 @@ public class FrameContainer {
 	private FramePostCreation frameCreationPost;
 	private FrameEditBlog frameEditBlog;
 	private QGridLayout layout;
-	private BlogWS blog = HelperClient
-			.getInstance("http://150.165.75.129:9913/blogao");
-	private String sessionId;
+
+	private BlogWS blog = HelperClient.getInstance("http://localhost:8080/blogao");
+	public String sessionId;
 	private String currentBlogId;
 	
 	public final String PASSWORD = "senha";
