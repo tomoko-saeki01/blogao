@@ -3,7 +3,6 @@ package br.edu.ufcg.blogao.GUI;
 import java.util.HashMap;
 
 import com.trolltech.qt.gui.QLabel;
-import com.trolltech.qt.gui.QMessageBox;
 import com.trolltech.qt.gui.QTextEdit;
 import com.trolltech.qt.gui.QWidget;
 
@@ -61,13 +60,5 @@ public class FramePosts extends QWidget {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-	
-	private void displayMessageErro(String title, String message) {
-		QMessageBox.critical(this, title, message);
-	}
-
-	private void displayMessageInformation(String title, String message) {
-		QMessageBox.information(this, title, message);
 	}
 }

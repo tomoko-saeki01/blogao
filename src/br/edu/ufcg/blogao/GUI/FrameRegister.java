@@ -2,6 +2,7 @@ package br.edu.ufcg.blogao.GUI;
 
 import com.trolltech.qt.core.QDate;
 import com.trolltech.qt.gui.QComboBox;
+import com.trolltech.qt.gui.QDateEdit;
 import com.trolltech.qt.gui.QFont;
 import com.trolltech.qt.gui.QIcon;
 import com.trolltech.qt.gui.QLabel;
@@ -211,6 +212,13 @@ public class FrameRegister extends QWidget {
 
 	@SuppressWarnings("unused")
 	private void registerUser() throws Exception {
+		QDateEdit b = new QDateEdit();
+		b.setDisplayFormat("dd/MM/yyyy");
+		int y = Integer.parseInt(yearCombo.currentText());
+		int m = Integer.parseInt(monthCombo.currentText());
+		int d = Integer.parseInt(dayCombo.currentText());
+		b.setDate(new QDate(y, m, d));
+		
 		String login = loginField.text();
 		String password = passwordField.text();
 		String confirmPassword = confirmPasswordField.text();
@@ -223,12 +231,7 @@ public class FrameRegister extends QWidget {
 		String musics = musicsField.toPlainText();
 		String books = booksField.toPlainText();
 		String sex = sexCombo.currentText();
-		String dateB = dayCombo.currentText() + "/" +
-					   monthCombo.currentText() + "/" + 
-					   yearCombo.currentText();
-
-		System.out.println(dateB);
-		
+		String dateB = b.toString();
 		
 		if (sex.trim().equals("")) {
 			sex = "Não informado";
@@ -254,7 +257,6 @@ public class FrameRegister extends QWidget {
 				closeFrame();
 			} catch (Exception e) {
 				displayMessageErro("Erro", e.getMessage());
-				// TODO achar o modo certo de limpar o campo certo!
 			}
 		}
 	}
