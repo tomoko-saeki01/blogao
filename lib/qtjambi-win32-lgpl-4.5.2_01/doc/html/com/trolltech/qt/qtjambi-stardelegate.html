@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Star Delegate Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Star Delegate Example</h1></center><p> <b>Code</b>: <ul><li> <a href="qtjambi-stardelegate-code.html">StarDelegate.java</a></li></ul> The Star Delegate example shows how to create a delegate that can paint itself and that supports edition. <br><center><img src="images/jambistardelegate.png"></center><br> When displaying data in a <a href="../../../com/trolltech/qt/gui/QListView.html">QListView</a>, <a href="../../../com/trolltech/qt/gui/QTableView.html">QTableView</a>, or <a href="../../../com/trolltech/qt/gui/QTreeView.html">QTreeView</a>, the individual items are drawn by a <a href="model-view-delegate.html">delegate</a>. Also, when the user starts editing an item (e.g., by double-clicking the item), the delegate provides an editor widget that is placed on top of the item while editing takes place. <p>Delegates are subclasses of <a href="../../../com/trolltech/qt/gui/QAbstractItemDelegate.html">QAbstractItemDelegate</a>. Qt Jambi provides <a href="../../../com/trolltech/qt/gui/QItemDelegate.html">QItemDelegate</a>, which inherits <a href="../../../com/trolltech/qt/gui/QAbstractItemDelegate.html">QAbstractItemDelegate</a> and handles the most common data types (notably <tt>Integer</tt> and String). If we need to support custom data types, or want to customize the rendering or the editing for existing data types, we can subclass <a href="../../../com/trolltech/qt/gui/QAbstractItemDelegate.html">QAbstractItemDelegate</a> or <a href="../../../com/trolltech/qt/gui/QItemDelegate.html">QItemDelegate</a>. See <a href="model-view-delegate.html">Delegate Classes</a> for more information about delegates, and <a href="model-view-programming.html">Model/View Programming</a> if you need a high-level introduction to Qt Jambi's model/view architecture (including delegates). <p>In this example, we will see how to implement a custom delegate to render and edit a "star rating" data type, which can stores values such as "1 out of 5 stars". <p>The example consists of the following classes: <ul><li> <tt>StarRating</tt> is the custom data type. It stores a rating expressed as stars, such as "2 out of 5 stars" or "5 out of 6 stars".</li><li> <tt>StarDelegate</tt> inherits <a href="../../../com/trolltech/qt/gui/QItemDelegate.html">QItemDelegate</a> and provides support for <tt>StarRating</tt> (in addition to the data types already handled by <a href="../../../com/trolltech/qt/gui/QItemDelegate.html">QItemDelegate</a>).</li><li> <tt>StarEditor</tt> inherits <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> and is used by <tt>StarDelegate</tt> to let the user edit a star rating using the mouse.</li><li> <tt>StarWindow</tt> fills a <a href="../../../com/trolltech/qt/gui/QTableWidget.html">QTableWidget</a> with some data and installs the delegate on it.</li></ul><a name="stardelegate-class-implementation"><h2>StarDelegate Class Implementation</h2> The StarDelegate consists of public methods reimplemented from <a href="../../../com/trolltech/qt/gui/QItemDelegate.html">QItemDelegate</a> to provide custom rendering and editing. <p>We provide the class with a constructor that takes a <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>, which we use for instantiating the superclass. The native Qt code demands that all objects that inherit <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> has a parent; otherwise the program will fail. <p>The paint() method is reimplemented from <a href="../../../com/trolltech/qt/gui/QItemDelegate.html">QItemDelegate</a> and is called whenever the view needs to repaint an item: <pre class="snippet">
+        public void paint(QPainter painter, QStyleOptionViewItem option, QModelIndex index)
+        {
+            Object data = index.data();
+
+            if (data != null && data instanceof StarRating) {
+                if (option.state().isSet(QStyle.StateFlag.State_Selected)) {
+                    painter.fillRect(option.rect(), option.palette().highlight());
+                }
+                ((StarRating) data).paint(painter, option.rect(), option.palette(),
+                                          StarRating.ReadOnly);
+            } else
+                super.paint(painter, option, index);
+        }
+</pre> The method is invoked once for each item, represented by a QModelIndex object from the model. If the data stored in the item is a <tt>StarRating</tt>, we paint it ourselves; otherwise, we let <a href="../../../com/trolltech/qt/gui/QItemDelegate.html">QItemDelegate</a> paint it for us. This ensures that the <tt>StarDelegate</tt> can handle the most common data types. <p>In the case where the item is a <tt>StarRating</tt>, we draw the background if the item is selected, and we draw the item using <tt>StarRating.paint()</tt>, which we will review later. <p>Any kind of Object can be stored in a model, but when the item delegate encounters items it does not know how to paint, it will leave the view for that item empty. <p>The createEditor() method is called when the user starts editing an item: <pre class="snippet">
+        public QWidget createEditor(QWidget parent, QStyleOptionViewItem item,
+                                    QModelIndex index)
+        {
+            Object data = index.data();
+
+            if (data instanceof StarRating)
+                return new StarEditor(parent, (StarRating) data);
+            else
+                return super.createEditor(parent, item, index);
+        }
+</pre> If the item is a <tt>StarRating</tt>, we create a <tt>StarEditor</tt>. The editor must have the <tt>parent</tt>; if not, it would be displayed as a top-level window. <p>The setEditorData() method is called when an editor is created to initialize it with data from the model: <pre class="snippet">
+        public void setEditorData(QWidget editor, QModelIndex index)
+        {
+            Object data = index.data();
+
+            if (data instanceof StarRating)
+                ((StarEditor) editor).setStarRating((StarRating) data);
+            else
+                super.setEditorData(editor, index);
+        }
+</pre> We simply call <tt>setStarRating()</tt> on the editor. <p>The setModelData() method is called when editing is finished, to commit data from the editor to the model: <pre class="snippet">
+        public void setModelData(QWidget editor, QAbstractItemModel model,
+                                 QModelIndex index)
+        {
+            if (index.data() instanceof StarRating)
+                model.setData(index, ((StarEditor) editor).starRating());
+            else
+                super.setModelData(editor, model, index);
+        }
+</pre> The editing is finished when the user clicks on the editor. Since we propagate the mouse click event (i.e., do not accept it), the view will close the editor for us when it receives the <a href="../../../com/trolltech/qt/gui/QMouseEvent.html">QMouseEvent</a>. <p>The <tt>sizeHint()</tt> method returns an item's preferred size: <pre class="snippet">
+        public QSize sizeHint(QStyleOptionViewItem option, QModelIndex index)
+        {
+            Object data = index.data();
+
+            if (data instanceof StarRating)
+                return ((StarRating) data).sizeHint();
+            else
+                return super.sizeHint(option, index);
+        }
+</pre> We simply forward the call to <tt>StarRating</tt>.<a name="stareditor-class-implementation"><h2>StarEditor Class Implementation</h2> The <tt>StarEditor</tt> is used by <tt>StarDelegate</tt> to edit items. The user edits a <tt>StarRating</tt> by moving the mouse over the editor. When the editing is finished the value of the star rating can be retrieved with <tt>getRating()</tt>. <p>The protected methods are reimplemented from <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> to handle mouse and paint events. The private method <tt>starAtPosition()</tt> is a helper method that returns the number of the star under the mouse pointer. <p>Let's start with the constructor: <pre class="snippet">
+        public StarEditor(QWidget parent, StarRating rating)
+        {
+            super(parent);
+
+            starRating = rating;
+            setMouseTracking(true);
+            setAutoFillBackground(true);
+        }
+</pre> We enable mouse tracking on the widget so we can follow the cursor even when the user doesn't hold down any mouse button. We also turn on <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>'s auto-fill background feature to obtain an opaque background. (Without the call, the view's background would shine through the editor.) <p>The <a href="porting4.html">paintEvent()</a> method is reimplemented from <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>: <pre class="snippet">
+        public void paintEvent(QPaintEvent event)
+        {
+            QPainter painter = new QPainter(this);
+            starRating.paint(painter, rect(), palette(), StarRating.ReadWrite);
+        }
+</pre> We simply call <tt>StarRating.paint()</tt> to draw the stars, just like we did when implementing <tt>StarDelegate</tt>. <pre class="snippet">
+        public void mouseMoveEvent(QMouseEvent event)
+        {
+            int star = starAtPosition(event.x());
+
+            if (star != starRating.getRating() && star &gt; 0) {
+                starRating.setRating(star);
+                update();
+            }
+        }
+</pre> In the mouse event handler, we call <tt>setRating()</tt> on the private data member <tt>starCount</tt> to reflect the current cursor position, and we call <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>.update() to force a repaint. <pre class="snippet">
+        public int starAtPosition(int x)
+        {
+            int star = (x / (starRating.sizeHint().width()
+                            / starRating.getMaxRating())) + 1;
+
+            if (star &lt;= 0 || star &gt; starRating.getMaxRating())
+                return -1;
+
+            return star;
+        }
+</pre> The <tt>starAtPosition()</tt> method uses basic linear algebra to find out which star is under the cursor.<a name="starrating-class-implementation"><h2>StarRating Class Implementation</h2> The <tt>StarRating</tt> class represents a rating as a number of stars. In addition to holding the data, it is also capable of painting the stars on a <a href="../../../com/trolltech/qt/gui/QPaintDevice.html">QPaintDevice</a>, which in this example is either a view or an editor. The <tt>starCount</tt> member variable stores the current rating, and <tt>maxStarCount</tt> stores the highest possible rating (typically 5). The polygons used for drawing stars and diamonds are set up in a static block. <p>The constructor initializes <tt>starCount</tt> and <tt>maxStarCount</tt>: <pre class="snippet">
+        public StarRating(int rating, int maxRating)
+        {
+            setupPolygons();
+            maxCount = maxRating;
+            setRating(rating);
+        }
+</pre> The <tt>paint()</tt> method paints the stars in this <tt>StarRating</tt> object on a paint device: <pre class="snippet">
+        public void paint(QPainter painter, QRect rect, QPalette palette,
+                      int mode)
+        {
+            painter.save();
+
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing, true);
+            painter.setPen(Qt.PenStyle.NoPen);
+
+            if (mode == ReadWrite)
+                painter.setBrush(palette.highlight());
+            else
+                painter.setBrush(palette.text());
+
+            int yOffset = (rect.height() - PaintingFactor) / 2;
+            painter.translate(rect.x(), rect.y() + yOffset);
+            painter.scale(PaintingFactor, PaintingFactor);
+
+            for (int i = 0; i &lt; maxCount; i++) {
+                if (i &lt; starCount)
+                    painter.drawPolygon(starPolygon, Qt.FillRule.WindingFill);
+                else
+                    painter.drawPolygon(diamondPolygon, Qt.FillRule.WindingFill);
+
+                painter.translate(1.0, 0.0);
+            }
+
+            painter.restore();
+        }
+</pre> We first set the pen and brush we will use for painting. The <tt>mode</tt> parameter can be either <tt>ReadWrite</tt> or <tt>ReadOnly</tt>. If <tt>mode</tt> is read and write, we use the Highlight color instead of the Foreground color to draw the stars. <p>Then we draw the stars. If we are in <tt>ReadWrite</tt> mode, we paint diamonds in place of stars if the rating is less than the highest rating. <p>The <tt>sizeHint()</tt> method returns the preferred size for an area to paint the stars on: <pre class="snippet">
+        public QSize sizeHint(QStyleOptionViewItem option, QModelIndex index)
+        {
+            Object data = index.data();
+
+            if (data instanceof StarRating)
+                return ((StarRating) data).sizeHint();
+            else
+                return super.sizeHint(option, index);
+        }
+</pre> The preferred size is just enough to paint the maximum number of stars. The method is called by both <tt>StarDelegate.sizeHint()</tt> and <tt>StarEditor.sizeHint()</tt>.<a name="starwindow-class-implementation"><h2>StarWindow Class Implementation</h2> StarWindow inherits <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> and displays a table that has a star delegate installed. <p>The table is set up in the <tt>createTable()</tt> method: <pre class="snippet">
+    public void createTable()
+    {
+        LinkedList&lt;String&gt; headers = new LinkedList&lt;String&gt;();
+
+        table = new QTableWidget(4, 4);
+
+        table.setItemDelegate(new Delegate(table));
+
+        table.setEditTriggers(QAbstractItemView.EditTrigger.DoubleClicked,
+                              QAbstractItemView.EditTrigger.SelectedClicked);
+        table.setSelectionBehavior(
+            QAbstractItemView.SelectionBehavior.SelectRows);
+</pre> The <tt>createTable()</tt> method creates a <a href="../../../com/trolltech/qt/gui/QTableWidget.html">QTableWidget</a> and sets a <tt>StarDelegate</tt> on it. We set... <pre class="snippet">
+    }
+</pre> The rest of the method fills the table with data including star ratings. DoubleClicked and SelectedClicked are set as edit triggers, so that the editor is opened by a single click when the star rating item is selected.<a name="possible-extensions-and-suggestions"><h2>Possible Extensions and Suggestions</h2> There are many ways to customize Qt Jambi's <a href="model-view-programming.html">model/view framework</a>. The approach used in this example is appropriate for most custom delegates and editors. Examples of possibilities not used by the star delegate and star editor are: <ul><li> It is possible to open editors programmatically by calling <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html">QAbstractItemView</a>.edit(), instead of relying on edit triggers. This could be use to support other edit triggers than those offered by <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html">QAbstractItemView</a>. For example, in the Star Delegate example, hovering over an item with the mouse might make sense as a way to pop up an editor.</li><li> By reimplementing <a href="../../../com/trolltech/qt/gui/QAbstractItemDelegate.html">QAbstractItemDelegate</a>.editorEvent(), it is possible to implement the editor directly in the delegate, instead of creating a separate <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> subclass.</li></ul><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

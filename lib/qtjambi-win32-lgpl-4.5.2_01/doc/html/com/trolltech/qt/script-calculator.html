@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>QtScript Calculator Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>QtScript Calculator Example</h1></center><p> In this simple <a href="qtscript.html">QtScript</a> example, we show how to implement the functionality of a calculator widget. <br><center><img src="images/qtscript-calculator-example.png"></center><br> The program logic in this example is a fairly straight port of the logic in the C++ <a href="widgets-calculator.html">Calculator Example</a>. The graphical user interface is defined in a UI file. <p>The C++ part of the example consists of four steps: <ul><li> Evaluate the script code that defines the <tt>Calculator</tt> class.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QScriptEngine engine;
+
+    QString scriptFileName(":/calculator.js");
+    QFile scriptFile(scriptFileName);
+    scriptFile.open(QIODevice::ReadOnly);
+    engine.evaluate(scriptFile.readAll(), scriptFileName);
+    scriptFile.close();
+</li></pre><li> Create a widget from the UI file using QUiLoader.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QUiLoader loader;
+    QFile uiFile(":/calculator.ui");
+    uiFile.open(QIODevice::ReadOnly);
+    QWidget *ui = loader.load(&uiFile);
+    uiFile.close();
+</li></pre><li> Call the Calculator constructor function to create a new <tt>Calculator</tt> script object, passing the widget as argument.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QScriptValue ctor = engine.evaluate("Calculator");
+    QScriptValue scriptUi = engine.newQObject(ui, QScriptEngine::ScriptOwnership);
+    QScriptValue calc = ctor.construct(QScriptValueList() &lt;&lt; scriptUi);
+</li></pre><li> Show the widget and start the application event loop.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    ui-&gt;show();
+    return app.exec();
+</li></ul></pre> On the script side, the <tt>Calculator</tt> constructor function initializes the instance variables of the new <tt>Calculator</tt> object, and connects the clicked() signal of the form's buttons to corresponding functions defined in the <tt>Calculator</tt> prototype object; the effect is that when a button is clicked, the proper script function will be invoked to carry out the operation. <pre class="snippet">
+function Calculator(ui)
+{
+    this.ui = ui;
+
+    this.pendingAdditiveOperator = "";
+    this.pendingMultiplicativeOperator = "";
+    this.sumInMemory = 0;
+    this.sumSoFar = 0;
+    this.factorSoFar = 0;
+    this.waitingForOperand = true;
+
+    with (ui) {
+        display.text = "0";
+
+        zeroButton.clicked.connect(this, this.digitClicked);
+        oneButton.clicked.connect(this, "digitClicked");
+        twoButton.clicked.connect(this, "digitClicked");
+        threeButton.clicked.connect(this, "digitClicked");
+        fourButton.clicked.connect(this, "digitClicked");
+        fiveButton.clicked.connect(this, "digitClicked");
+        sixButton.clicked.connect(this, "digitClicked");
+        sevenButton.clicked.connect(this, "digitClicked");
+        eightButton.clicked.connect(this, "digitClicked");
+        nineButton.clicked.connect(this, "digitClicked");
+
+        pointButton.clicked.connect(this, "pointClicked");
+        changeSignButton.clicked.connect(this, "changeSignClicked");
+
+        backspaceButton.clicked.connect(this, "backspaceClicked");
+        clearButton.clicked.connect(this, "clear");
+        clearAllButton.clicked.connect(this, "clearAll");
+
+        clearMemoryButton.clicked.connect(this, "clearMemory");
+        readMemoryButton.clicked.connect(this, "readMemory");
+        setMemoryButton.clicked.connect(this, "setMemory");
+        addToMemoryButton.clicked.connect(this, "addToMemory");
+  
+        divisionButton.clicked.connect(this, "multiplicativeOperatorClicked");
+        timesButton.clicked.connect(this, "multiplicativeOperatorClicked");
+        minusButton.clicked.connect(this, "additiveOperatorClicked");
+        plusButton.clicked.connect(this, "additiveOperatorClicked");
+
+        squareRootButton.clicked.connect(this, "unaryOperatorClicked");
+        powerButton.clicked.connect(this, "unaryOperatorClicked");
+        reciprocalButton.clicked.connect(this, "unaryOperatorClicked");
+        equalButton.clicked.connect(this, "equalClicked");
+    }
+}
+</pre> A <tt>Calculator</tt> object is just a plain script object; it is not a widget. Instead, it stores a reference to the calculator form (the widget) in an instance variable, <tt>ui</tt>. The calculator script functions can access components of the form by referring to the proper children of the <tt>ui</tt> member. <pre class="snippet">
+Calculator.prototype.digitClicked = function()
+{
+    var digitValue = __qt_sender__.text - 0;
+    if ((digitValue == 0) && (this.ui.display.text == "0"))
+        return;
+    if (this.waitingForOperand) {
+        this.ui.display.clear();
+        this.waitingForOperand = false;
+    }
+    this.ui.display.text += digitValue;
+}
+</pre> The digitClicked() function uses the special local variable __qt_sender__ to access the object that triggered the signal; this gives us a simple way to retrieve the value of the digit that was clicked. <pre class="snippet">
+Calculator.prototype.changeSignClicked = function()
+{
+    var text = this.ui.display.text;
+    var value = text - 0;
+
+    if (value &gt; 0) {
+        text = "-" + text;
+    } else if (value &lt; 0) {
+        text = text.slice(1);
+    }
+    this.ui.display.text = text;
+}
+</pre> The changeSign() function shows how we retrieve the text property of the calculator's display, change it appropriately, and write back the new value.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

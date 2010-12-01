@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Multiple Inheritance Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Multiple Inheritance Example</h1></center><p> The Multiple Inheritance Example shows how to use a form created with Qt Designer in an application by subclassing both <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> and the user interface class, which is <tt>Ui::CalculatorForm</tt>. <br><center><img src="images/multipleinheritance-example.png"></center><br> To subclass the <tt>calculatorform.ui</tt> file and ensure that <tt>qmake</tt> processes it with the <tt>uic</tt>, we have to include <tt>calculatorform.ui</tt> in the <tt>.pro</tt> file, as shown below:Error parsing snippet.</pre> When the project is compiled, the <tt>uic</tt> will generate a corresponding <tt>ui_calculatorform.h</tt>.<a name="calculatorform-definition"><h2>CalculatorForm Definition</h2> In the <tt>CalculatorForm</tt> definition, we include the <tt>ui_calculatorform.h</tt> that was generated earlier. <pre class="snippet">
+#include "ui_calculatorform.h"
+</pre> As mentioned earlier, the class is a subclass of both <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> and <tt>Ui::CalculatorForm</tt>. <pre class="snippet">
+class CalculatorForm : public QWidget, private Ui::CalculatorForm
+{
+    Q_OBJECT
+
+public:
+    CalculatorForm(QWidget *parent = 0);
+
+private slots:
+    void on_inputSpinBox1_valueChanged(int value);
+    void on_inputSpinBox2_valueChanged(int value);
+};
+</pre> Two slots are defined according to the <a href="designer-using-a-ui-file.html">automatic connection</a> naming convention required by <tt>uic</tt>. This is to ensure that QMetaObject's auto-connection facilities connect all the signals and slots involved automatically.<a name="calculatorform-implementation"><h2>CalculatorForm Implementation</h2> In the constructor, we call <tt>setupUi()</tt> to load the user interface file. Note that we do not need the <tt>ui</tt> prefix as <tt>CalculatorForm</tt> is a subclass of the user interface class.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+CalculatorForm::CalculatorForm(QWidget *parent)
+    : QWidget(parent)
+{
+    setupUi(this);
+}
+</pre> We include two slots, <tt>on_inputSpinBox1_valueChanged()</tt> and <tt>on_inputSpinBox2_valueChanged()</tt>. These slots respond to the valueChanged() signal that both spin boxes emit. Whenever there is a change in one spin box's value, we take that value and add it to whatever value the other spin box has.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void CalculatorForm::on_inputSpinBox1_valueChanged(int value)
+{
+    outputWidget-&gt;setText(QString::number(value + inputSpinBox2-&gt;value()));
+}
+<br>
+void CalculatorForm::on_inputSpinBox2_valueChanged(int value)
+{
+    outputWidget-&gt;setText(QString::number(value + inputSpinBox1-&gt;value()));
+}
+</pre><a name="function"><h2>main() Function</h2><tt>main()</tt> The <tt>main()</tt> function instantiates <a href="../../../com/trolltech/qt/gui/QApplication.html">QApplication</a> and <tt>CalculatorForm</tt>. The <tt>calculator</tt> object is displayed by invoking the <a href="../../../com/trolltech/qt/gui/QWidget.html#show()">show()</a> function.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    CalculatorForm calculator;
+    calculator.show();
+    return app.exec();
+}
+</pre> There are various approaches to include forms into applications. The Multiple Inheritance approach is just one of them. See <a href="designer-using-a-ui-file.html">Using a Designer .ui File in Your Application</a> for more information on the other approaches available.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

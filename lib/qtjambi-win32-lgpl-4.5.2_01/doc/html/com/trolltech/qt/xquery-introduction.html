@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>A Short Path to XQuery</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>A Short Path to XQuery</h1></center><p><p><a name="xquery-introduction"> XQuery is a language for querying XML data or non-XML data that can be modeled as XML. XQuery is specified by the W3C. <ul><li> <a href="#introduction">Introduction</a></li><li> <a href="#using-path-expressions-to-match-select-items">Using Path Expressions To Match & Select Items</a></li> <ul><li> <a href="#axis-steps">Axis Steps</a></li><li> <a href="#axis-specifiers">Axis Specifiers</a></li><li> <a href="#node-tests">Node Tests</a></li><li> <a href="#shorthand-form">Shorthand Form</a></li><li> <a href="#name-tests">Name Tests</a></li> <ul><li> <a href="#wildcards-in-name-tests">Wildcards in Name Tests</a></li></ul></ul><li> <a href="#using-predicates-in-path-expressions">Using Predicates In Path Expressions</a></li> <ul><li> <a href="#positional-predicates">Positional Predicates</a></li><li> <a href="#boolean-predicates">Boolean Predicates</a></li></ul><li> <a href="#constructing-elements">Constructing Elements</a></li> <ul><li> <a href="#element-constructors-are-expressions">Element Constructors are Expressions</a></li></ul><li> <a href="#constructing-atomic-values">Constructing Atomic Values</a></li><li> <a href="#running-the-cookbook-examples">Running The Cookbook Examples</a></li> <ul><li> <a href="#cookbook-xml">cookbook.xml</a></li></ul><li> <a href="#further-reading">Further Reading</a></li><li> <a href="#faq">FAQ</a></li> <ul><li> <a href="#why-didn-t-my-path-expression-match-anything">Why didn't my path expression match anything?</a></li><li> <a href="#what-if-my-input-namespace-is-different-from-my-output-namespace">What if my input namespace is different from my output namespace?</a></li><li> <a href="#why-doesn-t-my-return-clause-work">Why doesn't my return clause work?</a></li><li> <a href="#why-didn-t-my-expression-get-evaluated">Why didn't my expression get evaluated?</a></li><li> <a href="#my-predicate-is-correct-so-why-doesn-t-it-select-the-right-stuff">My predicate is correct, so why doesn't it select the right stuff?</a></li><li> <a href="#why-doesn-t-my-flwor-behave-as-expected">Why doesn't my FLWOR behave as expected?</a></li><li> <a href="#why-are-my-elements-created-in-the-wrong-order">Why are my elements created in the wrong order?</a></li><li> <a href="#why-can-t-i-use-and-in-my-xquery">Why can't I use  and  in my XQuery?</a></li></ul></ul><a name="introduction"><h2>Introduction</h2> Where Java and C++ are statement-based languages, the XQuery language is expression-based. The simplest XQuery expression is an XML element constructor: <pre class="snippet">
+&lt;recipe/&gt;
+</pre> This <tt>&lt;recipe/&gt;</tt> element is an XQuery expression that forms a complete XQuery. In fact, this XQuery doesn't actually query anything. It just creates an empty <tt>&lt;recipe/&gt;</tt> element in the output. But <a href="xquery-introduction.html#constructing-elements">constructing new elements in an XQuery</a> is often necessary. <p>An XQuery expression can also be enclosed in curly braces and embedded in another XQuery expression. This XQuery has a document expression embedded in a node expression: <pre class="snippet">
+ &lt;html xmlns="http://www.w3.org/1999/xhtml/"
+       xml:id="{doc("other.html")/html/&#64;xml:id}"/&gt;
+</pre> It creates a new <tt>&lt;html&gt;</tt> element in the output and sets its <tt>id</tt> attribute to be the <tt>id</tt> attribute from an <tt>&lt;html&gt;</tt> element in the <tt>other.html</tt> file.<a name="using-path-expressions-to-match-select-items"><h2>Using Path Expressions To Match & Select Items</h2> In C++ and Java, we write nested <tt>for</tt> loops and recursive functions to traverse XML trees in search of elements of interest. In XQuery, we write these iterative and recursive algorithms with path expressions. <p>A path expression looks somewhat like a typical file pathname for locating a file in a hierarchical file system. It is a sequence of one or more steps separated by slash '/' or double slash '//'. Although path expressions are used for traversing XML trees, not file systems, in QtXmlPatterms we can model a file system to look like an XML tree, so in <a href="qtxmlpatterns.html">QtXmlPatterns</a> we can use XQuery to traverse a file system. See the <a href="xmlpatterns-filetree.html">file system example</a>. <p>Think of a path expression as an algorithm for traversing an XML tree to find and collect items of interest. This algorithm is evaluated by evaluating each step moving from left to right through the sequence. A step is evaluated with a set of input items (nodes and atomic values), sometimes called the focus. The step is evaluated for each item in the focus. These evaluations produce a new set of items, called the result, which then becomes the focus that is passed to the next step. Evaluation of the final step produces the final result, which is the result of the XQuery. The items in the result set are presented in document order and without duplicates. <p>With <a href="qtxmlpatterns.html">QtXmlPatterns</a>, a standard way to present the initial focus to a query is to call <a href="../../../com/trolltech/qt/xmlpatterns/QXmlQuery.html#setFocus(com.trolltech.qt.core.QIODevice)">QXmlQuery::setFocus()</a>. Another common way is to let the XQuery itself create the initial focus by using the first step of the path expression to call the XQuery <tt>doc()</tt> function. The <tt>doc()</tt> function loads an XML document and returns the document node. Note that the document node is not the same as the document element. The document node is a node constructed in memory, when the document is loaded. It represents the entire XML document, not the document element. The document element is the single, top-level XML element in the file. The <tt>doc()</tt> function returns the document node, which becomes the singleton node in the initial focus set. The document node will have one child node, and that child node will represent the document element. Consider the following XQuery: <pre class="snippet">
+doc('cookbook.xml')//recipe
+</pre> The <tt>doc()</tt> function loads the file <a href="xquery-introduction.html#cookbook-xml">cookbook.xml</a> and returns the document node. The document node then becomes the focus for the next step <tt>//recipe</tt>. Here the double slash means select all <tt>&lt;recipe&gt;</tt> elements found below the document node, regardless of where they appear in the document tree. The query selects all <tt>&lt;recipe&gt;</tt> elements in the cookbook. See <a href="xquery-introduction.html#running-the-cookbook-examples">Running The Cookbook Examples</a> for instructions on how to run this query (and most of the ones that follow) from the command line. <p>Conceptually, evaluation of the steps of a path expression is similar to iterating through the same number of nested for loops. Consider the following XQuery, which builds on the previous one: <pre class="snippet">
+doc('cookbook.xml')//recipe/title
+</pre> This XQuery is a single path expression composed of three steps. The first step creates the initial focus by calling the <tt>doc()</tt> function. We can paraphrase what the query engine does at each step: <ol><li> for each node in the initial focus (the document node)...</li><li> for each descendant node that is a <tt>&lt;recipe&gt;</tt> element...</li><li> collect the child nodes that are <tt>&lt;title&gt;</tt> elements.</li></ol> Again the double slash means select all the <tt>&lt;recipe&gt;</tt> elements in the document. The single slash before the <tt>&lt;title&gt;</tt> element means select only those <tt>&lt;title&gt;</tt> elements that are child elements of a <tt>&lt;recipe&gt;</tt> element (i.e. not grandchildren, etc). The XQuery evaluates to a final result set containing the <tt>&lt;title&gt;</tt> element of each <tt>&lt;recipe&gt;</tt> element in the cookbook.<a name="axis-steps"><h3>Axis Steps</h3> The most common kind of path step is called an axis step, which tells the query engine which way to navigate from the context node, and which test to perform when it encounters nodes along the way. An axis step has two parts, an axis specifier, and a node test. Conceptually, evaluation of an axis step proceeds as follows: For each node in the focus set, the query engine navigates out from the node along the specified axis and applies the node test to each node it encounters. The nodes selected by the node test are collected in the result set, which becomes the focus set for the next step. <p>In the example XQuery above, the second and third steps are both axis steps. Both apply the <tt>element(name)</tt> node test to nodes encountered while traversing along some axis. But in this example, the two axis steps are written in a <a href="xquery-introduction.html#shorthand-form">shorthand form</a>, where the axis specifier and the node test are not written explicitly but are implied. XQueries are normally written in this shorthand form, but they can also be written in the longhand form. If we rewrite the XQuery in the longhand form, it looks like this: <pre class="snippet">
+doc('cookbook.xml')/descendant-or-self::element(recipe)/child::element(title)
+</pre> The two axis steps have been expanded. The first step (<tt>//recipe</tt>) has been rewritten as <tt>/descendant-or-self::element(recipe)</tt>, where <tt>descendant-or-self::</tt> is the axis specifier and <tt>element(recipe)</tt> is the node test. The second step (<tt>title</tt>) has been rewritten as <tt>/child::element(title)</tt>, where <tt>child::</tt> is the axis specifier and <tt>element(title)</tt> is the node test. The output of the expanded XQuery will be exactly the same as the output of the shorthand form. <p>To create an axis step, concatenate an axis specifier and a node test. The following sections list the axis specifiers and node tests that are available.<a name="axis-specifiers"><h3>Axis Specifiers</h3> An axis specifier defines the direction you want the query engine to take, when it navigates away from the context node. <a href="qtxmlpatterns.html">QtXmlPatterns</a> supports the following axes. <table align="center" border="0" cellpadding="2" cellspacing="1"><thead><tr class="qt-style" valign="top"><th><center> Axis Specifier</center></th><th><center> refers to the axis containing...</center></th></tr></thead><tr valign="top" class="even"><td> <tt>self::</tt></td><td> the context node itself</td></tr><tr valign="top" class="odd"><td> <tt>attribute::</tt></td><td> all attribute nodes of the context node</td></tr><tr valign="top" class="even"><td> <tt>child::</tt></td><td> all child nodes of the context node (not attributes)</td></tr><tr valign="top" class="odd"><td> <tt>descendant::</tt></td><td> all descendants of the context node (children, grandchildren, etc)</td></tr><tr valign="top" class="even"><td> <tt>descendant-or-self::</tt></td><td> all nodes in <tt>descendant</tt> + <tt>self</tt></td></tr><tr valign="top" class="odd"><td> <tt>parent::</tt></td><td> the parent node of the context node, or empty if there is no parent</td></tr><tr valign="top" class="even"><td> <tt>ancestor::</tt></td><td> all ancestors of the context node (parent, grandparent, etc)</td></tr><tr valign="top" class="odd"><td> <tt>ancestor-or-self::</tt></td><td> all nodes in <tt>ancestor</tt> + <tt>self</tt></td></tr><tr valign="top" class="even"><td> <tt>following::</tt></td><td> all nodes in the tree containing the context node, not including <tt>descendant</tt>, and that follow the context node in the document</td></tr><tr valign="top" class="odd"><td> <tt>preceding::</tt></td><td> all nodes in the tree contianing the context node, not including <tt>ancestor</tt>, and that precede the context node in the document</td></tr><tr valign="top" class="even"><td> <tt>following-sibling::</tt></td><td> all children of the context node's <tt>parent</tt> that follow the context node in the document</td></tr><tr valign="top" class="odd"><td> <tt>preceding-sibling::</tt></td><td> all children of the context node's <tt>parent</tt> that precede the context node in the document</td></tr></table><a name="node-tests"><h3>Node Tests</h3> A node test is a conditional expression that must be true for a node if the node is to be selected by the axis step. The conditional expression can test just the kind of node, or it can test the kind of node and the name of the node. The XQuery specification for node tests also defines a third condition, the node's Schema Type, but schema type tests are not supported in <a href="qtxmlpatterns.html">QtXmlPatterns</a>. <p><a href="qtxmlpatterns.html">QtXmlPatterns</a> supports the following node tests. The tests that have a <tt>name</tt> parameter test the node's name in addition to its kind and are often called the <a href="xquery-introduction.html#name-tests">Name Tests</a>. <table align="center" border="0" cellpadding="2" cellspacing="1"><thead><tr class="qt-style" valign="top"><th><center> Node Test</center></th><th><center> matches all...</center></th></tr></thead><tr valign="top" class="even"><td> <tt>node()</tt></td><td> nodes of any kind</td></tr><tr valign="top" class="odd"><td> <tt>text()</tt></td><td> text nodes</td></tr><tr valign="top" class="even"><td> <tt>comment()</tt></td><td> comment nodes</td></tr><tr valign="top" class="odd"><td> <tt>element()</tt></td><td> element nodes (same as star: *)</td></tr><tr valign="top" class="even"><td> <tt>element(name)</tt></td><td> element nodes named <tt>name</tt></td></tr><tr valign="top" class="odd"><td> <tt>attribute()</tt></td><td> attribute nodes</td></tr><tr valign="top" class="even"><td> <tt>attribute(name)</tt></td><td> attribute nodes named <tt>name</tt></td></tr><tr valign="top" class="odd"><td> <tt>processing-instruction()</tt></td><td> processing-instructions</td></tr><tr valign="top" class="even"><td> <tt>processing-instruction(name)</tt></td><td> processing-instructions named <tt>name</tt></td></tr><tr valign="top" class="odd"><td> <tt>document-node()</tt></td><td> document nodes (there is only one)</td></tr><tr valign="top" class="even"><td> <tt>document-node(element(name))</tt></td><td> document node with document element <tt>name</tt></td></tr></table><a name="shorthand-form"><a name="shorthand-form"><h3>Shorthand Form</h3> Writing axis steps using the longhand form with axis specifiers and node tests is semantically clear but syntactically verbose. The shorthand form is easy to learn and, once you learn it, just as easy to read. In the shorthand form, the axis specifier and node test are implied by the syntax. XQueries are normally written in the shorthand form. Here is a table of some frequently used shorthand forms: <table align="center" border="0" cellpadding="2" cellspacing="1"><thead><tr class="qt-style" valign="top"><th><center> Shorthand syntax</center></th><th><center> Short for...</center></th><th><center> matches all...</center></th></tr></thead><tr valign="top" class="even"><td> <tt>name</tt></td><td> <tt>child::element(name)</tt></td><td> child nodes that are <tt>name</tt> elements</td></tr><tr valign="top" class="odd"><td> <tt>*</tt></td><td> <tt>child::element()</tt></td><td> child nodes that are elements (<tt>node()</tt> matches all child nodes)</td></tr><tr valign="top" class="even"><td> <tt>..</tt></td><td> <tt>parent::node()</tt></td><td> parent nodes (there is only one)</td></tr><tr valign="top" class="odd"><td> <tt>@*</tt></td><td> <tt>attribute::attribute()</tt></td><td> attribute nodes</td></tr><tr valign="top" class="even"><td> <tt>@name</tt></td><td> <tt>attribute::attribute(name)</tt></td><td> <tt>name</tt> attributes</td></tr><tr valign="top" class="odd"><td> <tt>//</tt></td><td> <tt>descendant-or-self::node()</tt></td><td> descendent nodes (when used instead of '/')</td></tr></table> The XQuery language specification has a more detailed section on the shorthand form, which it calls the abbreviated syntax. More examples of path expressions written in the shorthand form are found there. There is also a section listing examples of path expressions written in the the longhand form.<a name="name-tests"><a name="name-tests"><h3>Name Tests</h3> The name tests are the <a href="xquery-introduction.html#node-tests">Node Tests</a> that have the <tt>name</tt> parameter. A name test must match the node name in addition to the node kind. We have already seen name tests used: <pre class="snippet">
+doc('cookbook.xml')//recipe/title
+</pre> In this path expression, both <tt>recipe</tt> and <tt>title</tt> are name tests written in the shorthand form. XQuery resolves these names (QNames) to their expanded form using whatever namespace declarations it knows about. Resolving a name to its expanded form means replacing its namespace prefix, if one is present (there aren't any present in the example), with a namespace URI. The expanded name then consists of the namespace URI and the local name. <p>But the names in the example above don't have namespace prefixes, because we didn't include a namespace declaration in our <tt>cookbook.xml</tt> file. However, we will often use XQuery to query XML documents that use namespaces. Forgetting to declare the correct namespace(s) in an XQuery is a common cause of XQuery failures. Let's add a default namespace to <tt>cookbook.xml</tt> now. Change the document element in <tt>cookbook.xml</tt> from: <pre class="snippet">
+&lt;cookbook&gt;
+</pre> to... <pre class="snippet">
+&lt;cookbook xmlns="http://cookbook/namespace"&gt;
+</pre> This is called a default namespace declaration because it doesn't include a namespace prefix. By including this default namespace declaration in the document element, we mean that all unprefixed element names in the document, including the document element itself (<tt>cookbook</tt>), are automatically in the default namespace <tt>http://cookbook/namespace</tt>. Note that unprefixed attribute names are not affected by the default namespace declaration. They are always considered to be in no namespace. Note also that the URL we choose as our namespace URI need not refer to an actual location, and doesn't refer to one in this case. But click on http://www.w3.org/XML/1998/namespace, for example, which is the namespace URI for elements and attributes prefixed with <tt>xml:</tt>. <p>Now when we try to run the previous XQuery example, no output is produced! The path expression no longer matches anything in the cookbook file because our XQuery doesn't yet know about the namespace declaration we added to the cookbook document. There are two ways we can declare the namespace in the XQuery. We can give it a namespace prefix (e.g. <tt>c</tt> for cookbook) and prefix each name test with the namespace prefix: <pre class="snippet">
+declare namespace c = "http://cookbook/namespace";
+doc('cookbook.xml')//c:recipe/c:title
+</pre> Or we can declare the namespace to be the default element namespace, and then we can still run the original XQuery: <pre class="snippet">
+declare default element namespace "http://cookbook/namespace";
+doc('cookbook.xml')//recipe/title
+</pre> Both methods will work and produce the same output, all the <tt>&lt;title&gt;</tt> elements: <pre class="snippet">
+&lt;title xmlns="http://cookbook/namespace"&gt;Quick and Easy Mushroom Soup&lt;/title&gt;
+&lt;title xmlns="http://cookbook/namespace"&gt;Cheese on Toast&lt;/title&gt;
+&lt;title xmlns="http://cookbook/namespace"&gt;Hard-Boiled Eggs&lt;/title&gt;
+</pre> But note how the output is slightly different from the output we saw before we added the default namespace declaration to the cookbook file. <a href="qtxmlpatterns.html">QtXmlPatterns</a> automatically includes the correct namespace attribute in each <tt>&lt;title&gt;</tt> element in the output. When <a href="qtxmlpatterns.html">QtXmlPatterns</a> loads a document and expands a QName, it creates an instance of <a href="../../../com/trolltech/qt/xmlpatterns/QXmlName.html">QXmlName</a>, which retains the namespace prefix along with the namespace URI and the local name. See <a href="../../../com/trolltech/qt/xmlpatterns/QXmlName.html">QXmlName</a> for further details. <p>One thing to keep in mind from this namespace discussion, whether you run XQueries in a Qt program using <a href="qtxmlpatterns.html">QtXmlPatterns</a>, or you run them from the command line using xmlpatterns, is that if you don't get the output you expect, it might be because the data you are querying uses namespaces, but you didn't declare those namespaces in your XQuery.<a name="wildcards-in-name-tests"><h4>Wildcards in Name Tests</h4> The wildcard <tt>'*'</tt> can be used in a name test. To find all the attributes in the cookbook but select only the ones in the <tt>xml</tt> namespace, use the <tt>xml:</tt> namespace prefix but replace the local name (the attribute name) with the wildcard: <pre class="snippet">
+doc('cookbook.xml')//&#64;xml:*
+</pre> Oops! If you save this XQuery in <tt>file.xq</tt> and run it through <tt>xmlpatterns</tt>, it doesn't work. You get an error message instead, something like this: Error SENR0001 in file:///...file.xq, at line 1, column 1: Attribute xml:id can't be serialized because it appears at the top level. The XQuery actually ran correctly. It selected a bunch of <tt>xml:id</tt> attributes and put them in the result set. But then <tt>xmlpatterns</tt> sent the result set to a <a href="../../../com/trolltech/qt/xmlpatterns/QXmlSerializer.html">serializer</a>, which tried to output it as well-formed XML. Since the result set contains only attributes and attributes alone are not well-formed XML, the <a href="../../../com/trolltech/qt/xmlpatterns/QXmlSerializer.html">serializer</a> reports a serialization error. <p>Fear not. XQuery can do more than just find and select elements and attributes. It can <a href="xquery-introduction.html#constructing-elements">construct new ones on the fly</a> as well, which is what we need to do here if we want <tt>xmlpatterns</tt> to let us see the attributes we selected. The example above and the ones below are revisited in the <a href="xquery-introduction.html#constructing-elements">Constructing Elements</a> section. You can jump ahead to see the modified examples now, and then come back, or you can press on from here. <p>To find all the <tt>name</tt> attributes in the cookbook and select them all regardless of their namespace, replace the namespace prefix with the wildcard and write <tt>name</tt> (the attribute name) as the local name: <pre class="snippet">
+doc('cookbook.xml')//&#64;*:name
+</pre> To find and select all the attributes of the document element in the cookbook, replace the entire name test with the wildcard: <pre class="snippet">
+declare default element namespace "http://cookbook/namespace";
+doc('cookbook.xml')/cookbook/&#64;*
+</pre><a name="using-predicates-in-path-expressions"><h2>Using Predicates In Path Expressions</h2> Predicates can be used to further filter the nodes selected by a path expression. A predicate is an expression in square brackets ('[' and ']') that either returns a boolean value or a number. A predicate can appear at the end of any path step in a path expression. The predicate is applied to each node in the focus set. If a node passes the filter, the node is included in the result set. The query below selects the recipe element that has the <tt>&lt;title&gt;</tt> element <tt>"Hard-Boiled Eggs"</tt>. <pre class="snippet">
+declare default element namespace "http://cookbook/namespace";
+doc("cookbook.xml")/cookbook/recipe[title = "Hard-Boiled Eggs"]
+</pre> The dot expression ('.') can be used in predicates and path expressions to refer to the current context node. The following query uses the dot expression to refer to the current <tt>&lt;method&gt;</tt> element. The query selects the empty <tt>&lt;method&gt;</tt> elements from the cookbook. <pre class="snippet">
+declare default element namespace "http://cookbook/namespace";
+doc('cookbook.xml')//method[string-length(.) = 0]
+</pre> Note that passing the dot expression to the string-length() function is optional. When string-length() is called with no parameter, the context node is assumed: <pre class="snippet">
+declare default element namespace "http://cookbook/namespace";
+doc('cookbook.xml')//method[string-length() = 0]
+</pre> Actually, selecting an empty <tt>&lt;method&gt;</tt> element might not be very useful by itself. It doesn't tell you which recipe has the empty method: <pre class="snippet">
+&lt;method xmlns="http://cookbook/namespace"/&gt;
+</pre><a name="empty-method-not-robust"> What you probably want to see instead are the <tt>&lt;recipe&gt;</tt> elements that have empty <tt>&lt;method&gt;</tt> elements: <pre class="snippet">
+declare default element namespace "http://cookbook/namespace";
+doc('cookbook.xml')//recipe[string-length(method) = 0]
+</pre> The predicate uses the string-length() function to test the length of each <tt>&lt;method&gt;</tt> element in each <tt>&lt;recipe&gt;</tt> element found by the node test. If a <tt>&lt;method&gt;</tt> contains no text, the predicate evaluates to <tt>true</tt> and the <tt>&lt;recipe&gt;</tt> element is selected. If the method contains some text, the predicate evaluates to <tt>false</tt>, and the <tt>&lt;recipe&gt;</tt> element is discarded. The output is the entire recipe that has no instructions for preparation: <pre class="snippet">
+&lt;recipe xmlns="http://cookbook/namespace" xml:id="HardBoiledEggs"&gt;
+    &lt;title&gt;Hard-Boiled Eggs&lt;/title&gt;
+    &lt;ingredient name="Eggs" quantity="3" unit="eggs"/&gt;
+    &lt;time quantity="3" unit="minutes"/&gt;
+    &lt;method/&gt;
+&lt;/recipe&gt;
+</pre> The astute reader will have noticed that this use of <tt>string-length()</tt> to find an empty element is unreliable. It works in this case, because the method element is written as <tt>&lt;method/&gt;</tt>, guaranteeing that its string length will be 0. It will still work if the method element is written as <tt>&lt;method&gt;&lt;/method&gt;</tt>, but it will fail if there is any whitespace between the opening and ending <tt>&lt;method&gt;</tt> tags. A more robust way to find the recipes with empty methods is presented in the section on <a href="xquery-introduction.html#boolean-predicates">Boolean Predicates</a>. <p>There are many more functions and operators defined for XQuery and XPath. They are all documented here.<a name="positional-predicates"><h3>Positional Predicates</h3> Predicates are often used to filter items based on their position in a sequence. For path expressions processing items loaded from XML documents, the normal sequence is document order. This query returns the second <tt>&lt;recipe&gt;</tt> element in the <tt>cookbook.xml</tt> file: <pre class="snippet">
+declare default element namespace "http://cookbook/namespace";
+doc('cookbook.xml')/cookbook/recipe[2]
+</pre> The other frequently used positional function is last(), which returns the numeric position of the last item in the focus set. Stated another way, last() returns the size of the focus set. This query returns the last recipe in the cookbook: <pre class="snippet">
+declare default element namespace "http://cookbook/namespace";
+doc('cookbook.xml')/cookbook/recipe[last()]
+</pre> And this query returns the next to last <tt>&lt;recipe&gt;</tt>: <pre class="snippet">
+declare default element namespace "http://cookbook/namespace";
+doc('cookbook.xml')/cookbook/recipe[last() - 1]
+</pre><a name="boolean-predicates"><h3>Boolean Predicates</h3> The other kind of predicate evaluates to true or false. A boolean predicate takes the value of its expression and determines its effective boolean value according to the following rules: <ul><li> An expression that evaluates to a single node is <tt>true</tt>.</li><li> An expression that evaluates to a string is <tt>false</tt> if the string is empty and <tt>true</tt> if the string is not empty.</li><li> An expression that evaluates to a boolean value (i.e. type <tt>xs:boolean</tt>) is that value.</li><li> If the expression evaluates to anything else, it's an error (e.g. type <tt>xs:date</tt>).</li></ul> We have already seen some boolean predicates in use. Earlier, we saw a not so robust way to find the <a href="xquery-introduction.html#empty-method-not-robust">recipes that have no instructions</a>. <tt>[string-length(method) = 0]</tt> is a boolean predicate that would fail in the example if the empty method element was written with both opening and closing tags and there was whitespace between the tags. Here is a more robust way that uses a different boolean predicate. <pre class="snippet">
+declare default element namespace "http://cookbook/namespace";
+doc('cookbook.xml')/cookbook/recipe[method[empty(step)]]
+</pre> This one uses the empty() and function to test whether the method contains any steps. If the method contains no steps, then <tt>empty(step)</tt> will return <tt>true</tt>, and hence the predicate will evaluate to <tt>true</tt>. <p>But even that version isn't foolproof. Suppose the method does contain steps, but all the steps themselves are empty. That's still a case of a recipe with no instructions that won't be detected. There is a better way: <pre class="snippet">
+declare default element namespace "http://cookbook/namespace";
+doc('cookbook.xml')/cookbook/recipe[not(normalize-space(method))]
+</pre> This version uses the not and normalize-space() functions. <tt>normalize-space(method))</tt> returns the contents of the method element as a string, but with all the whitespace normalized, i.e., the string value of each <tt>&lt;step&gt;</tt> element will have its whitespace normalized, and then all the normalized step values will be concatenated. If that string is empty, then <tt>not()</tt> returns <tt>true</tt> and the predicate is <tt>true</tt>. <p>We can also use the position() function in a comparison to inspect positions with conditional logic. The position() function returns the position index of the current context item in the sequence of items: <pre class="snippet">
+declare default element namespace "http://cookbook/namespace";
+doc('cookbook.xml')/cookbook/recipe[position() = 2]
+</pre> Note that the first position in the sequence is position 1, not 0. We can also select all the recipes after the first one: <pre class="snippet">
+declare default element namespace "http://cookbook/namespace";
+doc('cookbook.xml')/cookbook/recipe[position() &gt; 1]
+</pre><a name="constructing-elements"><a name="constructing-elements"><h2>Constructing Elements</h2> In the section about <a href="xquery-introduction.html#wildcards-in-name-tests">using wildcards in name tests</a>, we saw three simple example XQueries, each of which selected a different list of XML attributes from the cookbook. We couldn't use <tt>xmlpatterns</tt> to run these queries, however, because <tt>xmlpatterns</tt> sends the XQuery results to a <a href="../../../com/trolltech/qt/xmlpatterns/QXmlSerializer.html">serializer</a>, which expects to serialize the results as well-formed XML. Since a list of XML attributes by itself is not well-formed XML, the serializer reported an error for each XQuery. <p>Since an attribute must appear in an element, for each attribute in the result set, we must create an XML element. We can do that using a for clause with a bound variable, and a return clause with an element constructor: <pre class="snippet">
+for $i in doc("cookbook.xml")//&#64;xml:*
+return &lt;p&gt;{$i}&lt;/p&gt;
+</pre> The for clause produces a sequence of attribute nodes from the result of the path expression. Each attribute node in the sequence is bound to the variable <tt>$i</tt>. The return clause then constructs a <tt>&lt;p&gt;</tt> element around the attribute node. Here is the output: <pre class="snippet">
+&lt;p xml:id="MushroomSoup"/&gt;
+&lt;p xml:id="CheeseOnToast"/&gt;
+&lt;p xml:id="HardBoiledEggs"/&gt;
+</pre> The output contains one <tt>&lt;p&gt;</tt> element for each <tt>xml:id</tt> attribute in the cookbook. Note that XQuery puts each attribute in the right place in its <tt>&lt;p&gt;</tt> element, despite the fact that in the return clause, the <tt>$i</tt> variable is positioned as if it is meant to become <tt>&lt;p&gt;</tt> element content. <p>The other two examples from the <a href="xquery-introduction.html#wildcards-in-name-tests">wildcard</a> section can be rewritten the same way. Here is the XQuery that selects all the <tt>name</tt> attributes, regardless of namespace: <pre class="snippet">
+for $i in doc("cookbook.xml")//&#64;*:name
+return &lt;p&gt;{$i}&lt;/p&gt;
+</pre> And here is its output: <pre class="snippet">
+&lt;p name="Fresh mushrooms"/&gt;
+&lt;p name="Garlic"/&gt;
+&lt;p name="Olive oil"/&gt;
+&lt;p name="Milk"/&gt;
+&lt;p name="Water"/&gt;
+&lt;p name="Cream"/&gt;
+&lt;p name="Vegetable soup cube"/&gt;
+&lt;p name="Ground black pepper"/&gt;
+&lt;p name="Dried parsley"/&gt;
+&lt;p name="Bread"/&gt;
+&lt;p name="Cheese"/&gt;
+&lt;p name="Eggs"/&gt;
+</pre> And here is the XQuery that selects all the attributes from the document element: <pre class="snippet">
+declare default element namespace "http://cookbook/namespace";
+for $i in doc("cookbook.xml")/cookbook/&#64;*
+return &lt;p&gt;{$i}&lt;/p&gt;
+</pre> And here is its output: <pre class="snippet">
+&lt;p xmlns="http://cookbook/namespace" count="3"/&gt;
+</pre><a name="element-constructors-are-expressions"><h3>Element Constructors are Expressions</h3> Because node constructors are expressions, they can be used in XQueries wherever expressions are allowed. <pre class="snippet">
+declare default element namespace "http://cookbook/namespace";
+let $docURI := 'cookbook.xml'
+return if(doc-available($docURI))
+       then doc($docURI)//recipe/&lt;resept&gt;{./node()}&lt;/resept&gt;
+       else &lt;resept&gt;Failed to load {$docURI}&lt;/resept&gt;
+</pre> If <tt>cookbook.xml</tt> is loaded without error, a <tt>&lt;resept&gt;</tt> element (Norweigian word for recipe) is constructed for each <tt>&lt;recipe&gt;</tt> element in the cookbook, and the child nodes of the <tt>&lt;recipe&gt;</tt> are copied into the <tt>&lt;resept&gt;</tt> element. But if the cookbook document doesn't exist or does not contain well-formed XML, a single <tt>&lt;resept&gt;</tt> element is constructed containing an error message.<a name="constructing-atomic-values"><h2>Constructing Atomic Values</h2> XQuery also has atomic values. An atomic value is a value in the value space of one of the built-in datatypes in the XML Schema language. These atomic types have built-in operators for doing arithmetic, comparisons, and for converting values to other atomic types. See the Built-in Datatype Hierarchy for the entire tree of built-in, primitive and derived atomic types. <b>Note:</b> Click on a data type in the tree for its detailed specification. <p>To construct an atomic value as element content, enclose an expression in curly braces and embed it in the element constructor: <pre class="snippet">
+&lt;e&gt;{sum((1, 2, 3))}&lt;/e&gt;
+</pre> Sending this XQuery through xmlpatterns produces: <pre class="snippet">
+&lt;e&gt;6&lt;/e&gt;
+</pre> To compute the value of an attribute, enclose the expression in curly braces and embed it in the attribute value: <pre class="snippet">
+declare variable $insertion := "example";
+&lt;p class="important {$insertion} obsolete"/&gt;
+</pre> Sending this XQuery through xmlpatterns produces: <pre class="snippet">
+&lt;p class="important example obsolete"/&gt;
+
+declare default element namespace "http://cookbook/namespace";
+let $docURI := 'cookbook.xml'
+return if(doc-available($docURI))
+       then doc($docURI)//recipe/&lt;resept&gt;{./node()}&lt;/resept&gt;
+       else &lt;resept&gt;Failed to load {$docURI}&lt;/resept&gt;
+</pre> If <tt>cookbook.xml</tt> is loaded without error, a <tt>&lt;resept&gt;</tt> element (Norweigian word for recipe) is constructed for each <tt>&lt;recipe&gt;</tt> element in the cookbook, and the child nodes of the <tt>&lt;recipe&gt;</tt> are copied into the <tt>&lt;resept&gt;</tt> element. But if the cookbook document doesn't exist or does not contain well-formed XML, a single <tt>&lt;resept&gt;</tt> element is constructed containing an error message.<a name="running-the-cookbook-examples"><h2>Running The Cookbook Examples</h2> Most of the XQuery examples in this document refer to the cookbook written in XML shown below. Save it as <tt>cookbook.xml</tt>. In the same directory, save one of the cookbook XQuery examples in a <tt>.xq</tt> file (e.g. <tt>file.xq</tt>). Run the XQuery using Qt's command line utility: <pre class="snippet">
+xmlpatterns file.xq
+</pre><a name="cookbook-xml"><h3>cookbook.xml</h3> <pre class="snippet">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;cookbook&gt;
+    &lt;recipe xml:id="MushroomSoup"&gt;
+        &lt;title&gt;Quick and Easy Mushroom Soup&lt;/title&gt;
+        &lt;ingredient name="Fresh mushrooms"
+                    quantity="7"
+                    unit="pieces"/&gt;
+        &lt;ingredient name="Garlic"
+                    quantity="1"
+                    unit="cloves"/&gt;
+        &lt;ingredient name="Olive oil"
+                    quantity="2"
+                    unit="tablespoons"/&gt;
+        &lt;ingredient name="Milk"
+                    quantity="200"
+                    unit="milliliters"/&gt;
+        &lt;ingredient name="Water"
+                    quantity="200"
+                    unit="milliliters"/&gt;
+        &lt;ingredient name="Cream"
+                    quantity="100"
+                    unit="milliliters"/&gt;
+        &lt;ingredient name="Vegetable soup cube"
+                    quantity="1/2"
+                    unit="cubes"/&gt;
+        &lt;ingredient name="Ground black pepper"
+                    quantity="1/2"
+                    unit="teaspoons"/&gt;
+        &lt;ingredient name="Dried parsley"
+                    quantity="1"
+                    unit="teaspoons"/&gt;
+        &lt;time quantity="20"
+              unit="minutes"/&gt;
+        &lt;method&gt;
+            &lt;step&gt;1. Slice mushrooms and garlic.&lt;/step&gt;
+            &lt;step&gt;2. Fry mushroom slices and garlic with olive oil.&lt;/step&gt;
+            &lt;step&gt;3. Once mushrooms are cooked, add milk, cream water. Stir.&lt;/step&gt;
+            &lt;step&gt;4. Add vegetable soup cube.&lt;/step&gt;
+            &lt;step&gt;5. Reduce heat, add pepper and parsley.&lt;/step&gt;
+            &lt;step&gt;6. Turn off the stove before the mixture boils.&lt;/step&gt;
+            &lt;step&gt;7. Blend the mixture.&lt;/step&gt;
+        &lt;/method&gt;
+    &lt;/recipe&gt;
+    &lt;recipe xml:id="CheeseOnToast"&gt;
+        &lt;title&gt;Cheese on Toast&lt;/title&gt;
+        &lt;ingredient name="Bread"
+                    quantity="2"
+                    unit="slices"/&gt;
+        &lt;ingredient name="Cheese"
+                    quantity="2"
+                    unit="slices"/&gt;
+        &lt;time quantity="3"
+              unit="minutes"/&gt;
+        &lt;method&gt;
+            &lt;step&gt;1. Slice the bread and cheese.&lt;/step&gt;
+            &lt;step&gt;2. Grill one side of each slice of bread.&lt;/step&gt;
+            &lt;step&gt;3. Turn over the bread and place a slice of cheese on each piece.&lt;/step&gt;
+            &lt;step&gt;4. Grill until the cheese has started to melt.&lt;/step&gt;
+            &lt;step&gt;5. Serve and enjoy!&lt;/step&gt;
+        &lt;/method&gt;
+    &lt;/recipe&gt;
+    &lt;recipe xml:id="HardBoiledEggs"&gt;
+        &lt;title&gt;Hard-Boiled Eggs&lt;/title&gt;
+        &lt;ingredient name="Eggs"
+                    quantity="3"
+                    unit="eggs"/&gt;
+        &lt;time quantity="3"
+              unit="minutes"/&gt;
+        &lt;method/&gt;
+    &lt;/recipe&gt;
+&lt;/cookbook&gt;
+</pre><a name="further-reading"><h2>Further Reading</h2> There is much more to the XQuery language than we have presented in this short introduction. We will be adding more here in later releases. In the meantime, playing with the <tt>xmlpatterns</tt> utility and making modifications to the XQuery examples provided here will be quite informative. An XQuery textbook will be a good investment. <p>You can also ask questions on XQuery mail lists: <ul><li> qt-interest</li><li> talk at x-query.com.</li></ul> FunctX has a collection of XQuery functions that can be both useful and educational. <p>This introduction contains many links to the specifications, which, of course, are the ultimate source of information about XQuery. They can be a bit difficult, though, so consider investing in a textbook: <ul><li> XQuery 1.0: An XML Query Language - the main source for syntax and semantics.</li><li> XQuery 1.0 and XPath 2.0 Functions and Operators - the builtin functions and operators.</li></ul><a name="faq"><h2>FAQ</h2> The answers to these frequently asked questions explain the causes of several common mistakes that most beginners make. Reading through the answers ahead of time might save you a lot of head scratching.<a name="why-didn-t-my-path-expression-match-anything"><h3>Why didn't my path expression match anything?</h3> The most common cause of this bug is failure to declare one or more namespaces in your XQuery. Consider the following query for selecting all the examples in an XHTML document:<pre class="snippet">doc("index.html")/html/body/p[@class="example"]
+</pre> It won't match anything because <tt>index.html</tt> is an XHTML file, and all XHTML files declare the default namespace <tt>"http://www.w3.org/1999/xhtml"</tt> in their top (<tt>&lt;html&gt;</tt>) element. But the query doesn't declare this namespace, so the path expression expands <tt>html</tt> to <tt>{}html</tt> and tries to match that expanded name. But the actual expanded name is <tt>{http://www.w3.org/1999/xhtml}html</tt>. One possible fix is to declare the correct default namespace in the XQuery:<pre class="snippet">declare namespace x = "http://www.w3.org/1999/xhtml/";
+doc("index.html")/x:html/x:body/x:p[@class="example"]
+</pre> Another common cause of this bug is to confuse the document node with the top element node. They are different. This query won't match anything:<pre class="snippet">doc("myPlainHTML.html")/body
+</pre> The <tt>doc()</tt> function returns the document node, not the top element node (<tt>&lt;html&gt;</tt>). Don't forget to match the top element node in the path expression:<pre class="snippet">doc("myPlainHTML.html")/html/body
+</pre><a name="what-if-my-input-namespace-is-different-from-my-output-namespace"><h3>What if my input namespace is different from my output namespace?</h3> Just remember to declare both namespaces in your XQuery and use them properly. Consider the following query, which is meant to generate XHTML output from XML input:<pre class="snippet">declare default element namespace "http://www.w3.org/1999/xhtml";
+&lt;html&gt;
+    &lt;body&gt;
+        {
+            for $i in doc("testResult.xml")/tests/test[@status = "failure"]
+            order by $i/@name
+            return &lt;p&gt;{$i/@name}&lt;/p&gt;
+        }
+    &lt;/body&gt;
+&lt;/html&gt;
+</pre> We want the <tt>&lt;html&gt;</tt>, <tt>&lt;body&gt;</tt>, and <tt>&lt;p&gt;</tt> nodes we create in the output to be in the standard XHTML namespace, so we declare the default namespace to be <tt>http://www.w3.org/1999/xhtml</tt>. That's correct for the output, but that same default namespace will also be applied to the node names in the path expression we're trying to match in the input (<tt>/tests/test[@status = "failure"]</tt>), which is wrong, because the namespace used in <tt>testResult.xml</tt> is perhaps in the empty namespace. So we must declare that namespace too, with a namespace prefix, and then use the prefix with the node names in the path expression. This one will probably work better:<pre class="snippet">declare namespace x = "http://www.w3.org/1998/xhtml";
+&lt;x:html&gt;
+    &lt;x:body&gt;
+        {
+            for $i in doc("testResult.xml")/tests/test[@status = "failure"]
+            order by $i/@name
+            return &lt;x:p&gt;{$i/@name}&lt;/x:p&gt;
+        }
+    &lt;/x:body&gt;
+&lt;/x:html&gt;
+</pre><a name="why-doesn-t-my-return-clause-work"><h3>Why doesn't my return clause work?</h3> Recall that XQuery is an expression-based language, not statement-based. Because an XQuery is a lot of expressions, understanding XQuery expression precedence is very important. Consider the following query:<pre class="snippet">for $i in(reverse(1 to 10)),
+    $d in xs:integer(doc("numbers.xml")/numbers/number)
+return $i + $d
+</pre> It looks ok, but it isn't. It is supposed to be a FLWOR expression comprising a for clause and a return clause, but it isn't just that. It has a FLWOR expression, certainly (with the for and return clauses), but it also has an arithmetic expression (+ $d) dangling at the end because we didn't enclose the return expression in parentheses. <p>Using parentheses to establish precedence is more important in XQuery than in other languages, because XQuery is expression-based. In In this case, without parantheses enclosing <tt>$i + $d</tt>, the return clause only returns <tt>$i</tt>. The <tt>+$d</tt> will have the result of the FLWOR expression as its left operand. And, since the scope of variable <tt>$d</tt> ends at the end of the return clause, a variable out of scope error will be reported. Correct these problems by using parentheses.<pre class="snippet">for $i in(reverse(1 to 10)),
+    $d in xs:integer(doc("numbers.xml")/numbers/number)
+return ($i + $d)
+</pre><a name="why-didn-t-my-expression-get-evaluated"><h3>Why didn't my expression get evaluated?</h3> You probably misplaced some curly braces. When you want an expression evaluated inside an element constructor, enclose the expression in curly braces. Without the curly braces, the expression will be interpreted as text. Here is a <tt>sum()</tt> expression used in an <tt>&lt;e&gt;</tt> element. The table shows cases where the curly braces are missing, misplaced, and placed correctly: <table align="center" border="0" cellpadding="2" cellspacing="1"><thead><tr class="qt-style" valign="top"><th><center> element constructor with expression...</center></th><th><center> evaluates to...</center></th></tr></thead><tr valign="top" class="even"><td> &lt;e&gt;sum((1, 2, 3))&lt;/e&gt;</td><td> &lt;e&gt;sum((1, 2, 3))&lt;/e&gt;</td></tr><tr valign="top" class="odd"><td> &lt;e&gt;sum({(1, 2, 3)})&lt;/e&gt;</td><td> &lt;e&gt;sum(1 2 3)&lt;/e&gt;</td></tr><tr valign="top" class="even"><td> &lt;e&gt;{sum((1, 2, 3))}&lt;/e&gt;</td><td> &lt;e&gt;6&lt;/e&gt;</td></tr></table><a name="my-predicate-is-correct-so-why-doesn-t-it-select-the-right-stuff"><h3>My predicate is correct, so why doesn't it select the right stuff?</h3> Either you put your predicate in the wrong place in your path expression, or you forgot to add some parentheses. Consider this input file <tt>doc.txt</tt>:<pre class="snippet">&lt;doc&gt;
+  &lt;p&gt;
+    &lt;span&gt;1&lt;/span&gt;
+    &lt;span&gt;2&lt;/span&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;span&gt;3&lt;/span&gt;
+    &lt;span&gt;4&lt;/span&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;span&gt;5&lt;/span&gt;
+    &lt;span&gt;6&lt;/span&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;span&gt;7&lt;/span&gt;
+    &lt;span&gt;8&lt;/span&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;span&gt;9&lt;/span&gt;
+    &lt;span&gt;a&lt;/span&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;span&gt;b&lt;/span&gt;
+    &lt;span&gt;c&lt;/span&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;span&gt;d&lt;/span&gt;
+    &lt;span&gt;e&lt;/span&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;span&gt;f&lt;/span&gt;
+    &lt;span&gt;0&lt;/span&gt;
+  &lt;/p&gt;
+&lt;/doc&gt;
+
+</pre> Suppose you want the first <tt>&lt;span&gt;</tt> element of every <tt>&lt;p&gt;</tt> element. Apply a position filter (<tt>[1]</tt>) to the <tt>/span</tt> path step:<pre class="snippet">let $doc := doc('doc.txt')
+return $doc/doc/p/span[1]</pre> Applying the <tt>[1]</tt> filter to the <tt>/span</tt> step returns the first <tt>&lt;span&gt;</tt> element of each <tt>&lt;p&gt;</tt> element: <pre class="snippet">
+&lt;span&gt;1&lt;/span&gt;
+&lt;span&gt;3&lt;/span&gt;
+&lt;span&gt;5&lt;/span&gt;
+&lt;span&gt;7&lt;/span&gt;
+&lt;span&gt;9&lt;/span&gt;
+&lt;span&gt;b&lt;/span&gt;
+&lt;span&gt;d&lt;/span&gt;
+&lt;span&gt;f&lt;/span&gt;
+</pre> <b>Note:</b>: You can write the same query this way: <pre class="snippet">
+for $a in doc('doc.txt')/doc/p/span[1]
+return $a
+</pre> Or you can reduce it right down to this: <pre class="snippet">
+doc('doc.txt')/doc/p/span[1]
+</pre> On the other hand, suppose you really want only one <tt>&lt;span&gt;</tt> element, the first one in the document (i.e., you only want the first <tt>&lt;span&gt;</tt> element in the first <tt>&lt;p&gt;</tt> element). Then you have to do more filtering. There are two ways you can do it. You can apply the <tt>[1]</tt> filter in the same place as above but enclose the path expression in parentheses:<pre class="snippet">let $doc := doc('doc.txt')
+return ($doc/doc/p/span)[1]
+</pre> Or you can apply a second position filter (<tt>[1]</tt> again) to the <tt>/p</tt> path step: <pre class="snippet">
+let $doc := doc('doc.txt')
+return $doc/doc/p[1]/span[1]
+</pre> Either way the query will return only the first <tt>&lt;span&gt;</tt> element in the document: <pre class="snippet">
+&lt;span&gt;1&lt;/span&gt;
+</pre><a name="why-doesn-t-my-flwor-behave-as-expected"><h3>Why doesn't my FLWOR behave as expected?</h3> The quick answer is you probably expected your XQuery FLWOR to behave just like a C++ for loop. But they aren't the same. Consider a simple example:<pre class="snippet">for $a in (8, -4, 2)
+let $b := ($a * -1, $a)
+order by $a
+return $b
+</pre> This query evaluates to 4 -4 -2 2 -8 8. The for clause does set up a for loop style iteration, which does evaluate the rest of the FLWOR multiple times, one time for each value returned by the in expression. That much is similar to the C++ for loop. <p>But consider the return clause. In C++ if you hit a return statement, you break out of the for loop and return from the function with one value. Not so in XQuery. The return clause is the last clause of the FLWOR, and it means: Append the return value to the result list and then begin the next iteration of the FLWOR. When the for clause's in expression no longer returns a value, the entire result list is returned. <p>Next, consider the order by clause. It doesn't do any sorting on each iteration of the FLWOR. It just evaluates its expression on each iteration (<tt>$a</tt> in this case) to get an ordering value to map to the result item from each iteration. These ordering values are kept in a parallel list. The result list is sorted at the end using the parallel list of ordering values. <p>The last difference to note here is that the let clause does not set up an iteration through a sequence of values like the for clause does. The let clause isn't a sort of nested loop. It isn't a loop at all. It is just a variable binding. On each iteration, it binds the entire sequence of values on the right to the variable on the left. In the example above, it binds (4 -4) to <tt>$b</tt> on the first iteration, (-2 2) on the second iteration, and (-8 8) on the third iteration. So the following query doesn't iterate through anything, and doesn't do any ordering:<pre class="snippet">let $i := (2, 3, 1)
+order by $i[1]
+return $i
+</pre> It binds the entire sequence (2, 3, 1) to <tt>$i</tt> one time only; the order by clause only has one thing to order and hence does nothing, and the query evaluates to 2 3 1, the sequence assigned to <tt>$i</tt>. <p><b>Note:</b> We didn't include a where clause in the example. The where clause is for filtering results.<a name="why-are-my-elements-created-in-the-wrong-order"><h3>Why are my elements created in the wrong order?</h3> The short answer is your elements are not created in the wrong order, because when appearing as operands to a path expression, there is no correct order. Consider the following query, which again uses the input file <tt>doc.txt</tt>: <pre class="snippet">
+doc('doc.txt')//p/&lt;p&gt;{span/node()}&lt;/p&gt;
+</pre> The query finds all the <tt>&lt;p&gt;</tt> elements in the file. For each <tt>&lt;p&gt;</tt> element, it builds a <tt>&lt;p&gt;</tt> element in the output containing the concatenated contents of all the <tt>&lt;p&gt;</tt> element's child <tt>&lt;span&gt;</tt> elements. Running the query through <tt>xmlpatterns</tt> might produce the following output, which is not sorted in the expected order. <pre class="snippet">
+&lt;p&gt;78&lt;/p&gt;
+&lt;p&gt;9a&lt;/p&gt;
+&lt;p&gt;12&lt;/p&gt;
+&lt;p&gt;bc&lt;/p&gt;
+&lt;p&gt;de&lt;/p&gt;
+&lt;p&gt;34&lt;/p&gt;
+&lt;p&gt;56&lt;/p&gt;
+&lt;p&gt;f0&lt;/p&gt;
+</pre> You can use a for loop to ensure that the order of the result set corresponds to the order of the input sequence: <pre class="snippet">
+for $a in doc('doc.txt')//p
+ return &lt;p&gt;{$a/span/node()}&lt;/p&gt;
+</pre> This version produces the same result set but in the expected order: <pre class="snippet">
+&lt;p&gt;12&lt;/p&gt;
+&lt;p&gt;34&lt;/p&gt;
+&lt;p&gt;56&lt;/p&gt;
+&lt;p&gt;78&lt;/p&gt;
+&lt;p&gt;9a&lt;/p&gt;
+&lt;p&gt;bc&lt;/p&gt;
+&lt;p&gt;de&lt;/p&gt;
+&lt;p&gt;f0&lt;/p&gt;
+</pre><a name="why-can-t-i-use-and-in-my-xquery"><h3>Why can't I use true and false in my XQuery?</h3><tt>true</tt><tt>false</tt> You can, but not by just using the names <tt>true</tt> and <tt>false</tt> directly, because they are <a href="xquery-introduction.html#name-tests">name tests</a> although they look like boolean constants. The simple way to create the boolean values is to use the builtin functions <tt>true()</tt> and <tt>false()</tt> wherever you want to use <tt>true</tt> and <tt>false</tt>. The other way is to invoke the boolean constructor:<pre class="snippet">xs:boolean("true")
+</pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Calculator UI Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Calculator UI Example</h1></center><p> <b>Code</b>: <ul><li> <a href="qtjambi-calculator-code.html">AdvancedCalculator.java</a></li></ul> The Calculator UI Example shows how to use forms created with Qt Designer in an application. <table align="center" border="0" cellpadding="2" cellspacing="1"><tr valign="top" class="even"><td>  <br><center><img src="images/calculator-simple-example.png"></center><br></td><td>  <br><center><img src="images/calculator-normal-example.png"></center><br></td><td>  <br><center><img src="images/calculator-dockable-example.png"></center><br></td></tr><thead><tr class="qt-style" valign="top"><th><center> Simple</center></th><th><center> Normal</center></th><th><center> Dockable</center></th></tr></thead></table> The example provides a calculator application that allows the user to choose the preferred user interface among <b>Simple</b>, <b>Normal</b> and <b>Dockable</b>. The main application window is provided by the <tt>Calculator</tt> class which extends the <a href="../../../com/trolltech/qt/gui/QMainWindow.html">QMainWindow</a> class.<a name="calculator-class-definition"><h2>Calculator Class Definition</h2> In general, you only have to subclass <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> to implement the UI forms. The reason we have chosen to derive from <a href="../../../com/trolltech/qt/gui/QMainWindow.html">QMainWindow</a> (which is a <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> subclass) instead, is rooted in the dockable version of our calculator. <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> does not support dock widgets; <a href="../../../com/trolltech/qt/gui/QMainWindow.html">QMainWindow</a> does. <pre class="snippet">
+public class AdvancedCalculator extends QMainWindow {
+
+    public static void main(String[] args) {
+        QApplication.initialize(args);
+        AdvancedCalculator calculator = new AdvancedCalculator();
+        calculator.show();
+        QApplication.exec();
+    }
+
+    private QLineEdit lineEdit;
+    private QTextBrowser textBrowser;
+
+    private Interpreter interpreter = new Interpreter();
+</pre> In the <tt>Calculator</tt> class, we first provide a <tt>main()</tt> method to create and show the main application window when the example is run. While running the calculator, we will have to access the line edit to accept input and the text browser to display the calculations and results. For that reason, we declare corresponding variables in the application wide scope. We also have to provide methods that correspond to the application's user interface. All of this is taken care of in the <tt>Calculator</tt> class's constructor.<a name="calculator-class-constructor"><h2>Calculator Class Constructor</h2> In the constructor, we first define the various user interfaces that the user can choose from, and the we use the <a href="../../../com/trolltech/qt/gui/QInputDialog.html">QInputDialog</a> class to retrieve the user's preferred alternative: <pre class="snippet">
+    public AdvancedCalculator() {
+        Vector&lt;String&gt; uiTypes = new Vector&lt;String&gt;(3);
+        uiTypes.add("Simple");
+        uiTypes.add("Normal");
+        uiTypes.add("Dockable");
+...
+        String item = QInputDialog.getItem(this, tr("Ui selector"), tr("Ui configurations:"), uiTypes, 0, false);
+</pre> The <a href="../../../com/trolltech/qt/gui/QInputDialog.html">QInputDialog</a> class provides a simple convenience dialog to get a single value from the user. The input value can be a string, a number or an item from a list. We use the static <a href="../../../com/trolltech/qt/gui/QInputDialog.html#getItem(com.trolltech.qt.gui.QWidget, java.lang.String, java.lang.String, java.util.List<java.lang.String>, int, boolean, com.trolltech.qt.core.Qt.WindowFlags)">QInputDialog.getItem()</a> convenience method to let the user select one of our predefined alternatives using a combobox. <br><center><img src="images/calculator-selector.png"></center><br> When pressing the dialog's <b>OK</b> button, the <a href="../../../com/trolltech/qt/gui/QInputDialog.html#getItem(com.trolltech.qt.gui.QWidget, java.lang.String, java.lang.String, java.util.List<java.lang.String>, int, boolean, com.trolltech.qt.core.Qt.WindowFlags)">getItem()</a> method returns the text of the current item; otherwise it returns <tt>null</tt>. <pre class="snippet">
+        if (item == null || item.equals("Simple")) {
+            Ui_CalculatorSimple uiSimple = new Ui_CalculatorSimple();
+            uiSimple.setupUi(this);
+            lineEdit = uiSimple.lineEdit;
+            textBrowser = uiSimple.textBrowser;
+        } else if (item.equals("Normal")) {
+
+            Ui_CalculatorNormal uiNormal = new Ui_CalculatorNormal();
+            uiNormal.setupUi(this);
+            lineEdit = uiNormal.lineEdit;
+            textBrowser = uiNormal.textBrowser;
+        } else if (item.equals("Dockable")) {
+
+            Ui_CalculatorDockable uiDockable = new Ui_CalculatorDockable();
+            uiDockable.setupUi(this);
+            lineEdit = uiDockable.lineEdit;
+            textBrowser = uiDockable.textBrowser;
+        }
+</pre> Once we know which user interface the user prefer, we can create an object of the corresponding class. Note that you must run the user interface compiler for Qt (juic) to generate the latter class. For example, if the form created in Qt Designer is saved as <tt>CalculatorSimple.jui</tt>, running juic on the file will generate the corresponding <tt>Ui_CalculatorSimple.java</tt> file that defines the public <tt>Ui_CalculatorSimple</tt> class. The latter file must be located in the same directory as the application executable to be successfully loaded at runtime. <p>The generated class has a <tt>setupUI()</tt> method that we can use to set up the preferred user interface. We pass <tt>this</tt> as the argument to this method to use the <tt>Calculator</tt> widget itself as the container for the user interface. With the user interface in place, we can also establish the previously mentioned access to the input line edit and output text browser.<a name="connecting-to-the-user-interface"><h2>Connecting to the User Interface</h2> In addition to creating the user interface, <tt>setupUi()</tt> automatically calls the <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>.connectSlotsByName() method, connecting signals from widgets on the form to methods in our code. To indicate which widgets and signals in the user interface that should be connected to each method, we use a predefined naming convention. For example: <pre class="snippet">
+    public void on_button_equal_clicked() {
+        String expression = lineEdit.text();
+        String result = "";
+        boolean error = false;
+        try {
+            result = interpreter.evaluate(interpreter.parse(expression)).toString();
+        } catch (Interpreter.ParseException exception) {
+            result = "Error: &lt;font color=\"red\"&gt;" + exception.getMessage() + "&lt;/font&gt;";
+            error = true;
+        }
+
+        textBrowser.append(expression + "&lt;b&gt; = " + result + "&lt;/b&gt;&lt;br&gt;");
+        if (error)
+            result = expression;
+        lineEdit.setText(result);
+    }
+...
+}
+</pre> The <tt>on_button_equal_clicked()</tt> method is called whenever the button called "button_equal" in the user interface emits the QAbstractButton.clicked() signal. By providing similar methods for all the buttons in the user interface we get a fully responsive calculator application. <p>Note that the <tt>Calculator</tt> class defines several other methods used to perform the various calculations, but these are beyond the scope of this documentation. Please see the example code for implementation details.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

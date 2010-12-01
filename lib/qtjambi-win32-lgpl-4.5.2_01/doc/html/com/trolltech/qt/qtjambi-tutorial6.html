@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Qt Jambi Tutorial 6 - Building Blocks Galore!</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Qt Jambi Tutorial 6 - Building Blocks Galore!</h1></center><p>[Previous: <a href="qtjambi-tutorial5.html">Qt Jambi Tutorial 5 - Building Blocks</a>][<a href="qtjambi-tutorial.html">Qt Jambi Tutorial</a>][Next: <a href="qtjambi-tutorial7.html">Qt Jambi Tutorial 7 - One Thing Leads to Another</a>]<p> <b>Code</b>: <ul><li> <a href="qtjambi-tutorial6-code.html">BlocksGalore.java</a></li></ul> <br><center><img src="images/tutorial6-example.png"></center><br> This example shows how to encapsulate two widgets into a new component and how easy it is to use many widgets. For the first time, we use a custom widget as a child widget. <pre class="snippet">
+public class BlocksGalore extends QWidget
+{
+    public BlocksGalore()
+    {
+        QPushButton quit = new QPushButton(tr("Quit"));
+        quit.setFont(new QFont("Times", 18, QFont.Weight.Bold.value()));
+
+        quit.clicked.connect(QApplication.instance(), "quit()");
+
+
+
+        QGridLayout grid = new QGridLayout();
+        QVBoxLayout layout = new QVBoxLayout();
+        layout.addWidget(quit);
+        layout.addLayout(grid);
+        setLayout(layout);
+        setWindowTitle(tr("Building Blocks Galore"));
+
+ 
+        for (int row = 0; row &lt; 3; ++row) {
+ 
+            for (int column = 0; column &lt; 3; ++column) {
+                LCDRange lcdRange = new LCDRange();
+                grid.addWidget(lcdRange, row, column);
+            }
+        }
+    }
+
+
+
+    class LCDRange extends QWidget
+    {
+ 
+        public LCDRange()
+        {
+            QLCDNumber lcd = new QLCDNumber(2);
+            lcd.setSegmentStyle(QLCDNumber.SegmentStyle.Filled);
+
+            QSlider slider = new QSlider(Qt.Orientation.Horizontal);
+            slider.setRange(0, 99);
+            slider.setValue(0);
+
+            slider.valueChanged.connect(lcd, "display(int)");
+
+            QVBoxLayout layout = new QVBoxLayout();
+            layout.addWidget(lcd);
+            layout.addWidget(slider);
+            setLayout(layout);
+        }
+
+    }
+
+    public static void main(String args[])
+    {
+        QApplication.initialize(args);
+
+        BlocksGalore widget = new BlocksGalore();
+        widget.show();
+
+        QApplication.exec();
+    }
+}
+</pre><a name="line-by-line-walkthrough"><h2>Line by Line Walkthrough</h2> <pre class="snippet">
+    class LCDRange extends QWidget
+    {
+</pre> The <tt>LCDRange</tt> widget is a widget without any API. It just has a constructor. This sort of widget is not very useful, so we'll add some API later. <pre class="snippet">
+        public LCDRange()
+        {
+            QLCDNumber lcd = new QLCDNumber(2);
+            lcd.setSegmentStyle(QLCDNumber.SegmentStyle.Filled);
+
+            QSlider slider = new QSlider(Qt.Orientation.Horizontal);
+            slider.setRange(0, 99);
+            slider.setValue(0);
+
+            slider.valueChanged.connect(lcd, "display(int)");
+
+            QVBoxLayout layout = new QVBoxLayout();
+            layout.addWidget(lcd);
+            layout.addWidget(slider);
+            setLayout(layout);
+        }
+</pre> The code in the constructor is lifted straight from the <tt>Blocks</tt> constructor in Chapter 5. The only differences are that the <b>Quit</b> button is left out and the class is renamed. <p>The <tt>BlocksGalore</tt> class, too, contains no API except a constructor: <pre class="snippet"> 
+public class BlocksGalore extends QWidget
+{
+    public BlocksGalore()
+    {
+        QPushButton quit = new QPushButton(tr("Quit"));
+        quit.setFont(new QFont("Times", 18, QFont.Weight.Bold.value()));
+
+        quit.clicked.connect(QApplication.instance(), "quit()");
+</pre> The push button that used to be in what is now <tt>LCDRange</tt> has been separated so that we can have one <b>Quit</b> button and many <tt>LCDRange</tt> objects. <pre class="snippet">
+        QGridLayout grid = new QGridLayout();
+        QVBoxLayout layout = new QVBoxLayout();
+        layout.addWidget(quit);
+        layout.addLayout(grid);
+        setLayout(layout);
+        setWindowTitle(tr("Building Blocks Galore"));
+
+</pre> We create a <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> with a <a href="../../../com/trolltech/qt/gui/QGridLayout.html">QGridLayout</a> that will contain three columns. The <a href="../../../com/trolltech/qt/gui/QGridLayout.html">QGridLayout</a> automatically arranges its widgets in rows and columns; you can specify the row and column numbers when adding widgets to the layout, and <a href="../../../com/trolltech/qt/gui/QGridLayout.html">QGridLayout</a> will fit them into the grid. <p>We use a <a href="../../../com/trolltech/qt/gui/QVBoxLayout.html">QVBoxLayout</a> to lay out the <b>Quit</b> button and the grid layout. The <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>.addLayout() method is similar to the <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>.addWidget() method, making the given layout a child of the main layout. <p>We then proceed to create the LCDRange widgets: <pre class="snippet">
+        for (int row = 0; row &lt; 3; ++row) {
+
+            for (int column = 0; column &lt; 3; ++column) {
+                LCDRange lcdRange = new LCDRange();
+                grid.addWidget(lcdRange, row, column);
+            }
+        }
+    }
+</pre> We create nine <tt>LCDRange</tt> widgets, and we arrange them in three rows and three columns. We set the parent of the widgets to the BlocksGalore instance in the constructor. If we didn't, the parent of the widgets would be set when the layout is installed on the widget with <a href="porting4.html">setLayout()</a>. For this reason, it might be a good idea to always set a parent to a widget in its constructor. <p>That's all, folks!<a name="running-the-application"><h2>Running the Application</h2> This program shows how easy it is to use many widgets at a time. Each one behaves like the slider and LCD number in the previous chapter. Again, the difference lies in the implementation.<a name="exercises"><h2>Exercises</h2> Initialize each slider with a different/random value on startup.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

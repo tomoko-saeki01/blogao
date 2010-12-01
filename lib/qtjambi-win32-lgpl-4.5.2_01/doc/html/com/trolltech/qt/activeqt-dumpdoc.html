@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>The dumpdoc Tool (ActiveQt)</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>The dumpdoc Tool (ActiveQt)</h1></center><p><a name="dumpdoc"> The <tt>dumpdoc</tt> tool generates Qt-style documentation for any COM object and writes it into the file specified. <p>Call <tt>dumpdoc</tt> with the following command line parameters: <table align="center" border="0" cellpadding="2" cellspacing="1"><thead><tr class="qt-style" valign="top"><th><center> Option</center></th><th><center> Result</center></th></tr></thead><tr valign="top" class="even"><td> -o file</td><td> Writes output to file</td></tr><tr valign="top" class="odd"><td> object</td><td> Generate documentation for object</td></tr><tr valign="top" class="even"><td> -v</td><td> Print version information</td></tr><tr valign="top" class="odd"><td> -h</td><td> Print help</td></tr></table> object must be an object installed on the local machine (ie. remote objects are not supported), and can include subobjects accessible through properties, ie. <tt>Outlook.Application/Session/CurrentUser</tt> <p>The generated file will be an HTML file using Qt documentation style. <p>To build the tool you must first build the <a href="qaxcontainer.html">QAxContainer</a> library. Then run your make tool in <tt>tools/dumpdoc</tt>.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

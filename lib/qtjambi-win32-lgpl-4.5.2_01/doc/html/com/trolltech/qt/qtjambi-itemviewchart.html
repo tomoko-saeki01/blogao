@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Item View Chart Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Item View Chart Example</h1></center><p> <b>Code</b>: <ul><li> <a href="qtjambi-itemviewchart-code.html">ItemviewChart.java</a></li></ul> The Item View Chart example shows how to create a custom view for the model/view framework. <br><center><img src="images/chart-example.png"></center><br> In this example, the items in a table model are represented as slices in a pie chart, relying on the flexibility of the model/view architecture to handle custom editing and selection features. <p><b>Note that you only need to create a new view class if your data requires a specialized representation.</b> You should first consider using a standard <a href="../../../com/trolltech/qt/gui/QListView.html">QListView</a>, <a href="../../../com/trolltech/qt/gui/QTableView.html">QTableView</a>, or <a href="../../../com/trolltech/qt/gui/QTreeView.html">QTreeView</a> with a custom <a href="../../../com/trolltech/qt/gui/QItemDelegate.html">QItemDelegate</a> subclass if you need to represent data in a special way. <p>Many alternative representations of the same data, such as bar charts, could more easily be obtained using <a href="itemviews-pixelator.html">custom delegates</a> with a <a href="../../../com/trolltech/qt/gui/QTableView.html">QTableView</a>. <p>The example provides a custom <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html">QAbstractItemView</a> class, <tt>PieView</tt>, that is displayed side-by-side with a <a href="../../../com/trolltech/qt/gui/QTableView.html">QTableView</a> in a main window provided by the <tt>ItemviewChart</tt> class, a subclass of <a href="../../../com/trolltech/qt/gui/QMainWindow.html">QMainWindow</a>.<a name="itemviewchart-class-implementation"><h2>ItemviewChart Class Implementation</h2> The <tt>ItemviewChart</tt> class contains methods to handle the user interface and set up a model with data obtained from a file. It also contains the implementation of the <tt>PieView</tt> class (<a href="qtjambi-itemviewchart.html#pieview-class-implementation">shown later</a>). <pre class="snippet">
+public class ItemviewChart extends QMainWindow {
+
+    private QAbstractItemModel model;
+</pre> We define private variables for the model so that we can access and modify it as required. <p>The constructor sets up the user interface, connecting actions used in the menus to slots in the class, constructs a model, and arranges the views in the window: <pre class="snippet">
+    public ItemviewChart() {
+        QMenu fileMenu = new QMenu(tr("&File"), this);
+
+        QAction openAction = new QAction(tr("&Open..."), this);
+        openAction.setShortcut(new QKeySequence(tr("Ctrl+O")));
+        openAction.triggered.connect(this, "openFile()");
+        fileMenu.addAction(openAction);
+
+        QAction saveAction = new QAction(tr("&Save As..."), this);
+        saveAction.setShortcut(new QKeySequence(tr("Ctrl+S")));
+        saveAction.triggered.connect(this, "saveFile()");
+        fileMenu.addAction(saveAction);
+
+        QAction quitAction = new QAction(tr("&Quit"), this);
+        quitAction.setShortcut(new QKeySequence(tr("Ctrl+Q")));
+        quitAction.triggered.connect(this, "close()");
+        fileMenu.addAction(quitAction);
+
+        setupModel();
+        setupViews();
+
+        menuBar().addMenu(fileMenu);
+        statusBar();
+
+        openFile("classpath:com/trolltech/examples/qtdata.cht");
+
+        setWindowTitle(tr("Chart"));
+        setWindowIcon(new QIcon("classpath:com/trolltech/images/qt-logo.png"));
+        resize(750, 500);
+    }
+</pre> The data in the <tt>qtdata.cht</tt> file is accessed from the classpath via the <a href="qtjambi-resourcesystem.html">resource system</a>. <p>The <tt>setupModel()</tt> method provides an empty model with a reasonable number of rows and columns: <pre class="snippet">
+    private void setupModel() {
+        model = new QStandardItemModel(8, 2, this);
+        model.setHeaderData(0, Qt.Orientation.Horizontal, tr("Label"));
+        model.setHeaderData(1, Qt.Orientation.Horizontal, tr("Quantity"));
+    }
+</pre> Since the data used with the example is arranged in the form of a two-column table with an arbitrary number of rows, it is useful to set the number of columns when the model is constructed. The number of rows defined here is a useful minimum value, allowing the user to experiment by adding additional data to small data sets. <p>The <tt>setupViews()</tt> method arranges a table view alongside the custom pie view in a <a href="../../../com/trolltech/qt/gui/QSplitter.html">QSplitter</a> widget, enabling the amount of space assigned to each to be adjusted by the user: <pre class="snippet">
+    private void setupViews() {
+        QSplitter splitter = new QSplitter();
+        QTableView table = new QTableView();
+        QAbstractItemView pieChart = new PieView(this);
+        splitter.addWidget(table);
+        splitter.addWidget(pieChart);
+        splitter.setStretchFactor(0, 0);
+        splitter.setStretchFactor(1, 1);
+
+        table.setModel(model);
+        pieChart.setModel(model);
+
+        QItemSelectionModel selectionModel = new QItemSelectionModel(model);
+        table.setSelectionModel(selectionModel);
+        pieChart.setSelectionModel(selectionModel);
+
+        setCentralWidget(splitter);
+    }
+</pre> We construct a selection model for both views to share, before setting the splitter as the central widget for the main window. <p>The <tt>openFile()</tt> and <tt>saveFile()</tt> methods are called when the user selects the respective <b>File|Open...</b> and <b>File|Save As...</b> menu items. <tt>openFile()</tt> reads and parses data in a simple format, and populates the model with items. <tt>saveFile()</tt> exports the contents of the model to a file in the same format.<a name="pieview-class-overview"><h2>PieView Class Overview</h2> There are a number of different groups of methods in the <tt>PieView</tt> class. Some methods provide functionality defined in <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html">QAbstractItemView</a>, and are required for the view to method correctly. These typically handle interaction between the view and its model, or indicate the mapping between model indexes and the visual location of items within the view. <ul><li> The <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html#dataChanged(com.trolltech.qt.core.QModelIndex, com.trolltech.qt.core.QModelIndex)">dataChanged()</a>, <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html#rowsInserted(com.trolltech.qt.core.QModelIndex, int, int)">rowsInserted()</a>, and <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html#rowsAboutToBeRemoved(com.trolltech.qt.core.QModelIndex, int, int)">rowsAboutToBeRemoved()</a> methods are the couterparts of the signals with the same signatures in the <a href="../../../com/trolltech/qt/core/QAbstractItemModel.html">QAbstractItemModel</a> class. These handle changes to the model's data and underlying structure specified by model indexes.</li><li> The <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html#edit(com.trolltech.qt.core.QModelIndex)">edit()</a> method is called whenever the user attempts to edit an item. Since the base class implements the basic mechanism to do this, we don't need to provide more than a simple reimplementation of this method.</li></ul> Each view class needs to provide implementations of methods that specify how it arranges items in a view. These relate model indexes to the positions of corresponding visible items and the regions they occupy. <ul><li> The <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html#indexAt(com.trolltech.qt.core.QPoint)">indexAt()</a> method is used to relate a position in the view to a model index. Since views manage their own item placement, this method must be implemented.</li><li> <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html#visualRect(com.trolltech.qt.core.QModelIndex)">visualRect()</a> and <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html#visualRegionForSelection(com.trolltech.qt.gui.QItemSelection)">visualRegionForSelection()</a> relate model indexes to rectangles and regions specified in the viewport's coordinate system, so that visible items can be displayed.</li><li> The <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html#isIndexHidden(com.trolltech.qt.core.QModelIndex)">isIndexHidden()</a> method is used in certain types of view to support hidden items. We need to provide a default implementation even if he do not provide this feature.</li><li> <tt>itemRect()</tt> and <tt>itemRegion()</tt> relate model indexes to rectangles and regions specified in the view's coordinate system. These are private helper methods that make implementating other methods easier.</li></ul> Three methods are needed to control which part of the view is shown in the viewport: <ul><li> <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html#horizontalOffset()">horizontalOffset()</a> and <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html#verticalOffset()">verticalOffset()</a> are used to indicate the horizontal and vertical displacements of the area in the view that is shown in the viewport. These can usually be related to values provided by the view's scroll bars.</li><li> The <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html#scrollTo(com.trolltech.qt.core.QModelIndex)">scrollTo()</a> method is used to navigate to a particular item in the view by scrolling the viewport. Although useful for many views, we only provide a minimal implementation of this method.</li><li> The updateGeometries() method is called whenever the user scrolls the viewport.</li></ul> The view also needs to handle keyboard input to allow navigation between items, and provide support for selections. <ul><li> The <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html#moveCursor(com.trolltech.qt.gui.QAbstractItemView.CursorAction, com.trolltech.qt.core.Qt.KeyboardModifiers)">moveCursor()</a> method is called when the user presses a key corresponding to a <a href="../../../com/trolltech/qt/gui/QAbstractItemView.CursorAction.html">standard action</a>. It is up to the view to provide behavior that is appropriate for its visual representation of model data.</li><li> <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html#setSelection(com.trolltech.qt.core.QRect, com.trolltech.qt.gui.QItemSelectionModel.SelectionFlags)">setSelection()</a> must be implemented to relate a rectangle in view coordinates to a range of model indexes, and adjust the underlying selection model according to the specified selection mode. The <tt>itemRect()</tt> and <tt>itemRegion()</tt> methods can be used to help implement this method.</li></ul> A selection of event handlers are reimplemented to provide support for item selection and painting: <ul><li> The <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html#mousePressEvent(com.trolltech.qt.gui.QMouseEvent)">mousePressEvent()</a>, <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html#mouseMoveEvent(com.trolltech.qt.gui.QMouseEvent)">mouseMoveEvent()</a>, and <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html#mouseReleaseEvent(com.trolltech.qt.gui.QMouseEvent)">mouseReleaseEvent()</a> methods handle item selection, but can also be used to provide support for drag and drop.</li><li> We render the visible part of the view in the <a href="../../../com/trolltech/qt/gui/QWidget.html#paintEvent(com.trolltech.qt.gui.QPaintEvent)">paintEvent()</a> method.</li><li> The <a href="../../../com/trolltech/qt/gui/QWidget.html#resizeEvent(com.trolltech.qt.gui.QResizeEvent)">resizeEvent()</a> handler method is called whenever the view changes size. This method is reimplemented to ensure that the region shown in the viewport corresponds to the scroll bar positions.</li></ul> For convenience, we also implement a rows() method specific to this view that provides a convenient way to obtain the number of sibling of the item corresponding to a given model index.<a name="pieview-class-implementation"><h2>PieView Class Implementation</h2> The <tt>PieView</tt> class is subclassed from <a href="../../../com/trolltech/qt/gui/QAbstractItemView.html">QAbstractItemView</a> rather than one of the standard view classes because it represents data obtained from a model in a way that is quite different from those views. <p>To operate correctly, the view needs to record certain pieces of information about the data supplied by the model, including the sum of all values in the second column of the model and the number of valid items: <pre class="snippet">
+    private class PieView extends QAbstractItemView {
+
+        private int margin;
+        private int totalSize;
+        private int pieSize;
+        private int validItems;
+        private double totalValue;
+        private QPoint origin;
+        private QRubberBand rubberBand;
+</pre> The constructor provides default values for these variables: <pre class="snippet">
+        public PieView(QWidget parent) {
+            super(parent);
+            horizontalScrollBar().setRange(0, 0);
+            verticalScrollBar().setRange(0, 0);
+
+            margin = 8;
+            totalSize = 300;
+            pieSize = totalSize - 2 * margin;
+            validItems = 0;
+            totalValue = 0.0;
+        }
+</pre> We also set constant values for the total size of the view and its margin, calculating the pie chart's size from these values.<a name="handling-changes-to-data"><h3>Handling Changes to Data</h3> When data in the model is changed, the <tt>dataChanged()</tt> slot is called: <pre class="snippet">
+        protected void dataChanged(final QModelIndex topLeft, final QModelIndex bottomRight) {
+            super.dataChanged(topLeft, bottomRight);
+
+            validItems = 0;
+            totalValue = 0.0;
+
+            for (int row = 0; row &lt; model().rowCount(rootIndex()); ++row) {
+
+                QModelIndex index = model().index(row, 1, rootIndex());
+                double value = toDouble(model().data(index));
+
+                if (value &gt; 0.0) {
+                    totalValue += value;
+                    validItems++;
+                }
+            }
+            viewport().update();
+
+        }
+</pre> Since the view needs to know the sum of all values in the second column in order to correctly represent each individual item in the pie chart, it is useful to keep a running total of all values. Since we do not know the previous values of the items of data changed, we simply recalculate the total and number of valid items. <p>The <tt>rowsInserted()</tt> and <tt>rowsAboutToBeRemoved()</tt> slots are able to modify the running total and update the number of valid items: <pre class="snippet">
+        protected void rowsInserted(final QModelIndex parent, int start, int end) {
+            for (int row = start; row &lt;= end; ++row) {
+
+                QModelIndex index = model().index(row, 1, rootIndex());
+                double value = toDouble(model().data(index));
+
+                if (value &gt; 0.0) {
+                    totalValue += value;
+                    validItems++;
+                }
+            }
+
+            super.rowsInserted(parent, start, end);
+        }
+
+        &#64;Override
+        protected void rowsAboutToBeRemoved(final QModelIndex parent, int start, int end) {
+
+            for (int row = start; row &lt;= end; ++row) {
+
+                QModelIndex index = model().index(row, 1, rootIndex());
+                double value = toDouble(model().data(index));
+                if (value &gt; 0.0) {
+                    totalValue -= value;
+                    validItems--;
+                }
+            }
+
+            super.rowsAboutToBeRemoved(parent, start, end);
+
+        }
+</pre> The <tt>edit()</tt> slot handles item editing: <pre class="snippet">
+        protected boolean edit(final QModelIndex index, EditTrigger trigger, QEvent event) {
+            return false;
+        }
+</pre> We only allow the user to edit the labels for each item; these are stored in the first column of the model.<a name="relating-model-indexes-to-the-view"><h3>Relating Model Indexes to the View</h3> When the user interacts with the view using the mouse cursor, the position of the cursor needs to be related to the relevant model index so that the appropriate editing or selection actions can be performed. <p>Since custom views manage the geometries of the items they display, the <tt>indexAt()</tt> method must be implemented to perform this relation for each view, returning a model index corresponding to the item in which the given point lies, or an invalid model index if the point does not intersect with an item. <pre class="snippet">
+        public QModelIndex indexAt(final QPoint point) {
+            if (validItems == 0)
+                return null;
+
+            int wx = point.x() + horizontalScrollBar().value();
+            int wy = point.y() + verticalScrollBar().value();
+</pre> The initial conversion between viewport and view (contents) coordinates is straightforward for this view, requiring a simple translation based on the scroll offsets. <p>Since the view displays a pie chart in the left half of its area and a key on the right, we need to handle the point differently depending on its location. We compare a point that lies within the pie chart area against each of the slices in the pie and, if it lies within a slice, we return the corresponding model index: <pre class="snippet">
+            if (wx &lt; totalSize) {
+                double cx = wx - totalSize / 2;
+                double cy = totalSize / 2 - wy;
+                double d = Math.pow(Math.pow(cx, 2) + Math.pow(cy, 2), 0.5);
+
+                if (d == 0 || d &gt; pieSize / 2)
+                    return null;
+
+                double angle = (180 / Math.PI) * Math.acos(cx / d);
+                if (cy &lt; 0)
+                    angle = 360 - angle;
+
+                double startAngle = 0.0;
+
+                for (int row = 0; row &lt; model().rowCount(rootIndex()); ++row) {
+
+                    QModelIndex index = model().index(row, 1, rootIndex());
+                    double value = toDouble(model().data(index));
+
+                    if (value &gt; 0.0) {
+                        double sliceAngle = 360 * value / totalValue;
+
+                        if (angle &gt;= startAngle && angle &lt; (startAngle + sliceAngle))
+                            return model().index(row, 1, rootIndex());
+
+                        startAngle += sliceAngle;
+
+                    }
+                }
+            }
+
+            return null;
+
+        }
+</pre> If the point did not lie within any parts of the view that correspond to model indexes, null is returned. <p>The <tt>itemRect()</tt> method is used to obtain rectangles defined in view coordinates that correspond to model indexes: <pre class="snippet">
+        QRect itemRect(final QModelIndex index) {
+            if (index == null)
+                return new QRect();
+
+            if (index.column() != 1)
+                return new QRect();
+
+            if (toDouble(model().data(index)) &gt; 0.0) {
+                return new QRect(margin, margin, pieSize, pieSize);
+
+            }
+            return new QRect();
+
+        }
+</pre> In this example, we only return useful information for the model indexes that are used to obtain information about the key labels in the right half of the view. For the pie chart, we simply return a <a href="../../../com/trolltech/qt/core/QRect.html">QRect</a> that covers the entire pie chart. We return a null <a href="../../../com/trolltech/qt/core/QRect.html">QRect</a> for invalid model indexes. <p>For the <tt>itemRegion()</tt> implementation, we can provide more accurate information about the geometry of each slice in the pie chart that corresponds to the specified model index: <pre class="snippet">
+        QRegion itemRegion(final QModelIndex index) {
+            if (index == null)
+                return null;
+
+
+            if (index.column() != 1)
+                return null;
+
+
+            if (toDouble(model().data(index)) &lt;= 0.0)
+                return null;
+</pre> We are only interested in items in the second column in the model that contain positive double values, so we return null for all other model indexes. <p>For each suitable model index, we use a <a href="../../../com/trolltech/qt/gui/QPainterPath.html">QPainterPath</a> to define the geometry of the item, and convert it to a filled polygon to construct a new <a href="../../../com/trolltech/qt/gui/QRegion.html">QRegion</a> object: <pre class="snippet">
+            double startAngle = 0.0;
+            for (int row = 0; row &lt; model().rowCount(rootIndex()); ++row) {
+
+                QModelIndex sliceIndex = model().index(row, 1, rootIndex());
+                double value = toDouble(model().data(sliceIndex));
+
+                if (value &gt; 0.0) {
+                    double angle = 360 * value / totalValue;
+
+                    if (sliceIndex.equals(index)) {
+                        QPainterPath slicePath = new QPainterPath();
+                        slicePath.moveTo(totalSize / 2, totalSize / 2);
+                        slicePath.arcTo(margin, margin, margin + pieSize, margin + pieSize, startAngle, angle);
+                        slicePath.closeSubpath();
+
+                        return new QRegion(slicePath.toFillPolygon().toPolygon());
+                    }
+                    startAngle += angle;
+
+                }
+            }
+
+            return null;
+
+        }
+</pre> If the model index supplied was invalid, null is returned. <p>The <tt>visualRect()</tt> method returns the rectangle that corresponds to a given model index in viewport coordinates, calling the <tt>itemRect()</tt> method to avoid duplicating effort: <pre class="snippet">
+        public QRect visualRect(final QModelIndex index) {
+            QRect rect = itemRect(index);
+            if (rect.isValid())
+                return new QRect(rect.left() - horizontalScrollBar().value(), rect.top() - verticalScrollBar().value(), rect.width(), rect.height());
+            else
+                return rect;
+        }
+</pre> The <tt>visualRegionForSelection()</tt> method is similar to <tt>visualRect()</tt> but, where <tt>visualRect()</tt>, <tt>itemRect()</tt>, and <tt>itemRegion()</tt> are only used to obtain geometric information about individual items, this method is used to obtain regions that correspond to a number of selected items in viewport coordinates: <pre class="snippet">
+        protected QRegion visualRegionForSelection(final QItemSelection selection) {
+            int ranges = selection.size();
+
+            if (ranges == 0)
+                return new QRegion(new QRect());
+
+            QRegion region = new QRegion();
+            for (int i = 0; i &lt; ranges; ++i) {
+                QItemSelectionRange range = selection.at(i);
+                for (int row = range.top(); row &lt;= range.bottom(); ++row) {
+                    for (int col = range.left(); col &lt;= range.right(); ++col) {
+                        QModelIndex index = model().index(row, col, rootIndex());
+                        region = region.united(new QRegion(visualRect(index)));
+                    }
+                }
+            }
+            return region;
+
+        }
+</pre> We start with an empty region, and cumulatively find its union with the region that corresponds to each selected item. The result we return is the union of all selected items.<a name="scrolling-and-viewport-handling"><h3>Scrolling and Viewport Handling</h3> We need to ensure that the viewport only shows the part of the visible part of the view's contents, represented by the positions of the scroll bars if they are shown. To do this, we need to implement the <tt>horizontalOffset()</tt> and <tt>verticalOffset()</tt> methods to return the position of the top-left corner of the visible area relative to the top-left corner of the view's contents: <pre class="snippet">
+        protected int horizontalOffset() {
+            return horizontalScrollBar().value();
+        }
+<br>
+        protected int verticalOffset() {
+            return verticalScrollBar().value();
+        }
+</pre> Since the view does not contain scaled content, these methods simply return the corresponding scroll bar values. <p>The <tt>scrollTo()</tt> method is used to navigate to the item that corresponds to a particular model index: <pre class="snippet">
+        public void scrollTo(final QModelIndex index, ScrollHint hint) {
+            QRect area = viewport().rect();
+            QRect rect = visualRect(index);
+
+            if (rect.left() &lt; area.left())
+                horizontalScrollBar().setValue(
+                    horizontalScrollBar().value() + rect.left() - area.left());
+            else if (rect.right() &gt; area.right())
+                horizontalScrollBar().setValue(
+                    horizontalScrollBar().value() + Math.min(
+                        rect.right() - area.right(), rect.left() - area.left()));
+
+            if (rect.top() &lt; area.top())
+                verticalScrollBar().setValue(
+                    verticalScrollBar().value() + rect.top() - area.top());
+            else if (rect.bottom() &gt; area.bottom())
+                verticalScrollBar().setValue(
+                    verticalScrollBar().value() + Math.min(
+                        rect.bottom() - area.bottom(), rect.top() - area.top()));
+
+            update();
+        }
+</pre> We find the position of the item in viewport coordinates, and calculate the displacement from the top-left of the viewport. The result is used to provide new values for the horizontal and vertical scroll bars. <p>The <tt>updateGeometries()</tt> method ensures that the scroll bars have the correct size when the size of the viewport changes: <pre class="snippet">
+        protected void updateGeometries() {
+            horizontalScrollBar().setPageStep(viewport().width());
+            horizontalScrollBar().setRange(0, Math.max(0, totalSize - viewport().width()));
+            verticalScrollBar().setPageStep(viewport().height());
+            verticalScrollBar().setRange(0, Math.max(0, totalSize - viewport().height()));
+        }
+</pre> This method is called by the implementation of <tt>resizeEvent()</tt> handler method.<a name="keyboard-navigation-and-selections"><h3>Keyboard Navigation and Selections</h3> In the moveCursor() method, we interpret standard keyboard actions entered by the user, and update the current model index to refer to the corresponding current item in the view. <p>In this model, we only handle actions for the cursor keys: <pre class="snippet">
+        protected QModelIndex moveCursor(QAbstractItemView.CursorAction cursorAction, Qt.KeyboardModifiers modifiers) {
+            QModelIndex current = currentIndex();
+
+            switch (cursorAction) {
+            case MoveLeft:
+            case MoveUp:
+                if (current.row() &gt; 0)
+                    current = model().index(current.row() - 1, current.column(), rootIndex());
+                else
+                    current = model().index(0, current.column(), rootIndex());
+                break;
+            case MoveRight:
+            case MoveDown:
+                if (current.row() &lt; rows(current) - 1)
+                    current = model().index(current.row() + 1, current.column(), rootIndex());
+                else
+                    current = model().index(rows(current) - 1, current.column(), rootIndex());
+                break;
+            default:
+                break;
+            }
+
+            viewport().update();
+            return current;
+
+        }
+</pre> Here, we interpret the left and up cursor keys in the same way, setting the current model index to the index in the row above it in the model. Similarly, the right and down cursor keys cause the current model index to be set to the index in the row below it in the model. Although the view represents the items of data in the form of a pie chart, we do not allow the current index to "wrap around" from one end of the data set to the other. <p>Selections of items are handled by the <tt>setSelection()</tt> method, which translates a <a href="../../../com/trolltech/qt/core/QRect.html">QRect</a>, given in viewport coordinates, to the corresponding <a href="../../../com/trolltech/qt/core/QRect.html">QRect</a> in view contents coordinates, and determines which items lie within this selection rectangle. <p>First, we obtain model indexes from the model for each item of data, using <tt>itemRegion()</tt> to obtain a region for each item. <pre class="snippet">
+        protected void setSelection(final QRect rect, QItemSelectionModel.SelectionFlags command) {
+            QRect contentsRect = rect.translated(horizontalScrollBar().value(), verticalScrollBar().value()).normalized();
+
+            int rows = model().rowCount(rootIndex());
+            int columns = model().columnCount(rootIndex());
+            Vector&lt;QModelIndex&gt; indexes = new Vector&lt;QModelIndex&gt;();
+
+            for (int row = 0; row &lt; rows; ++row) {
+                for (int column = 0; column &lt; columns; ++column) {
+                    QModelIndex index = model().index(row, column, rootIndex());
+                    QRegion region = itemRegion(index);
+
+                    if (region != null && region.intersects(contentsRect))
+                        indexes.add(index);
+
+                }
+
+            }
+</pre> If an item's region intersects the selection rectangle, we add the model index to a vector of indexes. <p>Once we have examined the regions of each item, we check whether any indexes were stored in the vector. If so, we construct a selection by extending the current selection to cover a range of indexes. <pre class="snippet">
+
+            if (indexes.size() &gt; 0) {
+                int firstRow = indexes.elementAt(0).row();
+                int lastRow = indexes.elementAt(0).row();
+                int firstColumn = indexes.elementAt(0).column();
+                int lastColumn = indexes.elementAt(0).column();
+
+                for (int i = 1; i &lt; indexes.size(); ++i) {
+                    firstRow = Math.min(firstRow, indexes.elementAt(i).row());
+                    lastRow = Math.max(lastRow, indexes.elementAt(i).row());
+                    firstColumn = Math.min(firstColumn, indexes.elementAt(i).column());
+                    lastColumn = Math.max(lastColumn, indexes.elementAt(i).column());
+                }
+
+                QItemSelection selection = new QItemSelection(
+                    model().index(firstRow, firstColumn, rootIndex()),
+                    model().index(lastRow, lastColumn, rootIndex()));
+                selectionModel().select(selection, command);
+            } else {
+                QModelIndex noIndex = null;
+                QItemSelection selection = new QItemSelection(noIndex, noIndex);
+                selectionModel().select(selection, command);
+            }
+
+            update();
+
+        }
+</pre> Note that we still apply a selection even if there are no model indexes to select; this ensures that selection commands such as <a href="../../../com/trolltech/qt/gui/QItemSelectionModel.SelectionFlag.html">Clear</a> have an effect on the selection.<a name="event-handler-functions"><h3>Event Handler Functions</h3> We reimplement mouse event handlers for the view to control the way items are selected in the view. <p>In the <tt>mousePressEvent()</tt> method, we call the base class's method to ensure that various basic tasks are performed and, if necessary, we create a <a href="../../../com/trolltech/qt/gui/QRubberBand.html">QRubberBand</a> object that we will use to indicate the region the user has selected in the view: <pre class="snippet">
+        protected void mousePressEvent(QMouseEvent event) {
+            super.mousePressEvent(event);
+            origin = event.pos();
+            if (rubberBand == null)
+                rubberBand = new QRubberBand(QRubberBand.Shape.Rectangle, this);
+            rubberBand.setRubberBandGeometry(new QRect(origin, new QSize()));
+            rubberBand.show();
+        }
+</pre> We record the position of the mouse press in the instance's <tt>origin</tt> variable for later use. The rubber band initially has an invalid size; it will be resized if the user moves the mouse while the mouse button is held down. <p>The <tt>mouseMoveEvent()</tt> implementation resizes the rubber band using the value previously stored in <tt>origin</tt>, taking care to normalize the newly-constructed rectangle first, and calls the base class's implementation of the method: <pre class="snippet">
+        protected void mouseMoveEvent(QMouseEvent event) {
+            QRect rect = new QRect(origin, event.pos()).normalized();
+            rubberBand.setRubberBandGeometry(rect);
+            super.mouseMoveEvent(event);
+
+            QModelIndex underMouseIndex = indexAt(event.pos());
+            if (underMouseIndex == null)
+                setSelection(rect, selectionCommand(underMouseIndex, event));
+            viewport().update();
+        }
+</pre> If the mouse is over an item in the view, we update the selection to include the corresponding model index. We also update the visible part of the view to show any changes. <p>In the <tt>mouseReleaseEvent()</tt> method, we call the base class's implementation, hide the rubber band, and update the visible part of the view: <pre class="snippet">
+        protected void mouseReleaseEvent(QMouseEvent event) {
+            super.mouseReleaseEvent(event);
+            rubberBand.hide();
+            viewport().update();
+        }
+</pre> Although the selection handling provided by these event handlers is quite simple, it demonstrates a basic level of functionality that can be used as a starting point for more complex views.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

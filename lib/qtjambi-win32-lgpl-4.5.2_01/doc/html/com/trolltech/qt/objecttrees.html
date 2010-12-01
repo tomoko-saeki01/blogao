@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Object Trees and Object Ownership</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Object Trees and Object Ownership</h1></center><p>Information about the parent-child pattern used to describe object ownership in Qt.<a name="overview"><h2>Overview</h2> <a href="../../../com/trolltech/qt/core/QObject.html">QObjects</a> organize themselves in object trees. When you create a <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> with another object as parent, it's added to the parent's <a href="../../../com/trolltech/qt/core/QObject.html#children()">children()</a> list, and is deleted when the parent is. It turns out that this approach fits the needs of GUI objects very well. For example, a <a href="../../../com/trolltech/qt/gui/QShortcut.html">QShortcut</a> (keyboard shortcut) is a child of the relevant window, so when the user closes that window, the shorcut is deleted too. <p><a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>, the base class of everything that appears on the screen, extends the parent-child relationship. A child normally also becomes a child widget, i.e. it is displayed in its parent's coordinate system and is graphically clipped by its parent's boundaries. For example, when the application deletes a message box after it has been closed, the message box's buttons and label are also deleted, just as we'd want, because the buttons and label are children of the message box. <p>You can also delete child objects yourself, and they will remove themselves from their parents. For example, when the user removes a toolbar it may lead to the application deleting one of its <a href="../../../com/trolltech/qt/gui/QToolBar.html">QToolBar</a> objects, in which case the tool bar's <a href="../../../com/trolltech/qt/gui/QMainWindow.html">QMainWindow</a> parent would detect the change and reconfigure its screen space accordingly. <p>The debugging functions <a href="../../../com/trolltech/qt/core/QObject.html#dumpObjectTree()">QObject::dumpObjectTree()</a> and <a href="../../../com/trolltech/qt/core/QObject.html#dumpObjectInfo()">QObject::dumpObjectInfo()</a> are often useful when an application looks or acts strangely.<a name="note-on-the-order-of-construction-destruction-of-qobjects"><a name="construction-destruction-order-of-qobjects"><h2>Construction/Destruction Order of QObjects</h2> When <a href="../../../com/trolltech/qt/core/QObject.html">QObjects</a> are created on the heap (i.e., created with new), a tree can be constructed from them in any order, and later, the objects in the tree can be destroyed in any order. When any <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> in the tree is deleted, if the object has a parent, the destructor automatically removes the object from its parent. If the object has children, the destructor automatically deletes each child. No <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a> is deleted twice, regardless of the order of destruction. <p>When <a href="../../../com/trolltech/qt/core/QObject.html">QObjects</a> are created on the stack, the same behavior applies. Normally, the order of destruction still doesn't present a problem. Consider the following snippet: <pre class="snippet">
+int main()
+{
+    QWidget window;
+    QPushButton quit("Quit", &window);
+    ...
+}
+</pre> The parent, <tt>window</tt>, and the child, <tt>quit</tt>, are both <a href="../../../com/trolltech/qt/core/QObject.html">QObjects</a> because <a href="../../../com/trolltech/qt/gui/QPushButton.html">QPushButton</a> inherits <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>, and <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> inherits <a href="../../../com/trolltech/qt/core/QObject.html">QObject</a>. This code is correct: the destructor of <tt>quit</tt> is not called twice because the C++ language standard (ISO/IEC 14882:2003) specifies that destructors of local objects are called in the reverse order of their constructors. Therefore, the destructor of the child, <tt>quit</tt>, is called first, and it removes itself from its parent, <tt>window</tt>, before the destructor of <tt>window</tt> is called. <p>But now consider what happens if we swap the order of construction, as shown in this second snippet: <pre class="snippet">
+int main()
+{
+    QPushButton quit("Quit");
+    QWidget window;
+
+    quit.setParent(&window);
+    ...
+}
+</pre> In this case, the order of destruction causes a problem. The parent's destructor is called first because it was created last. It then calls the destructor of its child, <tt>quit</tt>, which is incorrect because <tt>quit</tt> is a local variable. When <tt>quit</tt> subsequently goes out of scope, its destructor is called again, this time correctly, but the damage has already been done.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

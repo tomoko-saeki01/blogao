@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Putting it all Together</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Putting it all Together</h1></center><p> Finally, we are ready to look at an example that brings what we have learned in this tutorial together. After this example, you can also check out the generator example, which uses the generator on a library for creating graphic adventure games.<a name="text-adventure-example"><h2>Text Adventure Example</h2> In keeping with the generator example, we will create an adventure game engine in C++ and map that to Java. However, we will venture a little longer back in time - to the eighties to be exact - when the text adventure had its days of glory. <p>Our text adventure library will contain a command parser, an object tree , and a collection of actions the player can make. The library consists of the following classes: <ul><li> Parser The parser knows how to parse the commands the player enteres, and will execute the commands given.</li><li> AdvObject Represents an object in the game, such as the player, a rooom, or a car. The objects are kept in a tree, which represents the world of the game.</li><li> Action An action represents an action the player can make. It contains a set of sentences (commands) the player can write to execute the action.</li><li> World Contains the root of the object tree, the current location of the player, and the objects held by the player.</li></ul><a name="example-java-game"><h2>Example Java Game</h2> In this section, we take a quick look at a Java game implemented using our text adventure library. <p>We have<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

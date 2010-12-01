@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>SQL Widget Mapper Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>SQL Widget Mapper Example</h1></center><p> The SQL Widget Mapper example shows how to use a map information from a database to widgets on a form. <br><center><img src="images/sql-widget-mapper.png"></center><br> In the <a href="itemviews-combowidgetmapper.html">Combo Widget Mapper Example</a>, we showed how to use a named mapping between a widget mapper and a <a href="../../../com/trolltech/qt/gui/QComboBox.html">QComboBox</a> widget with a special purpose model to relate values in the model to a list of choices. <p>Again, we create a <tt>Window</tt> class with an almost identical user interface, providing a combo box to allow their addresses to be classified as "Home", "Work" or "Other". However, instead of using a separate model to hold these address types, we use one database table to hold the example data and another to hold the address types. In this way, we store all the information in the same place.<a name="window-class-definition"><h2>Window Class Definition</h2> The class provides a constructor, a slot to keep the buttons up to date, and a private function to set up the model: <pre class="snippet">
+class Window : public QWidget
+{
+    Q_OBJECT
+
+public:
+    Window(QWidget *parent = 0);
+
+private slots:
+    void updateButtons(int row);
+
+private:
+    void setupModel();
+
+    QLabel *nameLabel;
+    QLabel *addressLabel;
+    QLabel *typeLabel;
+    QLineEdit *nameEdit;
+    QTextEdit *addressEdit;
+    QComboBox *typeComboBox;
+    QPushButton *nextButton;
+    QPushButton *previousButton;
+
+    QSqlRelationalTableModel *model;
+    QItemSelectionModel *selectionModel;
+    QDataWidgetMapper *mapper;
+    int typeIndex;
+};
+</pre> In addition to the <a href="../../../com/trolltech/qt/gui/QDataWidgetMapper.html">QDataWidgetMapper</a> object and the controls used to make up the user interface, we use a <a href="../../../com/trolltech/qt/gui/QStandardItemModel.html">QStandardItemModel</a> to hold our data and a <a href="../../../com/trolltech/qt/gui/QStringListModel.html">QStringListModel</a> to hold information about the types of address that can be applied to each person's data.<a name="window-class-implementation"><h2>Window Class Implementation</h2> The first act performed by the <tt>Window</tt> class constructor is to set up the model used to hold the example data. Since this is a key part of the example, we will look at this first. <p>The model is initialized in the window's <tt>setupModel()</tt> function. Here, we create a SQLite database containing a "person" table with primary key, name, address and type fields.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void Window::setupModel()
+{
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(":memory:");
+    if (!db.open()) {
+        QMessageBox::critical(0, tr("Cannot open database"),
+            tr("Unable to establish a database connection.\n"
+               "This example needs SQLite support. Please read "
+               "the Qt SQL driver documentation for information how "
+               "to build it."), QMessageBox::Cancel);
+        return;
+    }
+
+    QSqlQuery query;
+    query.exec("create table person (id int primary key, "
+               "name varchar(20), address varchar(200), typeid int)");
+    query.exec("insert into person values(1, 'Alice', "
+               "'&lt;qt&gt;123 Main Street&lt;br/&gt;Market Town&lt;/qt&gt;', 101)");
+    query.exec("insert into person values(2, 'Bob', "
+               "'&lt;qt&gt;PO Box 32&lt;br/&gt;Mail Handling Service"
+               "&lt;br/&gt;Service City&lt;/qt&gt;', 102)");
+    query.exec("insert into person values(3, 'Carol', "
+               "'&lt;qt&gt;The Lighthouse&lt;br/&gt;Remote Island&lt;/qt&gt;', 103)");
+    query.exec("insert into person values(4, 'Donald', "
+               "'&lt;qt&gt;47338 Park Avenue&lt;br/&gt;Big City&lt;/qt&gt;', 101)");
+    query.exec("insert into person values(5, 'Emma', "
+               "'&lt;qt&gt;Research Station&lt;br/&gt;Base Camp&lt;br/&gt;"
+               "Big Mountain&lt;/qt&gt;', 103)");
+</pre> On each row of the table, we insert default values for these fields, including values for the address types that correspond to the address types are stored in a separate table. <br><center><img src="images/widgetmapper-sql-mapping-table.png"></center><br> We create an "addresstype" table containing the identifiers used in the "person" table and the corresponding strings:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    query.exec("create table addresstype (id int, description varchar(20))");
+    query.exec("insert into addresstype values(101, 'Home')");
+    query.exec("insert into addresstype values(102, 'Work')");
+    query.exec("insert into addresstype values(103, 'Other')");
+
+    model = new QSqlRelationalTableModel(this);
+    model-&gt;setTable("person");
+    model-&gt;setEditStrategy(QSqlTableModel::OnManualSubmit);
+
+    typeIndex = model-&gt;fieldIndex("typeid");
+
+    model-&gt;setRelation(typeIndex,
+           QSqlRelation("addresstype", "id", "description"));
+    model-&gt;select();
+}
+</pre> The "typeid" field in the "person" table is related to the contents of the "addresstype" table via a relation in a <a href="../../../com/trolltech/qt/sql/QSqlRelationalTableModel.html">QSqlRelationalTableModel</a>. This kind of model performs all the necessary work to store the data in a database and also allows any relations to be used as models in their own right. <p>In this case, we have defined a relation for the "typeid" field in the "person" table that relates it to the "id" field in the "addresstype" table and which causes the contents of the "description" field to be used wherever the "typeid" is presented to the user. (See the <a href="../../../com/trolltech/qt/sql/QSqlRelationalTableModel.html#setRelation(int, com.trolltech.qt.sql.QSqlRelation)">QSqlRelationalTableModel::setRelation()</a> documentation for details.) <br><center><img src="images/widgetmapper-sql-mapping.png"></center><br> The constructor of the <tt>Window</tt> class can be explained in three parts. In the first part, we set up the model used to hold the data, then we set up the widgets used for the user interface:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+Window::Window(QWidget *parent)
+    : QWidget(parent)
+{
+    setupModel();
+
+    nameLabel = new QLabel(tr("Na&me:"));
+    nameEdit = new QLineEdit();
+    addressLabel = new QLabel(tr("&Address:"));
+    addressEdit = new QTextEdit();
+    typeLabel = new QLabel(tr("&Type:"));
+    typeComboBox = new QComboBox();
+    nextButton = new QPushButton(tr("&Next"));
+    previousButton = new QPushButton(tr("&Previous"));
+
+    nameLabel-&gt;setBuddy(nameEdit);
+    addressLabel-&gt;setBuddy(addressEdit);
+    typeLabel-&gt;setBuddy(typeComboBox);
+</pre> We obtain a model for the combo box from the main model, based on the relation we set up for the "typeid" field. The call to the combo box's <a href="../../../com/trolltech/qt/gui/QComboBox.html#setModelColumn(int)">setModelColumn()</a> selects the field in the field in the model to display. <p>Note that this approach is similar to the one used in the <a href="itemviews-combowidgetmapper.html">Combo Widget Mapper Example</a> in that we set up a model for the combo box. However, in this case, we obtain a model based on a relation in the <a href="../../../com/trolltech/qt/sql/QSqlRelationalTableModel.html">QSqlRelationalTableModel</a> rather than create a separate one. <p>Next, we set up the widget mapper, relating each input widget to a field in the model:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    QSqlTableModel *relModel = model-&gt;relationModel(typeIndex);
+    typeComboBox-&gt;setModel(relModel);
+    typeComboBox-&gt;setModelColumn(relModel-&gt;fieldIndex("description"));
+
+    mapper = new QDataWidgetMapper(this);
+    mapper-&gt;setModel(model);
+    mapper-&gt;setItemDelegate(new QSqlRelationalDelegate(this));
+    mapper-&gt;addMapping(nameEdit, model-&gt;fieldIndex("name"));
+    mapper-&gt;addMapping(addressEdit, model-&gt;fieldIndex("address"));
+    mapper-&gt;addMapping(typeComboBox, typeIndex);
+</pre> For the combo box, we already know the index of the field in the model from the <tt>setupModel()</tt> function. We use a <a href="../../../com/trolltech/qt/sql/QSqlRelationalDelegate.html">QSqlRelationalDelegate</a> as a proxy between the mapper and the input widgets to match up the "typeid" values in the model with those in the combo box's model and populate the combo box with descriptions rather than integer values. <p>As a result, the user is able to select an item from the combo box, and the associated value is written back to the model. <p>The rest of the constructor is very similar to that of the <a href="itemviews-simplewidgetmapper.html">Simple Widget Mapper Example</a>:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    connect(previousButton, SIGNAL(clicked()),
+            mapper, SLOT(toPrevious()));
+    connect(nextButton, SIGNAL(clicked()),
+            mapper, SLOT(toNext()));
+    connect(mapper, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(updateButtons(int)));
+
+    QGridLayout *layout = new QGridLayout();
+    layout-&gt;addWidget(nameLabel, 0, 0, 1, 1);
+    layout-&gt;addWidget(nameEdit, 0, 1, 1, 1);
+    layout-&gt;addWidget(previousButton, 0, 2, 1, 1);
+    layout-&gt;addWidget(addressLabel, 1, 0, 1, 1);
+    layout-&gt;addWidget(addressEdit, 1, 1, 2, 1);
+    layout-&gt;addWidget(nextButton, 1, 2, 1, 1);
+    layout-&gt;addWidget(typeLabel, 3, 0, 1, 1);
+    layout-&gt;addWidget(typeComboBox, 3, 1, 1, 1);
+    setLayout(layout);
+
+    setWindowTitle(tr("SQL Widget Mapper"));
+    mapper-&gt;toFirst();
+}
+</pre> We show the implementation of the <tt>updateButtons()</tt> slot for completeness:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void Window::updateButtons(int row)
+{
+    previousButton-&gt;setEnabled(row &gt; 0);
+    nextButton-&gt;setEnabled(row &lt; model-&gt;rowCount() - 1);
+}
+</pre><a name="summary-and-further-reading"><h2>Summary and Further Reading</h2> The use of a separate model for the combo box and a special delegate for the widget mapper allows us to present a menu of choices to the user. Although the choices are stored in the same database as the user's data, they are held in a separate table. Using this approach, we can reconstructed complete records at a later time while using database features appropriately. <p>If SQL models are not being used, it is still possible to use more than one model to present choices to the user. This is covered by the <a href="itemviews-combowidgetmapper.html">Combo Widget Mapper Example</a>.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

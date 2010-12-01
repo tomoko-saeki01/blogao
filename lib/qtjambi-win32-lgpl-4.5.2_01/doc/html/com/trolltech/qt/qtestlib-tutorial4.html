@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Chapter 4: Replaying GUI Events</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Chapter 4: Replaying GUI Events</h1></center><p>[Previous: <a href="qtestlib-tutorial3.html">Chapter 3: Simulating GUI Events</a>][<a href="qtestlib-tutorial.html">QTestLib Tutorial</a>][Next: <a href="qtestlib-tutorial5.html">Chapter 5: Writing a Benchmark</a>]<p> In thischapter, we will show how to simulate a GUI event, and how to store a series of GUI events as well as replay them on a widget. <p>The approach to storing a series of events and replay them, is quite similar to the approach explained in <a href="qtestlib-tutorial2.html">chapter 2</a>; all you need is to add a data function to your test class:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+class TestGui: public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testGui_data();
+    void testGui();
+};
+</pre><a name="writing-the-data-function"><h2>Writing the Data Function</h2> As before, a test function's associated data function carries the same name, appended by <tt>_data</tt>.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void TestGui::testGui_data()
+{
+    QTest::addColumn&lt;QTestEventList&gt;("events");
+    QTest::addColumn&lt;QString&gt;("expected");
+
+    QTestEventList list1;
+    list1.addKeyClick('a');
+    QTest::newRow("char") &lt;&lt; list1 &lt;&lt; "a";
+
+    QTestEventList list2;
+    list2.addKeyClick('a');
+    list2.addKeyClick(Qt::Key_Backspace);
+    QTest::newRow("there and back again") &lt;&lt; list2 &lt;&lt; "";
+}
+</pre> First, we define the elements of the table using the QTest::addColumn() function: A list of GUI events, and the expected result of applying the list of events on a <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>. Note that the type of the first element is QTestEventList. <p>A QTestEventList can be populated with GUI events that can be stored as test data for later usage, or be replayed on any <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>. <p>In our current data function, we create two QTestEventLists. The first list consists of a single click to the 'a' key. We add the event to the list using the QTestEventList::addKeyClick() function. Then we use the QTest::newRow() function to give the data set a name, and stream the event list and the expected result into the table. <p>The second list consists of two key clicks: an 'a' with a following 'backspace'. Again we use the QTestEventList::addKeyClick() to add the events to the list, and QTest::newRow() to put the event list and the expected result into the table with an associated name.<a name="rewriting-the-test-function"><h2>Rewriting the Test Function</h2> Our test can now be rewritten:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void TestGui::testGui()
+{
+    QFETCH(QTestEventList, events);
+    QFETCH(QString, expected);
+
+    QLineEdit lineEdit;
+
+    events.simulate(&lineEdit);
+
+    QCOMPARE(lineEdit.text(), expected);
+}
+</pre> The TestGui::testGui() function will be executed two times, once for each entry in the test data that we created in the associated TestGui::testGui_data() function. <p>First, we fetch the two elements of the data set using the QFETCH() macro. QFETCH() takes two arguments: The data type of the element and the element name. Then we create a <a href="../../../com/trolltech/qt/gui/QLineEdit.html">QLineEdit</a>, and apply the list of events on that widget using the QTestEventList::simulate() function. <p>Finally, we use the QCOMPARE() macro to check if the line edit's text is as expected. <p>As before, to make our test case a stand-alone executable, the following two lines are needed:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QTEST_MAIN(TestGui)
+#include "testgui.moc"
+</pre> The QTEST_MAIN() macro expands to a simple main() method that runs all the test functions, and since both the declaration and the implementation of our test class are in a .cpp file, we also need to include the generated moc file to make Qt's introspection work.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

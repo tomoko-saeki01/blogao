@@ -1,0 +1,983 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Diagram Scene Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Diagram Scene Example</h1></center><p> This example shows use of Qt's graphics framework. <br><center><img src="images/diagramscene.png"></center><br> The Diagram Scene example is an application in which you can create a flowchart diagram. It is possible to add flowchart shapes and text and connect the shapes by arrows as shown in the image above. The shapes, arrows, and text can be given different colors, and it is possible to change the font, style, and underline of the text. <p>The Qt graphics view framework is designed to manage and display custom 2D graphics items. The main classes of the framework are <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html">QGraphicsItem</a>, <a href="../../../com/trolltech/qt/gui/QGraphicsScene.html">QGraphicsScene</a> and <a href="../../../com/trolltech/qt/gui/QGraphicsView.html">QGraphicsView</a>. The graphics scene manages the items and provides a surface for them. <a href="../../../com/trolltech/qt/gui/QGraphicsView.html">QGraphicsView</a> is a widget that is used to render a scene on the screen. See the <a href="graphicsview.html">overview document</a> for a more detailed description of the framework. <p>In this example we show how to create such custom graphics scenes and items by implementing classes that inherit <a href="../../../com/trolltech/qt/gui/QGraphicsScene.html">QGraphicsScene</a> and <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html">QGraphicsItem</a>. <p>In particular we show how to: <ul><li> Create custom graphics items.</li><li> Handle mouse events and movement of items.</li><li> Implement a graphics scene that can manage our custom items.</li><li> Custom painting of items.</li><li> Create a movable and editable text item.</li></ul> The example consists of the following classes: <ul><li> <tt>MainWindow</tt> creates the widgets and display them in a <a href="../../../com/trolltech/qt/gui/QMainWindow.html">QMainWindow</a>. It also manages the interaction between the widgets and the graphics scene, view and items.</li><li> <tt>DiagramItem</tt> inherits <a href="../../../com/trolltech/qt/gui/QGraphicsPolygonItem.html">QGraphicsPolygonItem</a> and represents a flowchart shape.</li><li> <tt>TextDiagramItem</tt> inherits <a href="../../../com/trolltech/qt/gui/QGraphicsTextItem.html">QGraphicsTextItem</a> and represents text items in the diagram. The class adds support for moving the item with the mouse, which is not supported by <a href="../../../com/trolltech/qt/gui/QGraphicsTextItem.html">QGraphicsTextItem</a>.</li><li> <tt>Arrow</tt> inherits <a href="../../../com/trolltech/qt/gui/QGraphicsLineItem.html">QGraphicsLineItem</a> and is an arrow that connect two DiagramItems.</li><li> <tt>DiagramScene</tt> inherits QGraphicsDiagramScene and provides support for <tt>DiagramItem</tt>, <tt>Arrow</tt> and <tt>DiagramTextItem</tt> (In addition to the support already handled by <a href="../../../com/trolltech/qt/gui/QGraphicsScene.html">QGraphicsScene</a>).</li></ul><a name="mainwindow-class-definition"><h2>MainWindow Class Definition</h2> <pre class="snippet">
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+   MainWindow();
+
+private slots:
+    void backgroundButtonGroupClicked(QAbstractButton *button);
+    void buttonGroupClicked(int id);
+    void deleteItem();
+    void pointerGroupClicked(int id);
+    void bringToFront();
+    void sendToBack();
+    void itemInserted(DiagramItem *item);
+    void textInserted(QGraphicsTextItem *item);
+    void currentFontChanged(const QFont &font);
+    void fontSizeChanged(const QString &size);
+    void sceneScaleChanged(const QString &scale);
+    void textColorChanged();
+    void itemColorChanged();
+    void lineColorChanged();
+    void textButtonTriggered();
+    void fillButtonTriggered();
+    void lineButtonTriggered();
+    void handleFontChange();
+    void itemSelected(QGraphicsItem *item);
+    void about();
+
+private:
+    void createToolBox();
+    void createActions();
+    void createMenus();
+    void createToolbars();
+    QWidget *createBackgroundCellWidget(const QString &text,
+                                        const QString &image);
+    QWidget *createCellWidget(const QString &text,
+                              DiagramItem::DiagramType type);
+    QMenu *createColorMenu(const char *slot, QColor defaultColor);
+    QIcon createColorToolButtonIcon(const QString &image, QColor color);
+    QIcon createColorIcon(QColor color);
+
+    DiagramScene *scene;
+    QGraphicsView *view;
+
+    QAction *exitAction;
+    QAction *addAction;
+    QAction *deleteAction;
+
+    QAction *toFrontAction;
+    QAction *sendBackAction;
+    QAction *aboutAction;
+
+    QMenu *fileMenu;
+    QMenu *itemMenu;
+    QMenu *aboutMenu;
+
+    QToolBar *textToolBar;
+    QToolBar *editToolBar;
+    QToolBar *colorToolBar;
+    QToolBar *pointerToolbar;
+
+    QComboBox *sceneScaleCombo;
+    QComboBox *itemColorCombo;
+    QComboBox *textColorCombo;
+    QComboBox *fontSizeCombo;
+    QFontComboBox *fontCombo;
+
+    QToolBox *toolBox;
+    QButtonGroup *buttonGroup;
+    QButtonGroup *pointerTypeGroup;
+    QButtonGroup *backgroundButtonGroup;
+    QToolButton *fontColorToolButton;
+    QToolButton *fillColorToolButton;
+    QToolButton *lineColorToolButton;
+    QAction *boldAction;
+    QAction *underlineAction;
+    QAction *italicAction;
+    QAction *textAction;
+    QAction *fillAction;
+    QAction *lineAction;
+};
+</pre> The <tt>MainWindow</tt> class creates and lays out the widgets in a <a href="../../../com/trolltech/qt/gui/QMainWindow.html">QMainWindow</a>. The class forwards input from the widgets to the DiagramScene. It also updates its widgets when the diagram scene's text item changes, or a diagram item or a diagram text item is inserted into the scene. <p>The class also deletes items from the scene and handles the z-ordering, which decides the order in which items are drawn when they overlap each other.<a name="mainwindow-class-implementation"><h2>MainWindow Class Implementation</h2> We start with a look at the constructor:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+MainWindow::MainWindow()
+{
+    createActions();
+    createToolBox();
+    createMenus();
+
+    scene = new DiagramScene(itemMenu);
+    scene-&gt;setSceneRect(QRectF(0, 0, 5000, 5000));
+    connect(scene, SIGNAL(itemInserted(DiagramItem *)),
+            this, SLOT(itemInserted(DiagramItem *)));
+    connect(scene, SIGNAL(textInserted(QGraphicsTextItem *)),
+        this, SLOT(textInserted(QGraphicsTextItem *)));
+    connect(scene, SIGNAL(itemSelected(QGraphicsItem *)),
+        this, SLOT(itemSelected(QGraphicsItem *)));
+    createToolbars();
+
+    QHBoxLayout *layout = new QHBoxLayout;
+    layout-&gt;addWidget(toolBox);
+    view = new QGraphicsView(scene);
+    layout-&gt;addWidget(view);
+
+    QWidget *widget = new QWidget;
+    widget-&gt;setLayout(layout);
+
+    setCentralWidget(widget);
+    setWindowTitle(tr("Diagramscene"));
+}
+</pre> In the constructor we call methods to create the widgets and layouts of the example before we create the diagram scene. The toolbars must be created after the scene as they connect to its signals. We then lay the widgets out in the window. <p>We connect to the <tt>itemInserted()</tt> and <tt>textInserted()</tt> slots of the diagram scenes as we want to uncheck the buttons in the tool box when an item is inserted. When an item is selected in the scene we receive the <tt>itemSelected()</tt> signal. We use this to update the widgets that display font properties if the item selected is a <tt>DiagramTextItem</tt>. <p>The <tt>createToolBox()</tt> function creates and lays out the widgets of the <tt>toolBox</tt><a href="../../../com/trolltech/qt/gui/QToolBox.html">QToolBox</a>. We will not examine it with a high level of detail as it does not deal with graphics framework specific functionality. Here is its implementation:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::createToolBox()
+{
+    buttonGroup = new QButtonGroup;
+    buttonGroup-&gt;setExclusive(false);
+    connect(buttonGroup, SIGNAL(buttonClicked(int)),
+            this, SLOT(buttonGroupClicked(int)));
+    QGridLayout *layout = new QGridLayout;
+    layout-&gt;addWidget(createCellWidget(tr("Conditional"),
+                               DiagramItem::Conditional), 0, 0);
+    layout-&gt;addWidget(createCellWidget(tr("Process"),
+                      DiagramItem::Step),0, 1);
+    layout-&gt;addWidget(createCellWidget(tr("Input/Output"),
+                      DiagramItem::Io), 1, 0);
+</pre> This part of the function sets up the tabbed widget item that contains the flowchart shapes. An exclusive <a href="../../../com/trolltech/qt/gui/QButtonGroup.html">QButtonGroup</a> always keeps one button checked; we want the group to allow all buttons to be unchecked. We still use a button group since we can associate user data, which we use to store the diagram type, with each button. The <tt>createCellWidget()</tt> function sets up the buttons in the tabbed widget item and is examined later. <p>The buttons of the background tabbed widget item is set up in the same way, so we skip to the creation of the tool box:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    toolBox = new QToolBox;
+    toolBox-&gt;setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Ignored));
+    toolBox-&gt;setMinimumWidth(itemWidget-&gt;sizeHint().width());
+    toolBox-&gt;addItem(itemWidget, tr("Basic Flowchart Shapes"));
+    toolBox-&gt;addItem(backgroundWidget, tr("Backgrounds"));
+}
+</pre> We set the preferred size of the toolbox as its maximum. This way, more space is given to the graphics view. <p>Here is the <tt>createActions()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::createActions()
+{
+    toFrontAction = new QAction(QIcon(":/images/bringtofront.png"),
+                                tr("Bring to &Front"), this);
+    toFrontAction-&gt;setShortcut(tr("Ctrl+F"));
+    toFrontAction-&gt;setStatusTip(tr("Bring item to front"));
+    connect(toFrontAction, SIGNAL(triggered()),
+            this, SLOT(bringToFront()));
+</pre> We show an example of the creation of an action. The functionality the actions trigger is discussed in the slots we connect the actions to. You can see the <a href="qtjambi-application.html">application example</a> if you need a high-level introduction to actions. <p>The is the <tt>createMenus()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::createMenus()
+{
+    fileMenu = menuBar()-&gt;addMenu(tr("&File"));
+    fileMenu-&gt;addAction(exitAction);
+
+    itemMenu = menuBar()-&gt;addMenu(tr("&Item"));
+    itemMenu-&gt;addAction(deleteAction);
+    itemMenu-&gt;addSeparator();
+    itemMenu-&gt;addAction(toFrontAction);
+    itemMenu-&gt;addAction(sendBackAction);
+
+    aboutMenu = menuBar()-&gt;addMenu(tr("&Help"));
+    aboutMenu-&gt;addAction(aboutAction);
+}
+</pre> We create the three menus' of the example. <p>The <tt>createToolbars()</tt> function sets up the examples tool bars. The three <a href="../../../com/trolltech/qt/gui/QToolButton.html">QToolButton</a>s in the <tt>colorToolBar</tt>, the <tt>fontColorToolButton</tt>, <tt>fillColorToolButton</tt>, and <tt>lineColorToolButton</tt>, are interesting as we create icons for them by drawing on a <a href="../../../com/trolltech/qt/gui/QPixmap.html">QPixmap</a> with a <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a>. We show how the <tt>fillColorToolButton</tt> is created. This button lets the user select a color for the diagram items.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::createToolbars()
+{
+...
+    fillColorToolButton = new QToolButton;
+    fillColorToolButton-&gt;setPopupMode(QToolButton::MenuButtonPopup);
+    fillColorToolButton-&gt;setMenu(createColorMenu(SLOT(itemColorChanged()),
+                         Qt::white));
+    fillAction = fillColorToolButton-&gt;menu()-&gt;defaultAction();
+    fillColorToolButton-&gt;setIcon(createColorToolButtonIcon(
+    ":/images/floodfill.png", Qt::white));
+    connect(fillColorToolButton, SIGNAL(clicked()),
+            this, SLOT(fillButtonTriggered()));
+</pre> We set the menu of the tool button with <a href="../../../com/trolltech/qt/gui/QToolButton.html#setMenu(com.trolltech.qt.gui.QMenu)">setMenu()</a>. We need the <tt>fillAction</tt><a href="../../../com/trolltech/qt/gui/QAction.html">QAction</a> object to always be pointing to the selected action of the menu. The menu is created with the <tt>createColorMenu()</tt> function and, as we shall see later, contains one menu item for each color that the items can have. When the user presses the button, which trigger the clicked() signal, we can set the color of the selected item to the color of <tt>fillAction</tt>. It is with <tt>createColorToolButtonIcon()</tt> we create the icon for the button....<br><br>The following code example is written in c++.<br> <pre class="snippet">
+}
+</pre> Here is the <tt>createBackgroundCellWidget()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QWidget *MainWindow::createBackgroundCellWidget(const QString &text,
+                        const QString &image)
+{
+    QToolButton *button = new QToolButton;
+    button-&gt;setText(text);
+    button-&gt;setIcon(QIcon(image));
+    button-&gt;setIconSize(QSize(50, 50));
+    button-&gt;setCheckable(true);
+    backgroundButtonGroup-&gt;addButton(button);
+
+    QGridLayout *layout = new QGridLayout;
+    layout-&gt;addWidget(button, 0, 0, Qt::AlignHCenter);
+    layout-&gt;addWidget(new QLabel(text), 1, 0, Qt::AlignCenter);
+
+    QWidget *widget = new QWidget;
+    widget-&gt;setLayout(layout);
+
+    return widget;
+}
+</pre> This function creates <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>s containing a tool button and a label. The widgets created with this function are used for the background tabbed widget item in the tool box. <p>Here is the <tt>createCellWidget()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QWidget *MainWindow::createCellWidget(const QString &text,
+                      DiagramItem::DiagramType type)
+{
+
+    DiagramItem item(type, itemMenu);
+    QIcon icon(item.image());
+
+    QToolButton *button = new QToolButton;
+    button-&gt;setIcon(icon);
+    button-&gt;setIconSize(QSize(50, 50));
+    button-&gt;setCheckable(true);
+    buttonGroup-&gt;addButton(button, int(type));
+
+    QGridLayout *layout = new QGridLayout;
+    layout-&gt;addWidget(button, 0, 0, Qt::AlignHCenter);
+    layout-&gt;addWidget(new QLabel(text), 1, 0, Qt::AlignCenter);
+
+    QWidget *widget = new QWidget;
+    widget-&gt;setLayout(layout);
+
+    return widget;
+}
+</pre> This function returns a <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> containing a <a href="../../../com/trolltech/qt/gui/QToolButton.html">QToolButton</a> with an image of one of the <tt>DiagramItems</tt>, i.e., flowchart shapes. The image is created by the <tt>DiagramItem</tt> through the <tt>image()</tt> function. The <a href="../../../com/trolltech/qt/gui/QButtonGroup.html">QButtonGroup</a> class lets us attach a <a href="../../../com/trolltech/qt/QVariant.html">QVariant</a> with each button; we store the diagram's type, i.e., the DiagramItem::DiagramType enum. We use the stored diagram type when we create new diagram items for the scene. The widgets created with this function is used in the tool box. <p>Here is the <tt>createColorMenu()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QMenu *MainWindow::createColorMenu(const char *slot, QColor defaultColor)
+{
+    QList&lt;QColor&gt; colors;
+    colors &lt;&lt; Qt::black &lt;&lt; Qt::white &lt;&lt; Qt::red &lt;&lt; Qt::blue &lt;&lt; Qt::yellow;
+    QStringList names;
+    names &lt;&lt; tr("black") &lt;&lt; tr("white") &lt;&lt; tr("red") &lt;&lt; tr("blue")
+          &lt;&lt; tr("yellow");
+
+    QMenu *colorMenu = new QMenu;
+    for (int i = 0; i &lt; colors.count(); ++i) {
+        QAction *action = new QAction(names.at(i), this);
+        action-&gt;setData(colors.at(i));
+        action-&gt;setIcon(createColorIcon(colors.at(i)));
+        connect(action, SIGNAL(triggered()),
+                this, slot);
+        colorMenu-&gt;addAction(action);
+        if (colors.at(i) == defaultColor) {
+            colorMenu-&gt;setDefaultAction(action);
+        }
+    }
+    return colorMenu;
+}
+</pre> This function creates a color menu that is used as the drop-down menu for the tool buttons in the <tt>colorToolBar</tt>. We create an action for each color that we add to the menu. We fetch the actions data when we set the color of items, lines, and text. <p>Here is the <tt>createColorToolButtonIcon()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QIcon MainWindow::createColorToolButtonIcon(const QString &imageFile,
+                        QColor color)
+{
+    QPixmap pixmap(50, 80);
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    QPixmap image(imageFile);
+    QRect target(0, 0, 50, 60);
+    QRect source(0, 0, 42, 42);
+    painter.fillRect(QRect(0, 60, 50, 80), color);
+    painter.drawPixmap(target, image, source);
+
+    return QIcon(pixmap);
+}
+</pre> This function is used to create the <a href="../../../com/trolltech/qt/gui/QIcon.html">QIcon</a> of the <tt>fillColorToolButton</tt>, <tt>fontColorToolButton</tt>, and <tt>lineColorToolButton</tt>. The <tt>imageFile</tt> string is either the text, flood-fill, or line symbol that is used for the buttons. Beneath the image we draw a filled rectangle using <tt>color</tt>. <p>Here is the <tt>createColorIcon()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QIcon MainWindow::createColorIcon(QColor color)
+{
+    QPixmap pixmap(20, 20);
+    QPainter painter(&pixmap);
+    painter.setPen(Qt::NoPen);
+    painter.fillRect(QRect(0, 0, 20, 20), color);
+
+    return QIcon(pixmap);
+}
+</pre> This function creates an icon with a filled rectangle in the color of <tt>color</tt>. It is used for creating icons for the color menus in the <tt>fillColorToolButton</tt>, <tt>fontColorToolButton</tt>, and <tt>lineColorToolButton</tt>. <p>Here is the <tt>backgroundButtonGroupClicked()</tt> slot:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::backgroundButtonGroupClicked(QAbstractButton *button)
+{
+    QList&lt;QAbstractButton *&gt; buttons = backgroundButtonGroup-&gt;buttons();
+    foreach (QAbstractButton *myButton, buttons) {
+    if (myButton != button)
+        button-&gt;setChecked(false);
+    }
+    QString text = button-&gt;text();
+    if (text == tr("Blue Grid"))
+        scene-&gt;setBackgroundBrush(QPixmap(":/images/background1.png"));
+    else if (text == tr("White Grid"))
+        scene-&gt;setBackgroundBrush(QPixmap(":/images/background2.png"));
+    else if (text == tr("Gray Grid"))
+        scene-&gt;setBackgroundBrush(QPixmap(":/images/background3.png"));
+    else
+        scene-&gt;setBackgroundBrush(QPixmap(":/images/background4.png"));
+
+    scene-&gt;update();
+    view-&gt;update();
+}
+</pre> In this function we set the <a href="../../../com/trolltech/qt/gui/QBrush.html">QBrush</a> that is used to draw the background of the diagramscene. The background can be a grid of squares of blue, gray, or white tiles, or no grid at all. We have <a href="../../../com/trolltech/qt/gui/QPixmap.html">QPixmap</a>s of the tiles from png files that we create the brush with. <p>When one of the buttons in the background tabbed widget item is clicked we change the brush; we find out which button it is by checking its text. <p>Here is the implementation of <tt>buttonGroupClicked()</tt>:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::buttonGroupClicked(int id)
+{
+    QList&lt;QAbstractButton *&gt; buttons = buttonGroup-&gt;buttons();
+    foreach (QAbstractButton *button, buttons) {
+    if (buttonGroup-&gt;button(id) != button)
+        button-&gt;setChecked(false);
+    }
+    if (id == InsertTextButton) {
+        scene-&gt;setMode(DiagramScene::InsertText);
+    } else {
+        scene-&gt;setItemType(DiagramItem::DiagramType(id));
+        scene-&gt;setMode(DiagramScene::InsertItem);
+    }
+}
+</pre> This slot is called when a button in <tt>buttonGroup</tt> is checked. When a button is checked the user can click on the graphics view and a <tt>DiagramItem</tt> of the selected type will be inserted into the <tt>DiagramScene</tt>. We must loop through the buttons in the group to uncheck other buttons as only one button is allowed to be checked at a time. <p><tt>QButtonGroup</tt> assigns an id to each button. We have set the id of each button to the diagram type, as given by DiagramItem::DiagramType that will be inserted into the scene when it is clicked. We can then use the button id when we set the diagram type with <tt>setItemType()</tt>. In the case of text we assigned an id that has a value that is not in the DiagramType enum. <p>Here is the implementation of <tt>deleteItem()</tt>:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::deleteItem()
+{
+    foreach (QGraphicsItem *item, scene-&gt;selectedItems()) {
+        if (item-&gt;type() == DiagramItem::Type) {
+            qgraphicsitem_cast&lt;DiagramItem *&gt;(item)-&gt;removeArrows();
+        }
+        scene-&gt;removeItem(item);
+    }
+}
+</pre> This slot deletes the selected item, if any, from the scene. If the item to be deleted is a <tt>DiagramItem</tt>, we also need to delete arrows connected to it; we don't want arrows in the scene that aren't connected to items in both ends. <p>This is the implementation of pointerGroupClicked():<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::pointerGroupClicked(int)
+{
+    scene-&gt;setMode(DiagramScene::Mode(pointerTypeGroup-&gt;checkedId()));
+}
+</pre> The <tt>pointerTypeGroup</tt> decides whether the scene is in ItemMove or InsertLine mode. This button group is exclusive, i.e., only one button is checked at any time. As with the <tt>buttonGroup</tt> above we have assigned an id to the buttons that matches values of the DiagramScene::Mode enum, so that we can use the id to set the correct mode. <p>Here is the <tt>bringToFront()</tt> slot:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::bringToFront()
+{
+    if (scene-&gt;selectedItems().isEmpty())
+        return;
+
+    QGraphicsItem *selectedItem = scene-&gt;selectedItems().first();
+    QList&lt;QGraphicsItem *&gt; overlapItems = selectedItem-&gt;collidingItems();
+
+    qreal zValue = 0;
+    foreach (QGraphicsItem *item, overlapItems) {
+        if (item-&gt;zValue() &gt;= zValue &&
+            item-&gt;type() == DiagramItem::Type)
+            zValue = item-&gt;zValue() + 0.1;
+    }
+    selectedItem-&gt;setZValue(zValue);
+}
+</pre> Several items may collide, i.e., overlap, with each other in the scene. This slot is called when the user requests that an item should be placed on top of the items it collides with. <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html">QGrapicsItems</a> have a z-value that decides the order in which items are stacked in the scene; you can think of it as the z-axis in a 3D coordinate system. When items collide the items with higher z-values will be drawn on top of items with lower values. When we bring an item to the front we can loop through the items it collides with and set a z-value that is higher than all of them. <p>Here is the <tt>sendToBack()</tt> slot:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::sendToBack()
+{
+    if (scene-&gt;selectedItems().isEmpty())
+        return;
+
+    QGraphicsItem *selectedItem = scene-&gt;selectedItems().first();
+    QList&lt;QGraphicsItem *&gt; overlapItems = selectedItem-&gt;collidingItems();
+
+    qreal zValue = 0;
+    foreach (QGraphicsItem *item, overlapItems) {
+        if (item-&gt;zValue() &lt;= zValue &&
+            item-&gt;type() == DiagramItem::Type)
+            zValue = item-&gt;zValue() - 0.1;
+    }
+    selectedItem-&gt;setZValue(zValue);
+}
+</pre> This slot works in the same way as <tt>bringToFront()</tt> described above, but sets a z-value that is lower than items the item that should be send to the back collides with. <p>This is the implementation of <tt>itemInserted()</tt>:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::itemInserted(DiagramItem *item)
+{
+    pointerTypeGroup-&gt;button(int(DiagramScene::MoveItem))-&gt;setChecked(true);
+    scene-&gt;setMode(DiagramScene::Mode(pointerTypeGroup-&gt;checkedId()));
+    buttonGroup-&gt;button(int(item-&gt;diagramType()))-&gt;setChecked(false);
+}
+</pre> This slot is called from the <tt>DiagramScene</tt> when an item has been added to the scene. We set the mode of the scene back to the mode before the item was inserted, which is ItemMove or InsertText depending on which button is checked in the <tt>pointerTypeGroup</tt>. We must also uncheck the button in the in the <tt>buttonGroup</tt>. <p>Here is the implementation of <tt>textInserted()</tt>:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::textInserted(QGraphicsTextItem *)
+{
+    buttonGroup-&gt;button(InsertTextButton)-&gt;setChecked(false);
+    scene-&gt;setMode(DiagramScene::Mode(pointerTypeGroup-&gt;checkedId()));
+}
+</pre> We simply set the mode of the scene back to the mode it had before the text was inserted. <p>Here is the <tt>currentFontChanged()</tt> slot:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::currentFontChanged(const QFont &)
+{
+    handleFontChange();
+}
+</pre> When the user requests a font change, by using one of the widgets in the <tt>fontToolBar</tt>, we create a new <a href="../../../com/trolltech/qt/gui/QFont.html">QFont</a> object and set its properties to match the state of the widgets. This is done in <tt>handleFontChange()</tt>, so we simply call that slot. <p>Here is the <tt>fontSizeChanged()</tt> slot:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::fontSizeChanged(const QString &)
+{
+    handleFontChange();
+}
+</pre> When the user requests a font change, by using one of the widgets in the <tt>fontToolBar</tt>, we create a new <a href="../../../com/trolltech/qt/gui/QFont.html">QFont</a> object and set its properties to match the state of the widgets. This is done in <tt>handleFontChange()</tt>, so we simply call that slot. <p>Here is the implementation of <tt>sceneScaleChanged()</tt>:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::sceneScaleChanged(const QString &scale)
+{
+    double newScale = scale.left(scale.indexOf(tr("%"))).toDouble() / 100.0;
+    QMatrix oldMatrix = view-&gt;matrix();
+    view-&gt;resetMatrix();
+    view-&gt;translate(oldMatrix.dx(), oldMatrix.dy());
+    view-&gt;scale(newScale, newScale);
+}
+</pre> The user can increase or decrease the scale, with the <tt>sceneScaleCombo</tt>, the scene is drawn in. It is not the scene itself that changes its scale, but only the view. <p>Here is the <tt>textColorChanged()</tt> slot:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::textColorChanged()
+{
+    textAction = qobject_cast&lt;QAction *&gt;(sender());
+    fontColorToolButton-&gt;setIcon(createColorToolButtonIcon(
+                ":/images/textpointer.png",
+                qVariantValue&lt;QColor&gt;(textAction-&gt;data())));
+    textButtonTriggered();
+}
+</pre> This slot is called when an item in the drop-down menu of the <tt>fontColorToolButton</tt> is pressed. We need to change the icon on the button to the color of the selected <a href="../../../com/trolltech/qt/gui/QAction.html">QAction</a>. We keep a pointer to the selected action in <tt>textAction</tt>. It is in <tt>textButtonTriggered()</tt> we change the text color to the color of <tt>textAction</tt>, so we call that slot. <p>Here is the <tt>itemColorChanged()</tt> implementation:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::itemColorChanged()
+{
+    fillAction = qobject_cast&lt;QAction *&gt;(sender());
+    fillColorToolButton-&gt;setIcon(createColorToolButtonIcon(
+                 ":/images/floodfill.png",
+                 qVariantValue&lt;QColor&gt;(fillAction-&gt;data())));
+    fillButtonTriggered();
+}
+</pre> This slot handles requests for changing the color of <tt>DiagramItems</tt> in the same manner as <tt>textColorChanged()</tt> does for <tt>DiagramTextItems</tt>. <p>Here is the implementation of <tt>lineColorChanged()</tt>:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::lineColorChanged()
+{
+    lineAction = qobject_cast&lt;QAction *&gt;(sender());
+    lineColorToolButton-&gt;setIcon(createColorToolButtonIcon(
+                 ":/images/linecolor.png",
+                 qVariantValue&lt;QColor&gt;(lineAction-&gt;data())));
+    lineButtonTriggered();
+}
+</pre> This slot handles requests for changing the color of <tt>Arrows</tt> in the same manner that <tt>textColorChanged()</tt> does it for <tt>DiagramTextItems</tt>. <p>Here is the <tt>textButtonTriggered()</tt> slot:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::textButtonTriggered()
+{
+    scene-&gt;setTextColor(qVariantValue&lt;QColor&gt;(textAction-&gt;data()));
+}
+</pre> <tt>textAction</tt> points to the <a href="../../../com/trolltech/qt/gui/QAction.html">QAction</a> of the currently selected menu item in the <tt>fontColorToolButton</tt>'s color drop-down menu. We have set the data of the action to the <a href="../../../com/trolltech/qt/gui/QColor.html">QColor</a> the action represents, so we can simply fetch this when we set the color of text with <tt>setTextColor()</tt>. <p>Here is the <tt>fillButtonTriggered()</tt> slot:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::fillButtonTriggered()
+{
+    scene-&gt;setItemColor(qVariantValue&lt;QColor&gt;(fillAction-&gt;data()));
+}
+</pre> <tt>fillAction</tt> points to the selected menu item in the drop-down menu of <tt>fillColorToolButton()</tt>. We can therefore use the data of this action when we set the item color with <tt>setItemColor()</tt>. <p>Here is the <tt>lineButtonTriggered()</tt> slot:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::lineButtonTriggered()
+{
+    scene-&gt;setLineColor(qVariantValue&lt;QColor&gt;(lineAction-&gt;data()));
+}
+</pre> <tt>lineAction</tt> point to the selected item in the drop-down menu of <tt>lineColorToolButton</tt>. We use its data when we set the arrow color with <tt>setLineColor()</tt>. <p>Here is the <tt>handleFontChange()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::handleFontChange()
+{
+    QFont font = fontCombo-&gt;currentFont();
+    font.setPointSize(fontSizeCombo-&gt;currentText().toInt());
+    font.setWeight(boldAction-&gt;isChecked() ? QFont::Bold : QFont::Normal);
+    font.setItalic(italicAction-&gt;isChecked());
+    font.setUnderline(underlineAction-&gt;isChecked());
+
+    scene-&gt;setFont(font);
+}
+</pre> <tt>handleFontChange()</tt> is called when any of the widgets that show font properties changes. We create a new <a href="../../../com/trolltech/qt/gui/QFont.html">QFont</a> object and set its properties based on the widgets. We then call the <tt>setFont()</tt> function of <tt>DiagramScene</tt>; it is the scene that set the font of the <tt>DiagramTextItems</tt> it manages. <p>Here is the <tt>itemSelected()</tt> slot:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::itemSelected(QGraphicsItem *item)
+{
+    DiagramTextItem *textItem =
+    qgraphicsitem_cast&lt;DiagramTextItem *&gt;(item);
+
+    QFont font = textItem-&gt;font();
+    QColor color = textItem-&gt;defaultTextColor();
+    fontCombo-&gt;setCurrentFont(font);
+    fontSizeCombo-&gt;setEditText(QString().setNum(font.pointSize()));
+    boldAction-&gt;setChecked(font.weight() == QFont::Bold);
+    italicAction-&gt;setChecked(font.italic());
+    underlineAction-&gt;setChecked(font.underline());
+}
+</pre> This slot is called when an item in the <tt>DiagramScene</tt> is selected. In the case of this example it is only text items that emit signals when they are selected, so we do not need to check what kind of graphics <tt>item</tt> is. <p>We set the state of the widgets to match the properties of the font of the selected text item. <p>This is the <tt>about()</tt> slot:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void MainWindow::about()
+{
+    QMessageBox::about(this, tr("About Diagram Scene"),
+                       tr("The &lt;b&gt;Diagram Scene&lt;/b&gt; example shows "
+                          "use of the graphics framework."));
+}
+</pre> This slot displays an about box for the example when the user selects the about menu item from the help menu.<a name="diagramscene-class-definition"><h2>DiagramScene Class Definition</h2> The <tt>DiagramScene</tt> class inherits <a href="../../../com/trolltech/qt/gui/QGraphicsScene.html">QGraphicsScene</a> and adds functionality to handle <tt>DiagramItems</tt>, <tt>Arrows</tt>, and <tt>DiagramTextItems</tt> in addition to the items handled by its super class. <pre class="snippet">
+class DiagramScene : public QGraphicsScene
+{
+    Q_OBJECT
+
+public:
+    enum Mode { InsertItem, InsertLine, InsertText, MoveItem };
+
+    DiagramScene(QMenu *itemMenu, QObject *parent = 0);
+    QFont font() const
+        { return myFont; }
+    QColor textColor() const
+        { return myTextColor; }
+    QColor itemColor() const
+        { return myItemColor; }
+    QColor lineColor() const
+        { return myLineColor; }
+    void setLineColor(const QColor &color);
+    void setTextColor(const QColor &color);
+    void setItemColor(const QColor &color);
+    void setFont(const QFont &font);
+
+public slots:
+    void setMode(Mode mode);
+    void setItemType(DiagramItem::DiagramType type);
+    void editorLostFocus(DiagramTextItem *item);
+
+signals:
+    void itemInserted(DiagramItem *item);
+    void textInserted(QGraphicsTextItem *item);
+    void itemSelected(QGraphicsItem *item);
+
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
+
+private:
+    bool isItemChange(int type);
+
+    DiagramItem::DiagramType myItemType;
+    QMenu *myItemMenu;
+    Mode myMode;
+    bool leftButtonDown;
+    QPointF startPoint;
+    QGraphicsLineItem *line;
+    QFont myFont;
+    DiagramTextItem *textItem;
+    QColor myTextColor;
+    QColor myItemColor;
+    QColor myLineColor;
+};
+</pre> In the <tt>DiagramScene</tt> a mouse click can give three different actions: the item under the mouse can be moved, an item may be inserted, or an arrow may be connected between to diagram items. Which action a mouse click has depends on the mode, given by the Mode enum, the scene is in. The mode is set with the <tt>setMode()</tt> function. <p>The scene also sets the color of its items and the font of its text items. The colors and font used by the scene can be set with the <tt>setLineColor()</tt>, <tt>setTextColor()</tt>, <tt>setItemColor()</tt> and <tt>setFont()</tt> functions. The type of <tt>DiagramItem</tt>, given by the DiagramItem::DiagramType function, to be created when an item is inserted is set with the <tt>setItemType()</tt> slot. <p>The <tt>MainWindow</tt> and <tt>DiagramScene</tt> share responsibility for the examples functionality. <tt>MainWindow</tt> handles the following tasks: the deletion of items, text, and arrows; moving diagram items to the back and front; and setting the scale of the scene.<a name="diagramscene-class-implementation"><h2>DiagramScene Class Implementation</h2> We start with the constructor:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+DiagramScene::DiagramScene(QMenu *itemMenu, QObject *parent)
+    : QGraphicsScene(parent)
+{
+    myItemMenu = itemMenu;
+    myMode = MoveItem;
+    myItemType = DiagramItem::Step;
+    line = 0;
+    textItem = 0;
+    myItemColor = Qt::white;
+    myTextColor = Qt::black;
+    myLineColor = Qt::black;
+}
+</pre> The scene uses <tt>myItemMenu</tt> to set the context menu when it creates <tt>DiagramItems</tt>. We set the default mode to <tt>DiagramScene::MoveItem</tt> as this gives the default behavior of <a href="../../../com/trolltech/qt/gui/QGraphicsScene.html">QGraphicsScene</a>. <p>Here is the <tt>setLineColor()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void DiagramScene::setLineColor(const QColor &color)
+{
+    myLineColor = color;
+    if (isItemChange(Arrow::Type)) {
+        Arrow *item =
+            qgraphicsitem_cast&lt;Arrow *&gt;(selectedItems().first());
+        item-&gt;setColor(myLineColor);
+        update();
+    }
+}
+</pre> The <tt>isItemChange</tt> function returns true if an <tt>Arrow</tt> item is selected in the scene in which case we want to change its color. When the <tt>DiagramScene</tt> creates and adds new arrows to the scene it will also use the new <tt>color</tt>. <p>Here is the <tt>setTextColor()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void DiagramScene::setTextColor(const QColor &color)
+{
+    myTextColor = color;
+    if (isItemChange(DiagramTextItem::Type)) {
+        DiagramTextItem *item =
+            qgraphicsitem_cast&lt;DiagramTextItem *&gt;(selectedItems().first());
+        item-&gt;setDefaultTextColor(myTextColor);
+    }
+}
+</pre> This function sets the color of <tt>DiagramTextItems</tt> equal to the way <tt>setLineColor()</tt> sets the color of <tt>Arrows</tt>. <p>Here is the <tt>setItemColor()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void DiagramScene::setItemColor(const QColor &color)
+{
+    myItemColor = color;
+    if (isItemChange(DiagramItem::Type)) {
+        DiagramItem *item =
+            qgraphicsitem_cast&lt;DiagramItem *&gt;(selectedItems().first());
+        item-&gt;setBrush(myItemColor);
+    }
+}
+</pre> This function sets the color the scene will use when creating <tt>DiagramItems</tt>. It also changes the color of a selected <tt>DiagramItem</tt>. <p>This is the implementation of <tt>setFont()</tt>:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void DiagramScene::setFont(const QFont &font)
+{
+    myFont = font;
+
+    if (isItemChange(DiagramTextItem::Type)) {
+        QGraphicsTextItem *item =
+            qgraphicsitem_cast&lt;DiagramTextItem *&gt;(selectedItems().first());
+        item-&gt;setFont(myFont);
+    }
+}
+</pre> Set the font to use for new and selected, if a text item is selected, <tt>DiagramTextItems</tt>. <p>This is the implementation of <tt>editorLostFocus()</tt> slot:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void DiagramScene::editorLostFocus(DiagramTextItem *item)
+{
+    QTextCursor cursor = item-&gt;textCursor();
+    cursor.clearSelection();
+    item-&gt;setTextCursor(cursor);
+
+    if (item-&gt;toPlainText().isEmpty()) {
+        removeItem(item);
+        item-&gt;deleteLater();
+    }
+}
+</pre> <tt>DiagramTextItems</tt> emit a signal when they loose focus, which is connected to this slot. We remove the item if it has no text. If not, we would leak memory and confuse the user as the items will be edited when pressed on by the mouse. <p>The <tt>mousePressEvent()</tt> function handles mouse press event's different depending on which mode the <tt>DiagramScene</tt> is in. We examine its implementation for each mode:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void DiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
+{
+    if (mouseEvent-&gt;button() != Qt::LeftButton)
+        return;
+
+    DiagramItem *item;
+    switch (myMode) {
+        case InsertItem:
+            item = new DiagramItem(myItemType, myItemMenu);
+            item-&gt;setBrush(myItemColor);
+            addItem(item);
+            item-&gt;setPos(mouseEvent-&gt;scenePos());
+            emit itemInserted(item);
+            break;
+</pre> We simply create a new <tt>DiagramItem</tt> and add it to the scene at the position the mouse was pressed. Note that the origin of its local coordinate system will be under the mouse pointer position.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+        case InsertLine:
+            line = new QGraphicsLineItem(QLineF(mouseEvent-&gt;scenePos(),
+                                        mouseEvent-&gt;scenePos()));
+            line-&gt;setPen(QPen(myLineColor, 2));
+            addItem(line);
+            break;
+</pre> The user adds <tt>Arrows</tt> to the scene by stretching a line between the items the arrow should connect. The start of the line is fixed in the place the user clicked the mouse and the end follows the mouse pointer as long as the button is held down. When the user releases the mouse button an <tt>Arrow</tt> will be added to the scene if there is a <tt>DiagramItem</tt> under the start and end of the line. We will see how this is implemented later; here we simply add the line.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+        case InsertText:
+            textItem = new DiagramTextItem();
+            textItem-&gt;setFont(myFont);
+            textItem-&gt;setTextInteractionFlags(Qt::TextEditorInteraction);
+            textItem-&gt;setZValue(1000.0);
+            connect(textItem, SIGNAL(lostFocus(DiagramTextItem *)),
+                    this, SLOT(editorLostFocus(DiagramTextItem *)));
+            connect(textItem, SIGNAL(selectedChange(QGraphicsItem *)),
+                    this, SIGNAL(itemSelected(QGraphicsItem *)));
+            addItem(textItem);
+            textItem-&gt;setDefaultTextColor(myTextColor);
+            textItem-&gt;setPos(mouseEvent-&gt;scenePos());
+            emit textInserted(textItem);
+</pre> The <tt>DiagramTextItem</tt> is editable when the <a href="../../../com/trolltech/qt/core/Qt.TextInteractionFlag.html">Qt::TextEditorInteraction</a> flag is set, else it is movable by the mouse. We always want the text to be drawn on top of the other items in the scene, so we set the value to a number higher than other items in the scene.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    default:
+        ;
+    }
+    QGraphicsScene::mousePressEvent(mouseEvent);
+}
+</pre> We are in MoveItem mode if we get to the default switch; we can then call the <a href="../../../com/trolltech/qt/gui/QGraphicsScene.html">QGraphicsScene</a> implementation, which handles movement of items with the mouse. We make this call even if we are in another mode making it possible to add an item and then keep the mouse button pressed down and start moving the item. In the case of text items, this is not possible as they do not propagate mouse events when they are editable. <p>This is the <tt>mouseMoveEvent()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void DiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
+{
+    if (myMode == InsertLine && line != 0) {
+        QLineF newLine(line-&gt;line().p1(), mouseEvent-&gt;scenePos());
+        line-&gt;setLine(newLine);
+    } else if (myMode == MoveItem) {
+        QGraphicsScene::mouseMoveEvent(mouseEvent);
+    }
+}
+</pre> We must draw the line if we are in InsertMode and the mouse button is pressed down (the line is not 0). As discussed in <tt>mousePressEvent()</tt> the line is drawn from the position the mouse was pressed to the current position of the mouse. <p>If we are in MoveItem mode, we call the <a href="../../../com/trolltech/qt/gui/QGraphicsScene.html">QGraphicsScene</a> implementation, which handles movement of items. <p>In the <tt>mouseReleaseEvent()</tt> function we need to check if an arrow should be added to the scene:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void DiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
+{
+    if (line != 0 && myMode == InsertLine) {
+        QList&lt;QGraphicsItem *&gt; startItems = items(line-&gt;line().p1());
+        if (startItems.count() && startItems.first() == line)
+            startItems.removeFirst();
+        QList&lt;QGraphicsItem *&gt; endItems = items(line-&gt;line().p2());
+        if (endItems.count() && endItems.first() == line)
+            endItems.removeFirst();
+
+        removeItem(line);
+        delete line;
+</pre> First we need to get the items (if any) under the line's start and end points. The line itself is the first item at these points, so we remove it from the lists. As a precaution, we check if the lists are empty, but this should never happen.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+
+        if (startItems.count() &gt; 0 && endItems.count() &gt; 0 &&
+            startItems.first()-&gt;type() == DiagramItem::Type &&
+            endItems.first()-&gt;type() == DiagramItem::Type &&
+            startItems.first() != endItems.first()) {
+            DiagramItem *startItem =
+                qgraphicsitem_cast&lt;DiagramItem *&gt;(startItems.first());
+            DiagramItem *endItem =
+                qgraphicsitem_cast&lt;DiagramItem *&gt;(endItems.first());
+            Arrow *arrow = new Arrow(startItem, endItem);
+            arrow-&gt;setColor(myLineColor);
+            startItem-&gt;addArrow(arrow);
+            endItem-&gt;addArrow(arrow);
+            arrow-&gt;setZValue(-1000.0);
+            addItem(arrow);
+            arrow-&gt;updatePosition();
+        }
+    }
+</pre> Now we check if there are two different <tt>DiagramItems</tt> under the lines start and end points. If there are we can create an <tt>Arrow</tt> with the two items. The arrow is then added to each item and finally the scene. The arrow must be updated to adjust its start and end points to the items. We set the z-value of the arrow to -1000.0 because we always want it to be drawn under the items.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    line = 0;
+    QGraphicsScene::mouseReleaseEvent(mouseEvent);
+}
+</pre> Here is the <tt>isItemChange()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+bool DiagramScene::isItemChange(int type)
+{
+    foreach (QGraphicsItem *item, selectedItems()) {
+        if (item-&gt;type() == type)
+            return true;
+    }
+    return false;
+}
+</pre> The scene has single selection, i.e., only one item can be selected at any given time. The foreach will then loop one time with the selected item or none if no item is selected. <tt>isItemChange()</tt> is used to check whether a selected item exists and also is of the specified diagram <tt>type</tt>.<a name="diagramitem-class-definition"><h2>DiagramItem Class Definition</h2> <pre class="snippet">
+class DiagramItem : public QGraphicsPolygonItem
+{
+public:
+    enum { Type = UserType + 15 };
+    enum DiagramType { Step, Conditional, StartEnd, Io };
+
+    DiagramItem(DiagramType diagramType, QMenu *contextMenu,
+        QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+
+    void removeArrow(Arrow *arrow);
+    void removeArrows();
+    DiagramType diagramType() const
+        { return myDiagramType; }
+    QPolygonF polygon() const
+        { return myPolygon; }
+    void addArrow(Arrow *arrow);
+    QPixmap image() const;
+    int type() const
+        { return Type;}
+
+protected:
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+
+private:
+    DiagramType myDiagramType;
+    QPolygonF myPolygon;
+    QMenu *myContextMenu;
+    QList&lt;Arrow *&gt; arrows;
+};
+</pre> The <tt>DiagramItem</tt> represents a flowchart shape in the <tt>DiagramScene</tt>. It inherits <a href="../../../com/trolltech/qt/gui/QGraphicsPolygonItem.html">QGraphicsPolygonItem</a> and has a polygon for each shape. The enum DiagramType has a value for each of the flowchart shapes. <p>The class has a list of the arrows that are connected to it. This is necessary because only the item knows when it is being moved (with the <tt>itemChanged()</tt> function) at which time the arrows must be updated. The item can also draw itself onto a <a href="../../../com/trolltech/qt/gui/QPixmap.html">QPixmap</a> with the <tt>image()</tt> function. This is used for the tool buttons in <tt>MainWindow</tt>, see <tt>createColorToolButtonIcon()</tt> in <tt>MainWindow</tt>. <p>The Type enum is a unique identifier of the class. It is used by <tt>qgraphicsitem_cast()</tt>, which does dynamic casts of graphics items. The UserType constant is the minimum value a custom graphics item type can be.<a name="diagramitem-class-implementation"><h2>DiagramItem Class Implementation</h2> We start with a look at the constructor:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+DiagramItem::DiagramItem(DiagramType diagramType, QMenu *contextMenu,
+             QGraphicsItem *parent, QGraphicsScene *scene)
+    : QGraphicsPolygonItem(parent, scene)
+{
+    myDiagramType = diagramType;
+    myContextMenu = contextMenu;
+
+    QPainterPath path;
+    switch (myDiagramType) {
+        case StartEnd:
+            path.moveTo(200, 50);
+            path.arcTo(150, 0, 50, 50, 0, 90);
+            path.arcTo(50, 0, 50, 50, 90, 90);
+            path.arcTo(50, 50, 50, 50, 180, 90);
+            path.arcTo(150, 50, 50, 50, 270, 90);
+            path.lineTo(200, 25);
+            myPolygon = path.toFillPolygon();
+            break;
+        case Conditional:
+            myPolygon &lt;&lt; QPointF(-100, 0) &lt;&lt; QPointF(0, 100)
+                      &lt;&lt; QPointF(100, 0) &lt;&lt; QPointF(0, -100)
+                      &lt;&lt; QPointF(-100, 0);
+            break;
+        case Step:
+            myPolygon &lt;&lt; QPointF(-100, -100) &lt;&lt; QPointF(100, -100)
+                      &lt;&lt; QPointF(100, 100) &lt;&lt; QPointF(-100, 100)
+                      &lt;&lt; QPointF(-100, -100);
+            break;
+        default:
+            myPolygon &lt;&lt; QPointF(-120, -80) &lt;&lt; QPointF(-70, 80)
+                      &lt;&lt; QPointF(120, 80) &lt;&lt; QPointF(70, -80)
+                      &lt;&lt; QPointF(-120, -80);
+            break;
+    }
+    setPolygon(myPolygon);
+    setFlag(QGraphicsItem::ItemIsMovable, true);
+    setFlag(QGraphicsItem::ItemIsSelectable, true);
+}
+</pre> In the constructor we create the items polygon according to <tt>diagramType</tt>. <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html">QGraphicsItem</a>s are not movable or selectable by default, so we must set these properties. <p>Here is the <tt>removeArrow()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void DiagramItem::removeArrow(Arrow *arrow)
+{
+    int index = arrows.indexOf(arrow);
+
+    if (index != -1)
+        arrows.removeAt(index);
+}
+</pre> <tt>removeArrow()</tt> is used to remove <tt>Arrow</tt> items when they or <tt>DiagramItems</tt> they are connected to are removed from the scene. <p>Here is the <tt>removeArrows()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void DiagramItem::removeArrows()
+{
+    foreach (Arrow *arrow, arrows) {
+        arrow-&gt;startItem()-&gt;removeArrow(arrow);
+        arrow-&gt;endItem()-&gt;removeArrow(arrow);
+        scene()-&gt;removeItem(arrow);
+        delete arrow;
+    }
+}
+</pre> This function is called when the item is removed from the scene and removes all arrows that are connected to this item. The arrow must be removed from the <tt>arrows</tt> list of both its start and end item. <p>Here is the <tt>addArrow()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void DiagramItem::addArrow(Arrow *arrow)
+{
+    arrows.append(arrow);
+}
+</pre> This function simply adds the <tt>arrow</tt> to the items <tt>arrows</tt> list. <p>Here is the <tt>image()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QPixmap DiagramItem::image() const
+{
+    QPixmap pixmap(250, 250);
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    painter.setPen(QPen(Qt::black, 8));
+    painter.translate(125, 125);
+    painter.drawPolyline(myPolygon);
+
+    return pixmap;
+}
+</pre> This function draws the polygon of the item onto a <a href="../../../com/trolltech/qt/gui/QPixmap.html">QPixmap</a>. In this example we use this to create icons for the tool buttons in the tool box. <p>Here is the <tt>contextMenuEvent()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void DiagramItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+{
+    scene()-&gt;clearSelection();
+    setSelected(true);
+    myContextMenu-&gt;exec(event-&gt;screenPos());
+}
+</pre> We show the context menu. As right mouse clicks, which shows the menu, don't select items by default we set the item selected with <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html#setSelected(boolean)">setSelected()</a>. This is necessary since an item must be selected to change its elevation with the <tt>bringToFront</tt> and <tt>sendToBack</tt> actions. <p>This is the implementation of <tt>itemChange()</tt>:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QVariant DiagramItem::itemChange(GraphicsItemChange change,
+                     const QVariant &value)
+{
+    if (change == QGraphicsItem::ItemPositionChange) {
+        foreach (Arrow *arrow, arrows) {
+            arrow-&gt;updatePosition();
+        }
+    }
+
+    return value;
+}
+</pre> If the item has moved, we need to update the positions of the arrows connected to it. The implementation of <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html">QGraphicsItem</a> does nothing, so we just return <tt>value</tt>.<a name="diagramtextitem-class-definition"><h2>DiagramTextItem Class Definition</h2> The <tt>TextDiagramItem</tt> class inherits <a href="../../../com/trolltech/qt/gui/QGraphicsTextItem.html">QGraphicsTextItem</a> and adds the possibility to move editable text items. Editable QGraphicsTextItems are designed to be fixed in place and editing starts when the user single clicks on the item. With <tt>DiagramTextItem</tt> the editing starts with a double click leaving single click available to interact with and move it. <pre class="snippet">
+class DiagramTextItem : public QGraphicsTextItem
+{
+    Q_OBJECT
+
+public:
+    enum { Type = UserType + 3 };
+
+    DiagramTextItem(QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+
+    int type() const
+        { return Type; }
+
+signals:
+    void lostFocus(DiagramTextItem *item);
+    void selectedChange(QGraphicsItem *item);
+
+protected:
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+    void focusOutEvent(QFocusEvent *event);
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
+};
+</pre> We use <tt>itemChange()</tt> and <tt>focusOutEvent()</tt> to notify the <tt>DiagramScene</tt> when the text item loses focus and gets selected. <p>Vi reimplement the functions that handle mouse events to make it possible to alter the mouse behavior of <a href="../../../com/trolltech/qt/gui/QGraphicsTextItem.html">QGraphicsTextItem</a>.<a name="diagramtextitem-implementation"><h2>DiagramTextItem Implementation</h2> We start with the constructor:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+DiagramTextItem::DiagramTextItem(QGraphicsItem *parent, QGraphicsScene *scene)
+    : QGraphicsTextItem(parent, scene)
+{
+    setFlag(QGraphicsItem::ItemIsMovable);
+    setFlag(QGraphicsItem::ItemIsSelectable);
+}
+</pre> We simply set the item movable and selectable, as these flags are off by default. <p>Here is the <tt>itemChange()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QVariant DiagramTextItem::itemChange(GraphicsItemChange change,
+                     const QVariant &value)
+{
+    if (change == QGraphicsItem::ItemSelectedHasChanged)
+        emit selectedChange(this);
+    return value;
+}
+</pre> When the item is selected we emit the selectedChanged signal. The <tt>MainWindow</tt> uses this signal to update the widgets that display font properties to the font of the selected text item. <p>Here is the <tt>focusOutEvent()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void DiagramTextItem::focusOutEvent(QFocusEvent *event)
+{
+    setTextInteractionFlags(Qt::NoTextInteraction);
+    emit lostFocus(this);
+    QGraphicsTextItem::focusOutEvent(event);
+}
+</pre> <tt>DiagramScene</tt> uses the signal emitted when the text item looses remove the item if it is empty, i.e., it contains no text. <p>This is the implementation of <tt>mouseDoubleClickEvent()</tt>:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void DiagramTextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (textInteractionFlags() == Qt::NoTextInteraction)
+        setTextInteractionFlags(Qt::TextEditorInteraction);
+    QGraphicsTextItem::mouseDoubleClickEvent(event);
+}
+</pre> When we receive a double click event, we make the item editable by calling <a href="../../../com/trolltech/qt/gui/QGraphicsTextItem.html#setTextInteractionFlags(com.trolltech.qt.core.Qt.TextInteractionFlag[])">QGraphicsTextItem::setTextInteractionFlags()</a>. We then forward the double-click to the item itself.<a name="arrow-class-definition"><h2>Arrow Class Definition</h2> The <tt>Arrow</tt> class is a graphics item that connects two <tt>DiagramItems</tt>. It draws an arrow head to one of the items. To achieve this the item needs to paint itself and also re implement methods used by the graphics scene to check for collisions and selections. The class inherits QGraphicsLine item, and draws the arrowhead and moves with the items it connects. <pre class="snippet">
+class Arrow : public QGraphicsLineItem
+{
+public:
+    enum { Type = UserType + 4 };
+
+    Arrow(DiagramItem *startItem, DiagramItem *endItem,
+      QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+
+    int type() const
+        { return Type; }
+    QRectF boundingRect() const;
+    QPainterPath shape() const;
+    void setColor(const QColor &color)
+        { myColor = color; }
+    DiagramItem *startItem() const
+        { return myStartItem; }
+    DiagramItem *endItem() const
+        { return myEndItem; }
+
+
+public slots:
+    void updatePosition();
+
+protected:
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+               QWidget *widget = 0);
+
+private:
+    DiagramItem *myStartItem;
+    DiagramItem *myEndItem;
+    QColor myColor;
+    QPolygonF arrowHead;
+};
+</pre> The item's color can be set with <tt>setColor()</tt>. <p><tt>boundingRect()</tt> and <tt>shape()</tt> are reimplemented from <a href="../../../com/trolltech/qt/gui/QGraphicsLineItem.html">QGraphicsLineItem</a> and are used by the scene to check for collisions and selections. <p>Calling <tt>updatePosition()</tt> causes the arrow to recalculate its position and arrow head angle. <tt>paint()</tt> is reimplemented so that we can paint an arrow rather than just a line between items. <p><tt>myStartItem</tt> and <tt>myEndItem</tt> are the diagram items that the arrow connects. The arrow is drawn with its head to the end item. <tt>arrowHead</tt> is a polygon with three vertices's we use to draw the arrow head.<a name="arrow-class-implementation"><h2>Arrow Class Implementation</h2> The constructor of the <tt>Arrow</tt> class looks like this:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+Arrow::Arrow(DiagramItem *startItem, DiagramItem *endItem,
+         QGraphicsItem *parent, QGraphicsScene *scene)
+    : QGraphicsLineItem(parent, scene)
+{
+    myStartItem = startItem;
+    myEndItem = endItem;
+    setFlag(QGraphicsItem::ItemIsSelectable, true);
+    myColor = Qt::black;
+    setPen(QPen(myColor, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+}
+</pre> We set the start and end diagram items of the arrow. The arrow head will be drawn where the line intersects the end item. <p>Here is the <tt>boundingRect()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QRectF Arrow::boundingRect() const
+{
+    qreal extra = (pen().width() + 20) / 2.0;
+
+    return QRectF(line().p1(), QSizeF(line().p2().x() - line().p1().x(),
+                                      line().p2().y() - line().p1().y()))
+        .normalized()
+        .adjusted(-extra, -extra, extra, extra);
+}
+</pre> We need to reimplement this function because the arrow is larger than the bounding rectangle of the <a href="../../../com/trolltech/qt/gui/QGraphicsLineItem.html">QGraphicsLineItem</a>. The graphics scene uses the bounding rectangle to know which regions of the scene to update. <p>Here is the <tt>shape()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QPainterPath Arrow::shape() const
+{
+    QPainterPath path = QGraphicsLineItem::shape();
+    path.addPolygon(arrowHead);
+    return path;
+}
+</pre> The shape function returns a <a href="../../../com/trolltech/qt/gui/QPainterPath.html">QPainterPath</a> that is the exact shape of the item. The <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html#shape()">QGraphicsLineItem::shape()</a> returns a path with a line drawn with the current pen, so we only need to add the arrow head. This function is used to check for collisions and selections with the mouse. <p>Here is the <tt>updatePosition()</tt> slot:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void Arrow::updatePosition()
+{
+    QLineF line(mapFromItem(myStartItem, 0, 0), mapFromItem(myEndItem, 0, 0));
+    setLine(line);
+}
+</pre> This slot updates the arrow by setting the start and end points of its line to the center of the items it connects. <p>Here is the <tt>paint()</tt> function:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
+          QWidget *)
+{
+    if (myStartItem-&gt;collidesWithItem(myEndItem))
+        return;
+
+    QPen myPen = pen();
+    myPen.setColor(myColor);
+    qreal arrowSize = 20;
+    painter-&gt;setPen(myPen);
+    painter-&gt;setBrush(myColor);
+</pre> If the start and end items collide we do not draw the arrow; the algorithm we use to find the point the arrow should be drawn at may fail if the items collide. <p>We first set the pen and brush we will use for drawing the arrow.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+
+    QLineF centerLine(myStartItem-&gt;pos(), myEndItem-&gt;pos());
+    QPolygonF endPolygon = myEndItem-&gt;polygon();
+    QPointF p1 = endPolygon.first() + myEndItem-&gt;pos();
+    QPointF p2;
+    QPointF intersectPoint;
+    QLineF polyLine;
+    for (int i = 1; i &lt; endPolygon.count(); ++i) {
+    p2 = endPolygon.at(i) + myEndItem-&gt;pos();
+    polyLine = QLineF(p1, p2);
+    QLineF::IntersectType intersectType =
+        polyLine.intersect(centerLine, &intersectPoint);
+    if (intersectType == QLineF::BoundedIntersection)
+        break;
+        p1 = p2;
+    }
+
+    setLine(QLineF(intersectPoint, myStartItem-&gt;pos()));
+</pre> We then need to find the position at which to draw the arrowhead. The head should be drawn where the line and the end item intersects. This is done by taking the line between each point in the polygon and check if it intersects with the line of the arrow. Since the line start and end points are set to the center of the items the arrow line should intersect one and only one of the lines of the polygon. Note that the points in the polygon are relative to the local coordinate system of the item. We must therefore add the position of the end item to make the coordinates relative to the scene.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+
+    double angle = ::acos(line().dx() / line().length());
+    if (line().dy() &gt;= 0)
+        angle = (Pi * 2) - angle;
+
+        QPointF arrowP1 = line().p1() + QPointF(sin(angle + Pi / 3) * arrowSize,
+                                        cos(angle + Pi / 3) * arrowSize);
+        QPointF arrowP2 = line().p1() + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
+                                        cos(angle + Pi - Pi / 3) * arrowSize);
+
+        arrowHead.clear();
+        arrowHead &lt;&lt; line().p1() &lt;&lt; arrowP1 &lt;&lt; arrowP2;
+</pre> We calculate the angle between the x-axis and the line of the arrow. We need to turn the arrow head to this angle so that it follows the direction of the arrow. If the angle is negative we must turn the direction of the arrow. <p>We can then calculate the three points of the arrow head polygon. One of the points is the end of the line, which now is the intersection between the arrow line and the end polygon. Then we clear the <tt>arrowHead</tt> polygon from the previous calculated arrow head and set these new points.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+        painter-&gt;drawLine(line());
+        painter-&gt;drawPolygon(arrowHead);
+        if (isSelected()) {
+            painter-&gt;setPen(QPen(myColor, 1, Qt::DashLine));
+        QLineF myLine = line();
+        myLine.translate(0, 4.0);
+        painter-&gt;drawLine(myLine);
+        myLine.translate(0,-8.0);
+        painter-&gt;drawLine(myLine);
+    }
+}
+</pre> If the line is selected we draw to dotted lines that are parallel with the line of the arrow. We do not use the default implementation, which uses <a href="../../../com/trolltech/qt/gui/QGraphicsItem.html#boundingRect()">boundingRect()</a> because the <a href="../../../com/trolltech/qt/core/QRect.html">QRect</a> bounding rectangle is considerably larger than the line.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Threaded Fortune Server Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Threaded Fortune Server Example</h1></center><p> The Threaded Fortune Server example shows how to create a server for a simple network service that uses threads to handle requests from different clients. It is intended to be run alongside the Fortune Client example. <br><center><img src="images/threadedfortuneserver-example.png"></center><br> The implementation of this example is similar to that of the <a href="network-fortuneserver.html">Fortune Server</a> example, but here we will implement a subclass of <a href="../../../com/trolltech/qt/network/QTcpServer.html">QTcpServer</a> that starts each connection in a different thread. <p>For this we need two classes: FortuneServer, a <a href="../../../com/trolltech/qt/network/QTcpServer.html">QTcpServer</a> subclass, and FortuneThread, which inherits QThread. <pre class="snippet">
+class FortuneServer : public QTcpServer
+{
+    Q_OBJECT
+
+public:
+    FortuneServer(QObject *parent = 0);
+
+protected:
+    void incomingConnection(int socketDescriptor);
+
+private:
+    QStringList fortunes;
+};
+</pre> FortuneServer inherits <a href="../../../com/trolltech/qt/network/QTcpServer.html">QTcpServer</a> and reimplements <a href="../../../com/trolltech/qt/network/QTcpServer.html#incomingConnection(int)">QTcpServer::incomingConnection()</a>. We also use it for storing the list of random fortunes.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+FortuneServer::FortuneServer(QObject *parent)
+    : QTcpServer(parent)
+{
+    fortunes &lt;&lt; tr("You've been leading a dog's life. Stay off the furniture.")
+             &lt;&lt; tr("You've got to think about tomorrow.")
+             &lt;&lt; tr("You will be surprised by a loud noise.")
+             &lt;&lt; tr("You will feel hungry again in another hour.")
+             &lt;&lt; tr("You might have mail.")
+             &lt;&lt; tr("You cannot kill time without injuring eternity.")
+             &lt;&lt; tr("Computers are not intelligent. They only think they are.");
+}
+</pre> We use FortuneServer's constructor to simply generate the list of fortunes.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void FortuneServer::incomingConnection(int socketDescriptor)
+{
+    QString fortune = fortunes.at(qrand() % fortunes.size());
+    FortuneThread *thread = new FortuneThread(socketDescriptor, fortune, this);
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    thread-&gt;start();
+}
+</pre> Our implementation of <a href="../../../com/trolltech/qt/network/QTcpServer.html#incomingConnection(int)">QTcpServer::incomingConnection()</a> creates a FortuneThread object, passing the incoming socket descriptor and a random fortune to FortuneThread's constructor. By connecting FortuneThread's finished() signal to QObject::deleteLater(), we ensure that the thread gets deleted once it has finished. We can then call QThread::start(), which starts the thread. <pre class="snippet">
+class FortuneThread : public QThread
+{
+    Q_OBJECT
+
+public:
+    FortuneThread(int socketDescriptor, const QString &fortune, QObject *parent);
+
+    void run();
+
+signals:
+    void error(QTcpSocket::SocketError socketError);
+
+private:
+    int socketDescriptor;
+    QString text;
+};
+</pre> Moving on to the FortuneThread class, this is a QThread subclass whose job is to write the fortune to the connected socket. The class reimplements QThread::run(), and it has a signal for reporting errors.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+FortuneThread::FortuneThread(int socketDescriptor, const QString &fortune, QObject *parent)
+    : QThread(parent), socketDescriptor(socketDescriptor), text(fortune)
+{
+}
+</pre> FortuneThread's constructor simply stores the socket descriptor and fortune text, so that they are available for run() later on.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void FortuneThread::run()
+{
+    QTcpSocket tcpSocket;
+</pre> The first thing our run() function does is to create a <a href="../../../com/trolltech/qt/network/QTcpSocket.html">QTcpSocket</a> object on the stack. What's worth noticing is that we are creating this object inside the thread, which automatically associates the socket to the thread's event loop. This ensures that Qt will not try to deliver events to our socket from the main thread while we are accessing it from FortuneThread::run().<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    if (!tcpSocket.setSocketDescriptor(socketDescriptor)) {
+        emit error(tcpSocket.error());
+        return;
+    }
+</pre> The socket is initialized by calling <a href="../../../com/trolltech/qt/network/QAbstractSocket.html#setSocketDescriptor(int, com.trolltech.qt.network.QAbstractSocket.SocketState, com.trolltech.qt.core.QIODevice.OpenModeFlag[])">QTcpSocket::setSocketDescriptor()</a>, passing our socket descriptor as an argument. We expect this to succeed, but just to be sure, (although unlikely, the system may run out of resources,) we catch the return value and report any error.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_4_0);
+    out &lt;&lt; (quint16)0;
+    out &lt;&lt; text;
+    out.device()-&gt;seek(0);
+    out &lt;&lt; (quint16)(block.size() - sizeof(quint16));
+</pre> As with the <a href="network-fortuneserver.html">Fortune Server</a> example, we encode the fortune into a <a href="../../../com/trolltech/qt/core/QByteArray.html">QByteArray</a> using <a href="../../../com/trolltech/qt/core/QDataStream.html">QDataStream</a>.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+
+    tcpSocket.write(block);
+    tcpSocket.disconnectFromHost();
+    tcpSocket.waitForDisconnected();
+}
+</pre> But unlike the previous example, we finish off by calling <a href="../../../com/trolltech/qt/network/QAbstractSocket.html#waitForDisconnected()">QTcpSocket::waitForDisconnected()</a>, which blocks the calling thread until the socket has disconnected. Because we are running in a separate thread, the GUI will remain responsive. <p><DT><b>See also:</b><br><DD><a href="network-fortuneserver.html">Fortune Server Example</a>, <a href="network-fortuneclient.html">Fortune Client Example</a>, and <a href="network-blockingfortuneclient.html">Blocking Fortune Client Example</a>. <br></DD></DT><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

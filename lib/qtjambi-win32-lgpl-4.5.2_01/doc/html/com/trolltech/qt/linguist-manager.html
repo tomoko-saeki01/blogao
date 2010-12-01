@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Qt Linguist Manual: Release Manager</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Qt Linguist Manual: Release Manager</h1></center><p>[<a href="linguist-manual.html">Qt Linguist Manual</a>][Next: <a href="linguist-translators.html">Qt Linguist Manual: Translators</a>]<p><a name="lupdate"><a name="lrelease"> Two tools are provided for the release manager, <a href="linguist-manager.html#lupdate">lupdate</a> and <a href="linguist-manager.html#lrelease">lrelease</a>. These tools can process <a href="qmake-manual.html">qmake</a> project files, or operate directly on the file system.<a name="qt-project-files"><h2>Qt Project Files</h2> The easiest method to use <a href="linguist-manager.html#lupdate">lupdate</a> and <a href="linguist-manager.html#lrelease">lrelease</a> is by specifing a <tt>.pro</tt> Qt project file. There must be an entry in the <tt>TRANSLATIONS</tt> section of the project file for each language that is additional to the native language. A typical entry looks like this:Error parsing snippet.</pre> Using a locale within the translation file name is useful for determining which language to load at runtime. This is explained in the <a href="qtjambi-linguist-programmers.html">Programmers</a> chapter. <p>An example of a complete <tt>.pro</tt> file with four translation source files: <pre class="snippet">
+HEADERS         = main-dlg.h \
+                  options-dlg.h
+SOURCES         = main-dlg.cpp \
+                  options-dlg.cpp \
+                  main.cpp
+FORMS           = search-dlg.ui
+TRANSLATIONS    = superapp_dk.ts \
+                  superapp_fi.ts \
+                  superapp_no.ts \
+                  superapp_se.ts
+
+CODECFORTR      = ISO-8859-5
+</pre> QTextCodec::setCodecForTr() makes it possible to choose a 8-bit encoding for literal strings that appear within <tt>tr()</tt> calls. This is useful for applications whose source language is, for example, Chinese or Japanese. If no encoding is set, <tt>tr()</tt> uses Latin1. <p>If you do use the QTextCodec::codecForTr() mechanism in your application, Qt Linguist needs you to set the <tt>CODECFORTR</tt> entry in the <tt>.pro</tt> file as well. For example: <pre class="snippet">
+CODECFORTR      = ISO-8859-5
+</pre> Also, if your compiler uses a different encoding for its runtime system as for its source code and you want to use non-ASCII characters in string literals, you will need to set the <tt>CODECFORSRC</tt>. For example: <pre class="snippet">
+CODECFORSRC     = UTF-8
+</pre> Microsoft Visual Studio 2005 .NET appears to be the only compiler for which this is necessary. However, if you want to write portable code, we recommend that you avoid non-ASCII characters in your source files. You can still specify non-ASCII characters portably using escape sequences, for example: <pre class="snippet">
+label-&gt;setText(tr("F\374r \310lise"));
+</pre><a name="lupdate"><h2>lupdate</h2> Usage: <tt>lupdate myproject.pro</tt> <p><a href="linguist-manager.html#lupdate">lupdate</a> is a command line tool that finds the translatable strings in the specified source, header and Qt Designer interface files, and produces or updates <tt>.ts</tt> translation files. The files to process and the files to update can be set at the command line, or provided in a <tt>.pro</tt> file specified as an command line argument. The produced translation files are given to the translator who uses Qt Linguist to read the files and insert the translations. <p>Companies that have their own translators in-house may find it useful to run <a href="linguist-manager.html#lupdate">lupdate</a> regularly, perhaps monthly, as the application develops. This will lead to a fairly low volume of translation work spread evenly over the life of the project and will allow the translators to support a number of projects simultaneously. <p>Companies that hire in translators as required may prefer to run <a href="linguist-manager.html#lupdate">lupdate</a> only a few times in the application's life cycle, the first time might be just before the first test phase. This will provide the translator with a substantial single block of work and any bugs that the translator detects may easily be included with those found during the initial test phase. The second and any subsequent <a href="linguist-manager.html#lupdate">lupdate</a> runs would probably take place during the final beta phase. <p>The <tt>.ts</tt> file format is a simple human-readable XML format that can be used with version control systems if required. <tt>lupdate</tt> can also process Localization Interchange File Format (XLIFF) format files; file in this format typically have file names that end with the <tt>.xlf</tt> suffix. <p>Pass the <tt>-help</tt> option to <tt>lupdate</tt> to obtain the list of supported options: <pre class="snippet">
+Usage:
+    lupdate [options] [project-file]
+    lupdate [options] [source-file|path]... -ts ts-files
+Options:
+    -help  Display this information and exit.
+    -noobsolete
+           Drop all obsolete strings.
+    -extensions &lt;ext&gt;[,&lt;ext&gt;]...
+           Process files with the given extensions only.
+           The extension list must be separated with commas, not with whitespace.
+           Default: 'ui,c,c++,cc,cpp,cxx,ch,h,h++,hh,hpp,hxx'.
+    -pluralonly
+           Only include plural form messages.
+    -silent
+           Don't explain what is being done.
+    -version
+           Display the version of lupdate and exit.
+</pre> Qt Linguist is also able to import and export XLIFF files. See the <a href="qtjambi-linguist-translators.html">Translators</a> section for more information.<a name="lrelease"><h2>lrelease</h2> Usage: <tt>lrelease myproject.pro</tt> <p><a href="linguist-manager.html#lrelease">lrelease</a> is a command line tool that produces <tt>.qm</tt> files out of <tt>.ts</tt> files. The <tt>.qm</tt> file format is a compact binary format that is used by the localized application. It provides extremely fast lookups for translations. The <tt>.ts</tt> files <a href="linguist-manager.html#lrelease">lrelease</a> processes can be specified at the command line, or given indirectly by a Qt <tt>.pro</tt> project file. <p>This tool is run whenever a release of the application is to be made, from initial test version through to final release version. If the <tt>.qm</tt> files are not created, e.g. because an alpha release is required before any translation has been undertaken, the application will run perfectly well using the text the programmers placed in the source files. Once the <tt>.qm</tt> files are available the application will detect them and use them automatically. <p>Note that lrelease will only incorporate translations that are marked as "finished". Otherwise the original text will be used instead. <p>Pass the <tt>-help</tt> option to <tt>lrelease</tt> to obtain the list of supported options: <pre class="snippet">
+Usage:
+    lrelease [options] project-file
+    lrelease [options] ts-files [-qm qm-file]
+Options:
+    -help  Display this information and exit
+    -compress
+           Compress the .qm files
+    -nounfinished
+           Do not include unfinished translations
+    -removeidentical
+           If the translated text is the same as
+           the source text, do not include the message
+    -silent
+           Don't explain what is being done
+    -version
+           Display the version of lrelease and exit
+</pre><a name="missing-translations"><h2>Missing Translations</h2> Both <a href="linguist-manager.html#lupdate">lupdate</a> and <a href="linguist-manager.html#lrelease">lrelease</a> may be used with <tt>.ts</tt> translation source files which are incomplete. Missing translations will be replaced with the native language phrases at runtime.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

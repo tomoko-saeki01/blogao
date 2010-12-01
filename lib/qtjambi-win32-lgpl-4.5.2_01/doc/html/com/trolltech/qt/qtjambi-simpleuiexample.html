@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Simple UI Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Simple UI Example</h1></center><p> <b>Code</b>: <ul><li> <a href="qtjambi-simpleuiexample-code.html">SimpleUIExample.java</a></li></ul> The Simple UI Example shows how user interface (<tt>.jui</tt>) files created with Qt Designer can be used to implement user interfaces for applications. <br><center><img src="images/simpleui-example.png"></center><br> The example's main window shows a text browser and an <b>Open Dialog</b> button that can be used to access a dialog with input fields. When these fields have been completed, or the dialog canceled, the resulting input is placed in the text browser.<a name="simpleuiexample-class-implementation"><h2>SimpleUIExample Class Implementation</h2> The <tt>SimpleUIExample</tt> class is derived from <a href="../../../com/trolltech/qt/gui/QMainWindow.html">QMainWindow</a>, and provides a user interface that is implemented by an instance of the <tt>Ui_SimpleUIExampleMainWindow</tt> class: <pre class="snippet">
+public class SimpleUIExample extends QMainWindow {
+
+
+    public static void main(String[] args) {
+        QApplication.initialize(args);
+        SimpleUIExample mainw = new SimpleUIExample();
+        mainw.show();
+        QApplication.exec();
+    }
+
+
+    Ui_SimpleUIExampleMainWindow mainWindowUi = new Ui_SimpleUIExampleMainWindow();
+</pre> The instance of the user interface class is implemented as a member of the <tt>SimpleUIExample</tt> class. <p>This user interface class is generated from a user interface file when the example is built, and provides a <tt>setupUi()</tt> method that we use in the <tt>SimpleUIExample</tt> constructor to set up the user interface: <pre class="snippet">
+    public SimpleUIExample() {
+        // Place what you made in Designer onto the main window.
+        mainWindowUi.setupUi(this);
+        setWindowIcon(new QIcon("classpath:com/trolltech/images/qt-logo.png"));
+
+        // Connect the OpenDialog button to the showDialog method.
+        mainWindowUi.pushButton_OpenDialog.clicked.connect(this, "showDialog()");
+    }
+</pre> We also set the window's icon, and connect a push button defined in the user interface to the <tt>showDialog()</tt> slot in this class: <pre class="snippet">
+    private void showDialog() {
+        // Make the dialog.
+        Ui_SimpleUIExample dialogUi = new Ui_SimpleUIExample();
+        QDialog dialog = new QDialog(this);
+        dialogUi.setupUi(dialog);
+</pre> The dialog itself uses a user interface class generated from a <tt>.jui</tt> file, which we set up in a similar way to before. Here, we call the <tt>Ui_SimpleUIExample</tt> instance's <tt>setupUi()</tt> method on the newly-constructed <a href="../../../com/trolltech/qt/gui/QDialog.html">QDialog</a> instance. <p>Once set up, the dialog is executed in the normal way: <pre class="snippet">
+        String result = "";
+        if (dialog.exec() == QDialog.DialogCode.Accepted.value()) {
+            result += "Name: " + dialogUi.lineEdit_Name.text() + "\n";
+            result += "E-Mail: " + dialogUi.lineEdit_Email.text() + "\n";
+            // Get rest of dialog information here
+
+        } else {
+            result = "Cancelled by user.";
+        }
+
+        mainWindowUi.textBrowser.setText(result);
+
+    }
+
+}
+</pre> If the user accepts the dialog, we read the contents of the input widgets it contains, and write the result to the main window's text browser widget. If the user cancels the dialog, the text "Cancelled by user." is written to the text browser.<a name="the-main-function"><h2>The main() Function</h2> The <tt>main()</tt> method is defined as part of the <tt>SimpleUIExample</tt> class. It constructs the necessary <a href="../../../com/trolltech/qt/gui/QApplication.html">QApplication</a> instance, constructs and shows an instance of the <tt>SimpleUIExample</tt> class, and executes the application's event loop: <pre class="snippet">
+    public static void main(String[] args) {
+        QApplication.initialize(args);
+        SimpleUIExample mainw = new SimpleUIExample();
+        mainw.show();
+        QApplication.exec();
+    }
+</pre> The example exits when the event loop has finished running, typically when the user closes the main window.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

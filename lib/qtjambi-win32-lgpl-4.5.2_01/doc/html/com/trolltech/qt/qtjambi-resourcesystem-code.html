@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Code for Resource System Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Code for Resource System Example</h1></center><p><pre class="snippet"><html style="white-space:pre-wrap;font-family:courier new"><font color=darkgreen><i>/****************************************************************************
+**
+** Copyright (C) 1992-2009 Nokia Corporation and/or its subsidiary(-ies).
+** All rights reserved.
+**
+** This file is part of Qt Jambi.
+**
+** 
+** Commercial Usage
+** Licensees holding valid Qt Commercial licenses may use this file in
+** accordance with the Qt Commercial License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Nokia.
+** 
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 2.1 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU Lesser General Public License version 2.1 requirements
+** will be met: http:<font color=darkgreen><i>//www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+</i></font>** 
+** In addition, as a special exception, Nokia gives you certain
+** additional rights. These rights are described in the Nokia Qt LGPL
+** Exception version 1.0, included in the file LGPL_EXCEPTION.txt in this
+** package.
+** 
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 3.0 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU General Public License version 3.0 requirements will be
+** met: http:<font color=darkgreen><i>//www.gnu.org/copyleft/gpl.html.
+</i></font>** 
+** If you are unsure which license is appropriate for your use, please
+** contact the sales department at qt-sales@nokia.com.
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/</i></font>
+
+<font color=blue>package</font> com.trolltech.examples;
+
+<font color=blue>import</font> com.trolltech.qt.core.*;
+<font color=blue>import</font> com.trolltech.qt.gui.*;
+
+<font color=blue>import</font> java.util.*;
+
+
+<font color=blue>class</font> ResourceItem <font color=blue>extends</font> <font color=darkmagenta><i>QTreeWidgetItem</i></font>
+{
+    <font color=blue>private</font> <font color=darkmagenta><i>QFileInfo</i></font> mainInfo = null;
+    <font color=blue>private</font> <font color=blue>static</font> <font color=darkmagenta><i>QFileIconProvider</i></font> iconProvider = <font color=blue>new</font> <font color=darkmagenta><i>QFileIconProvider</i></font>();
+    <font color=blue>private</font> <font color=blue>boolean</font> isPopulated = false;
+    <font color=blue>private</font> <font color=darkmagenta><i>QTreeWidgetItem</i></font> dummyNode = null;
+
+    <font color=blue>public</font> ResourceItem(<font color=darkmagenta><i>QTreeWidgetItem</i></font> parent, <font color=darkmagenta><i>QFileInfo</i></font> info, <font color=blue>boolean</font> recurse)
+    {
+        <font color=blue>super</font>(parent);
+        setInfo(info, recurse);
+    }
+
+    <font color=blue>public</font> ResourceItem(<font color=darkmagenta><i>QTreeWidget</i></font> parent, <font color=darkmagenta><i>QFileInfo</i></font> info, <font color=blue>boolean</font> recurse)
+    {
+        <font color=blue>super</font>(parent);
+        setInfo(info, recurse);
+    }
+
+    <font color=blue>public</font> <font color=darkmagenta><i>QFileInfo</i></font> getInfo()
+    {
+        <font color=blue>return</font> mainInfo;
+    }
+
+    <font color=blue>boolean</font> shouldInsertFile(<font color=darkmagenta><i>QFileInfo</i></font> i)
+    {
+        <font color=blue>return</font> ((i.isDir() && !i.fileName().equals(<font color=darkgreen><i>"."</i></font>) && !i.fileName().equals(<font color=darkgreen><i>".."</i></font>))
+                || i.suffix().equals(<font color=darkgreen><i>"png"</i></font>)
+                || i.suffix().equals(<font color=darkgreen><i>"jpg"</i></font>)
+                || i.suffix().equals(<font color=darkgreen><i>"jpeg"</i></font>));
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> populate()
+    {
+        <font color=darkmagenta><i>QDir</i></font> dir = <font color=blue>new</font> <font color=darkmagenta><i>QDir</i></font>(mainInfo.absoluteFilePath());
+
+        List&lt;<font color=darkmagenta><i>QFileInfo</i></font>&gt; entryList = dir.entryInfoList();
+
+        <font color=blue>for</font> (<font color=darkmagenta><i>QFileInfo</i></font> i : entryList) {
+            <font color=blue>if</font> (shouldInsertFile(i))
+                <font color=blue>new</font> ResourceItem(<font color=blue>this</font>, i, false);
+        }
+
+        isPopulated = true;
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> expand()
+    {
+        <font color=blue>if</font> (!isPopulated) {
+            <font color=blue>if</font> (dummyNode != null) {
+                takeChildren();
+                dummyNode.dispose();
+                dummyNode = null;
+            }
+
+            populate();
+        }
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> setInfo(<font color=darkmagenta><i>QFileInfo</i></font> info, <font color=blue>boolean</font> recurse)
+    {
+        mainInfo = info;
+
+        setText(0, mainInfo.fileName());
+        setIcon(0, iconProvider.icon(info));
+
+        <font color=blue>if</font> (mainInfo.isDir() && recurse) {
+            populate();
+        } <font color=blue>else</font> <font color=blue>if</font> (mainInfo.isDir()) {
+            dummyNode = <font color=blue>new</font> <font color=darkmagenta><i>QTreeWidgetItem</i></font>(<font color=blue>this</font>);
+        }
+
+    }
+}
+
+@<font color=darkmagenta><i>QtJambiExample</i></font>(name = <font color=darkgreen><i>"Resource System"</i></font>,
+                canInstantiate = <font color=darkgreen><i>"call-static-method:notWebstart"</i></font>)
+<font color=blue>public</font> <font color=blue>class</font> ResourceSystem <font color=blue>extends</font> <font color=darkmagenta><i>QWidget</i></font>
+{
+    <font color=blue>private</font> <font color=darkmagenta><i>QLabel</i></font> currentImage = null;
+    <font color=blue>private</font> <font color=darkmagenta><i>QTreeWidget</i></font> selection = null;
+    <font color=blue>private</font> <font color=darkmagenta><i>QRadioButton</i></font> browseClassPathButton;
+    <font color=blue>private</font> <font color=blue>boolean</font> browseClassPath = true;
+    <font color=blue>private</font> <font color=blue>boolean</font> shown = false;
+    <font color=blue>private</font> String jarName = null;
+
+    <font color=blue>public</font> Signal1&lt;String&gt; pathChanged = <font color=blue>new</font> Signal1&lt;String&gt;();
+
+    <font color=blue>public</font> ResourceSystem()
+    {
+        setupUI();
+
+        pathChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"setPreviewFile(String)"</i></font>);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> setupUI()
+    {
+        currentImage = <font color=blue>new</font> <font color=darkmagenta><i>QLabel</i></font>();
+        selection = <font color=blue>new</font> <font color=darkmagenta><i>QTreeWidget</i></font>();
+        selection.setColumnCount(1);
+        selection.setSizePolicy(<font color=darkmagenta><i>QSizePolicy</i></font>.Policy.Expanding, <font color=darkmagenta><i>QSizePolicy</i></font>.Policy.Minimum);
+        selection.currentItemChanged.connect(<font color=blue>this</font>, <font color=darkgreen><i>"itemChanged(QTreeWidgetItem, QTreeWidgetItem)"</i></font>);
+        selection.itemExpanded.connect(<font color=blue>this</font>, <font color=darkgreen><i>"expandItem(QTreeWidgetItem)"</i></font>);
+
+        List&lt;String&gt; labels = <font color=blue>new</font> LinkedList&lt;String&gt;();
+        labels.add(<font color=darkgreen><i>"Name"</i></font>);
+        selection.setHeaderLabels(labels);
+
+        browseClassPathButton = <font color=blue>new</font> <font color=darkmagenta><i>QRadioButton</i></font>(<font color=darkgreen><i>"Browse class path"</i></font>);
+        browseClassPathButton.setChecked(true);
+        <font color=darkmagenta><i>QRadioButton</i></font> bt2 = <font color=blue>new</font> <font color=darkmagenta><i>QRadioButton</i></font>(<font color=darkgreen><i>"Pick file to browse"</i></font>);
+
+        <font color=darkmagenta><i>QButtonGroup</i></font> group = <font color=blue>new</font> <font color=darkmagenta><i>QButtonGroup</i></font>(<font color=blue>this</font>);
+        group.addButton(browseClassPathButton);
+        group.addButton(bt2);
+        group.setId(browseClassPathButton, 0);
+        group.setId(bt2, 1);
+        group.buttonIdClicked.connect(<font color=blue>this</font>, <font color=darkgreen><i>"modeChanged(int)"</i></font>);
+
+        <font color=darkmagenta><i>QHBoxLayout</i></font> layout2 = <font color=blue>new</font> <font color=darkmagenta><i>QHBoxLayout</i></font>();
+        layout2.addWidget(browseClassPathButton);
+        layout2.addWidget(bt2);
+
+        <font color=darkmagenta><i>QVBoxLayout</i></font> layout = <font color=blue>new</font> <font color=darkmagenta><i>QVBoxLayout</i></font>();
+        layout.addWidget(selection);
+        layout.addLayout(layout2);
+        layout.addWidget(currentImage);
+
+        setLayout(layout);
+
+        setWindowIcon(<font color=blue>new</font> <font color=darkmagenta><i>QIcon</i></font>(<font color=darkgreen><i>"classpath:com/trolltech/images/qt-logo.png"</i></font>));
+
+        setWindowTitle(<font color=darkgreen><i>"Resource System"</i></font>);
+    }
+
+    <font color=blue>protected</font> <font color=blue>void</font> expandItem(<font color=darkmagenta><i>QTreeWidgetItem</i></font> item)
+    {
+        <font color=blue>if</font> (item <font color=blue>instanceof</font> ResourceItem)
+            ((ResourceItem) item).expand();
+    }
+
+    <font color=blue>protected</font> <font color=blue>void</font> modeChanged(<font color=blue>int</font> id)
+    {
+        <font color=blue>if</font> (id == 0)
+            browseClassPath = true;
+        <font color=blue>else</font>
+            browseClassPath = false;
+
+        setupSelection();
+    }
+
+    <font color=blue>protected</font> <font color=blue>void</font> itemChanged(<font color=darkmagenta><i>QTreeWidgetItem</i></font> cur, <font color=darkmagenta><i>QTreeWidgetItem</i></font> prev)
+    {
+        <font color=blue>if</font> (cur == null || !(cur <font color=blue>instanceof</font> ResourceItem))
+            <font color=blue>return</font> ;
+
+        ResourceItem selected_item = (ResourceItem) cur;
+        <font color=darkmagenta><i>QFileInfo</i></font> info = selected_item.getInfo();
+
+        <font color=blue>if</font> (info.exists() && !info.isDir()) {
+            pathChanged.emit(info.absoluteFilePath());
+        }
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> setPreviewFile(String path) {
+        <font color=darkmagenta><i>QPixmap</i></font> pm = <font color=blue>new</font> <font color=darkmagenta><i>QPixmap</i></font>(path);
+        <font color=blue>if</font> (pm.width() &gt; 100 || pm.height() &gt; 100)
+            pm = pm.scaled(100, 100, <font color=darkmagenta><i>Qt</i></font>.AspectRatioMode.KeepAspectRatio, <font color=darkmagenta><i>Qt</i></font>.TransformationMode.SmoothTransformation);
+        currentImage.setPixmap(pm);
+
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> setupSelection()
+    {
+        selection.clear();
+
+        String searchPath = null;
+        <font color=blue>if</font> (!browseClassPath) {
+            String fileName = <font color=darkmagenta><i>QFileDialog</i></font>.getOpenFileName(<font color=blue>this</font>, <font color=darkgreen><i>"Select a .jar file"</i></font>,
+                    null, <font color=blue>new</font> <font color=darkmagenta><i>QFileDialog</i></font>.Filter(<font color=darkgreen><i>"Jar Files (*.jar)"</i></font>));
+
+            <font color=blue>if</font> (fileName.length() == 0) {
+                browseClassPath = true;
+                browseClassPathButton.setChecked(true);
+            }
+
+            <font color=darkmagenta><i>QFileInfo</i></font> jarInfo = <font color=blue>new</font> <font color=darkmagenta><i>QFileInfo</i></font>(fileName);
+            searchPath = <font color=darkgreen><i>"classpath:"</i></font> + jarInfo.canonicalFilePath() + <font color=darkgreen><i>"#/"</i></font>;
+        }
+
+        <font color=blue>if</font> (browseClassPath) {
+            searchPath = <font color=darkgreen><i>"classpath:/"</i></font>;
+        }
+
+        <font color=darkmagenta><i>QFileInfo</i></font> info = <font color=blue>new</font> <font color=darkmagenta><i>QFileInfo</i></font>(searchPath);
+        <font color=blue>if</font> (!info.exists() || !info.isDir()) {
+            <font color=darkmagenta><i>QMessageBox</i></font>.warning(<font color=blue>this</font>, <font color=darkgreen><i>"Couldn't open root dir"</i></font>, <font color=darkgreen><i>"Problem reading from class path"</i></font>);
+            <font color=blue>return</font> ;
+        }
+        <font color=blue>new</font> ResourceItem(selection, info, true);
+
+    }
+
+    @Override
+    <font color=blue>protected</font> <font color=blue>void</font> showEvent(<font color=darkmagenta><i>QShowEvent</i></font> e) {
+        <font color=blue>if</font> (!shown) {
+            <font color=darkmagenta><i>QTimer</i></font>.singleShot(0, <font color=blue>this</font>, <font color=darkgreen><i>"setupSelection()"</i></font>);
+            shown = true;
+        }
+    }
+
+
+    <font color=blue>public</font> <font color=blue>static</font> <font color=blue>boolean</font> notWebstart() {
+        <font color=blue>return</font> System.getProperty(<font color=darkgreen><i>"com.trolltech.launcher.webstart"</i></font>) == null;
+    }
+
+
+    <font color=blue>public</font> <font color=blue>static</font> <font color=blue>void</font> main(String[] args)
+    {
+        <font color=darkmagenta><i>QApplication</i></font>.initialize(args);
+        ResourceSystem w = <font color=blue>new</font> ResourceSystem();
+        w.show();
+        <font color=darkmagenta><i>QApplication</i></font>.exec();
+    }
+
+}
+</html></pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

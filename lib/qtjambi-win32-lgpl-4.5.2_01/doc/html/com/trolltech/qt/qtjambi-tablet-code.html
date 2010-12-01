@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Code for Tablet Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Code for Tablet Example</h1></center><p><pre class="snippet"><html style="white-space:pre-wrap;font-family:courier new"><font color=darkgreen><i>/****************************************************************************
+**
+** Copyright (C) 1992-2009 Nokia Corporation and/or its subsidiary(-ies).
+** All rights reserved.
+**
+** This file is part of Qt Jambi.
+**
+** 
+** Commercial Usage
+** Licensees holding valid Qt Commercial licenses may use this file in
+** accordance with the Qt Commercial License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Nokia.
+** 
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 2.1 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU Lesser General Public License version 2.1 requirements
+** will be met: http:<font color=darkgreen><i>//www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+</i></font>** 
+** In addition, as a special exception, Nokia gives you certain
+** additional rights. These rights are described in the Nokia Qt LGPL
+** Exception version 1.0, included in the file LGPL_EXCEPTION.txt in this
+** package.
+** 
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 3.0 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU General Public License version 3.0 requirements will be
+** met: http:<font color=darkgreen><i>//www.gnu.org/copyleft/gpl.html.
+</i></font>** 
+** If you are unsure which license is appropriate for your use, please
+** contact the sales department at qt-sales@nokia.com.
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/</i></font>
+
+<font color=blue>package</font> com.trolltech.examples;
+
+<font color=blue>import</font> com.trolltech.qt.core.*;
+<font color=blue>import</font> com.trolltech.qt.gui.*;
+
+<font color=blue>public</font> <font color=blue>class</font> Tablet <font color=blue>extends</font> <font color=darkmagenta><i>QMainWindow</i></font>
+{
+    <font color=blue>public</font> <font color=blue>static</font> TabletCanvas myCanvas;
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> brushColorAction;
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QActionGroup</i></font> alphaChannelGroup;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> alphaChannelPressureAction;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> alphaChannelTiltAction;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> noAlphaChannelAction;
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QActionGroup</i></font> colorSaturationGroup;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> colorSaturationVTiltAction;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> colorSaturationHTiltAction;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> colorSaturationPressureAction;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> noColorSaturationAction;
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QActionGroup</i></font> lineWidthGroup;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> lineWidthPressureAction;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> lineWidthTiltAction;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> lineWidthFixedAction;
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> exitAction;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> saveAction;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> loadAction;
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> aboutAction;
+    <font color=blue>private</font> <font color=darkmagenta><i>QAction</i></font> aboutQtAction;
+
+    <font color=blue>private</font> <font color=darkmagenta><i>QMenu</i></font> fileMenu;
+    <font color=blue>private</font> <font color=darkmagenta><i>QMenu</i></font> brushMenu;
+    <font color=blue>private</font> <font color=darkmagenta><i>QMenu</i></font> tabletMenu;
+    <font color=blue>private</font> <font color=darkmagenta><i>QMenu</i></font> helpMenu;
+    <font color=blue>private</font> <font color=darkmagenta><i>QMenu</i></font> colorSaturationMenu;
+    <font color=blue>private</font> <font color=darkmagenta><i>QMenu</i></font> lineWidthMenu;
+    <font color=blue>private</font> <font color=darkmagenta><i>QMenu</i></font> alphaChannelMenu;
+
+    <font color=blue>public</font> <font color=blue>enum</font> AlphaChannelType { AlphaPressure, AlphaTilt, NoAlpha }
+    <font color=blue>public</font> <font color=blue>enum</font> ColorSaturationType { SaturationVTilt, SaturationHTilt,
+                                   SaturationPressure, NoSaturation }
+    <font color=blue>public</font> <font color=blue>enum</font> LineWidthType { LineWidthPressure, LineWidthTilt, NoLineWidth }
+
+    <font color=blue>public</font> Tablet()
+    {
+        myCanvas = <font color=blue>new</font> TabletCanvas();
+
+        createActions();
+        createMenus();
+
+        myCanvas.setColor(<font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(<font color=darkmagenta><i>Qt</i></font>.GlobalColor.red));
+        myCanvas.setLineWidthType(LineWidthType.LineWidthPressure);
+        myCanvas.setAlphaChannelType(AlphaChannelType.NoAlpha);
+        myCanvas.setColorSaturationType(ColorSaturationType.NoSaturation);
+
+        setWindowTitle(tr(<font color=darkgreen><i>"Tablet Example"</i></font>));
+        setCentralWidget(myCanvas);
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> brushColorAct()
+    {
+        <font color=darkmagenta><i>QColor</i></font> color = <font color=darkmagenta><i>QColorDialog</i></font>.getColor(myCanvas.color());
+
+        <font color=blue>if</font> (color.isValid())
+            myCanvas.setColor(color);
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> alphaActionTriggered(<font color=darkmagenta><i>QAction</i></font> action)
+    {
+        <font color=blue>if</font> (action.equals(alphaChannelPressureAction)) {
+            myCanvas.setAlphaChannelType(AlphaChannelType.AlphaPressure);
+        } <font color=blue>else</font> <font color=blue>if</font> (action.equals(alphaChannelTiltAction)) {
+            myCanvas.setAlphaChannelType(AlphaChannelType.AlphaTilt);
+        } <font color=blue>else</font> {
+            myCanvas.setAlphaChannelType(AlphaChannelType.NoAlpha);
+        }
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> lineWidthActionTriggered(<font color=darkmagenta><i>QAction</i></font> action)
+    {
+        <font color=blue>if</font> (action.equals(lineWidthPressureAction)) {
+            myCanvas.setLineWidthType(LineWidthType.LineWidthPressure);
+        } <font color=blue>else</font> <font color=blue>if</font> (action.equals(lineWidthTiltAction)) {
+            myCanvas.setLineWidthType(LineWidthType.LineWidthTilt);
+        } <font color=blue>else</font> {
+            myCanvas.setLineWidthType(LineWidthType.NoLineWidth);
+        }
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> saturationActionTriggered(<font color=darkmagenta><i>QAction</i></font> action)
+    {
+        <font color=blue>if</font> (action.equals(colorSaturationVTiltAction)) {
+            myCanvas.setColorSaturationType(ColorSaturationType.SaturationVTilt);
+        } <font color=blue>else</font> <font color=blue>if</font> (action.equals(colorSaturationHTiltAction)) {
+            myCanvas.setColorSaturationType(ColorSaturationType.SaturationHTilt);
+        } <font color=blue>else</font> <font color=blue>if</font> (action.equals(colorSaturationPressureAction)) {
+            myCanvas.setColorSaturationType(ColorSaturationType.SaturationPressure);
+        } <font color=blue>else</font> {
+            myCanvas.setColorSaturationType(ColorSaturationType.NoSaturation);
+        }
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> saveAct()
+    {
+        String path = <font color=darkmagenta><i>QDir</i></font>.currentPath() + tr(<font color=darkgreen><i>"/untitled.png"</i></font>);
+        String fileName = <font color=darkmagenta><i>QFileDialog</i></font>.getSaveFileName(<font color=blue>this</font>, tr(<font color=darkgreen><i>"Save Picture"</i></font>),
+                                 path);
+
+        <font color=blue>if</font> (!myCanvas.saveImage(fileName))
+            <font color=darkmagenta><i>QMessageBox</i></font>.information(<font color=blue>this</font>, tr(<font color=darkgreen><i>"Error Saving Picture"</i></font>),
+                                          tr(<font color=darkgreen><i>"Could not save the image"</i></font>));
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> loadAct()
+    {
+        String fileName = <font color=darkmagenta><i>QFileDialog</i></font>.getOpenFileName(<font color=blue>this</font>, tr(<font color=darkgreen><i>"Open Picture"</i></font>),
+                                                            <font color=darkmagenta><i>QDir</i></font>.currentPath());
+
+        <font color=blue>if</font> (!myCanvas.loadImage(fileName))
+            <font color=darkmagenta><i>QMessageBox</i></font>.information(<font color=blue>this</font>, tr(<font color=darkgreen><i>"Error Opening Picture"</i></font>),
+                                          tr(<font color=darkgreen><i>"Could not open picture"</i></font>));
+    }
+
+    <font color=blue>public</font> <font color=blue>void</font> aboutAct()
+    {
+        <font color=darkmagenta><i>QMessageBox</i></font>.about(<font color=blue>this</font>, tr(<font color=darkgreen><i>"About Tablet Example"</i></font>),
+                       tr(<font color=darkgreen><i>"This example shows use of a Wacom tablet in Jambi Qt"</i></font>));
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> createActions()
+    {
+        brushColorAction = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&Brush Color..."</i></font>), <font color=blue>this</font>);
+        brushColorAction.setShortcut(tr(<font color=darkgreen><i>"Ctrl+C"</i></font>));
+        brushColorAction.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"brushColorAct()"</i></font>);
+
+        alphaChannelPressureAction = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&Pressure"</i></font>), <font color=blue>this</font>);
+        alphaChannelPressureAction.setCheckable(true);
+
+        alphaChannelTiltAction = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&Tilt"</i></font>), <font color=blue>this</font>);
+        alphaChannelTiltAction.setCheckable(true);
+
+        noAlphaChannelAction = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"No Alpha Channel"</i></font>), <font color=blue>this</font>);
+        noAlphaChannelAction.setCheckable(true);
+        noAlphaChannelAction.setChecked(true);
+
+        alphaChannelGroup = <font color=blue>new</font> <font color=darkmagenta><i>QActionGroup</i></font>(<font color=blue>this</font>);
+        alphaChannelGroup.addAction(alphaChannelPressureAction);
+        alphaChannelGroup.addAction(alphaChannelTiltAction);
+        alphaChannelGroup.addAction(noAlphaChannelAction);
+        alphaChannelGroup.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"alphaActionTriggered(QAction)"</i></font>);
+
+        colorSaturationVTiltAction = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&Vertical Tilt"</i></font>), <font color=blue>this</font>);
+        colorSaturationVTiltAction.setCheckable(true);
+
+        colorSaturationHTiltAction = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&Horizontal Tilt"</i></font>), <font color=blue>this</font>);
+        colorSaturationHTiltAction.setCheckable(true);
+
+        colorSaturationPressureAction = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&Pressure"</i></font>), <font color=blue>this</font>);
+        colorSaturationPressureAction.setCheckable(true);
+
+        noColorSaturationAction = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&No Color Saturation"</i></font>), <font color=blue>this</font>);
+        noColorSaturationAction.setCheckable(true);
+        noColorSaturationAction.setChecked(true);
+
+        colorSaturationGroup = <font color=blue>new</font> <font color=darkmagenta><i>QActionGroup</i></font>(<font color=blue>this</font>);
+        colorSaturationGroup.addAction(colorSaturationVTiltAction);
+        colorSaturationGroup.addAction(colorSaturationHTiltAction);
+        colorSaturationGroup.addAction(colorSaturationPressureAction);
+        colorSaturationGroup.addAction(noColorSaturationAction);
+        colorSaturationGroup.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"saturationActionTriggered(QAction)"</i></font>);
+
+        lineWidthPressureAction = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&Pressure"</i></font>), <font color=blue>this</font>);
+        lineWidthPressureAction.setCheckable(true);
+        lineWidthPressureAction.setChecked(true);
+        lineWidthTiltAction = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&Tilt"</i></font>), <font color=blue>this</font>);
+        lineWidthTiltAction.setCheckable(true);
+
+        lineWidthFixedAction = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&Fixed"</i></font>), <font color=blue>this</font>);
+        lineWidthFixedAction.setCheckable(true);
+
+        lineWidthGroup = <font color=blue>new</font> <font color=darkmagenta><i>QActionGroup</i></font>(<font color=blue>this</font>);
+        lineWidthGroup.addAction(lineWidthPressureAction);
+        lineWidthGroup.addAction(lineWidthTiltAction);
+        lineWidthGroup.addAction(lineWidthFixedAction);
+        lineWidthGroup.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"lineWidthActionTriggered(QAction)"</i></font>);
+
+        exitAction = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"E&xit"</i></font>), <font color=blue>this</font>);
+        exitAction.setShortcut(tr(<font color=darkgreen><i>"Ctrl+X"</i></font>));
+        exitAction.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"close()"</i></font>);
+
+        loadAction = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&Open..."</i></font>), <font color=blue>this</font>);
+        loadAction.setShortcut(tr(<font color=darkgreen><i>"Ctrl+O"</i></font>));
+        loadAction.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"loadAct()"</i></font>);
+
+        saveAction = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"&Save As..."</i></font>), <font color=blue>this</font>);
+        saveAction.setShortcut(tr(<font color=darkgreen><i>"Ctrl+S"</i></font>));
+        saveAction.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"saveAct()"</i></font>);
+
+        aboutAction = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"A&bout"</i></font>), <font color=blue>this</font>);
+        aboutAction.setShortcut(tr(<font color=darkgreen><i>"Ctrl+B"</i></font>));
+        aboutAction.triggered.connect(<font color=blue>this</font>, <font color=darkgreen><i>"aboutAct()"</i></font>);
+
+        aboutQtAction = <font color=blue>new</font> <font color=darkmagenta><i>QAction</i></font>(tr(<font color=darkgreen><i>"About &Qt Jambi"</i></font>), <font color=blue>this</font>);
+        aboutQtAction.setShortcut(tr(<font color=darkgreen><i>"Ctrl+Q"</i></font>));
+        aboutQtAction.triggered.connect(<font color=darkmagenta><i>QApplication</i></font>.instance(), <font color=darkgreen><i>"aboutQt()"</i></font>);
+    }
+
+    <font color=blue>private</font> <font color=blue>void</font> createMenus()
+    {
+        fileMenu = menuBar().addMenu(tr(<font color=darkgreen><i>"&File"</i></font>));
+        fileMenu.addAction(loadAction);
+        fileMenu.addAction(saveAction);
+        fileMenu.addSeparator();
+        fileMenu.addAction(exitAction);
+
+        brushMenu = menuBar().addMenu(tr(<font color=darkgreen><i>"&Brush"</i></font>));
+        brushMenu.addAction(brushColorAction);
+
+        tabletMenu = menuBar().addMenu(tr(<font color=darkgreen><i>"&Tablet"</i></font>));
+
+        lineWidthMenu = tabletMenu.addMenu(tr(<font color=darkgreen><i>"&Line Width"</i></font>));
+        lineWidthMenu.addAction(lineWidthPressureAction);
+        lineWidthMenu.addAction(lineWidthTiltAction);
+        lineWidthMenu.addAction(lineWidthFixedAction);
+
+        alphaChannelMenu = tabletMenu.addMenu(tr(<font color=darkgreen><i>"&Alpha Channel"</i></font>));
+        alphaChannelMenu.addAction(alphaChannelPressureAction);
+        alphaChannelMenu.addAction(alphaChannelTiltAction);
+        alphaChannelMenu.addAction(noAlphaChannelAction);
+
+        colorSaturationMenu = tabletMenu.addMenu(tr(<font color=darkgreen><i>"&Color Saturation"</i></font>));
+        colorSaturationMenu.addAction(colorSaturationVTiltAction);
+        colorSaturationMenu.addAction(colorSaturationHTiltAction);
+        colorSaturationMenu.addAction(noColorSaturationAction);
+
+        helpMenu = menuBar().addMenu(<font color=darkgreen><i>"&Help"</i></font>);
+        helpMenu.addAction(aboutAction);
+        helpMenu.addAction(aboutQtAction);
+    }
+
+    <font color=blue>class</font> TabletCanvas <font color=blue>extends</font> <font color=darkmagenta><i>QWidget</i></font>
+    {
+        <font color=blue>private</font> AlphaChannelType alphaChannelType;
+        <font color=blue>private</font> ColorSaturationType colorSaturationType;
+        <font color=blue>private</font> LineWidthType lineWidthType;
+        <font color=blue>private</font> <font color=darkmagenta><i>QTabletEvent</i></font>.TabletDevice myTabletDevice;
+        <font color=blue>private</font> <font color=darkmagenta><i>QColor</i></font> myColor;
+
+        <font color=blue>private</font> <font color=darkmagenta><i>QImage</i></font> image;
+        <font color=blue>private</font> <font color=darkmagenta><i>QBrush</i></font> myBrush;
+        <font color=blue>private</font> <font color=darkmagenta><i>QPen</i></font> myPen;
+        <font color=blue>private</font> <font color=blue>boolean</font> deviceDown;
+        <font color=blue>private</font> <font color=darkmagenta><i>QPoint</i></font> polyLine[] = <font color=blue>new</font> <font color=darkmagenta><i>QPoint</i></font>[3];
+
+        <font color=blue>public</font> TabletCanvas()
+        {
+            myBrush = <font color=blue>new</font> <font color=darkmagenta><i>QBrush</i></font>();
+            myPen = <font color=blue>new</font> <font color=darkmagenta><i>QPen</i></font>();
+            image = <font color=blue>new</font> <font color=darkmagenta><i>QImage</i></font>(500, 500, <font color=darkmagenta><i>QImage</i></font>.Format.Format_ARGB32);
+            <font color=darkmagenta><i>QPainter</i></font> painter = <font color=blue>new</font> <font color=darkmagenta><i>QPainter</i></font>(image);
+            painter.fillRect(0, 0, 499, 499, <font color=blue>new</font> <font color=darkmagenta><i>QBrush</i></font>(<font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(<font color=darkmagenta><i>Qt</i></font>.GlobalColor.white)));
+            setAutoFillBackground(true);
+            deviceDown = false;
+            myColor = <font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(<font color=darkmagenta><i>Qt</i></font>.GlobalColor.red);
+            myTabletDevice = <font color=darkmagenta><i>QTabletEvent</i></font>.TabletDevice.Stylus;
+            alphaChannelType = AlphaChannelType.NoAlpha;
+            colorSaturationType = ColorSaturationType.NoSaturation;
+            lineWidthType = LineWidthType.LineWidthPressure;
+        }
+
+        <font color=blue>public</font> <font color=blue>void</font> setAlphaChannelType(AlphaChannelType type)
+        {
+            alphaChannelType = type;
+        }
+
+        <font color=blue>public</font> <font color=blue>void</font> setColorSaturationType(ColorSaturationType type)
+        {
+            colorSaturationType = type;
+        }
+
+        <font color=blue>public</font> <font color=blue>void</font> setLineWidthType(LineWidthType type)
+        {
+            lineWidthType = type;
+        }
+
+        <font color=blue>public</font> <font color=blue>void</font> setColor(<font color=darkmagenta><i>QColor</i></font> color)
+        {
+            myColor = color;
+        }
+
+        <font color=blue>public</font> <font color=darkmagenta><i>QColor</i></font> color()
+        {
+            <font color=blue>return</font> myColor;
+        }
+
+        <font color=blue>public</font> <font color=blue>void</font> setTabletDevice(<font color=darkmagenta><i>QTabletEvent</i></font>.TabletDevice device)
+        {
+            myTabletDevice = device;
+        }
+
+        <font color=blue>boolean</font> saveImage(String file)
+        {
+            <font color=blue>return</font> image.save(file);
+        }
+
+        <font color=blue>boolean</font> loadImage(String file)
+        {
+            <font color=blue>boolean</font> success = image.load(file);
+
+            <font color=blue>if</font> (success) {
+                update();
+                <font color=blue>return</font> true;
+            }
+            <font color=blue>return</font> false;
+        }
+
+        @Override
+        <font color=blue>protected</font> <font color=blue>void</font> tabletEvent(<font color=darkmagenta><i>QTabletEvent</i></font> event)
+        {
+            <font color=blue>switch</font> (event.type()) {
+                <font color=blue>case</font> TabletPress:
+                    <font color=blue>if</font> (deviceDown)
+                        deviceDown = true;
+                    <font color=blue>break</font>;
+                <font color=blue>case</font> TabletRelease:
+                    <font color=blue>if</font> (!deviceDown)
+                        deviceDown = false;
+                    <font color=blue>break</font>;
+                <font color=blue>case</font> TabletMove:
+                    polyLine[2] = polyLine[1];
+                    polyLine[1] = polyLine[0];
+                    polyLine[0] = event.pos();
+
+                    <font color=blue>if</font> (deviceDown) {
+                        updateBrush(event);
+                        <font color=darkmagenta><i>QPainter</i></font> painter = <font color=blue>new</font> <font color=darkmagenta><i>QPainter</i></font>(image);
+                        paintImage(painter, event);
+                    }
+                    <font color=blue>break</font>;
+                <font color=blue>default</font>:
+                    <font color=blue>break</font>;
+            }
+            update();
+        }
+
+        @Override
+        <font color=blue>protected</font> <font color=blue>void</font> paintEvent(<font color=darkmagenta><i>QPaintEvent</i></font> event)
+        {
+            <font color=darkmagenta><i>QPainter</i></font> painter = <font color=blue>new</font> <font color=darkmagenta><i>QPainter</i></font>(<font color=blue>this</font>);
+            painter.drawImage(<font color=blue>new</font> <font color=darkmagenta><i>QPoint</i></font>(0, 0), image);
+        }
+
+        <font color=blue>private</font> <font color=blue>void</font> paintImage(<font color=darkmagenta><i>QPainter</i></font> painter, <font color=darkmagenta><i>QTabletEvent</i></font> event)
+        {
+            <font color=darkmagenta><i>QPoint</i></font> brushAdjust = <font color=blue>new</font> <font color=darkmagenta><i>QPoint</i></font>(10, 10);
+
+            <font color=blue>switch</font> (myTabletDevice) {
+                <font color=blue>case</font> Stylus:
+                    painter.setBrush(myBrush);
+                    painter.setPen(myPen);
+                    painter.drawLine(polyLine[1], event.pos());
+                    <font color=blue>break</font>;
+                <font color=blue>case</font> Airbrush:
+                    myBrush.setColor(myColor);
+                    myBrush.setStyle(brushPattern(event.pressure()));
+                    painter.setPen(<font color=darkmagenta><i>Qt</i></font>.PenStyle.NoPen);
+                    painter.setBrush(myBrush);
+
+                    <font color=blue>for</font> (<font color=blue>int</font> i = 0; i &lt; 3; ++i) {
+                        painter.drawEllipse(<font color=blue>new</font> <font color=darkmagenta><i>QRect</i></font>(polyLine[i].subtract(brushAdjust),
+                                                      polyLine[i].add(brushAdjust)));
+                    }
+                    <font color=blue>break</font>;
+                <font color=blue>default</font>:
+                    System.err.println(<font color=darkgreen><i>"Unsupported tablet device."</i></font>);
+            }
+        }
+
+        <font color=blue>private</font> <font color=darkmagenta><i>Qt</i></font>.BrushStyle brushPattern(<font color=blue>double</font> value)
+        {
+            <font color=blue>int</font> pattern = ((<font color=blue>int</font>) (value * 100.0)) % 7;
+
+            <font color=blue>switch</font> (pattern) {
+                <font color=blue>case</font> 0:
+                    <font color=blue>return</font> <font color=darkmagenta><i>Qt</i></font>.BrushStyle.SolidPattern;
+                <font color=blue>case</font> 1:
+                    <font color=blue>return</font> <font color=darkmagenta><i>Qt</i></font>.BrushStyle.Dense1Pattern;
+                <font color=blue>case</font> 2:
+                    <font color=blue>return</font> <font color=darkmagenta><i>Qt</i></font>.BrushStyle.Dense2Pattern;
+                <font color=blue>case</font> 3:
+                    <font color=blue>return</font> <font color=darkmagenta><i>Qt</i></font>.BrushStyle.Dense3Pattern;
+               <font color=blue>case</font> 4:
+                    <font color=blue>return</font> <font color=darkmagenta><i>Qt</i></font>.BrushStyle.Dense4Pattern;
+                <font color=blue>case</font> 5:
+                    <font color=blue>return</font> <font color=darkmagenta><i>Qt</i></font>.BrushStyle.Dense5Pattern;
+                <font color=blue>case</font> 6:
+                    <font color=blue>return</font> <font color=darkmagenta><i>Qt</i></font>.BrushStyle.Dense6Pattern;
+                <font color=blue>default</font>:
+                    <font color=blue>return</font> <font color=darkmagenta><i>Qt</i></font>.BrushStyle.Dense7Pattern;
+            }
+        }
+
+        <font color=blue>private</font> <font color=blue>void</font> updateBrush(<font color=darkmagenta><i>QTabletEvent</i></font> event)
+        {
+            <font color=blue>int</font> hue, value, alpha;
+            hue = myColor.hue();
+            value = myColor.value();
+            alpha = myColor.alpha();
+
+            <font color=blue>int</font> vValue = (<font color=blue>int</font>) (((event.yTilt() + 60.0) / 120.0) * 255);
+            <font color=blue>int</font> hValue = (<font color=blue>int</font>) (((event.xTilt() + 60.0) / 120.0) * 255);
+
+            <font color=blue>switch</font> (alphaChannelType) {
+                <font color=blue>case</font> AlphaPressure:
+                    myColor.setAlpha((<font color=blue>int</font>) (event.pressure() * 255.0));
+                    <font color=blue>break</font>;
+                <font color=blue>case</font> AlphaTilt:
+                    myColor.setAlpha(Math.max(Math.abs(vValue - 127), Math.abs(hValue - 127)));
+                    <font color=blue>break</font>;
+                <font color=blue>default</font>:
+                    myColor.setAlpha(255);
+            }
+
+            <font color=blue>switch</font> (colorSaturationType) {
+                <font color=blue>case</font> SaturationVTilt:
+                    myColor.setHsv(hue, vValue, value, alpha);
+                    <font color=blue>break</font>;
+                <font color=blue>case</font> SaturationHTilt:
+                    myColor.setHsv(hue, hValue, value, alpha);
+                    <font color=blue>break</font>;
+                <font color=blue>case</font> SaturationPressure:
+                    myColor.setHsv(hue, (<font color=blue>int</font>) (event.pressure() * 255.0), value, alpha);
+                    <font color=blue>break</font>;
+                <font color=blue>default</font>:
+                    ;
+            }
+
+            <font color=blue>switch</font> (lineWidthType) {
+                <font color=blue>case</font> LineWidthPressure:
+                    myPen.setWidthF(event.pressure() * 10 + 1);
+                    <font color=blue>break</font>;
+                <font color=blue>case</font> LineWidthTilt:
+                    myPen.setWidthF(Math.max(Math.abs(vValue - 127), Math.abs(hValue - 127)) / 12);
+                    <font color=blue>break</font>;
+                <font color=blue>default</font>:
+                    myPen.setWidthF(1);
+            }
+
+            <font color=blue>if</font> (event.pointerType().equals(<font color=darkmagenta><i>QTabletEvent</i></font>.PointerType.Eraser)) {
+                myBrush.setColor(<font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(<font color=darkmagenta><i>Qt</i></font>.GlobalColor.white));
+                myPen.setColor(<font color=blue>new</font> <font color=darkmagenta><i>QColor</i></font>(<font color=darkmagenta><i>Qt</i></font>.GlobalColor.white));
+                myPen.setWidthF(event.pressure() * 10 + 1);
+            } <font color=blue>else</font> {
+                myBrush.setColor(myColor);
+                myPen.setColor(myColor);
+            }
+        }
+    }
+
+    <font color=blue>public</font> <font color=blue>class</font> TabletApplication <font color=blue>extends</font> <font color=darkmagenta><i>QApplication</i></font>
+    {
+        <font color=blue>public</font> TabletApplication(String args[])
+        {
+            <font color=blue>super</font>(args);
+        }
+
+        @Override
+        <font color=blue>public</font> <font color=blue>boolean</font> event(<font color=darkmagenta><i>QEvent</i></font> event)
+        {
+            <font color=blue>if</font> (event.type().equals(<font color=darkmagenta><i>QEvent</i></font>.Type.TabletEnterProximity) ||
+                event.type().equals(<font color=darkmagenta><i>QEvent</i></font>.Type.TabletLeaveProximity)) {
+                Tablet.myCanvas.setTabletDevice(((<font color=darkmagenta><i>QTabletEvent</i></font>) event).device());
+                <font color=blue>return</font> true;
+            }
+            <font color=blue>return</font> <font color=blue>super</font>.event(event);
+        }
+    }
+
+    <font color=blue>public</font> <font color=blue>static</font> <font color=blue>void</font> main(String args[])
+    {
+        Tablet.TabletApplication.initialize(args);
+
+        Tablet mainWindow = <font color=blue>new</font> Tablet();
+        mainWindow.resize(500, 500);
+        mainWindow.show();
+
+        Tablet.TabletApplication.exec();
+    }
+}
+</html></pre><p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

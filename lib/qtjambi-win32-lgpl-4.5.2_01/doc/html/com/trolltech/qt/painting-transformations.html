@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Transformations Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Transformations Example</h1></center><p> The Transformations example shows how transformations influence the way that <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a> renders graphics primitives. In particular it shows how the order of transformations affect the result. <br><center><img src="images/transformations-example.png"></center><br> The application allows the user to manipulate the rendering of a shape by changing the translation, rotation and scale of <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a>'s coordinate system. <p>The example consists of two classes and a global enum: <ul><li> The <tt>RenderArea</tt> class controls the rendering of a given shape.</li><li> The <tt>Window</tt> class is the application's main window.</li><li> The <tt>Operation</tt> enum describes the various transformation operations available in the application.</li></ul> First we will take a quick look at the <tt>Operation</tt> enum, then we will review the <tt>RenderArea</tt> class to see how a shape is rendered. Finally, we will take a look at the Transformations application's features implemented in the <tt>Window</tt> class.<a name="transformation-operations"><h2>Transformation Operations</h2> Normally, the <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a> operates on the associated device's own coordinate system, but it also has good support for coordinate transformations. <p>The default coordinate system of a paint device has its origin at the top-left corner. The x values increase to the right and the y values increase downwards. You can scale the coordinate system by a given offset using the <a href="../../../com/trolltech/qt/gui/QPainter.html#scale(double, double)">QPainter::scale()</a> function, you can rotate it clockwise using the <a href="../../../com/trolltech/qt/gui/QPainter.html#rotate(double)">QPainter::rotate()</a> function and you can translate it (i.e. adding a given offset to the points) using the <a href="../../../com/trolltech/qt/gui/QPainter.html#translate(com.trolltech.qt.core.QPoint)">QPainter::translate()</a> function. You can also twist the coordinate system around the origin (called shearing) using the <a href="../../../com/trolltech/qt/gui/QPainter.html#shear(double, double)">QPainter::shear()</a> function. <p>All the tranformation operations operate on <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a>'s tranformation matrix that you can retrieve using the QPainter::matrix() function. A matrix transforms a point in the plane to another point. For more information about the transformation matrix, see the <a href="coordsys.html">The Coordinate System</a> and <a href="../../../com/trolltech/qt/gui/QMatrix.html">QMatrix</a> documentation. <pre class="snippet">
+enum Operation { NoTransformation, Translate, Rotate, Scale };
+</pre> The global <tt>Operation</tt> enum is declared in the <tt>renderarea.h</tt> file and describes the various transformation operations available in the Transformations application.<a name="renderarea-class-definition"><h2>RenderArea Class Definition</h2> The <tt>RenderArea</tt> class inherits <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>, and controls the rendering of a given shape. <pre class="snippet">
+class RenderArea : public QWidget
+{
+    Q_OBJECT
+
+public:
+    RenderArea(QWidget *parent = 0);
+
+    void setOperations(const QList&lt;Operation&gt; &operations);
+    void setShape(const QPainterPath &shape);
+
+    QSize minimumSizeHint() const;
+    QSize sizeHint() const;
+
+protected:
+    void paintEvent(QPaintEvent *event);
+</pre> We declare two public functions, <tt>setOperations()</tt> and <tt>setShape()</tt>, to be able to specify the <tt>RenderArea</tt> widget's shape and to transform the coordinate system the shape is rendered within. <p>We reimplement the <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>'s <a href="../../../com/trolltech/qt/gui/QWidget.html#minimumSizeHint()">minimumSizeHint()</a> and <a href="../../../com/trolltech/qt/gui/QWidget.html#sizeHint()">sizeHint()</a> functions to give the <tt>RenderArea</tt> widget a reasonable size within our application, and we reimplement the <a href="../../../com/trolltech/qt/gui/QWidget.html#paintEvent(com.trolltech.qt.gui.QPaintEvent)">QWidget::paintEvent()</a> event handler to draw the render area's shape applying the user's transformation choices. <pre class="snippet">
+private:
+    void drawCoordinates(QPainter &painter);
+    void drawOutline(QPainter &painter);
+    void drawShape(QPainter &painter);
+    void transformPainter(QPainter &painter);
+
+    QList&lt;Operation&gt; operations;
+    QPainterPath shape;
+    QRect xBoundingRect;
+    QRect yBoundingRect;
+};
+</pre> We also declare several convenience functions to draw the shape, the coordinate system's outline and the coordinates, and to transform the painter according to the chosen transformations. <p>In addition, the <tt>RenderArea</tt> widget keeps a list of the currently applied transformation operations, a reference to its shape, and a couple of convenience variables that we will use when rendering the coordinates.<a name="renderarea-class-implementation"><h2>RenderArea Class Implementation</h2> The <tt>RenderArea</tt> widget controls the rendering of a given shape, including the transformations of the coordinate system, by reimplementing the <a href="../../../com/trolltech/qt/gui/QWidget.html#paintEvent(com.trolltech.qt.gui.QPaintEvent)">QWidget::paintEvent()</a> event handler. But first we will take a quick look at the constructor and at the functions that provides access to the <tt>RenderArea</tt> widget:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+RenderArea::RenderArea(QWidget *parent)
+    : QWidget(parent)
+{
+    QFont newFont = font();
+    newFont.setPixelSize(12);
+    setFont(newFont);
+
+    QFontMetrics fontMetrics(newFont);
+    xBoundingRect = fontMetrics.boundingRect(tr("x"));
+    yBoundingRect = fontMetrics.boundingRect(tr("y"));
+}
+</pre> In the constructor we pass the parent parameter on to the base class, and customize the font that we will use to render the coordinates. The <a href="../../../com/trolltech/qt/gui/QWidget.html#font()">QWidget::font()</a> funtion returns the font currently set for the widget. As long as no special font has been set, or after <a href="../../../com/trolltech/qt/gui/QWidget.html#setFont(com.trolltech.qt.gui.QFont)">QWidget::setFont()</a> is called, this is either a special font for the widget class, the parent's font or (if this widget is a top level widget) the default application font. <p>After ensuring that the font's size is 12 points, we extract the rectangles enclosing the coordinate letters, 'x' and 'y', using the <a href="../../../com/trolltech/qt/gui/QFontMetrics.html">QFontMetrics</a> class. <p><a href="../../../com/trolltech/qt/gui/QFontMetrics.html">QFontMetrics</a> provides functions to access the individual metrics of the font, its characters, and for strings rendered in the font. The <a href="../../../com/trolltech/qt/gui/QFontMetrics.html#boundingRect(char)">QFontMetrics::boundingRect()</a> function returns the bounding rectangle of the given character relative to the left-most point on the base line.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void RenderArea::setOperations(const QList&lt;Operation&gt; &operations)
+{
+    this-&gt;operations = operations;
+    update();
+}
+<br>
+void RenderArea::setShape(const QPainterPath &shape)
+{
+    this-&gt;shape = shape;
+    update();
+}
+</pre> In the <tt>setShape()</tt> and <tt>setOperations()</tt> functions we update the <tt>RenderArea</tt> widget by storing the new value or values followed by a call to the <a href="../../../com/trolltech/qt/gui/QWidget.html#update()">QWidget::update()</a> slot which schedules a paint event for processing when Qt returns to the main event loop.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QSize RenderArea::minimumSizeHint() const
+{
+    return QSize(182, 182);
+}
+<br>
+QSize RenderArea::sizeHint() const
+{
+    return QSize(232, 232);
+}
+</pre> We reimplement the <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a>'s <a href="../../../com/trolltech/qt/gui/QWidget.html#minimumSizeHint()">minimumSizeHint()</a> and <a href="../../../com/trolltech/qt/gui/QWidget.html#sizeHint()">sizeHint()</a> functions to give the <tt>RenderArea</tt> widget a reasonable size within our application. The default implementations of these functions returns an invalid size if there is no layout for this widget, and returns the layout's minimum size or preferred size, respectively, otherwise.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void RenderArea::paintEvent(QPaintEvent *event)
+{
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.fillRect(event-&gt;rect(), QBrush(Qt::white));
+
+    painter.translate(66, 66);
+</pre> The <tt>paintEvent()</tt> event handler recieves the <tt>RenderArea</tt> widget's paint events. A paint event is a request to repaint all or part of the widget. It can happen as a result of <a href="../../../com/trolltech/qt/gui/QWidget.html#repaint()">QWidget::repaint()</a> or <a href="../../../com/trolltech/qt/gui/QWidget.html#update()">QWidget::update()</a>, or because the widget was obscured and has now been uncovered, or for many other reasons. <p>First we create a <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a> for the <tt>RenderArea</tt> widget. The <a href="../../../com/trolltech/qt/gui/QPainter.RenderHint.html">QPainter::Antialiasing</a> render hint indicates that the engine should antialias edges of primitives if possible. Then we erase the area that needs to be repainted using the <a href="../../../com/trolltech/qt/gui/QPainter.html#fillRect(com.trolltech.qt.core.QRect, com.trolltech.qt.gui.QBrush)">QPainter::fillRect()</a> function. <p>We also translate the coordinate system with an constant offset to ensure that the original shape is renderend with a suitable margin.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    painter.save();
+    transformPainter(painter);
+    drawShape(painter);
+    painter.restore();
+</pre> Before we start to render the shape, we call the <a href="../../../com/trolltech/qt/gui/QPainter.html#save()">QPainter::save()</a> function. <p><a href="../../../com/trolltech/qt/gui/QPainter.html#save()">QPainter::save()</a> saves the current painter state (i.e. pushes the state onto a stack) including the current coordinate system. The rationale for saving the painter state is that the following call to the <tt>transformPainter()</tt> function will transform the coordinate system depending on the currently chosen transformation operations, and we need a way to get back to the original state to draw the outline. <p>After transforming the coordinate system, we draw the <tt>RenderArea</tt>'s shape, and then we restore the painter state using the the <a href="../../../com/trolltech/qt/gui/QPainter.html#restore()">QPainter::restore()</a> function (i.e. popping the saved state off the stack).<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    drawOutline(painter);
+</pre> Then we draw the square outline.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    transformPainter(painter);
+    drawCoordinates(painter);
+}
+</pre> Since we want the coordinates to correspond with the coordinate system the shape is rendered within, we must make another call to the <tt>transformPainter()</tt> function. <p>The order of the painting operations is essential with respect to the shared pixels. The reason why we don't render the coordinates when the coordinate system already is transformed to render the shape, but instead defer their rendering to the end, is that we want the coordinates to appear on top of the shape and its outline. <p>There is no need to save the <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a> state this time since drawing the coordinates is the last painting operation.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void RenderArea::drawCoordinates(QPainter &painter)
+{
+    painter.setPen(Qt::red);
+
+    painter.drawLine(0, 0, 50, 0);
+    painter.drawLine(48, -2, 50, 0);
+    painter.drawLine(48, 2, 50, 0);
+    painter.drawText(60 - xBoundingRect.width() / 2,
+                     0 + xBoundingRect.height() / 2, tr("x"));
+
+    painter.drawLine(0, 0, 0, 50);
+    painter.drawLine(-2, 48, 0, 50);
+    painter.drawLine(2, 48, 0, 50);
+    painter.drawText(0 - yBoundingRect.width() / 2,
+                     60 + yBoundingRect.height() / 2, tr("y"));
+}
+<br>
+void RenderArea::drawOutline(QPainter &painter)
+{
+    painter.setPen(Qt::darkGreen);
+    painter.setPen(Qt::DashLine);
+    painter.setBrush(Qt::NoBrush);
+    painter.drawRect(0, 0, 100, 100);
+}
+<br>
+void RenderArea::drawShape(QPainter &painter)
+{
+    painter.fillPath(shape, Qt::blue);
+}
+</pre> The <tt>drawCoordinates()</tt>, <tt>drawOutline()</tt> and <tt>drawShape()</tt> are convenience functions called from the <tt>paintEvent()</tt> event handler. For more information about <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a>'s basic drawing operations and how to display basic graphics primitives, see the <a href="painting-basicdrawing.html">Basic Drawing</a> example.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void RenderArea::transformPainter(QPainter &painter)
+{
+    for (int i = 0; i &lt; operations.size(); ++i) {
+        switch (operations[i]) {
+        case Translate:
+            painter.translate(50, 50);
+            break;
+        case Scale:
+            painter.scale(0.75, 0.75);
+            break;
+        case Rotate:
+            painter.rotate(60);
+            break;
+        case NoTransformation:
+        default:
+            ;
+        }
+    }
+}
+</pre> The <tt>transformPainter()</tt> convenience function is also called from the <tt>paintEvent()</tt> event handler, and transforms the given <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a>'s coordinate system according to the user's transformation choices.<a name="window-class-definition"><h2>Window Class Definition</h2> The <tt>Window</tt> class is the Transformations application's main window. <p>The application displays four <tt>RenderArea</tt> widgets. The left-most widget renders the shape in <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a>'s default coordinate system, the others render the shape with the chosen transformation in addition to all the transformations applied to the <tt>RenderArea</tt> widgets to their left. <pre class="snippet">
+class Window : public QWidget
+{
+    Q_OBJECT
+
+public:
+    Window();
+
+public slots:
+    void operationChanged();
+    void shapeSelected(int index);
+</pre> We declare two public slots to make the application able to respond to user interaction, updating the displayed <tt>RenderArea</tt> widgets according to the user's transformation choices. <p>The <tt>operationChanged()</tt> slot updates each of the <tt>RenderArea</tt> widgets applying the currently chosen transformation operations, and is called whenever the user changes the selected operations. The <tt>shapeSelected()</tt> slot updates the <tt>RenderArea</tt> widgets' shapes whenever the user changes the preferred shape. <pre class="snippet">
+private:
+    void setupShapes();
+
+    enum { NumTransformedAreas = 3 };
+    RenderArea *originalRenderArea;
+    RenderArea *transformedRenderAreas[NumTransformedAreas];
+    QComboBox *shapeComboBox;
+    QComboBox *operationComboBoxes[NumTransformedAreas];
+    QList&lt;QPainterPath&gt; shapes;
+};
+</pre> We also declare a private convenience function, <tt>setupShapes()</tt>, that is used when constructing the <tt>Window</tt> widget, and we declare pointers to the various components of the widget. We choose to keep the available shapes in a QList of <a href="../../../com/trolltech/qt/gui/QPainterPath.html">QPainterPath</a>s. In addition we declare a private enum counting the number of displayed <tt>RenderArea</tt> widgets except the widget that renders the shape in <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a>'s default coordinate system.<a name="window-class-implementation"><h2>Window Class Implementation</h2> In the constructor we create and initialize the application's components:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+Window::Window()
+{
+    originalRenderArea = new RenderArea;
+
+    shapeComboBox = new QComboBox;
+    shapeComboBox-&gt;addItem(tr("Clock"));
+    shapeComboBox-&gt;addItem(tr("House"));
+    shapeComboBox-&gt;addItem(tr("Text"));
+    shapeComboBox-&gt;addItem(tr("Truck"));
+
+    QGridLayout *layout = new QGridLayout;
+    layout-&gt;addWidget(originalRenderArea, 0, 0);
+    layout-&gt;addWidget(shapeComboBox, 1, 0);
+</pre> First we create the <tt>RenderArea</tt> widget that will render the shape in the default coordinate system. We also create the associated <a href="../../../com/trolltech/qt/gui/QComboBox.html">QComboBox</a> that allows the user to choose among four different shapes: A clock, a house, a text and a truck. The shapes themselves are created at the end of the constructor, using the <tt>setupShapes()</tt> convenience function.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    for (int i = 0; i &lt; NumTransformedAreas; ++i) {
+        transformedRenderAreas[i] = new RenderArea;
+
+        operationComboBoxes[i] = new QComboBox;
+        operationComboBoxes[i]-&gt;addItem(tr("No transformation"));
+        operationComboBoxes[i]-&gt;addItem(tr("Rotate by 60\xB0"));
+        operationComboBoxes[i]-&gt;addItem(tr("Scale to 75%"));
+        operationComboBoxes[i]-&gt;addItem(tr("Translate by (50, 50)"));
+
+        connect(operationComboBoxes[i], SIGNAL(activated(int)),
+                this, SLOT(operationChanged()));
+
+        layout-&gt;addWidget(transformedRenderAreas[i], 0, i + 1);
+        layout-&gt;addWidget(operationComboBoxes[i], 1, i + 1);
+    }
+</pre> Then we create the <tt>RenderArea</tt> widgets that will render their shapes with coordinate tranformations. By default the applied operation is <b>No Transformation</b>, i.e. the shapes are rendered within the default coordinate system. We create and initialize the associated <a href="../../../com/trolltech/qt/gui/QComboBox.html">QComboBox</a>es with items corresponding to the various transformation operations decribed by the global <tt>Operation</tt> enum. <p>We also connect the <a href="../../../com/trolltech/qt/gui/QComboBox.html">QComboBox</a>es' activated() signal to the <tt>operationChanged()</tt> slot to update the application whenever the user changes the selected transformation operations.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+    setLayout(layout);
+    setupShapes();
+    shapeSelected(0);
+
+    setWindowTitle(tr("Transformations"));
+}
+</pre> Finally, we set the layout for the application window using the <a href="../../../com/trolltech/qt/gui/QWidget.html#setLayout(com.trolltech.qt.gui.QLayout)">QWidget::setLayout()</a> function, construct the available shapes using the private <tt>setupShapes()</tt> convenience function, and make the application show the clock shape on startup using the public <tt>shapeSelected()</tt> slot before we set the window title.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void Window::setupShapes()
+{
+    QPainterPath truck;
+
+    QPainterPath clock;
+
+    QPainterPath house;
+
+    QPainterPath text;
+...
+    shapes.append(clock);
+    shapes.append(house);
+    shapes.append(text);
+    shapes.append(truck);
+
+    connect(shapeComboBox, SIGNAL(activated(int)),
+            this, SLOT(shapeSelected(int)));
+}
+</pre> The <tt>setupShapes()</tt> function is called from the constructor and create the <a href="../../../com/trolltech/qt/gui/QPainterPath.html">QPainterPath</a> objects representing the shapes that are used in the application. For construction details, see the <a href="qtjambi-deployment-specification.html">window.cpp</a> example file. The shapes are stored in a QList. The QList::append() function inserts the given shape at the end of the list. <p>We also connect the associated <a href="../../../com/trolltech/qt/gui/QComboBox.html">QComboBox</a>'s activated() signal to the <tt>shapeSelected()</tt> slot to update the application when the user changes the preferred shape.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void Window::operationChanged()
+{
+    static const Operation operationTable[] = {
+        NoTransformation, Rotate, Scale, Translate
+    };
+
+    QList&lt;Operation&gt; operations;
+    for (int i = 0; i &lt; NumTransformedAreas; ++i) {
+        int index = operationComboBoxes[i]-&gt;currentIndex();
+        operations.append(operationTable[index]);
+        transformedRenderAreas[i]-&gt;setOperations(operations);
+    }
+}
+</pre> The public <tt>operationChanged()</tt> slot is called whenever the user changes the selected operations. <p>We retrieve the chosen transformation operation for each of the transformed <tt>RenderArea</tt> widgets by querying the associated <a href="../../../com/trolltech/qt/gui/QComboBox.html">QComboBoxes</a>. The transformed <tt>RenderArea</tt> widgets are supposed to render the shape with the transformation specified by its associated combobox in addition to all the transformations applied to the <tt>RenderArea</tt> widgets to its left. For that reason, for each widget we query, we append the associated operation to a QList of transformations which we apply to the widget before proceeding to the next.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void Window::shapeSelected(int index)
+{
+    QPainterPath shape = shapes[index];
+    originalRenderArea-&gt;setShape(shape);
+    for (int i = 0; i &lt; NumTransformedAreas; ++i)
+        transformedRenderAreas[i]-&gt;setShape(shape);
+}
+</pre> The <tt>shapeSelected()</tt> slot is called whenever the user changes the preferred shape, updating the <tt>RenderArea</tt> widgets using their public <tt>setShape()</tt> function.<a name="summary"><h2>Summary</h2> The Transformations example shows how transformations influence the way that <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a> renders graphics primitives. Normally, the <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a> operates on the device's own coordinate system, but it also has good support for coordinate transformations. With the Transformations application you can scale, rotate and translate <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a>'s coordinate system. The order in which these tranformations are applied is essential for the result. <p>All the tranformation operations operate on <a href="../../../com/trolltech/qt/gui/QPainter.html">QPainter</a>'s tranformation matrix. For more information about the transformation matrix, see the <a href="coordsys.html">The Coordinate System</a> and <a href="../../../com/trolltech/qt/gui/QMatrix.html">QMatrix</a> documentation. <p>The Qt reference documentation provides several painting demos. Among these is the <a href="demos-affine.html">Affine Transformations</a> demo that shows Qt's ability to perform transformations on painting operations. The demo also allows the user to experiment with the various transformation operations.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Accelerated Graphics Driver Example</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Accelerated Graphics Driver Example</h1></center><p> The Accelerated Graphics Driver example shows how you can write your own accelerated graphics driver and <a href="qt-embedded-accel.html">add your graphics driver to Qt for Embedded Linux</a>. In <a href="qt-embedded-linux.html">Qt for Embedded Linux</a>, painting is a pure software implementation and is normally performed in two steps: The clients render each window onto a corresponding surface (stored in memory) using a paint engine, and then the server uses the graphics driver to compose the surface images and copy them to the screen. (See the <a href="qt-embedded-architecture.html">Qt for Embedded Linux Architecture</a> documentation for details.) <p>The rendering can be accelerated in two ways: Either by accelerating the copying of pixels to the screen, or by accelerating the explicit painting operations. The first is done in the graphics driver implementation, the latter is performed by the paint engine implementation. Typically, both the pixel copying and the painting operations are accelerated using the following approach: <ol><li> Creating a Custom Graphics Driver</li><li> <a href="qws-svgalib.html#step-2-implementing-a-custom-raster-paint-engine">Implementing a Custom Paint Engine</a></li><li> <a href="qws-svgalib.html#step-3-making-the-widgets-aware-of-the-custom-paint-engine">Making the Widgets Aware of the Custom Paint Engine</a></li></ol> After compiling the example code, install the graphics driver plugin with the command <tt>make install</tt>. To start an application using the graphics driver, you can either set the environment variable <a href="qt-embedded-envvars.html">QWS_DISPLAY</a> and then run the application, or you can just run the application using the <tt>-display</tt> switch: <pre class="snippet">
+myApplication -qws -display svgalib
+</pre> <table align="center" border="0" cellpadding="2" cellspacing="1"><thead><tr class="qt-style" valign="top"><th><center> SVGAlib</center></th></tr></thead><tr valign="top" class="even"><td> Instead of interfacing the graphics hardware directly, this example relies on SVGAlib being installed on your system. SVGAlib is a small graphics library which provides acceleration for many common graphics cards used on desktop computers. It should work on most workstations and has a small and simple API.</td></tr></table><a name="step-1-creating-a-custom-graphics-driver"><h2>Step 1: Creating a Custom Graphics Driver</h2> The custom graphics driver is created by deriving from the QScreen class. QScreen is the base class for implementing screen/graphics drivers in Qt for Embedded Linux. <pre class="snippet">
+class SvgalibScreen : public QScreen
+{
+public:
+    SvgalibScreen(int displayId) : QScreen(displayId) {}
+    ~SvgalibScreen() {}
+
+    bool connect(const QString &displaySpec);
+    bool initDevice();
+    void shutdownDevice();
+    void disconnect();
+
+    void setMode(int, int, int) {}
+    void blank(bool) {}
+
+    void blit(const QImage &img, const QPoint &topLeft, const QRegion &region);
+    void solidFill(const QColor &color, const QRegion &region);
+<br>
+private:
+    void initColorMap();
+    void blit16To8(const QImage &image,
+                   const QPoint &topLeft, const QRegion &region);
+    void blit32To8(const QImage &image,
+                   const QPoint &topLeft, const QRegion &region);
+
+    GraphicsContext *context;
+};
+</pre> The connect(), disconnect(), initDevice() and shutdownDevice() functions are declared as pure virtual functions in QScreen and must be implemented. They are used to configure the hardware, or query its configuration: connect() and disconnect() are called by both the server and client processes, while the initDevice() and shutdownDevice() functions are only called by the server process. <p>QScreen's setMode() and blank() functions are also pure virtual, but our driver's implementations are trivial. The last two functions (blit() and solidFill()) are the ones involved in putting pixels on the screen, i.e., we reimplement these functions to perform the pixel copying acceleration. <p>Finally, the <tt>context</tt> variable is a pointer to a SVGAlib specific type. Note that the details of using the SVGAlib library is beyond the scope of this example.<a name="svgalibscreen-class-implementation"><h3>SvgalibScreen Class Implementation</h3> The connect() function is the first function that is called after the constructor returns. It queries SVGAlib about the graphics mode and initializes the variables.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+bool SvgalibScreen::connect(const QString &displaySpec)
+{
+    int mode = vga_getdefaultmode();
+    if (mode &lt;= 0) {
+        qCritical("SvgalibScreen::connect(): invalid vga mode");
+        return false;
+    }
+
+    vga_modeinfo *modeinfo = vga_getmodeinfo(mode);
+
+    QScreen::lstep = modeinfo-&gt;linewidth;
+    QScreen::dw = QScreen::w = modeinfo-&gt;width;
+    QScreen::dh = QScreen::h = modeinfo-&gt;height;
+    QScreen::d = getModeDepth(modeinfo);
+    QScreen::size = QScreen::lstep * dh;
+    QScreen::data = 0;
+
+    switch (depth()) {
+    case 32:
+        setPixelFormat(QImage::Format_ARGB32_Premultiplied);
+        break;
+    case 24:
+        setPixelFormat(QImage::Format_RGB888);
+        break;
+    case 16:
+        setPixelFormat(QImage::Format_RGB16);
+        break;
+    case 15:
+        setPixelFormat(QImage::Format_RGB555);
+        break;
+    default:
+        break;
+    }
+
+    const int dpi = 72;
+    QScreen::physWidth = qRound(QScreen::dw * 25.4 / dpi);
+    QScreen::physHeight = qRound(QScreen::dh * 25.4 / dpi);
+
+    const QStringList args = displaySpec.split(QLatin1Char(':'),
+                                               QString::SkipEmptyParts);
+    grayscale = args.contains(QLatin1String("grayscale"), Qt::CaseInsensitive);
+
+    return true;
+}
+</pre> It is important that the connect() function initializes the <tt>data</tt>, <tt>lstep</tt>, <tt>w</tt>, <tt>h</tt>, <tt>dw</tt>, <tt>dh</tt>, <tt>d</tt>, <tt>physWidth</tt> and <tt>physHeight</tt> variables (inherited from QScreen) to ensure that the driver is in a state consistent with the driver configuration. <p>In this particular example we do not have any information of the real physical size of the screen, so we set these values with the assumption of a screen with 72 DPI.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+bool SvgalibScreen::initDevice()
+{
+    if (vga_init() != 0) {
+        qCritical("SvgalibScreen::initDevice(): unable to initialize svgalib");
+        return false;
+    }
+
+    int mode = vga_getdefaultmode();
+    if (vga_setmode(mode) == -1) {
+        qCritical("SvgalibScreen::initialize(): unable to set graphics mode");
+        return false;
+    }
+
+    if (gl_setcontextvga(mode) != 0) {
+        qCritical("SvgalibScreen::initDevice(): unable to set vga context");
+        return false;
+    }
+    context = gl_allocatecontext();
+    gl_getcontext(context);
+
+    vga_modeinfo *modeinfo = vga_getmodeinfo(mode);
+    if (modeinfo-&gt;flags & IS_LINEAR)
+        QScreen::data = vga_getgraphmem();
+
+    initColorMap();
+
+    QScreenCursor::initSoftwareCursor();
+    return true;
+}
+</pre> When the connect() function returns, the server process calls the initDevice() function which is expected to do the necessary hardware initialization, leaving the hardware in a state consistent with the driver configuration. <p>Note that we have chosen to use the software cursor. If you want to use a hardware cursor, you should create a subclass of QScreenCursor, create an instance of it, and make the global variable <tt>qt_screencursor</tt> point to this instance.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void SvgalibScreen::shutdownDevice()
+{
+    gl_freecontext(context);
+    vga_setmode(TEXT);
+}
+<br>
+void SvgalibScreen::disconnect()
+{
+}
+</pre> Before exiting, the server process will call the shutdownDevice() function to do the necessary hardware cleanup. Again, it is important that the function leaves the hardware in a state consistent with the driver configuration. When shutdownDevice() returns, the disconnect() function is called. Our implementation of the latter function is trivial. <p>Note that, provided that the <tt>QScreen::data</tt> variable points to a valid linear framebuffer, the graphics driver is fully functional as a simple screen driver at this point. The rest of this example will show where to take advantage of the accelerated capabilities available on the hardware. <p>Whenever an area on the screen needs to be updated, the server will call the exposeRegion() function that paints the given region on screen. The default implementation will do the necessary composing of the top-level windows and call solidFill() and blit() whenever it is required. We do not want to change this behavior in the driver so we do not reimplement exposeRegion(). <p>To control how the pixels are put onto the screen we need to reimplement the solidFill() and blit() functions.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void SvgalibScreen::solidFill(const QColor &color, const QRegion &reg)
+{
+    int c;
+    if (depth() == 4 || depth() == 8)
+        c = alloc(color.red(), color.green(), color.blue());
+    else
+        c = gl_rgbcolor(color.red(), color.green(), color.blue());
+
+    const QVector&lt;QRect&gt; rects = (reg & region()).rects();
+    for (int i = 0; i &lt; rects.size(); ++i) {
+        const QRect r = rects.at(i);
+        gl_fillbox(r.left(), r.top(), r.width(), r.height(), c);
+    }
+}
+<br>
+void SvgalibScreen::blit(const QImage &img, const QPoint &topLeft,
+                         const QRegion &reg)
+{
+    if (depth() == 8) {
+        switch (img.format()) {
+        case QImage::Format_RGB16:
+            blit16To8(img, topLeft, reg);
+            return;
+        case QImage::Format_RGB32:
+        case QImage::Format_ARGB32:
+        case QImage::Format_ARGB32_Premultiplied:
+            blit32To8(img, topLeft, reg);
+            return;
+        default:
+            break;
+        }
+    }
+
+    if (img.format() != pixelFormat()) {
+        if (base())
+            QScreen::blit(img, topLeft, reg);
+        return;
+    }
+
+    const QVector&lt;QRect&gt; rects = (reg & region()).rects();
+
+    for (int i = 0; i &lt; rects.size(); ++i) {
+        const QRect r = rects.at(i);
+        gl_putboxpart(r.x(), r.y(), r.width(), r.height(),
+                      img.width(), img.height(),
+                      static_cast&lt;void*&gt;(const_cast&lt;uchar*&gt;(img.bits())),
+                      r.x() - topLeft.x(), r.y() - topLeft.y());
+    }
+}
+</pre><a name="step-2-implementing-a-custom-raster-paint-engine"><h2>Step 2: Implementing a Custom Raster Paint Engine</h2> <a href="qt-embedded-linux.html">Qt for Embedded Linux</a> uses QRasterPaintEngine (a raster-based implementation of <a href="../../../com/trolltech/qt/gui/QPaintEngine.html">QPaintEngine</a>) to implement the painting operations. <p>Acceleration of the painting operations is done by deriving from QRasterPaintEngine class. This is a powerful mechanism for accelerating graphic primitives while getting software fallbacks for all the primitives you do not accelerate. <pre class="snippet">
+#include &lt;private/qpaintengine_raster_p.h&gt;
+
+class SvgalibPaintEngine : public QRasterPaintEngine
+{
+public:
+    SvgalibPaintEngine();
+    ~SvgalibPaintEngine();
+
+    bool begin(QPaintDevice *device);
+    bool end();
+    void updateState(const QPaintEngineState &state);
+    void drawRects(const QRect *rects, int rectCount);
+
+private:
+    void setClip(const QRegion &region);
+    void updateClip();
+
+    QPen pen;
+    bool simplePen;
+    QBrush brush;
+    bool simpleBrush;
+    QMatrix matrix;
+    bool simpleMatrix;
+    QRegion clip;
+    bool clipEnabled;
+    bool simpleClip;
+    bool opaque;
+    bool aliased;
+    bool sourceOver;
+    QPaintDevice *device;
+};
+</pre> In this example, we will only accelerate one of the drawRects() functions, i.e., only non-rotated, aliased and opaque rectangles will be rendered using accelerated painting. All other primitives are rendered using the base class's unaccelerated implementation. <p>The paint engine's state is stored in the private member variables, and we reimplement the <a href="../../../com/trolltech/qt/gui/QPaintEngine.html#updateState(com.trolltech.qt.gui.QPaintEngineState)">updateState()</a> function to ensure that our custom paint engine's state is updated properly whenever it is required. The private <tt>setClip()</tt> and <tt>updateClip()</tt> functions are only helper function used to simplify the <a href="../../../com/trolltech/qt/gui/QPaintEngine.html#updateState(com.trolltech.qt.gui.QPaintEngineState)">updateState()</a> implementation. <p>We also reimplement QRasterPaintEngine's <a href="../../../com/trolltech/qt/gui/QPaintEngine.html#begin(com.trolltech.qt.gui.QPaintDeviceInterface)">begin()</a> and <a href="../../../com/trolltech/qt/gui/QPaintEngine.html#end()">end()</a> functions to initialize the paint engine and to do the cleanup when we are done rendering, respectively. <table align="center" border="0" cellpadding="2" cellspacing="1"><thead><tr class="qt-style" valign="top"><th><center> Private Header Files</center></th></tr></thead><tr valign="top" class="even"><td> Note the <tt>include</tt> statement used by this class. The files prefixed with <tt>private/</tt> are private headers file within <a href="qt-embedded-linux.html">Qt for Embedded Linux</a>. Private header files are not part of the standard installation and are only present while compiling Qt. To be able to compile using private header files you need to use a <tt>qmake</tt> binary within a compiled <a href="qt-embedded-linux.html">Qt for Embedded Linux</a> package. <p><b>Warning:</b> Private header files may change without notice between releases.</td></tr></table> The <a href="../../../com/trolltech/qt/gui/QPaintEngine.html#begin(com.trolltech.qt.gui.QPaintDeviceInterface)">begin()</a> function initializes the internal state of the paint engine. Note that it also calls the base class implementation to initialize the parts inherited from QRasterPaintEngine:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+bool SvgalibPaintEngine::begin(QPaintDevice *dev)
+{
+    device = dev;
+    pen = Qt::NoPen;
+    simplePen = true;
+    brush = Qt::NoBrush;
+    simpleBrush = true;
+    matrix = QMatrix();
+    simpleMatrix = true;
+    setClip(QRect(0, 0, device-&gt;width(), device-&gt;height()));
+    opaque = true;
+    aliased = true;
+    sourceOver = true;
+
+    return QRasterPaintEngine::begin(dev);
+}
+<br>
+bool SvgalibPaintEngine::end()
+{
+    gl_setclippingwindow(0, 0, device-&gt;width() - 1, device-&gt;height() - 1);
+    return QRasterPaintEngine::end();
+}
+</pre> The implementation of the <a href="../../../com/trolltech/qt/gui/QPaintEngine.html#end()">end()</a> function removes the clipping constraints that might have been set in SVGAlib, before calling the corresponding base class implementation.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void SvgalibPaintEngine::updateState(const QPaintEngineState &state)
+{
+    QPaintEngine::DirtyFlags flags = state.state();
+
+    if (flags & DirtyTransform) {
+        matrix = state.matrix();
+        simpleMatrix = (matrix.m12() == 0 && matrix.m21() == 0);
+    }
+
+    if (flags & DirtyPen) {
+        pen = state.pen();
+        simplePen = (pen.width() == 0 || pen.widthF() &lt;= 1)
+                    && (pen.style() == Qt::NoPen || pen.style() == Qt::SolidLine)
+                    && (pen.color().alpha() == 255);
+    }
+
+    if (flags & DirtyBrush) {
+        brush = state.brush();
+        simpleBrush = (brush.style() == Qt::SolidPattern
+                       || brush.style() == Qt::NoBrush)
+                      && (brush.color().alpha() == 255);
+    }
+
+    if (flags & DirtyClipRegion)
+        setClip(state.clipRegion());
+
+    if (flags & DirtyClipEnabled) {
+        clipEnabled = state.isClipEnabled();
+        updateClip();
+    }
+
+    if (flags & DirtyClipPath) {
+        setClip(QRegion());
+        simpleClip = false;
+    }
+
+    if (flags & DirtyCompositionMode) {
+        const QPainter::CompositionMode m = state.compositionMode();
+        sourceOver = (m == QPainter::CompositionMode_SourceOver);
+    }
+
+    if (flags & DirtyOpacity)
+        opaque = (state.opacity() == 256);
+
+    if (flags & DirtyHints)
+        aliased = !(state.renderHints() & QPainter::Antialiasing);
+
+    QRasterPaintEngine::updateState(state);
+}
+</pre> The <a href="../../../com/trolltech/qt/gui/QPaintEngine.html#updateState(com.trolltech.qt.gui.QPaintEngineState)">updateState()</a> function updates our custom paint engine's state. The <a href="../../../com/trolltech/qt/gui/QPaintEngineState.html">QPaintEngineState</a> class provides information about the active paint engine's current state. <p>Note that we only accept and save the current matrix if it doesn't do any shearing. The pen is accepted if it is opaque and only one pixel wide. The rest of the engine's properties are updated following the same pattern. Again it is important that the <a href="../../../com/trolltech/qt/gui/QPaintEngine.html#updateState(com.trolltech.qt.gui.QPaintEngineState)">QPaintEngine::updateState()</a> function is called to update the parts inherited from the base class.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void SvgalibPaintEngine::setClip(const QRegion &region)
+{
+    if (region.isEmpty())
+        clip = QRect(0, 0, device-&gt;width(), device-&gt;height());
+    else
+        clip = matrix.map(region) & QRect(0, 0, device-&gt;width(), device-&gt;height());
+    clipEnabled = true;
+    updateClip();
+}
+<br>
+void SvgalibPaintEngine::updateClip()
+{
+    QRegion clipRegion = QRect(0, 0, device-&gt;width(), device-&gt;height());
+
+    if (!systemClip().isEmpty())
+        clipRegion &= systemClip();
+    if (clipEnabled)
+        clipRegion &= clip;
+
+    simpleClip = (clipRegion.rects().size() &lt;= 1);
+
+    const QRect r = clipRegion.boundingRect();
+    gl_setclippingwindow(r.left(), r.top(),
+                         r.x() + r.width(),
+                         r.y() + r.height());
+}
+</pre> The <tt>setClip()</tt> helper function is called from our custom implementation of <a href="../../../com/trolltech/qt/gui/QPaintEngine.html#updateState(com.trolltech.qt.gui.QPaintEngineState)">updateState()</a>, and enables clipping to the given region. An empty region means that clipping is disabled. <p>Our custom update function also makes use of the <tt>updateClip()</tt> helper function that checks if the clip is "simple", i.e., that it can be represented by only one rectangle, and updates the clip region in SVGAlib.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void SvgalibPaintEngine::drawRects(const QRect *rects, int rectCount)
+{
+    const bool canAccelerate = simplePen && simpleBrush && simpleMatrix
+                               && simpleClip && opaque && aliased
+                               && sourceOver;
+    if (!canAccelerate) {
+        QRasterPaintEngine::drawRects(rects, rectCount);
+        return;
+    }
+
+    for (int i = 0; i &lt; rectCount; ++i) {
+        const QRect r = matrix.mapRect(rects[i]);
+        if (brush != Qt::NoBrush) {
+            gl_fillbox(r.left(), r.top(), r.width(), r.height(),
+                       brush.color().rgba());
+        }
+        if (pen != Qt::NoPen) {
+            const int c = pen.color().rgba();
+            gl_hline(r.left(), r.top(), r.right(), c);
+            gl_hline(r.left(), r.bottom(), r.right(), c);
+            gl_line(r.left(), r.top(), r.left(), r.bottom(), c);
+            gl_line(r.right(), r.top(), r.right(), r.bottom(), c);
+        }
+    }
+}
+</pre> Finally, we accelerated that drawing of non-rotated, aliased and opaque rectangles in our reimplementation of the drawRects() function. The QRasterPaintEngine fallback is used whenever the rectangle is not simple enough.<a name="step-3-making-the-widgets-aware-of-the-custom-paint-engine"><h2>Step 3: Making the Widgets Aware of the Custom Paint Engine</h2> To activate the custom paint engine, we also need to implement a corresponding paint device and window surface and make some minor adjustments of the graphics driver. <ul><li> <a href="qws-svgalib.html#implementing-a-custom-paint-device">Implementing a Custom Paint Device</a></li><li> <a href="qws-svgalib.html#implementing-a-custom-window-surface">Implementing a Custom Window Surface</a></li><li> <a href="qws-svgalib.html#adjusting-the-graphics-driver">Adjusting the Graphics Driver</a></li></ul><a name="implementing-a-custom-paint-device"><h3>Implementing a Custom Paint Device</h3> The custom paint device can be derived from the QCustomRasterPaintDevice class. Reimplement its <a href="../../../com/trolltech/qt/gui/QPaintDevice.html#paintEngine()">paintEngine()</a> and memory() functions to activate the accelerated paint engine: <pre class="snippet">
+class SvgalibPaintDevice : public QCustomRasterPaintDevice
+{
+public:
+    SvgalibPaintDevice(QWidget *w);
+    ~SvgalibPaintDevice();
+
+    void* memory() const { return QScreen::instance()-&gt;base(); }
+
+    QPaintEngine *paintEngine() const { return pengine; }
+    int metric(PaintDeviceMetric m) const;
+
+private:
+    SvgalibPaintEngine *pengine;
+};
+</pre> The <a href="../../../com/trolltech/qt/gui/QPaintDevice.html#paintEngine()">paintEngine()</a> function should return an instance of the <tt>SvgalibPaintEngine</tt> class. The memory() function should return a pointer to the buffer which should be used when drawing the widget. <p>Our example driver is rendering directly to the screen without any buffering, i.e., our custom pain device's memory() function returns a pointer to the framebuffer. For this reason, we must also reimplement the <a href="../../../com/trolltech/qt/gui/QPaintDevice.html#metric(com.trolltech.qt.gui.QPaintDevice.PaintDeviceMetric)">metric()</a> function to reflect the metrics of framebuffer.<a name="implementing-a-custom-window-surface"><h3>Implementing a Custom Window Surface</h3> The custom window surface can be derived from the QWSWindowSurface class. QWSWindowSurface manages the memory used when drawing a window. <pre class="snippet">
+class SvgalibSurface : public QWSWindowSurface
+{
+public:
+    SvgalibSurface();
+    SvgalibSurface(QWidget *w);
+    ~SvgalibSurface();
+
+    void setGeometry(const QRect &rect);
+    bool isValid() const { return true; }
+    bool scroll(const QRegion &region, int dx, int dy);
+    QString key() const { return QLatin1String("svgalib"); }
+
+    bool attach(const QByteArray &) { return true; }
+    void detach() {}
+
+    QImage image() const { return QImage(); }
+    QPaintDevice *paintDevice() { return pdevice; }
+    QPoint painterOffset() const;
+
+private:
+    SvgalibPaintDevice *pdevice;
+};
+</pre> We can implement most of the pure virtual functions inherited from QWSWindowSurface as trivial inline functions, except the scroll() function that actually makes use of some hardware acceleration:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+bool SvgalibSurface::scroll(const QRegion &region, int dx, int dy)
+{
+    const QVector&lt;QRect&gt; rects = region.rects();
+    for (int i = 0; i &lt; rects.size(); ++i) {
+        const QRect r = rects.at(i);
+        gl_copybox(r.left(), r.top(), r.width(), r.height(),
+                   r.left() + dx, r.top() + dy);
+    }
+
+    return true;
+}
+</pre><a name="adjusting-the-graphics-driver"><h3>Adjusting the Graphics Driver</h3> Finally, we enable the graphics driver to recognize an instance of our custom window surface:<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QWSWindowSurface* SvgalibScreen::createSurface(QWidget *widget) const
+{
+    if (base()) {
+        static int onScreenPaint = -1;
+        if (onScreenPaint == -1)
+            onScreenPaint = qgetenv("QT_ONSCREEN_PAINT").toInt();
+
+        if (onScreenPaint &gt; 0 || widget-&gt;testAttribute(Qt::WA_PaintOnScreen))
+            return new SvgalibSurface(widget);
+    }
+    return QScreen::createSurface(widget);
+}
+<br>
+QWSWindowSurface* SvgalibScreen::createSurface(const QString &key) const
+{
+    if (key == QLatin1String("svgalib"))
+        return new SvgalibSurface;
+    return QScreen::createSurface(key);
+}
+</pre> The createSurface() functions are factory functions that determines what kind of surface a top-level window is using. In our example we only use the custom surface if the given window has the <a href="../../../com/trolltech/qt/core/Qt.WidgetAttribute.html">Qt::WA_PaintOnScreen</a> attribute or the <a href="qt-embedded-envvars.html">QT_ONSCREEN_PAINT</a> environment variable is set.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

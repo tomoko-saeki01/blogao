@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Qt Jambi Tutorial 7 - One Thing Leads to Another</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Qt Jambi Tutorial 7 - One Thing Leads to Another</h1></center><p>[Previous: <a href="qtjambi-tutorial6.html">Qt Jambi Tutorial 6 - Building Blocks Galore!</a>][<a href="qtjambi-tutorial.html">Qt Jambi Tutorial</a>]<p> <b>Code</b>: <ul><li> <a href="qtjambi-tutorial7-code.html">ConnectedSliders.java</a></li></ul> <br><center><img src="images/tutorial7-example.png"></center><br> This example shows how to create custom widgets with signals and slots, and how to connect them together in more complex ways.<a name="line-by-line-walkthrough"><h2>Line by Line Walkthrough</h2> This file is mainly lifted from <tt>BlocksGalore</tt> in Chapter 6; only the non-trivial changes are noted here. <p>The LCDRange class now includes three members besides the constructor. They make up an interface between this widget and other components in a program. Until now, <tt>LCDRange</tt> didn't really have an API at all. We will examine them as we stumble upon them in the code. <p>This class is for the most part equal to LCDRange from chapter 6, and only the changes are noted here. <pre class="snippet">
+        quit.setFont(new QFont("Times", 18, QFont.Weight.Bold.value()));
+</pre> We have added a private variable that will hold the number in the display. <pre class="snippet">
+        public final Signal1&lt;Integer&gt; valueChanged = new Signal1&lt;Integer&gt;();
+</pre> Here we declare our first custom signal: <tt>valueChanged</tt>. We will emit it whenever the value of the LCD changes. A signal is an instance of one of the signal classes, which are Signal1, Signal2 ... Signal9). The suffix number is equal to the number of arguments of the signal; the types of the arguments must be given as class generics. We want one argument (the value of the LCD display), so we use the Signal1 class with Integers. You already know how to connect to the signal. The signal can be connected to any method that takes an Integer. <p>We move on to the constructor: <pre class="snippet">
+        public LCDRange()
+
+        {
+...
+            slider.valueChanged.connect(lcd, "display(int)");
+
+            slider.valueChanged.connect(valueChanged);
+...
+        }
+</pre> We connect the sliders <tt>valueChanged</tt> signal to our <tt>display()</tt> slot, and to our own <tt>valueChanged</tt> signal. The signal you connect will be triggered by the signal to which it is connected. <p>Let's take a closer look at what happens when the user operates the slider. The slider sees that its value has changed and emits the <a href="../../../com/trolltech/qt/gui/QSlider.html">QSlider</a>.valueChanged signal. That signal is connected both to the <a href="../../../com/trolltech/qt/gui/QLCDNumber.html">QLCDNumber</a>.display() slot and to the <tt>valueChanged</tt> signal of the <tt>LCDRange</tt>. <p>Thus, when the signal is emitted, <tt>LCDRange</tt> emits its own <tt>valueChanged</tt> signal. In addition, <a href="../../../com/trolltech/qt/gui/QLCDNumber.html">QLCDNumber</a>.display() is called and shows the new number. <p>Note that you're not guaranteed any particular order of execution; <tt>LCDRange.valueChanged</tt> may be emitted before or after <a href="../../../com/trolltech/qt/gui/QLCDNumber.html">QLCDNumber</a>.display() is called. <pre class="snippet">
+        public int value()
+        {
+            return value;
+        }
+</pre> The implementation of <tt>value()</tt> is straightforward. It simply returns the slider's value. <pre class="snippet">
+        public void setValue(int value)
+        {
+            slider.setValue(value);
+        }
+</pre> The implementation of <tt>setValue()</tt> is equally straightforward. Note that because the slider and LCD number are connected, setting the slider's value automatically updates the LCD number as well. In addition, the slider will automatically adjust the value if it is outside its legal range. <p>The <tt>ConnectedSlider</tt> class is copied from BlocksGalore in the previous chapter except for the constructor. We examine the changes here: <pre class="snippet">
+        LCDRange previousRange = null;
+
+
+        for (int row = 0; row &lt; 3; ++row) {
+            for (int column = 0; column &lt; 3; ++column) {
+                LCDRange lcdRange = new LCDRange();
+                grid.addWidget(lcdRange, row, column);
+
+            if (previousRange != null)
+                lcdRange.valueChanged.
+                connect(previousRange, "setValue(int)");
+
+                previousRange = lcdRange;
+
+            }
+
+        }
+</pre> When we create the nine <tt>LCDRange</tt> objects, we connect them using the <a href="qtjambi-signalsandslots.html">signals and slots</a> mechanism. Each has its <tt>valueChanged</tt> signal connected to the previous one's <tt>setValue()</tt> slot. Because <tt>LCDRange</tt> emits the <tt>valueChanged</tt> signal when its value changes, we are here creating a chain of signals and slots.<a name="running-the-application"><h2>Running the Application</h2> On startup, the program's appearance is identical to the previous one. Try operating the slider to the bottom-right.<a name="exercises"><h2>Exercises</h2> Use the bottom-right slider to set all LCDs to 50. Then set the top six to 30 by clicking on the slider on the row above. Now, use the one to the left of the last one operated to set the first five LCDs back to 50. <p>Click to the left of the handle on the bottom-right slider. What happens? Why is this the correct behavior?<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>

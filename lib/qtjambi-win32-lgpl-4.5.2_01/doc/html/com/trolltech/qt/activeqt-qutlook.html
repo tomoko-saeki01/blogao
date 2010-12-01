@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Qutlook Example (ActiveQt)</title><link href="classic.css" rel="stylesheet" type="text/css" />
+</head><table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+ <td align="left" valign="top" width="32"> <img src="images/qt-logo.png" align="left" width="32" height="32" border="0" /> </td>
+ <td width="1">&nbsp;&nbsp;</td> <td class="postheader" valign="center"> <a href="qtjambi-index.html"> <font color="#004faf">Home</font></a>&nbsp;&middot; <a href="qtjambi-examples.html"> <font color="#004faf">Examples</font></a>&nbsp; </td>
+ </tr></table><body><p><hr><p><center><h1>Qutlook Example (ActiveQt)</h1></center><p> The Qutlook example demonstrates the use of <a href="activeqt.html">ActiveQt</a> to automate Outlook. The example makes use of the <a href="activeqt-dumpcpp.html">dumpcpp</a> tool to generate a C++ namespace for the type library describing the Outlook Object Model. <p>The project file for the example looks like this:Error parsing snippet.Error parsing snippet.</pre> The project file uses the <tt>dumpcpp</tt> tool to add an MS Outlook type library to the project. If this fails, then the generated makefile will just print an error message, otherwise the build step will now run the dumpcpp tool on the type library, and generate a header and a cpp file (in this case, <tt>msoutl.h</tt> and <tt>msoutl.cpp</tt>) that declares and implement an easy to use API to the Outlook objects. <pre class="snippet">
+class AddressView : public QWidget
+{
+    Q_OBJECT
+
+public:
+    AddressView(QWidget *parent = 0);
+
+protected slots:
+    void addEntry();
+    void changeEntry();
+    void itemSelected(const QModelIndex &index);
+
+    void updateOutlook();
+
+protected:
+    AddressBookModel *model;
+
+    QTreeView *treeView;
+    QPushButton *add, *change;
+    QLineEdit *iFirstName, *iLastName, *iAddress, *iEMail;
+};
+</pre> The AddressView class is a <a href="../../../com/trolltech/qt/gui/QWidget.html">QWidget</a> subclass for the user interface. The <a href="../../../com/trolltech/qt/gui/QTreeView.html">QTreeView</a> widget will display the contents of Outlook's Contact folder as provided by the <tt>model</tt>.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+#include "addressview.h"
+#include "msoutl.h"
+#include &lt;QtGui&gt;
+
+class AddressBookModel : public QAbstractListModel
+{
+public:
+    AddressBookModel(AddressView *parent);
+    ~AddressBookModel();
+
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    int columnCount(const QModelIndex &parent) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+    QVariant data(const QModelIndex &index, int role) const;
+
+    void changeItem(const QModelIndex &index, const QString &firstName, const QString &lastName, const QString &address, const QString &email);
+    void addItem(const QString &firstName, const QString &lastName, const QString &address, const QString &email);
+    void update();
+
+private:
+    Outlook::Application outlook;
+    Outlook::Items * contactItems;
+
+    mutable QHash&lt;QModelIndex, QStringList&gt; cache;
+};
+</pre> The AddressBookModel class is a <a href="../../../com/trolltech/qt/core/QAbstractListModel.html">QAbstractListModel</a> subclass that communicates directly with Outlook, using a QHash for caching.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+
+AddressBookModel::AddressBookModel(AddressView *parent)
+: QAbstractListModel(parent)
+{
+    if (!outlook.isNull()) {
+        Outlook::NameSpace session(outlook.Session());
+        session.Logon();
+        Outlook::MAPIFolder *folder = session.GetDefaultFolder(Outlook::olFolderContacts);
+        contactItems = new Outlook::Items(folder-&gt;Items());
+	connect(contactItems, SIGNAL(ItemAdd(IDispatch*)), parent, SLOT(updateOutlook()));
+	connect(contactItems, SIGNAL(ItemChange(IDispatch*)), parent, SLOT(updateOutlook()));
+	connect(contactItems, SIGNAL(ItemRemove()), parent, SLOT(updateOutlook()));    
+
+        delete folder;
+    }
+}
+
+</pre> The constructor initializes Outlook. The various signals Outlook provides to notify about contents changes are connected to the <tt>updateOutlook()</tt> slot.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+AddressBookModel::~AddressBookModel()
+{
+    delete contactItems;
+
+    if (!outlook.isNull())
+        Outlook::NameSpace(outlook.Session()).Logoff();
+}
+
+</pre> The destructor logs off from the session.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+int AddressBookModel::rowCount(const QModelIndex &) const
+{
+    return contactItems ? contactItems-&gt;Count() : 0;
+}
+
+int AddressBookModel::columnCount(const QModelIndex &parent) const
+{
+    return 4;
+}
+
+</pre> The <tt>rowCount()</tt> implementation returns the number of entries as reported by Outlook. <tt>columnCount</tt> and <tt>headerData</tt> are implemented to show four columns in the tree view.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QVariant AddressBookModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (role != Qt::DisplayRole)
+        return QVariant();
+
+    switch (section) {
+    case 0:
+        return tr("First Name");
+    case 1:
+        return tr("Last Name");
+    case 2:
+        return tr("Address");
+    case 3:
+        return tr("Email");
+    default:
+        break;
+    }
+
+    return QVariant();
+}
+
+</pre> The <tt>headerData()</tt> implementation returns hardcoded strings.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+QVariant AddressBookModel::data(const QModelIndex &index, int role) const
+{
+    if (!index.isValid() || role != Qt::DisplayRole)
+        return QVariant();
+
+    QStringList data;
+    if (cache.contains(index)) {
+        data = cache.value(index);
+    } else {
+        Outlook::ContactItem contact(contactItems-&gt;Item(index.row() + 1));
+        data &lt;&lt; contact.FirstName() &lt;&lt; contact.LastName() &lt;&lt; contact.HomeAddress() &lt;&lt; contact.Email1Address();
+        cache.insert(index, data);
+    }
+
+    if (index.column() &lt; data.count())
+        return data.at(index.column());
+
+    return QVariant();
+}
+
+</pre> The <tt>data()</tt> implementation is the core of the model. If the requested data is in the cache the cached value is used, otherwise the data is acquired from Outlook.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void AddressBookModel::changeItem(const QModelIndex &index, const QString &firstName, const QString &lastName, const QString &address, const QString &email)
+{
+    Outlook::ContactItem item(contactItems-&gt;Item(index.row() + 1));
+
+    item.SetFirstName(firstName);
+    item.SetLastName(lastName);
+    item.SetHomeAddress(address);
+    item.SetEmail1Address(email);
+
+    item.Save();
+
+    cache.take(index);
+}
+
+</pre> The <tt>changeItem()</tt> slot is called when the user changes the current entry using the user interface. The Outlook item is accessed using the Outlook API, and is modified using the property setters. Finally, the item is saved to Outlook, and removed from the cache. Note that the model does not signal the view of the data change, as Outlook will emit a signal on its own.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void AddressBookModel::addItem(const QString &firstName, const QString &lastName, const QString &address, const QString &email)
+{
+    Outlook::ContactItem item(outlook.CreateItem(Outlook::olContactItem));
+    if (!item.isNull()) {
+        item.SetFirstName(firstName);
+        item.SetLastName(lastName);
+        item.SetHomeAddress(address);
+        item.SetEmail1Address(email);
+
+        item.Save();
+    }
+}
+
+</pre> The <tt>addItem()</tt> slot calls the CreateItem method of Outlook to create a new contact item, sets the properties of the new item to the values entered by the user and saves the item.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+void AddressBookModel::update()
+{
+    cache.clear();
+
+    emit reset();
+}
+
+
+</pre> The <tt>update()</tt> slot clears the cache, and emits the <a href="../../../com/trolltech/qt/core/QTextStream.html#reset()">reset()</a> signal to notify the view about the data change requiring a redraw of the contents.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+AddressView::AddressView(QWidget *parent)
+: QWidget(parent)
+{
+    QGridLayout *mainGrid = new QGridLayout(this);
+
+    QLabel *liFirstName = new QLabel("First &Name", this);
+    liFirstName-&gt;resize(liFirstName-&gt;sizeHint());
+    mainGrid-&gt;addWidget(liFirstName, 0, 0);
+
+    QLabel *liLastName = new QLabel("&Last Name", this);
+    liLastName-&gt;resize(liLastName-&gt;sizeHint());
+    mainGrid-&gt;addWidget(liLastName, 0, 1);
+
+    QLabel *liAddress = new QLabel("Add&ress", this);
+    liAddress-&gt;resize(liAddress-&gt;sizeHint());
+    mainGrid-&gt;addWidget(liAddress, 0, 2);
+
+    QLabel *liEMail = new QLabel("&E-Mail", this);
+    liEMail-&gt;resize(liEMail-&gt;sizeHint());
+    mainGrid-&gt;addWidget(liEMail, 0, 3);
+
+    add = new QPushButton("A&dd", this);
+    add-&gt;resize(add-&gt;sizeHint());
+    mainGrid-&gt;addWidget(add, 0, 4);
+    connect(add, SIGNAL(clicked()), this, SLOT(addEntry()));
+
+    iFirstName = new QLineEdit(this);
+    iFirstName-&gt;resize(iFirstName-&gt;sizeHint());
+    mainGrid-&gt;addWidget(iFirstName, 1, 0);
+    liFirstName-&gt;setBuddy(iFirstName);
+
+    iLastName = new QLineEdit(this);
+    iLastName-&gt;resize(iLastName-&gt;sizeHint());
+    mainGrid-&gt;addWidget(iLastName, 1, 1);
+    liLastName-&gt;setBuddy(iLastName);
+
+    iAddress = new QLineEdit(this);
+    iAddress-&gt;resize(iAddress-&gt;sizeHint());
+    mainGrid-&gt;addWidget(iAddress, 1, 2);
+    liAddress-&gt;setBuddy(iAddress);
+
+    iEMail = new QLineEdit(this);
+    iEMail-&gt;resize(iEMail-&gt;sizeHint());
+    mainGrid-&gt;addWidget(iEMail, 1, 3);
+    liEMail-&gt;setBuddy(iEMail);
+
+    change = new QPushButton("&Change", this);
+    change-&gt;resize(change-&gt;sizeHint());
+    mainGrid-&gt;addWidget(change, 1, 4);
+    connect(change, SIGNAL(clicked()), this, SLOT(changeEntry()));
+
+    treeView = new QTreeView(this);
+    treeView-&gt;setSelectionMode(QTreeView::SingleSelection);
+    treeView-&gt;setRootIsDecorated(false);
+
+    model = new AddressBookModel(this);
+    treeView-&gt;setModel(model);
+
+    connect(treeView-&gt;selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(itemSelected(QModelIndex)));
+
+    mainGrid-&gt;addWidget(treeView, 2, 0, 1, 5);
+}
+
+void AddressView::updateOutlook()
+{
+    model-&gt;update();
+}
+
+void AddressView::addEntry()
+{
+    if (!iFirstName-&gt;text().isEmpty() || !iLastName-&gt;text().isEmpty() ||
+         !iAddress-&gt;text().isEmpty() || !iEMail-&gt;text().isEmpty()) {
+        model-&gt;addItem(iFirstName-&gt;text(), iFirstName-&gt;text(), iAddress-&gt;text(), iEMail-&gt;text());
+    }
+
+    iFirstName-&gt;setText("");
+    iLastName-&gt;setText("");
+    iAddress-&gt;setText("");
+    iEMail-&gt;setText("");
+}
+
+void AddressView::changeEntry()
+{
+    QModelIndex current = treeView-&gt;currentIndex();
+
+    if (current.isValid())
+        model-&gt;changeItem(current, iFirstName-&gt;text(), iLastName-&gt;text(), iAddress-&gt;text(), iEMail-&gt;text());
+}
+
+
+void AddressView::itemSelected(const QModelIndex &index)
+{
+    if (!index.isValid())
+	return;
+
+    QAbstractItemModel *model = treeView-&gt;model();
+    iFirstName-&gt;setText(model-&gt;data(model-&gt;index(index.row(), 0)).toString());
+    iLastName-&gt;setText(model-&gt;data(model-&gt;index(index.row(), 1)).toString());
+    iAddress-&gt;setText(model-&gt;data(model-&gt;index(index.row(), 2)).toString());
+    iEMail-&gt;setText(model-&gt;data(model-&gt;index(index.row(), 3)).toString());
+}
+</pre> The rest of the file implements the user interface using only Qt APIs, i.e. without communicating with Outlook directly.<br><br>The following code example is written in c++.<br> <pre class="snippet">
+#include "addressview.h"
+#include &lt;QApplication&gt;
+
+int main(int argc, char ** argv)
+{
+    QApplication a(argc, argv);
+
+    AddressView view;
+    view.setWindowTitle("Qt Example - Looking at Outlook");
+    view.show();
+
+    return a.exec();
+}
+</pre> The <tt>main()</tt> entry point function finally instantiates the user interface and enters the event loop. <p>To build the example you must first build the <a href="qaxcontainer.html">QAxContainer</a> library. Then run your make tool in <tt>examples/activeqt/qutlook</tt> and run the resulting <tt>qutlook.exe</tt>.<p /><address><hr /><div align="center">
+ <table width="100%" cellspacing="0" border="0"><tr class="address">
+ <td width="30%">Copyright &copy; 2009 Nokia Corporation and/or its subsidiary(-ies)</td>
+ <td width="40%" align="center"><a href="trademarks.html">Trademarks</a></td>
+ <td width="30%" align="right"><div align="right">Qt Jambi 4.5.2_01</div></td>
+ </tr></table></div></address></body></html>
