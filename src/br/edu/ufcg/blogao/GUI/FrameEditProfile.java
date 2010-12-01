@@ -2,6 +2,7 @@ package br.edu.ufcg.blogao.GUI;
 
 import br.edu.ufcg.blogao.webservice.BlogWS;
 
+import com.trolltech.qt.core.QDate;
 import com.trolltech.qt.gui.QComboBox;
 import com.trolltech.qt.gui.QFont;
 import com.trolltech.qt.gui.QIcon;
@@ -17,7 +18,7 @@ public class FrameEditProfile extends QWidget {
 			moviesLabel, musicsLabel, booksLabel, whoIAmLabel, sexLabel,
 			dateBirthdayLabel;
 
-	private QLineEdit nameField, addressField, dateBirthdayField;
+	private QLineEdit nameField, addressField;
 
 	private QTextEdit interestsField, moviesField, musicsField, booksField,
 			whoIAmField;
@@ -38,6 +39,33 @@ public class FrameEditProfile extends QWidget {
 	private void actionsObjects() {
 		refreshButton.clicked.connect(this, "refreshProfile()");
 		cancelButton.clicked.connect(this, "closeFrame()");
+	}
+	
+	private void createComboDay() {
+		for (int i = 1; i <= 31; i++) {
+			String d = "" + i;
+			if ( d.length() < 2) {
+				d = "0" + d;
+			}
+			dayCombo.addItem(d);
+		}
+	}
+
+	private void createComboMonth() {
+		for (int i = 1; i <= 12; i++) {
+			String d = "" + i;
+			if ( d.length() < 2) {
+				d = "0" + d;
+			}
+			monthCombo.addItem(d);
+		}
+	}
+
+	private void createComboYear() {
+		int currentYear = QDate.currentDate().year();
+		for (int i = currentYear; i >= 1960; i--) {
+			yearCombo.addItem("" + i);
+		}
 	}
 
 	private void closeFrame() {
@@ -62,7 +90,6 @@ public class FrameEditProfile extends QWidget {
 			String musics = container.getBlog().getProfileInformationBySessionId(container.getActualSession(), container.MUSICS);
 			String books = container.getBlog().getProfileInformationBySessionId(container.getActualSession(), container.BOOKS);
 			String name = container.getBlog().getProfileInformationBySessionId(container.getActualSession(), container.NAME);
-			String birthDate = container.getBlog().getProfileInformationBySessionId(container.getActualSession(), container.DATE_BIRTHDAY);
 			String address = container.getBlog().getProfileInformationBySessionId(container.getActualSession(), container.ADDRESS);
 			String whoIAm = container.getBlog().getProfileInformationBySessionId(container.getActualSession(), container.WHO_I_AM);
 			String sex = container.getBlog().getProfileInformationBySessionId(container.getActualSession(), container.SEX);
@@ -72,7 +99,6 @@ public class FrameEditProfile extends QWidget {
 			musicsField.setText(musics);
 			booksField.setText(books);
 			nameField.setText(name);
-			dateBirthdayField.setText(birthDate);
 			addressField.setText(address);
 			whoIAmField.setText(whoIAm);
 			
@@ -117,7 +143,15 @@ public class FrameEditProfile extends QWidget {
 		dateBirthdayLabel = new QLabel("Data de Nascimento", this);
 		dateBirthdayLabel.setFont(new QFont("Tempus Sans ITC", 11));
 
-		dateBirthdayField = new QLineEdit(this);
+		dayCombo = new QComboBox(this);
+		createComboDay();
+
+		monthCombo = new QComboBox(this);
+		createComboMonth();
+
+		yearCombo = new QComboBox(this);
+		createComboYear();
+		
 		nameField = new QLineEdit(this);
 		addressField = new QLineEdit(this);
 
@@ -167,7 +201,9 @@ public class FrameEditProfile extends QWidget {
 		booksLabel.move(w + 750, h + 8);
 
 		nameField.move(w + 50, h);
-		dateBirthdayField.move(w + 140, h + 37);
+		dayCombo.move(w + 140, h + 37);
+		monthCombo.move(w + 180, h +37);
+		yearCombo.move(w + 220, h + 37);
 		sexCombo.move(w + 50, h + 74);
 		addressField.move(w + 70, h + 111);
 		whoIAmField.move(w + 50, h + 200);
@@ -217,7 +253,6 @@ public class FrameEditProfile extends QWidget {
 			closeFrame();
 		} catch (Exception e) {
 			displayMessageErro("Erro", e.getMessage());
-			// TODO achar o modo certo de limpar o campo certo!
 		}
 	}
 
