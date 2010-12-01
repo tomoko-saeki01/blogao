@@ -13,6 +13,7 @@ public class FrameContainer {
 	private FrameUserPage frameUser;
 	private FramePostCreation frameCreationPost;
 	private FrameEditBlog frameEditBlog;
+	private FrameCommentCreation frameCreationComment;
 	private QGridLayout layout;
 
 	private BlogWS blog = HelperClient.getInstance("http://localhost:8080/blogao");
@@ -61,6 +62,10 @@ public class FrameContainer {
 	public FrameBlog getActualBlogFrame() {
 
 		return frameBlog;
+	}
+	
+	public FrameCommentCreation getActualCreationCommentFrame()  {
+		return frameCreationComment;
 	}
 	
 	public FrameBlogCreation getActualCreationBlogFrame() {
@@ -112,6 +117,11 @@ public class FrameContainer {
 	public FrameBlog getNewBlogFrame() {
 		frameBlog = new FrameBlog();
 		return frameBlog;
+	}
+	
+	public FrameCommentCreation getNewCreationCommentFrame() {
+		frameCreationComment = new FrameCommentCreation();
+		return frameCreationComment;
 	}
 
 	public FrameBlogCreation getNewCreationBlogFrame() {
