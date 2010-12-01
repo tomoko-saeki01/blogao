@@ -25,6 +25,6 @@ public class Blogao {
 //		HelperServer.startServer("http://localhost:8080/blogao");
 		
 		// Este link abaixo eh pra rodar testando em Soberba
-		HelperServer.startServer("http://150.165.75.129:8080/blogao");
+		HelperServer.startServer("http://150.165.75.129:9913/blogao");
 	}
 }
