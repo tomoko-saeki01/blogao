@@ -21,6 +21,10 @@ public class Blogao {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		HelperServer.startServer("http://localhost:8080/blogao");
+		// O link pra rodar localmente em um computador eh este abaixo.
+//		HelperServer.startServer("http://localhost:8080/blogao");
+		
+		// Este link abaixo eh pra rodar testando em Soberba
+		HelperServer.startServer("http://150.165.75.129:8080/blogao");
 	}
 }
