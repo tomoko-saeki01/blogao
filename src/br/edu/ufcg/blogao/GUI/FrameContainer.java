@@ -17,8 +17,7 @@ public class FrameContainer {
 	private QGridLayout layout;
 
 	private BlogWS blog = HelperClient.getInstance("http://localhost:8080/blogao");
-	public String sessionId;
-	private String currentBlogId;
+	public String sessionId, postId, currentBlogId;
 	
 	public final String PASSWORD = "senha";
 	public final String LOGIN = "login";
@@ -100,6 +99,10 @@ public class FrameContainer {
 		return framePostCreation;
 	}
 
+	public String getActualPostId() {
+		return postId;
+	}
+	
 	public BlogWS getBlog() {
 		return blog;
 	}
@@ -153,19 +156,21 @@ public class FrameContainer {
 		frameUser = new FrameUserPage();
 		return frameUser;
 	}
-
-	public void setActualSession(String id) {
-		this.sessionId = id;
-	}
 	
 	public void setCurrentBlogId(String id) {
 		this.currentBlogId = id;
 	}
 
+	public void setActualPostId(String id){
+		this.postId = id;
+	}
+	
+	public void setActualSession(String id) {
+		this.sessionId = id;
+	}
+	
 	public FramePostCreation getNewPostCreationFrame() {
 		framePostCreation = new FramePostCreation();
 		return framePostCreation;
 	}
-
-	
 }
