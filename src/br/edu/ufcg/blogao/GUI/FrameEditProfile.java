@@ -83,13 +83,10 @@ public class FrameEditProfile extends QWidget {
 			} else {
 				sexCombo.setCurrentIndex(0);
 			}
-			
-			
-			
 		} catch (Exception e) {
-			// TODO: handle exception
+			displayMessageErro("Erro", "A página não pôde ser carregada. Tente novamente.");
+			closeFrame();
 		}
-		
 	}
 	
 	private void init() {
@@ -193,7 +190,7 @@ public class FrameEditProfile extends QWidget {
 		String musics = musicsField.toPlainText();
 		String books = booksField.toPlainText();
 		String sex = sexCombo.currentText();
-		//TODO fix it!s
+		//TODO fix it!
 		String dateB = ""; // = dateBirthday.text();
 		
 		if (sex.trim().equals("")) {
@@ -201,7 +198,6 @@ public class FrameEditProfile extends QWidget {
 		}
 
 		try {
-			//TODO procurar o motivo de nao atualizar e dar sempre erro!
 			BlogWS blog = container.getBlog();
 			String login = container.getActualSession();
 			blog.changeProfileInformation(login, container.NAME, name);
