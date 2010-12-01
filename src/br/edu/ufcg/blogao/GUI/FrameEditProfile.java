@@ -22,7 +22,7 @@ public class FrameEditProfile extends QWidget {
 	private QTextEdit interestsField, moviesField, musicsField, booksField,
 			whoIAmField;
 
-	private QComboBox sexCombo;
+	private QComboBox sexCombo, dayCombo, monthCombo, yearCombo;
 	private QPushButton refreshButton, cancelButton;
 	private FrameContainer container = FrameContainer.getInstance();
 
@@ -190,8 +190,9 @@ public class FrameEditProfile extends QWidget {
 		String musics = musicsField.toPlainText();
 		String books = booksField.toPlainText();
 		String sex = sexCombo.currentText();
-		//TODO fix it!
-		String dateB = ""; // = dateBirthday.text();
+		String dateB = dayCombo.currentText() + "/" + 
+		   monthCombo.currentText() + "/" +
+		   yearCombo.currentText(); 
 		
 		if (sex.trim().equals("")) {
 			sex = "Não informado";
