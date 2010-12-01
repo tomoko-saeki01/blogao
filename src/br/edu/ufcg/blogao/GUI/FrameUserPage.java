@@ -10,8 +10,10 @@ import com.trolltech.qt.gui.QWidget;
 public class FrameUserPage extends QWidget {
 
 	private QComboBox blogs;
+
 	private QPushButton createBlogButton, cancelButton, editProfileButton,
-			goToBlog, deleteBlog, deleteProfileButton;
+			goToBlog, deleteBlog, deleteProfileButton, editBlog;
+
 	private QLabel blogsLabel, dataLabel;
 
 	private FrameContainer container = FrameContainer.getInstance();
@@ -30,7 +32,11 @@ public class FrameUserPage extends QWidget {
 		createBlogButton.clicked.connect(this, "createBlog()");
 		editProfileButton.clicked.connect(this, "openEditProfile()");
 		deleteBlog.clicked.connect(this, "deleteBlog()");
+
+		editBlog.clicked.connect(this, "editBlog()");
+
 		deleteProfileButton.clicked.connect(this, "deleteProfile()");
+
 	}
 
 	private void closeFrame() {
@@ -49,6 +55,20 @@ public class FrameUserPage extends QWidget {
 		close();
 		container.getLayout().removeWidget(container.getActualUserFrame());
 		container.getLayout().addWidget(container.getNewCreationBlogFrame());
+	}
+	
+	@SuppressWarnings("unused")
+	private void editBlog() {
+		close();
+		try {
+			String blogId = container.getBlog().getBlogBySessionId(container.getActualSession(), blogs.currentIndex()).toString();
+			container.setCurrentBlogId(blogId);
+			container.getLayout().removeWidget(container.getActualUserFrame());
+			container.getLayout().addWidget(container.getNewEditBlogFrame());
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
 	}
 
 	@SuppressWarnings("unused")
@@ -74,6 +94,7 @@ public class FrameUserPage extends QWidget {
 		}
 	}
 
+
 	@SuppressWarnings("unused")
 	private void deleteProfile() throws Exception {
 		try {
@@ -83,6 +104,7 @@ public class FrameUserPage extends QWidget {
 		} catch (Exception e) {
 			displayMessageErro("Erro", "Perfil não pôde ser deletado.");
 		}
+
 	}
 	
 	private void displayMessageErro(String title, String message) {
@@ -107,6 +129,11 @@ public class FrameUserPage extends QWidget {
 
 		deleteBlog = new QPushButton("Deletar", this);
 		deleteBlog.setIcon(new QIcon("pictures/wrong.png"));
+
+		
+		editBlog = new QPushButton("Editar", this);
+		editBlog.setIcon(new QIcon("pictures/edit.png"));
+		
 
 		blogsLabel = new QLabel("Blogs:", this);
 		dataLabel = new QLabel("Dados", this);
@@ -151,6 +178,7 @@ public class FrameUserPage extends QWidget {
 		editProfileButton.maximumSize();
 		deleteBlog.maximumSize();
 		goToBlog.maximumSize();
+		editBlog.maximumSize();
 		blogs.resize(150, 20);
 		deleteProfileButton.maximumSize();
 	}
@@ -168,5 +196,6 @@ public class FrameUserPage extends QWidget {
 		deleteBlog.move(w + 200, h + 190);
 		blogsLabel.move(w + 80, h + 120);
 		dataLabel.move(w + 80, h + 20);
+		editBlog.move(w + 300, h + 190);
 	}
 }
