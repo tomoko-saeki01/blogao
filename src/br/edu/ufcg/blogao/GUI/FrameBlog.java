@@ -30,9 +30,9 @@ public class FrameBlog extends QWidget {
 		cancelButton.clicked.connect(this, "closeFrame()");
 	}
 
+	@SuppressWarnings("unused")
 	private void createPost() {
 		try {
-
 			close();
 			container.getLayout().removeWidget(container.getActualBlogFrame());
 			container.getLayout().addWidget(container.getNewPostCreationFrame());
@@ -41,9 +41,9 @@ public class FrameBlog extends QWidget {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	private void closeFrame() {
 		close();
-		//TODO fix it!
 		container.getLayout().removeWidget(container.getActualBlogFrame());
 		container.getLayout().addWidget(container.getNewUserFrame());
 	}
