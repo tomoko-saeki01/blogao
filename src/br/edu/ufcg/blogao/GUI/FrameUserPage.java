@@ -70,7 +70,7 @@ public class FrameUserPage extends QWidget {
 			blogs.clear();
 			getUserData();
 		} catch (Exception e) {
-			// TODO: handle exception
+			displayMessageErro("Erro", "O blog não pôde ser deletado. Tente novamente");
 		}
 	}
 

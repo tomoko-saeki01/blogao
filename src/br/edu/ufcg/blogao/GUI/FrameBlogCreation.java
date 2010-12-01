@@ -40,19 +40,18 @@ public class FrameBlogCreation extends QWidget {
 			nameField.clear();
 		} else {
 			try {
-				//TODO it.
 				container.getBlog().createBlog(container.getActualSession(), name, description);
 				displayMessageInformation("Informação", "Blog criado com sucesso!");
 				closeFrame();
 			} catch (Exception e) {
-				//TODO it.
+				displayMessageErro("Erro", "O blog não pôde ser criado. Tente novamente.");
+				closeFrame();
 			}
 		}
 	}
 
 	private void closeFrame() {
 		close();
-		//TODO fix it!
 		container.getLayout().removeWidget(container.getActualCreationBlogFrame());
 		container.getLayout().addWidget(container.getNewUserFrame());
 	}
